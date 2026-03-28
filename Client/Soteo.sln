@@ -1,0 +1,43 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo", "Soteo.csproj", "{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServer", "..\AuthServer\AuthServer.csproj", "{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterServer", "..\MasterServer\MasterServer.csproj", "{82665651-6B81-4156-9BCF-BB7CC5CDFA9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "..\Shared\Shared.csproj", "{C2443568-2C0A-4C9C-8B7C-BD991DAC094A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+	Debug|Any CPU = Debug|Any CPU
+	ExportDebug|Any CPU = ExportDebug|Any CPU
+	ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{82665651-6B81-4156-9BCF-BB7CC5CDFA9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82665651-6B81-4156-9BCF-BB7CC5CDFA9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82665651-6B81-4156-9BCF-BB7CC5CDFA9C}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82665651-6B81-4156-9BCF-BB7CC5CDFA9C}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{82665651-6B81-4156-9BCF-BB7CC5CDFA9C}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{82665651-6B81-4156-9BCF-BB7CC5CDFA9C}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{C2443568-2C0A-4C9C-8B7C-BD991DAC094A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2443568-2C0A-4C9C-8B7C-BD991DAC094A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2443568-2C0A-4C9C-8B7C-BD991DAC094A}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2443568-2C0A-4C9C-8B7C-BD991DAC094A}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{C2443568-2C0A-4C9C-8B7C-BD991DAC094A}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2443568-2C0A-4C9C-8B7C-BD991DAC094A}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+EndGlobal

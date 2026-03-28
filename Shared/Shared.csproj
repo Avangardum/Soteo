@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <RootNamespace>Soteo.Shared</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Folder Include="Messages\PlayerShard\" />
+    </ItemGroup>
+
+</Project>

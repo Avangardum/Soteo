@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/LogIn.cs" type="Script" id=1]
+
+[node name="LogIn" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+
+[node name="Email" type="LineEdit" parent="."]
+margin_left = 360.0
+margin_top = 220.0
+margin_right = 630.0
+margin_bottom = 255.0
+
+[node name="Password" type="LineEdit" parent="."]
+margin_left = 360.0
+margin_top = 280.0
+margin_right = 630.0
+margin_bottom = 315.0
+
+[node name="Player" type="Button" parent="."]
+margin_left = 380.0
+margin_top = 345.0
+margin_right = 600.0
+margin_bottom = 390.0
+text = "Player"
+
+[node name="Shard" type="Button" parent="."]
+margin_left = 380.0
+margin_top = 415.0
+margin_right = 600.0
+margin_bottom = 460.0
+text = "Shard"
+
+[node name="HTTPRequest" type="HTTPRequest" parent="."]
+timeout = 5.0
+
+[connection signal="button_up" from="Player" to="." method="OnPlayerButtonUp"]
+[connection signal="button_up" from="Shard" to="." method="OnShardButtonUp"]
+[connection signal="request_completed" from="HTTPRequest" to="." method="OnRequestCompleted"]
