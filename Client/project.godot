@@ -14,6 +14,12 @@ config/name="Soteo"
 run/main_scene="res://Scenes/LogIn.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+MasterServerLink="*res://Scripts/MasterServerLink.cs"
+AsyncExceptionCollector="*res://Scripts/AsyncExceptionCollector.cs"
+ServiceProvider="*res://Scripts/ServiceProvider.cs"
+
 [gui]
 
 common/drop_mouse_on_gui_input_disabled=true

@@ -1,6 +1,8 @@
 using Soteo.MasterServer;
 using Soteo.MasterServer.GameState.Repositories;
 using Soteo.MasterServer.Interfaces;
+using Soteo.Shared.Interfaces;
+using Soteo.Shared.MessageSerializers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +22,7 @@ builder.Services.AddSingleton<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<ICharacterRepository, CharacterRepository>();
 builder.Services.AddSingleton<IMessageSender, WebSocketMessageSender>();
 builder.Services.AddSingleton<IDispatcher, Dispatcher>();
+builder.Services.AddSingleton<IMessageSerializer, UniversalMessageSerializer>();
 
 foreach (Type type in TypeLocator.MessageHandlerTypes.Values) builder.Services.AddTransient(type);
 

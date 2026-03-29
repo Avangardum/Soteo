@@ -10,7 +10,8 @@ public sealed class CharacterRecalledMessageHandler(ICharacterRepository charact
     protected override void Handle(CharacterRecalledMessage message, User sender)
     {
         characterRepository.TryGetValue(message.CharacterId, out Character? character);
-        Validate(sender.IsShard && character?.ShardId == sender.Id);
+        Validate(sender.IsShard, "Only shards can recall characters");
+        Validate(character?.ShardId == sender.Id, "Character is not in this shard");
         character.ShardId = Guid.Empty;
     }
 }

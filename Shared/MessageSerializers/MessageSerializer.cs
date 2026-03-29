@@ -39,7 +39,7 @@ public abstract class MessageSerializer<TMessage> : IMessageSerializer
     public TMessage Deserialize(Span<byte> bytes)
     {
         TMessage result = DeserializeInternal(ref bytes);
-        if (!bytes.IsEmpty) throw new InvalidMessageException();
+        if (!bytes.IsEmpty) throw new BadMessageException("Message contains extra bytes");
         return result;
     }
     
@@ -47,14 +47,14 @@ public abstract class MessageSerializer<TMessage> : IMessageSerializer
     {
         var message = new TMessage();
         var type = DeserializeEnum<MessageType>(ref span);
-        if (type != message.Type) throw new InvalidMessageException();
+        if (type != message.Type) throw new InvalidOperationException("Wrong serializer");
         message.CorrelationId = DeserializeGuid(ref span);
         return message;
     }
     
     protected Span<byte> SliceOff(int count, ref Span<byte> span)
     {
-        if (count > span.Length) throw new InvalidMessageException();
+        if (count > span.Length) throw new BadMessageException("Message is missing bytes");
         Span<byte> result = span[..count];
         span = span[count..];
         return result;
@@ -108,7 +108,7 @@ public abstract class MessageSerializer<TMessage> : IMessageSerializer
     {
         TEnum value = DeserializeEnumWithoutValidation<TEnum>(ref span);
         if (!Enum.IsDefined(typeof(TEnum), value) && !typeof(TEnum).HasAttribute<FlagsAttribute>())
-            throw new InvalidMessageException();
+            throw new BadMessageException("Invalid enum value");
         return value;
     }
     
@@ -131,7 +131,7 @@ public abstract class MessageSerializer<TMessage> : IMessageSerializer
     {
         int length = DeserializeInt(ref span);
         int maxLength = span.Length / SizeOf<TElement>();
-        if (length < 0 || length > maxLength) throw new InvalidMessageException();
+        if (length < 0 || length > maxLength) throw new BadMessageException("Invalid array length");
         var result = new TElement[length];
         for (int i = 0; i < length; i++) result[i] = deserializeValue(ref span);
         return result;
@@ -151,7 +151,7 @@ public abstract class MessageSerializer<TMessage> : IMessageSerializer
     protected string DeserializeString(ref Span<byte> span)
     {
         int byteCount = DeserializeInt(ref span);
-        if (byteCount < 0 || byteCount > span.Length) throw new InvalidMessageException();
+        if (byteCount < 0 || byteCount > span.Length) throw new BadMessageException("Invalid string length");
         Span<byte> slice = SliceOff(byteCount, ref span);
         return Encoding.UTF8.GetString(slice);
     }

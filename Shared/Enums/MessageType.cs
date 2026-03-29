@@ -3,7 +3,8 @@ namespace Soteo.Shared.Enums;
 public enum MessageType : byte
 {
     Ok,
-    InvalidMessage,
+    BadInput,
+    InternalServerError,
     SpawnCharacter,
     CharacterRecalled,
     WebrtcSdp,

@@ -10,7 +10,8 @@ public sealed class WebrtcSdpMessageHandler(IMessageSender messageSender, IUserR
     public override async Task HandleAsync(WebrtcSdpMessage message, User sender)
     {
         if (!userRepo.TryGetValue(message.PeerId, out User? receiver)) return;
-        Validate(sender.IsPlayer && receiver.IsShard || sender.IsShard && receiver.IsPlayer);
+        Validate(sender.IsPlayer && receiver.IsShard || sender.IsShard && receiver.IsPlayer,
+            "WebRTC signaling can only happen between a player and a shard");
         await messageSender.RelayFromAsync(message, sender.Id);
     }
 }

@@ -5,11 +5,18 @@ namespace Soteo.Client;
 
 public static class TaskExtensions
 {
-    extension (Task task)
+    extension (Task self)
     {
-        public void PrintException()
+        public async void CollectException()
         {
-            task.ContinueWith(_ => { if (task.IsFaulted) GD.Print(task.Exception); });
+            try
+            {
+                await self;
+            }
+            catch (Exception e)
+            {
+                AsyncExceptionCollector.Collect(e);
+            }
         }
     }
 }

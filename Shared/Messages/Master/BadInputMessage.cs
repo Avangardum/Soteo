@@ -4,5 +4,8 @@ using Soteo.Shared.Messages.Shared;
 
 namespace Soteo.Shared.Messages.Master;
 
-[MessageType(MessageType.InvalidMessage)]
-public sealed record InvalidMessageMessage : Message;
+[MessageType(MessageType.BadInput)]
+public sealed record BadInputMessage : Message
+{
+    public string Reason { get; set; } = "";
+}

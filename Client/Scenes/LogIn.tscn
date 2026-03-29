@@ -12,30 +12,20 @@ margin_left = 360.0
 margin_top = 220.0
 margin_right = 630.0
 margin_bottom = 255.0
+text = "admin@example.com"
 
 [node name="Password" type="LineEdit" parent="."]
 margin_left = 360.0
 margin_top = 280.0
 margin_right = 630.0
 margin_bottom = 315.0
+text = "Admin_0"
 
 [node name="Player" type="Button" parent="."]
 margin_left = 380.0
 margin_top = 345.0
 margin_right = 600.0
 margin_bottom = 390.0
-text = "Player"
-
-[node name="Shard" type="Button" parent="."]
-margin_left = 380.0
-margin_top = 415.0
-margin_right = 600.0
-margin_bottom = 460.0
-text = "Shard"
-
-[node name="HTTPRequest" type="HTTPRequest" parent="."]
-timeout = 5.0
+text = "Log in"
 
 [connection signal="button_up" from="Player" to="." method="OnPlayerButtonUp"]
-[connection signal="button_up" from="Shard" to="." method="OnShardButtonUp"]
-[connection signal="request_completed" from="HTTPRequest" to="." method="OnRequestCompleted"]

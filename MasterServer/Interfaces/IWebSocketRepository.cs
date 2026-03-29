@@ -1,8 +1,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Net.WebSockets;
+using Soteo.Shared.Attributes;
 
 namespace Soteo.MasterServer.Interfaces;
 
+/// <summary>
+/// Stores users' WebSocket instances. Thread safe.
+/// </summary>
 public interface IWebSocketRepository
 {
     bool TryGet(Guid userId, [NotNullWhen(true)] out WebSocket? ws);

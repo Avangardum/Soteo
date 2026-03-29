@@ -10,15 +10,12 @@ using Soteo.Shared.Enums;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Messages.Master;
-using Soteo.Shared.MessageSerializers;
+using Soteo.Shared.Messages.Shared;
 
 namespace Soteo.MasterServer.Controllers;
 
 public sealed class WebSocketController : Controller
 {
-    private readonly HandshakeMessageSerializer _handshakeMessageSerializer =
-        (HandshakeMessageSerializer)TypeLocator.MessageSerializers[MessageType.Handshake];
-
     private readonly IServiceProvider _requestServiceProvider;
     private readonly IMessageSender _messageSender;
     private readonly IWebSocketRepository _wsRepo;
@@ -30,6 +27,8 @@ public sealed class WebSocketController : Controller
     private DispatcherPriority _priority = DispatcherPriority.PlayerMessage;
     private readonly byte[] _receiveBuffer = new byte[1024];
     private WebSocket? _ws;
+    private IMessageSerializer _messageSerializer;
+    private ILogger<WebSocketController> _logger;
 
     public WebSocketController
     (
@@ -38,7 +37,9 @@ public sealed class WebSocketController : Controller
         IWebSocketRepository wsRepo,
         IUserRepository userRepo,
         IDispatcher dispatcher,
-        IConfiguration configuration
+        IConfiguration configuration,
+        IMessageSerializer messageSerializer,
+        ILogger<WebSocketController> logger
     )
     {
         _requestServiceProvider = requestServiceProvider;
@@ -46,9 +47,11 @@ public sealed class WebSocketController : Controller
         _wsRepo = wsRepo;
         _userRepo = userRepo;
         _dispatcher = dispatcher;
-        
+        _messageSerializer = messageSerializer;
+        _logger = logger;
+
         string intercomSecret = configuration["Soteo:IntercomSecret"] ??
-            throw new InvalidOperationException("Intercom secret is not set.");
+                                throw new InvalidOperationException("Intercom secret is not set.");
         _tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = false,
@@ -120,14 +123,15 @@ public sealed class WebSocketController : Controller
         HandshakeMessage message;
         try
         {
-            message = _handshakeMessageSerializer.Deserialize(_receiveBuffer.AsSpan(..receiveResult.Count));
+            message = _messageSerializer.Deserialize(_receiveBuffer.AsSpan(..receiveResult.Count))
+                as HandshakeMessage ?? throw new BadMessageException("Handshake message should be sent first");
         }
-        catch (InvalidMessageException)
+        catch (BadMessageException)
         {
             await _ws.CloseAsync
             (
                 WebSocketCloseStatus.InvalidMessageType,
-                "Invalid handshake message format.",
+                "Invalid handshake message format",
                 CancellationToken.None
             );
             return null;
@@ -135,7 +139,7 @@ public sealed class WebSocketController : Controller
         
         if (message.Version != Const.Version)
         {
-            await _ws.CloseAsync(WebSocketCloseStatus.ProtocolError, "Wrong client version.", CancellationToken.None);
+            await _ws.CloseAsync(WebSocketCloseStatus.ProtocolError, "Wrong client version", CancellationToken.None);
             return null;
         }
         
@@ -143,7 +147,7 @@ public sealed class WebSocketController : Controller
             await new JwtSecurityTokenHandler().ValidateTokenAsync(message.Token, _tokenValidationParameters);
         if (!validationResult.IsValid)
         {
-            await _ws.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid token.", CancellationToken.None);
+            await _ws.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid token", CancellationToken.None);
             return null;
         }
         
@@ -158,7 +162,7 @@ public sealed class WebSocketController : Controller
                 await HandleBinaryMessageAsync(bytes);
                 break;
             case WebSocketMessageType.Text:
-                await _messageSender.SendToAsync(new InvalidMessageMessage(), _userId);
+                await _messageSender.SendToAsync(new BadInputMessage(), _userId);
                 break;
             case WebSocketMessageType.Close:
                 break;
@@ -168,17 +172,16 @@ public sealed class WebSocketController : Controller
     private async Task HandleBinaryMessageAsync(ArraySegment<byte> bytes)
     {
         Guid correlationId = Guid.Empty;
+        Message? message = null;
         try
         {
-            if (bytes.Count < 17) throw new InvalidMessageException();
+            if (bytes.Count < 17) throw new BadMessageException("Message is too short");
             var messageType = (MessageType)bytes[0];
             correlationId = new Guid(bytes[1..17]);
-            if (!TypeLocator.MessageSerializers.TryGetValue(messageType, out IMessageSerializer? serializer))
-                throw new InvalidMessageException();
-            var message = serializer.Deserialize(bytes);
+            message = _messageSerializer.Deserialize(bytes);
             
             if (!TypeLocator.MessageHandlerTypes.TryGetValue(messageType, out Type? handlerType))
-                throw new InvalidMessageException();
+                throw new BadMessageException($"Message type {messageType} can't be handled");
             await using AsyncServiceScope scope = _requestServiceProvider.CreateAsyncScope();
             var handler = (IMessageHandler)scope.ServiceProvider.GetRequiredService(handlerType);
             await _dispatcher.InvokeAsync
@@ -187,9 +190,15 @@ public sealed class WebSocketController : Controller
                 _priority
             );
         }
-        catch (InvalidMessageException)
+        catch (BadMessageException e)
         {
-            await _messageSender.SendToAsync(new InvalidMessageMessage { CorrelationId = correlationId }, _userId);
+            await _messageSender
+                .SendToAsync(new BadInputMessage { CorrelationId = correlationId, Reason = e.Reason }, _userId);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Unhandled exception while handling message {message}", message);
+            await _messageSender.SendToAsync(new InternalServerErrorMessage(), _userId);
         }
     }
 }
