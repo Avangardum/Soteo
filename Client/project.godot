@@ -16,10 +16,15 @@ config/icon="res://icon.png"
 
 [autoload]
 
-MasterServerLink="*res://Scripts/MasterServerLink.cs"
 AsyncExceptionCollector="*res://Scripts/AsyncExceptionCollector.cs"
+MasterServerCommunicator="*res://Scripts/MasterServerCommunicator.cs"
+ClientShardServerCommunicator="*res://Scripts/ClientShardServerCommunicator.cs"
 CharacterSpawner="*res://Scripts/CharacterSpawner.cs"
 ServiceProvider="*res://Scripts/ServiceProvider.cs"
+
+[gdnative]
+
+singletons=[ "res://webrtc/webrtc.tres" ]
 
 [gui]
 

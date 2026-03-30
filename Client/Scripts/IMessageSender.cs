@@ -4,5 +4,5 @@ namespace Soteo.Client;
 
 public interface IMessageSender
 {
-    void SendTo(Message message, Guid receiverId);
+    void SendReliable(Message message, Guid receiverId);
 }

@@ -21,6 +21,6 @@ public class LogIn : Control
     {
         string email = _emailLineEdit.Text;
         string password = _passwordLineEdit.Text;
-        MasterServerLink.Instance.ConnectAsPlayer(email, password);
+        MasterServerCommunicator.Instance.ConnectAsPlayer(email, password);
     }
 }

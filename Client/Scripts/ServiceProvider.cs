@@ -8,23 +8,43 @@ public sealed class ServiceProvider : Node, IServiceProvider
     
     public static ServiceProvider Instance { get; private set; } = null!;
     
+    private MasterServerCommunicator _masterServerCommunicator = null!;
+    private CharacterSpawner _characterSpawner = null!;
+    private ClientShardServerCommunicator _clientShardServerCommunicator = null!;
+    
     public override void _Ready()
     {
         if (Instance != null) throw new InvalidOperationException();
         Instance = this;
         
+        GetNodes();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
-        
         _innerProvider = serviceCollection.BuildServiceProvider();
+        InjectIntoAutoloads();
     }
     
-    public void RegisterServices(IServiceCollection serviceCollection)
+    private void GetNodes()
     {
-        foreach (Type type in TypeLocator.MessageHandlerTypes.Values) serviceCollection.AddTransient(type);
+        _masterServerCommunicator = GetNode<MasterServerCommunicator>("/root/MasterServerCommunicator");
+        _clientShardServerCommunicator = GetNode<ClientShardServerCommunicator>("/root/ClientShardServerCommunicator");
+        _characterSpawner = GetNode<CharacterSpawner>("/root/CharacterSpawner");
+    }
+    
+    public void RegisterServices(IServiceCollection services)
+    {
+        foreach (Type type in TypeLocator.MessageHandlerTypes.Values) services.AddTransient(type);
 
-        serviceCollection.AddSingleton<IMessageSender>(GetNode<MasterServerLink>("/root/MasterServerLink"));
-        serviceCollection.AddSingleton<ICharacterSpawner>(GetNode<CharacterSpawner>("/root/CharacterSpawner"));
+        services.AddSingleton<IMasterServerCommunicator>(_masterServerCommunicator);
+        services.AddSingleton<IMessageSender>(
+            new UniversalMessageSender(_masterServerCommunicator, _clientShardServerCommunicator));
+        services.AddSingleton<ICharacterSpawner>(_characterSpawner);
+        services.AddSingleton<IWebRtcSignalingReceiver>(_clientShardServerCommunicator);
+    }
+    
+    private void InjectIntoAutoloads()
+    {
+        _clientShardServerCommunicator.Inject(_masterServerCommunicator, this);
     }
 
     public object? GetService(Type serviceType) => _innerProvider.GetService(serviceType);
