@@ -96,12 +96,16 @@ public abstract class MessageSerializer<TMessage> : IMessageSerializer
     
     protected void SerializeChar(char value, ref Span<byte> span) => SerializeUShort(value, ref span);
 
-    protected Guid DeserializeGuid(ref Span<byte> span) => new(SliceOff(Const.BytesInGuid, ref span));
-    
+    protected Guid DeserializeGuid(ref Span<byte> span)
+    {
+        Span<byte> slice = SliceOff(Const.BytesInGuid, ref span);
+        return new Guid(slice.ToArray());
+    }
+
     protected void SerializeGuid(Guid value, ref Span<byte> span)
     {
         var slice = SliceOff(Const.BytesInGuid, ref span);
-        value.TryWriteBytes(slice);
+        value.ToByteArray().CopyTo(slice);
     }
     
     protected TEnum DeserializeEnum<TEnum>(ref Span<byte> span) where TEnum : Enum
@@ -153,7 +157,7 @@ public abstract class MessageSerializer<TMessage> : IMessageSerializer
         int byteCount = DeserializeInt(ref span);
         if (byteCount < 0 || byteCount > span.Length) throw new BadMessageException("Invalid string length");
         Span<byte> slice = SliceOff(byteCount, ref span);
-        return Encoding.UTF8.GetString(slice);
+        return Encoding.UTF8.GetString(slice.ToArray());
     }
     
     protected void SerializeString(string value, ref Span<byte> span)
@@ -161,7 +165,7 @@ public abstract class MessageSerializer<TMessage> : IMessageSerializer
         int byteCount = Encoding.UTF8.GetByteCount(value);
         SerializeInt(byteCount, ref span);
         Span<byte> slice = SliceOff(byteCount, ref span);
-        Encoding.UTF8.GetBytes(value, slice);
+        Encoding.UTF8.GetBytes(value).CopyTo(slice);
     }
 
     protected int SizeOf<TValue>(TValue value = default) where TValue : unmanaged

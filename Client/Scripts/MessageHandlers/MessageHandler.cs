@@ -17,7 +17,7 @@ public abstract class MessageHandler<T> : IMessageHandler where T : Message
     
     protected virtual void Handle(T message, Guid senderId) {}
     
-    protected void Validate([DoesNotReturnIf(false)] bool condition, string reason)
+    protected void Validate(bool condition, string reason)
     {
         if (!condition) throw new BadMessageException(reason);
     }
