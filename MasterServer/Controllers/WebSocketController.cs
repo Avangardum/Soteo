@@ -9,45 +9,45 @@ using Soteo.Shared;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Interfaces;
-using Soteo.Shared.Messages.Master;
-using Soteo.Shared.Messages.Shared;
+using Soteo.Shared.Packets.Master;
+using Soteo.Shared.Packets.Shared;
 
 namespace Soteo.MasterServer.Controllers;
 
 public sealed class WebSocketController : Controller
 {
     private readonly IServiceProvider _requestServiceProvider;
-    private readonly IMessageSender _messageSender;
+    private readonly IPacketSender _packetSender;
     private readonly IWebSocketRepository _wsRepo;
     private readonly IUserRepository _userRepo;
     private readonly IDispatcher _dispatcher;
     private readonly TokenValidationParameters _tokenValidationParameters;
     private Guid _userId;
     private ClaimsPrincipal? _claims;
-    private DispatcherPriority _priority = DispatcherPriority.PlayerMessage;
+    private DispatcherPriority _priority = DispatcherPriority.PlayerPacket;
     private readonly byte[] _receiveBuffer = new byte[1024];
     private WebSocket? _ws;
-    private IMessageSerializer _messageSerializer;
+    private IPacketSerializer _packetSerializer;
     private ILogger<WebSocketController> _logger;
 
     public WebSocketController
     (
         IServiceProvider requestServiceProvider,
-        IMessageSender messageSender,
+        IPacketSender packetSender,
         IWebSocketRepository wsRepo,
         IUserRepository userRepo,
         IDispatcher dispatcher,
         IConfiguration configuration,
-        IMessageSerializer messageSerializer,
+        IPacketSerializer packetSerializer,
         ILogger<WebSocketController> logger
     )
     {
         _requestServiceProvider = requestServiceProvider;
-        _messageSender = messageSender;
+        _packetSender = packetSender;
         _wsRepo = wsRepo;
         _userRepo = userRepo;
         _dispatcher = dispatcher;
-        _messageSerializer = messageSerializer;
+        _packetSerializer = packetSerializer;
         _logger = logger;
 
         string intercomSecret = configuration["Soteo:IntercomSecret"] ??
@@ -73,16 +73,16 @@ public sealed class WebSocketController : Controller
         {
             using WebSocket ws = await HttpContext.WebSockets.AcceptWebSocketAsync();
             _ws = ws;
-            _claims = await ReceiveAndValidateHandshakeMessageAsync();
+            _claims = await ReceiveAndValidateHandshakePacketAsync();
             if (_claims == null) return;
             _userId = _claims.Id;
-            _priority = _claims.IsPlayer ? DispatcherPriority.PlayerMessage : DispatcherPriority.ServiceMessage;
+            _priority = _claims.IsPlayer ? DispatcherPriority.PlayerPacket : DispatcherPriority.ServicePacket;
 
             try
             {
                 await _wsRepo.CloseOldAndSetAsync(_userId, ws);
                 await _dispatcher.InvokeSync(() => _userRepo.OnConnected(_claims), _priority);
-                await ReceiveAndHandleMessages();
+                await ReceiveAndHandlePackets();
                 await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, null, ct);
             }
             finally
@@ -94,7 +94,7 @@ public sealed class WebSocketController : Controller
         catch (WebSocketException) {}
     }
     
-    private async Task ReceiveAndHandleMessages()
+    private async Task ReceiveAndHandlePackets()
     {
         WebSocketReceiveResult? receiveResult = null;
         while (receiveResult?.CloseStatus == null)
@@ -112,39 +112,39 @@ public sealed class WebSocketController : Controller
                 await _ws.CloseAsync(WebSocketCloseStatus.MessageTooBig, null, CancellationToken.None);
                 return;
             }
-            await HandleMessageAsync(new ArraySegment<byte>(_receiveBuffer, 0, size), receiveResult.MessageType);
+            await HandlePacketAsync(new ArraySegment<byte>(_receiveBuffer, 0, size), receiveResult.MessageType);
         }
     }
     
-    private async Task<ClaimsPrincipal?> ReceiveAndValidateHandshakeMessageAsync()
+    private async Task<ClaimsPrincipal?> ReceiveAndValidateHandshakePacketAsync()
     {
         WebSocketReceiveResult receiveResult = await _ws!.ReceiveAsync(_receiveBuffer, CancellationToken.None);
         
-        HandshakeMessage message;
+        HandshakePacket packet;
         try
         {
-            message = _messageSerializer.Deserialize(_receiveBuffer.AsSpan(..receiveResult.Count))
-                as HandshakeMessage ?? throw new BadMessageException("Handshake message should be sent first");
+            packet = _packetSerializer.Deserialize(_receiveBuffer.AsSpan(..receiveResult.Count))
+                as HandshakePacket ?? throw new BadPacketException("Handshake packet should be sent first");
         }
-        catch (BadMessageException)
+        catch (BadPacketException)
         {
             await _ws.CloseAsync
             (
                 WebSocketCloseStatus.InvalidMessageType,
-                "Invalid handshake message format",
+                "Invalid handshake packet format",
                 CancellationToken.None
             );
             return null;
         }
         
-        if (message.Version != Const.Version)
+        if (packet.Version != Const.Version)
         {
             await _ws.CloseAsync(WebSocketCloseStatus.ProtocolError, "Wrong client version", CancellationToken.None);
             return null;
         }
         
         TokenValidationResult? validationResult =
-            await new JwtSecurityTokenHandler().ValidateTokenAsync(message.Token, _tokenValidationParameters);
+            await new JwtSecurityTokenHandler().ValidateTokenAsync(packet.Token, _tokenValidationParameters);
         if (!validationResult.IsValid)
         {
             await _ws.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "Invalid token", CancellationToken.None);
@@ -154,51 +154,51 @@ public sealed class WebSocketController : Controller
         return new ClaimsPrincipal(validationResult.ClaimsIdentity);
     }
     
-    private async Task HandleMessageAsync(ArraySegment<byte> bytes, WebSocketMessageType type)
+    private async Task HandlePacketAsync(ArraySegment<byte> bytes, WebSocketMessageType type)
     {
         switch (type)
         {
             case WebSocketMessageType.Binary:
-                await HandleBinaryMessageAsync(bytes);
+                await HandleBinaryPacketAsync(bytes);
                 break;
             case WebSocketMessageType.Text:
-                await _messageSender.SendToAsync(new BadInputMessage(), _userId);
+                await _packetSender.SendToAsync(new BadInputPacket(), _userId);
                 break;
             case WebSocketMessageType.Close:
                 break;
         }
     }
     
-    private async Task HandleBinaryMessageAsync(ArraySegment<byte> bytes)
+    private async Task HandleBinaryPacketAsync(ArraySegment<byte> bytes)
     {
         Guid correlationId = Guid.Empty;
-        Message? message = null;
+        Packet? packet = null;
         try
         {
-            if (bytes.Count < 17) throw new BadMessageException("Message is too short");
-            var messageType = (MessageType)bytes[0];
+            if (bytes.Count < 17) throw new BadPacketException("Packet is too short");
+            var packetType = (PacketType)bytes[0];
             correlationId = new Guid(bytes[1..17]);
-            message = _messageSerializer.Deserialize(bytes);
+            packet = _packetSerializer.Deserialize(bytes);
             
-            if (!TypeLocator.MessageHandlerTypes.TryGetValue(messageType, out Type? handlerType))
-                throw new BadMessageException($"Message type {messageType} can't be handled");
+            if (!TypeLocator.PacketHandlerTypes.TryGetValue(packetType, out Type? handlerType))
+                throw new BadPacketException($"Packet type {packetType} can't be handled");
             await using AsyncServiceScope scope = _requestServiceProvider.CreateAsyncScope();
-            var handler = (IMessageHandler)scope.ServiceProvider.GetRequiredService(handlerType);
+            var handler = (IPacketHandler)scope.ServiceProvider.GetRequiredService(handlerType);
             await _dispatcher.InvokeAsync
             (
-                async () => await handler.HandleAsync(message, _userRepo[_userId]),
+                async () => await handler.HandleAsync(packet, _userRepo[_userId]),
                 _priority
             );
         }
-        catch (BadMessageException e)
+        catch (BadPacketException e)
         {
-            await _messageSender
-                .SendToAsync(new BadInputMessage { CorrelationId = correlationId, Reason = e.Reason }, _userId);
+            await _packetSender
+                .SendToAsync(new BadInputPacket { CorrelationId = correlationId, Reason = e.Reason }, _userId);
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Unhandled exception while handling message {message}", message);
-            await _messageSender.SendToAsync(new InternalServerErrorMessage(), _userId);
+            _logger.LogError(e, "Unhandled exception while handling packet {packet}", packet);
+            await _packetSender.SendToAsync(new InternalServerErrorPacket(), _userId);
         }
     }
 }

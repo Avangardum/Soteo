@@ -5,14 +5,14 @@ using Soteo.Shared;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
-using Soteo.Shared.Messages.Master;
-using Soteo.Shared.Messages.PlayerShard;
-using Soteo.Shared.Messages.Shared;
-using Soteo.Shared.MessageSerializers;
+using Soteo.Shared.Packets.Master;
+using Soteo.Shared.Packets.PlayerShard;
+using Soteo.Shared.Packets.Shared;
+using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Client;
 
-public sealed class ClientShardServerCommunicator : Node, IMessageSender, IWebRtcSignalingReceiver
+public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtcSignalingReceiver
 {
     private record PeerConnectionAndChannels
     (
@@ -24,7 +24,7 @@ public sealed class ClientShardServerCommunicator : Node, IMessageSender, IWebRt
     private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
         _peerConnectionsAndChannels = [];
     private IMasterServerCommunicator _masterServerCommunicator = null!;
-    private readonly IMessageSerializer _messageSerializer = new UniversalMessageSerializer();
+    private readonly IPacketSerializer _packetSerializer = new UniversalPacketSerializer();
     private IServiceProvider _serviceProvider = null!;
 
     public void Inject(IMasterServerCommunicator masterServerCommunicator, IServiceProvider serviceProvider)
@@ -56,27 +56,27 @@ public sealed class ClientShardServerCommunicator : Node, IMessageSender, IWebRt
         ) in _peerConnectionsAndChannels)
         {
             connection.Poll();
-            HandleMessages(reliableChannel, peerId);
-            HandleMessages(unreliableChannel, peerId);
+            HandlePackets(reliableChannel, peerId);
+            HandlePackets(unreliableChannel, peerId);
         }
     }
     
-    private void HandleMessages(WebRTCDataChannel channel, Guid senderId)
+    private void HandlePackets(WebRTCDataChannel channel, Guid senderId)
     {
         while (channel.GetAvailablePacketCount() > 0)
         {
             byte[] bytes = channel.GetPacket();
             try
             {
-                Message message = _messageSerializer.Deserialize(bytes);
-                if (!TypeLocator.MessageHandlerTypes.TryGetValue(message.Type, out Type? handlerType))
-                    throw new BadMessageException($"Can't handle message of type {message.Type}");
-                var handler = (IMessageHandler)_serviceProvider.GetRequiredService(handlerType);
-                handler.HandleAsync(message, senderId);
+                Packet packet = _packetSerializer.Deserialize(bytes);
+                if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type? handlerType))
+                    throw new BadPacketException($"Can't handle packet of type {packet.Type}");
+                var handler = (IPacketHandler)_serviceProvider.GetRequiredService(handlerType);
+                handler.HandleAsync(packet, senderId);
             }
-            catch (BadMessageException e)
+            catch (BadPacketException e)
             {
-                if (IsServer) SendReliable(new BadInputMessage { Reason = e.Reason }, senderId);
+                if (IsServer) SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
                 else throw;
             }
         }
@@ -126,13 +126,13 @@ public sealed class ClientShardServerCommunicator : Node, IMessageSender, IWebRt
     {
         var peerId = new Guid(peerIdBytes);
         _peerConnectionsAndChannels[peerId].Connection.SetLocalDescription(type, sdp);
-        _masterServerCommunicator.SendMessage(new WebrtcSdpMessage { Sdp = sdp, PeerId = peerId } );
+        _masterServerCommunicator.SendPacket(new WebrtcSdpPacket { Sdp = sdp, PeerId = peerId } );
     }
     
     private void OnIceCandidateCreated(string media, int index, String name, byte[] peerIdBytes)
     {
         var peerId = new Guid(peerIdBytes);
-        _masterServerCommunicator.SendMessage(new WebrtcIceCandidateMessage
+        _masterServerCommunicator.SendPacket(new WebrtcIceCandidatePacket
         {
             Media = media,
             Index = index,
@@ -141,45 +141,45 @@ public sealed class ClientShardServerCommunicator : Node, IMessageSender, IWebRt
         });
     }
 
-    public void SendReliable(Message message, Guid receiverId)
+    public void SendReliable(Packet packet, Guid receiverId)
     {
         if (!_peerConnectionsAndChannels.TryGetValue(receiverId, out var connectionAndChannels)) return;
-        byte[] bytes = _messageSerializer.Serialize(message);
+        byte[] bytes = _packetSerializer.Serialize(packet);
         connectionAndChannels.ReliableChannel.PutPacket(bytes);
     }
     
-    public void SendUnreliable(Message message, Guid receiverId)
+    public void SendUnreliable(Packet packet, Guid receiverId)
     {
         if (!_peerConnectionsAndChannels.TryGetValue(receiverId, out var connectionAndChannels)) return;
-        byte[] bytes = _messageSerializer.Serialize(message);
+        byte[] bytes = _packetSerializer.Serialize(packet);
         connectionAndChannels.UnreliableChannel.PutPacket(bytes);
     }
     
-    public void SetRemoteDescription(WebrtcSdpMessage message)
+    public void SetRemoteDescription(WebrtcSdpPacket packet)
     {
         string type = IsServer ? "offer" : "answer";
-        WebRTCPeerConnection? connection = IsServer ? CreateConnection(message.PeerId) :
-            _peerConnectionsAndChannels.GetOrDefault(message.PeerId)?.Connection;
+        WebRTCPeerConnection? connection = IsServer ? CreateConnection(packet.PeerId) :
+            _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         if (connection == null) return;
-        connection.SetRemoteDescription(type, message.Sdp);
+        connection.SetRemoteDescription(type, packet.Sdp);
         GD.Print("Set remote description");
-        GD.Print(message.Sdp);
+        GD.Print(packet.Sdp);
         if (!IsServer) Task.Delay(1000).ContinueWithinContext(_ =>
         {
             GD.Print("Sending move");
-            SendReliable(new MoveMessage(), message.PeerId);
-            SendUnreliable(new MoveMessage(), message.PeerId);
+            SendReliable(new MovePacket(), packet.PeerId);
+            SendUnreliable(new MovePacket(), packet.PeerId);
         }); // todo remove
     }
     
-    public void AddRemoteIceCandidate(WebrtcIceCandidateMessage message)
+    public void AddRemoteIceCandidate(WebrtcIceCandidatePacket packet)
     {
-        WebRTCPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(message.PeerId)?.Connection;
+        WebRTCPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         if (connection == null) return;
-        connection.AddIceCandidate(message.Media, message.Index, message.Name);
+        connection.AddIceCandidate(packet.Media, packet.Index, packet.Name);
         GD.Print("Added remote ice candidate");
-        GD.Print(message.Media);
-        GD.Print(message.Index);
-        GD.Print(message.Name);
+        GD.Print(packet.Media);
+        GD.Print(packet.Index);
+        GD.Print(packet.Name);
     }
 }

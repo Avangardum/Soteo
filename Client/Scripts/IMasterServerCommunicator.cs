@@ -1,11 +1,11 @@
-using Soteo.Shared.Messages.Shared;
+using Soteo.Shared.Packets.Shared;
 
 namespace Soteo.Client;
 
-public interface IMasterServerCommunicator : IMessageSender
+public interface IMasterServerCommunicator : IPacketSender
 {
     event Action ConnectionEstablished;
     void ConnectAsPlayer(string email, string password);
     void ConnectAsShardServer();
-    void SendMessage(Message message);
+    void SendPacket(Packet packet);
 }

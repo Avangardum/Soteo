@@ -33,11 +33,11 @@ public sealed class ServiceProvider : Node, IServiceProvider
     
     public void RegisterServices(IServiceCollection services)
     {
-        foreach (Type type in TypeLocator.MessageHandlerTypes.Values) services.AddTransient(type);
+        foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
 
         services.AddSingleton<IMasterServerCommunicator>(_masterServerCommunicator);
-        services.AddSingleton<IMessageSender>(
-            new UniversalMessageSender(_masterServerCommunicator, _clientShardServerCommunicator));
+        services.AddSingleton<IPacketSender>(
+            new UniversalPacketSender(_masterServerCommunicator, _clientShardServerCommunicator));
         services.AddSingleton<ICharacterSpawner>(_characterSpawner);
         services.AddSingleton<IWebRtcSignalingReceiver>(_clientShardServerCommunicator);
     }

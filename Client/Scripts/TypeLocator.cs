@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Soteo.Client.MessageHandlers;
+using Soteo.Client.PacketHandlers;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 
@@ -8,12 +8,12 @@ namespace Soteo.Client;
 
 public static class TypeLocator
 {
-    public static readonly Dictionary<MessageType, Type> MessageHandlerTypes;
+    public static readonly Dictionary<PacketType, Type> PacketHandlerTypes;
     
     static TypeLocator()
     {
-        MessageHandlerTypes = typeof(IMessageHandler).Assembly.ExportedTypes
-            .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(IMessageHandler)))
-            .ToDictionary(it => it.GetMessageType(typeof(MessageHandler<>)));
+        PacketHandlerTypes = typeof(IPacketHandler).Assembly.ExportedTypes
+            .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(IPacketHandler)))
+            .ToDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
     }
 }

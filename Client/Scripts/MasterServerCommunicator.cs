@@ -4,9 +4,9 @@ using Godot;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Shared;
 using Soteo.Shared.Interfaces;
-using Soteo.Shared.Messages.Master;
-using Soteo.Shared.Messages.Shared;
-using Soteo.Shared.MessageSerializers;
+using Soteo.Shared.Packets.Master;
+using Soteo.Shared.Packets.Shared;
+using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Client;
 
@@ -20,7 +20,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     public static MasterServerCommunicator Instance { get; private set; } = null!;
     
     private readonly WebSocketClient _wsClient = new();
-    private readonly IMessageSerializer _messageSerializer = new UniversalMessageSerializer();
+    private readonly IPacketSerializer _packetSerializer = new UniversalPacketSerializer();
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
     
     private string _token = "";
@@ -65,12 +65,12 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     public void OnConnectionEstablished(string protocol)
     {
         _status = Status.Connected;
-        GD.Print("Master server connection established, sending handshake message");
-        SendMessage(new HandshakeMessage { Token = _token, Version = Const.Version });
+        GD.Print("Master server connection established, sending handshake packet");
+        SendPacket(new HandshakePacket { Token = _token, Version = Const.Version });
         ConnectionEstablished();
         if (!IsServer)
         {
-            SendMessage(new SpawnCharacterMessage { PeerId = Const.TestShardId });
+            SendPacket(new SpawnCharacterPacket { PeerId = Const.TestShardId });
             GetTree().ChangeScene("res://Scenes/Maps/Test.tscn");
         }
     }
@@ -78,10 +78,10 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     public void OnDataReceived()
     {
         byte[] bytes = _wsClient.GetPeer(1).GetPacket();
-        Message message = _messageSerializer.Deserialize(bytes);
-        IMessageHandler handler =
-            (IMessageHandler)ServiceProvider.Instance.GetRequiredService(TypeLocator.MessageHandlerTypes[message.Type]);
-        handler.HandleAsync(message, MasterServerId);
+        Packet packet = _packetSerializer.Deserialize(bytes);
+        IPacketHandler handler =
+            (IPacketHandler)ServiceProvider.Instance.GetRequiredService(TypeLocator.PacketHandlerTypes[packet.Type]);
+        handler.HandleAsync(packet, MasterServerId);
     }
     
     public void OnServerCloseRequest(int code, string reason)
@@ -141,15 +141,15 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
         }
     }
 
-    public void SendMessage(Message message)
+    public void SendPacket(Packet packet)
     {
-        byte[] bytes = _messageSerializer.Serialize(message);
+        byte[] bytes = _packetSerializer.Serialize(packet);
         _wsClient.GetPeer(1).PutPacket(bytes);
     }
     
-    void IMessageSender.SendReliable(Message message, Guid receiverId)
+    void IPacketSender.SendReliable(Packet packet, Guid receiverId)
     {
         if (receiverId != MasterServerId) throw new InvalidOperationException();
-        SendMessage(message);
+        SendPacket(packet);
     }
 }

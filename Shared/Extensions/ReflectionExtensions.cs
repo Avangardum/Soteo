@@ -37,12 +37,12 @@ public static class ReflectionExtensions
         
         public bool IsAssignableTo(Type other) => other.IsAssignableFrom(self);
         
-        public MessageType GetMessageType(Type baseGenericClass)
+        public PacketType GetPacketType(Type baseGenericClass)
         {
             return self.BaseTypes
                 .Single(bt => bt.IsConstructedGenericType && bt.GetGenericTypeDefinition() == baseGenericClass)
                 .GenericTypeArguments.Single()
-                .GetRequiredAttribute<MessageTypeAttribute>().Type;
+                .GetRequiredAttribute<PacketTypeAttribute>().Type;
         }
     }
 }

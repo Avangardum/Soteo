@@ -12,8 +12,8 @@ public class Dispatcher : IDispatcher
     
     private readonly ConcurrentQueue<Action> _asyncContinuationQueue = [];
     private readonly ConcurrentQueue<Action> _systemTickQueue = [];
-    private readonly ConcurrentQueue<Action> _serviceMessageQueue = [];
-    private readonly ConcurrentQueue<Action> _playerMessageQueue = [];
+    private readonly ConcurrentQueue<Action> _servicePacketQueue = [];
+    private readonly ConcurrentQueue<Action> _playerPacketQueue = [];
     private readonly SemaphoreSlim _semaphore = new(0);
     private readonly ILogger<Dispatcher> _logger;
     private readonly Thread _mainThread;
@@ -36,8 +36,8 @@ public class Dispatcher : IDispatcher
             bool wasShuttingDownAtCycleStart = _isShuttingDown;
             if (_asyncContinuationQueue.TryDequeue(out var asyncContinuation)) asyncContinuation();
             else if (_systemTickQueue.TryDequeue(out var systemTick)) systemTick();
-            else if (_serviceMessageQueue.TryDequeue(out var serviceMessage)) serviceMessage();
-            else if (_playerMessageQueue.TryDequeue(out var playerMessage)) playerMessage();
+            else if (_servicePacketQueue.TryDequeue(out var servicePacket)) servicePacket();
+            else if (_playerPacketQueue.TryDequeue(out var playerPacket)) playerPacket();
             else if (wasShuttingDownAtCycleStart && _asyncInvocationsInProgress == 0) break;
         }
     }
@@ -54,8 +54,8 @@ public class Dispatcher : IDispatcher
         ConcurrentQueue<Action> queue = priority switch
         {
             DispatcherPriority.SystemTick => _systemTickQueue,
-            DispatcherPriority.ServiceMessage => _serviceMessageQueue,
-            DispatcherPriority.PlayerMessage => _playerMessageQueue,
+            DispatcherPriority.ServicePacket => _servicePacketQueue,
+            DispatcherPriority.PlayerPacket => _playerPacketQueue,
             _ => throw new ArgumentOutOfRangeException(nameof(priority), priority, null)
         };
         var taskCompletionSource = new TaskCompletionSource<T>();
