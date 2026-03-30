@@ -1,6 +1,6 @@
 using Soteo.MasterServer.GameState.DataObjects;
 using Soteo.MasterServer.Interfaces;
-using Soteo.Shared.Packets.Master;
+using Soteo.Shared.Packets.MasterServer;
 
 namespace Soteo.MasterServer.PacketHandlers;
 

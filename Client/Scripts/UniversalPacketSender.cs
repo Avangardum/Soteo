@@ -1,3 +1,4 @@
+using Soteo.Client.Interfaces;
 using Soteo.Shared.Packets.Shared;
 
 namespace Soteo.Client;

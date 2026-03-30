@@ -1,5 +1,5 @@
 using Soteo.Shared.Attributes;
-using Soteo.Shared.Packets.Master;
+using Soteo.Shared.Packets.MasterServer;
 using Soteo.Shared.Packets.Shared;
 
 namespace Soteo.MasterServer.Interfaces;

@@ -1,4 +1,5 @@
-using Soteo.Shared.Packets.Master;
+using Soteo.Client.Interfaces;
+using Soteo.Shared.Packets.MasterServer;
 
 namespace Soteo.Client.PacketHandlers;
 

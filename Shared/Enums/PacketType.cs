@@ -7,7 +7,7 @@ public enum PacketType : byte
     BadInput,
     InternalServerError,
     // Master server <--> *
-    Handshake,
+    MasterServerHandshake,
     SpawnCharacter,
     CharacterRecalled,
     WebrtcSdp,

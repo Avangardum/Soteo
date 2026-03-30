@@ -9,7 +9,7 @@ using Soteo.Shared;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Interfaces;
-using Soteo.Shared.Packets.Master;
+using Soteo.Shared.Packets.MasterServer;
 using Soteo.Shared.Packets.Shared;
 
 namespace Soteo.MasterServer.Controllers;
@@ -120,11 +120,11 @@ public sealed class WebSocketController : Controller
     {
         WebSocketReceiveResult receiveResult = await _ws!.ReceiveAsync(_receiveBuffer, CancellationToken.None);
         
-        HandshakePacket packet;
+        MasterServerHandshakePacket packet;
         try
         {
             packet = _packetSerializer.Deserialize(_receiveBuffer.AsSpan(..receiveResult.Count))
-                as HandshakePacket ?? throw new BadPacketException("Handshake packet should be sent first");
+                as MasterServerHandshakePacket ?? throw new BadPacketException("Handshake packet should be sent first");
         }
         catch (BadPacketException)
         {

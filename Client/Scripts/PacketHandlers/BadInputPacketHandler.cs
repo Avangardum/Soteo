@@ -1,5 +1,5 @@
 using Soteo.Shared.Exceptions;
-using Soteo.Shared.Packets.Master;
+using Soteo.Shared.Packets.Shared;
 
 namespace Soteo.Client.PacketHandlers;
 

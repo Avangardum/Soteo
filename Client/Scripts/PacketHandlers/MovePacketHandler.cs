@@ -1,4 +1,4 @@
-using Soteo.Shared.Packets.PlayerShard;
+using Soteo.Shared.Packets.PlayerShardServer;
 
 namespace Soteo.Client.PacketHandlers;
 

@@ -16,11 +16,11 @@ config/icon="res://icon.png"
 
 [autoload]
 
-AsyncExceptionCollector="*res://Scripts/AsyncExceptionCollector.cs"
-MasterServerCommunicator="*res://Scripts/MasterServerCommunicator.cs"
-ClientShardServerCommunicator="*res://Scripts/ClientShardServerCommunicator.cs"
-CharacterSpawner="*res://Scripts/CharacterSpawner.cs"
-ServiceProvider="*res://Scripts/ServiceProvider.cs"
+AsyncExceptionCollector="*res://Scripts/Nodes/Autoloads/AsyncExceptionCollector.cs"
+CharacterSpawner="*res://Scripts/Nodes/Autoloads/CharacterSpawner.cs"
+ClientShardServerCommunicator="*res://Scripts/Nodes/Autoloads/ClientShardServerCommunicator.cs"
+MasterServerCommunicator="*res://Scripts/Nodes/Autoloads/MasterServerCommunicator.cs"
+ServiceProvider="*res://Scripts/Nodes/Autoloads/ServiceProvider.cs"
 
 [gdnative]
 

@@ -3,6 +3,7 @@ using Soteo.MasterServer.GameState.Repositories;
 using Soteo.MasterServer.Interfaces;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.PacketSerializers;
+using Soteo.Shared.PacketSerializers.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 

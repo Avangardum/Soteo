@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Soteo.Client.Interfaces;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Packets.Shared;
 
