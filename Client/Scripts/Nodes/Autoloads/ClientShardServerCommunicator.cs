@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Godot.Collections;
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.Client.Extensions;
 using Soteo.Client.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Exceptions;
@@ -74,7 +75,7 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
                 if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type? handlerType))
                     throw new BadPacketException($"Can't handle packet of type {packet.Type}");
                 var handler = (IPacketHandler)_serviceProvider.GetRequiredService(handlerType);
-                handler.HandleAsync(packet, senderId);
+                handler.HandleAsync(packet, senderId).CollectException();
             }
             catch (BadPacketException e)
             {
@@ -143,18 +144,39 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
         });
     }
 
-    public void SendReliable(Packet packet, Guid receiverId)
+    public void SendReliable(Packet packet, Guid receiverId) =>
+        Send(_packetSerializer.Serialize(packet), receiverId, it => it.ReliableChannel);
+    
+    public void SendUnreliable(Packet packet, Guid receiverId) =>
+        Send(_packetSerializer.Serialize(packet), receiverId, it => it.UnreliableChannel);
+    
+    public void BroadcastReliable(Packet packet)
     {
-        if (!_peerConnectionsAndChannels.TryGetValue(receiverId, out var connectionAndChannels)) return;
+        if (!IsServer) throw new InvalidOperationException();
         byte[] bytes = _packetSerializer.Serialize(packet);
-        connectionAndChannels.ReliableChannel.PutPacket(bytes);
+        foreach (var receiverId in _peerConnectionsAndChannels.Keys)
+            Send(bytes, receiverId, it => it.ReliableChannel);
     }
     
-    public void SendUnreliable(Packet packet, Guid receiverId)
+    public void BroadcastUnreliable(Packet packet)
+    {
+        if (!IsServer) throw new InvalidOperationException();
+        byte[] bytes = _packetSerializer.Serialize(packet);
+        foreach (var receiverId in _peerConnectionsAndChannels.Keys)
+            Send(bytes, receiverId, it => it.UnreliableChannel);
+    }
+    
+    private void Send
+    (
+        byte[] bytes,
+        Guid receiverId,
+        Func<PeerConnectionAndChannels, WebRTCDataChannel> channelSelector
+    )
     {
         if (!_peerConnectionsAndChannels.TryGetValue(receiverId, out var connectionAndChannels)) return;
-        byte[] bytes = _packetSerializer.Serialize(packet);
-        connectionAndChannels.UnreliableChannel.PutPacket(bytes);
+        WebRTCDataChannel channel = channelSelector(connectionAndChannels);
+        if (channel.GetReadyState() != WebRTCDataChannel.ChannelState.Open) return;
+        channel.PutPacket(bytes);
     }
     
     public void SetRemoteDescription(WebrtcSdpPacket packet)
@@ -166,12 +188,15 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
         connection.SetRemoteDescription(type, packet.Sdp);
         GD.Print("Set remote description");
         GD.Print(packet.Sdp);
-        if (!IsServer) Task.Delay(1000).ContinueWithinContext(_ =>
+        if (!IsServer) SendTestPacket(); // todo remove
+        
+        async void SendTestPacket()
         {
+            await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
             GD.Print("Sending move");
             SendReliable(new MovePacket(), packet.PeerId);
             SendUnreliable(new MovePacket(), packet.PeerId);
-        }); // todo remove
+        }
     }
     
     public void AddRemoteIceCandidate(WebrtcIceCandidatePacket packet)

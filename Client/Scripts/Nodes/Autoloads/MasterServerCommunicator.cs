@@ -13,8 +13,8 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
 {
     private enum Status { Disconnected, Connecting, Connected }
     
-    private const string MasterServerUrl = "ws://localhost:3706"; // todo wss
-    private const string AuthServerUrl = "http://localhost:3705"; // todo https
+    private const string MasterServerUrl = "wss://localhost:3706";
+    private const string AuthServerUrl = "https://localhost:3705";
     
     public static MasterServerCommunicator Instance { get; private set; } = null!;
     
@@ -144,11 +144,5 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
         _wsClient.GetPeer(1).PutPacket(bytes);
-    }
-    
-    void IPacketSender.SendReliable(Packet packet, Guid receiverId)
-    {
-        if (receiverId != MasterServerId) throw new InvalidOperationException();
-        SendPacket(packet);
     }
 }

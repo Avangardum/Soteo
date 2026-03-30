@@ -14,4 +14,14 @@ public sealed class UniversalPacketSender
         if (receiverId == MasterServerId) masterSender.SendPacket(packet);
         else clientShardServerSender.SendReliable(packet, receiverId);
     }
+
+    public void SendUnreliable(Packet packet, Guid receiverId)
+    {
+        if (receiverId == MasterServerId) throw new InvalidOperationException();
+        clientShardServerSender.SendUnreliable(packet, receiverId);
+    }
+
+    public void BroadcastReliable(Packet packet) => clientShardServerSender.BroadcastReliable(packet);
+
+    public void BroadcastUnreliable(Packet packet) => clientShardServerSender.BroadcastUnreliable(packet);
 }
