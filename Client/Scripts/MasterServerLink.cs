@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Godot;
+using Microsoft.Extensions.DependencyInjection;
 using Soteo.Shared;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Messages.Master;
@@ -75,10 +76,8 @@ public sealed class MasterServerLink : Node, IMessageSender
     {
         byte[] bytes = _wsClient.GetPeer(1).GetPacket();
         Message message = _messageSerializer.Deserialize(bytes);
-        // IMessageHandler handler =
-        //     (IMessageHandler)ServiceProvider.Instance.GetRequiredService(TypeLocator.MessageHandlerTypes[message.Type]);
         IMessageHandler handler =
-            (IMessageHandler)Activator.CreateInstance(TypeLocator.MessageHandlerTypes[message.Type]);
+            (IMessageHandler)ServiceProvider.Instance.GetRequiredService(TypeLocator.MessageHandlerTypes[message.Type]);
         handler.HandleAsync(message, MasterServerId);
     }
     
