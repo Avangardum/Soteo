@@ -12,14 +12,14 @@ margin_left = 360.0
 margin_top = 220.0
 margin_right = 630.0
 margin_bottom = 255.0
-text = "admin@example.com"
+text = "player1@soteo.net"
 
 [node name="Password" type="LineEdit" parent="."]
 margin_left = 360.0
 margin_top = 280.0
 margin_right = 630.0
 margin_bottom = 315.0
-text = "Admin_0"
+text = "Pa55_word"
 
 [node name="Player" type="Button" parent="."]
 margin_left = 380.0
