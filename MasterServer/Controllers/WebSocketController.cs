@@ -26,9 +26,9 @@ public sealed class WebSocketController : Controller
     private ClaimsPrincipal? _claims;
     private DispatcherPriority _priority = DispatcherPriority.PlayerPacket;
     private readonly byte[] _receiveBuffer = new byte[1024];
-    private WebSocket? _ws;
-    private IPacketSerializer _packetSerializer;
-    private ILogger<WebSocketController> _logger;
+    private WebSocket _ws = null!;
+    private readonly IPacketSerializer _packetSerializer;
+    private readonly ILogger<WebSocketController> _logger;
 
     public WebSocketController
     (
@@ -51,7 +51,7 @@ public sealed class WebSocketController : Controller
         _logger = logger;
 
         string intercomSecret = configuration["Soteo:IntercomSecret"] ??
-                                throw new InvalidOperationException("Intercom secret is not set.");
+            throw new InvalidOperationException("Intercom secret is not set.");
         _tokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = false,
@@ -61,7 +61,7 @@ public sealed class WebSocketController : Controller
     }
 
     [Route("/")]
-    public async Task Connect(CancellationToken ct)
+    public async Task Connect()
     {
         if (!HttpContext.WebSockets.IsWebSocketRequest)
         {
@@ -82,8 +82,7 @@ public sealed class WebSocketController : Controller
             {
                 await _wsRepo.CloseOldAndSetAsync(_userId, ws);
                 await _dispatcher.InvokeSync(() => _userRepo.OnConnected(_claims), _priority);
-                await ReceiveAndHandlePackets();
-                await ws.CloseAsync(WebSocketCloseStatus.NormalClosure, null, ct);
+                await ReceiveAndHandlePacketsAsync();
             }
             finally
             {
@@ -94,37 +93,61 @@ public sealed class WebSocketController : Controller
         catch (WebSocketException) {}
     }
     
-    private async Task ReceiveAndHandlePackets()
+    private async Task ReceiveAndHandlePacketsAsync()
     {
-        WebSocketReceiveResult? receiveResult = null;
-        while (receiveResult?.CloseStatus == null)
+        while (true)
         {
-            int size = 0;
-            var segment = new ArraySegment<byte>(_receiveBuffer);
-            do
+            var wsPacket = await ReceiveWsPacketAsync();
+            if (wsPacket == null) return;
+            switch (wsPacket.Value.Type)
             {
-                receiveResult = await _ws!.ReceiveAsync(segment, CancellationToken.None);
-                segment = segment[receiveResult.Count..];
-                size += receiveResult.Count;
-            } while (!receiveResult.EndOfMessage && segment.Count > 0);
-            if (!receiveResult.EndOfMessage)
-            {
-                await _ws.CloseAsync(WebSocketCloseStatus.MessageTooBig, null, CancellationToken.None);
-                return;
+                case WebSocketMessageType.Binary:
+                    await HandleBinaryPacketAsync(wsPacket.Value.Bytes);
+                    break;
+                case WebSocketMessageType.Text:
+                    await _packetSender.SendToAsync(
+                        new BadInputPacket { Reason = "Text websocket packets are not supported" }, _userId);
+                    break;
+                case WebSocketMessageType.Close:
+                    await _ws.CloseAsync(WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                    return;
             }
-            await HandlePacketAsync(new ArraySegment<byte>(_receiveBuffer, 0, size), receiveResult.MessageType);
+        }
+    }
+    
+    private async Task<(ArraySegment<byte> Bytes, WebSocketMessageType Type)?> ReceiveWsPacketAsync()
+    {
+        int size = 0;
+        var segment = new ArraySegment<byte>(_receiveBuffer);
+        WebSocketReceiveResult receiveResult;
+        do
+        {
+            receiveResult = await _ws.ReceiveAsync(segment, CancellationToken.None);
+            segment = segment[receiveResult.Count..];
+            size += receiveResult.Count;
+        } while (!receiveResult.EndOfMessage && segment.Count > 0);
+        
+        if (!receiveResult.EndOfMessage)
+        {
+            await _ws.CloseAsync(WebSocketCloseStatus.MessageTooBig, null, CancellationToken.None);
+            return null;
+        }
+        else
+        {
+            return (new ArraySegment<byte>(_receiveBuffer, 0, size), receiveResult.MessageType);
         }
     }
     
     private async Task<ClaimsPrincipal?> ReceiveAndValidateHandshakePacketAsync()
     {
-        WebSocketReceiveResult receiveResult = await _ws!.ReceiveAsync(_receiveBuffer, CancellationToken.None);
-        
+        var wsPacket = await ReceiveWsPacketAsync();
+        if (wsPacket == null) return null;
         MasterServerHandshakePacket packet;
         try
         {
-            packet = _packetSerializer.Deserialize(_receiveBuffer.AsSpan(..receiveResult.Count))
-                as MasterServerHandshakePacket ?? throw new BadPacketException("Handshake packet should be sent first");
+            if (wsPacket.Value.Type != WebSocketMessageType.Binary) throw new BadPacketException("");
+            packet = _packetSerializer.Deserialize(wsPacket.Value.Bytes) as MasterServerHandshakePacket ??
+                throw new BadPacketException("");
         }
         catch (BadPacketException)
         {
@@ -153,22 +176,7 @@ public sealed class WebSocketController : Controller
         
         return new ClaimsPrincipal(validationResult.ClaimsIdentity);
     }
-    
-    private async Task HandlePacketAsync(ArraySegment<byte> bytes, WebSocketMessageType type)
-    {
-        switch (type)
-        {
-            case WebSocketMessageType.Binary:
-                await HandleBinaryPacketAsync(bytes);
-                break;
-            case WebSocketMessageType.Text:
-                await _packetSender.SendToAsync(new BadInputPacket(), _userId);
-                break;
-            case WebSocketMessageType.Close:
-                break;
-        }
-    }
-    
+
     private async Task HandleBinaryPacketAsync(ArraySegment<byte> bytes)
     {
         Guid correlationId = Guid.Empty;
