@@ -4,15 +4,10 @@ namespace Soteo.Client.Nodes.Systems;
 
 public sealed class CharacterSpawner : Node, ICharacterSpawner
 {
-    public static CharacterSpawner Instance { get; private set; } = null!;
-
     private PackedScene _playerCharacterScene = null!;
     
     public override void _Ready()
     {
-        if (Instance != null) throw new InvalidOperationException();
-        Instance = this;
-        
         _playerCharacterScene = GD.Load<PackedScene>("res://Scenes/Player.tscn");
     }
 

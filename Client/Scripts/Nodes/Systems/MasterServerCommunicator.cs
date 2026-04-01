@@ -14,9 +14,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     
     private const string MasterServerUrl = "wss://localhost:3706";
     private const string AuthServerUrl = "https://localhost:3705";
-    
-    public static MasterServerCommunicator Instance { get; private set; } = null!;
-    
+
     private readonly WebSocketClient _wsClient = new();
     private readonly IPacketSerializer _packetSerializer = new UniversalPacketSerializer();
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
@@ -36,9 +34,6 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     
     public override void _Ready()
     {
-        if (Instance != null) throw new InvalidOperationException();
-        Instance = this;
-        
         _wsClient.Connect("connection_closed", this, nameof(OnConnectionClosed));
         _wsClient.Connect("connection_error", this, nameof(OnConnectionError));
         _wsClient.Connect("connection_established", this, nameof(OnConnectionEstablished));
