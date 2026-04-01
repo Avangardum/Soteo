@@ -1,4 +1,4 @@
-using Soteo.Client.Nodes.Autoloads;
+using Soteo.Client.Nodes.Systems;
 
 namespace Soteo.Client.Nodes;
 
@@ -18,5 +18,6 @@ public class LogIn : Control
         string email = _emailLineEdit.Text;
         string password = _passwordLineEdit.Text;
         MasterServerCommunicator.Instance.ConnectAsPlayer(email, password);
+        Visible = false;
     }
 }

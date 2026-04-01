@@ -1,0 +1,15 @@
+[gd_scene format=2]
+
+[node name="Shard" type="Node2D"]
+
+[node name="Map" type="Node2D" parent="."]
+
+[node name="Entities" type="Node2D" parent="."]
+
+[node name="PlayerCharacters" type="Node2D" parent="Entities"]
+
+[node name="NonPlayerCharacters" type="Node2D" parent="Entities"]
+
+[node name="Buildings" type="Node2D" parent="Entities"]
+
+[node name="Projectiles" type="Node2D" parent="Entities"]

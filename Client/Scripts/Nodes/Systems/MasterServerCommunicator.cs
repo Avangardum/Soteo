@@ -5,10 +5,9 @@ using Soteo.Shared;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets.MasterServer;
 using Soteo.Shared.Packets.Shared;
-using Soteo.Shared.PacketSerializers;
 using Soteo.Shared.PacketSerializers.Shared;
 
-namespace Soteo.Client.Nodes.Autoloads;
+namespace Soteo.Client.Nodes.Systems;
 public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
 {
     private enum Status { Disconnected, Connecting, Connected }
@@ -21,10 +20,18 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     private readonly WebSocketClient _wsClient = new();
     private readonly IPacketSerializer _packetSerializer = new UniversalPacketSerializer();
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
+    private IServiceProvider _serviceProvider = null!;
+    private IShardLoader _shardLoader = null!;
     
     private string _token = "";
     private Status _status;
 
+    public void Inject(IServiceProvider serviceProvider, IShardLoader shardLoader)
+    {
+        _serviceProvider = serviceProvider;
+        _shardLoader = shardLoader;
+    }
+    
     public event Action ConnectionEstablished = delegate {};
     
     public override void _Ready()
@@ -70,7 +77,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
         if (!IsServer)
         {
             SendPacket(new SpawnCharacterPacket { PeerId = Const.TestShardId });
-            GetTree().ChangeScene("res://Scenes/Maps/Test.tscn");
+            _shardLoader.LoadShard();
         }
     }
     
@@ -78,8 +85,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     {
         byte[] bytes = _wsClient.GetPeer(1).GetPacket();
         Packet packet = _packetSerializer.Deserialize(bytes);
-        IPacketHandler handler =
-            (IPacketHandler)ServiceProvider.Instance.GetRequiredService(TypeLocator.PacketHandlerTypes[packet.Type]);
+        var handler = (IPacketHandler)_serviceProvider.GetRequiredService(TypeLocator.PacketHandlerTypes[packet.Type]);
         handler.HandleAsync(packet, MasterServerId);
     }
     

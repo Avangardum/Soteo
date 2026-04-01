@@ -1,6 +1,6 @@
 using Soteo.Client.Interfaces;
 
-namespace Soteo.Client.Nodes.Autoloads;
+namespace Soteo.Client.Nodes.Systems;
 
 public sealed class CharacterSpawner : Node, ICharacterSpawner
 {

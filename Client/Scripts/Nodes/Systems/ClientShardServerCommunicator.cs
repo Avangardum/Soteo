@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Godot.Collections;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Client.Extensions;
@@ -10,10 +9,9 @@ using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets.MasterServer;
 using Soteo.Shared.Packets.PlayerShardServer;
 using Soteo.Shared.Packets.Shared;
-using Soteo.Shared.PacketSerializers;
 using Soteo.Shared.PacketSerializers.Shared;
 
-namespace Soteo.Client.Nodes.Autoloads;
+namespace Soteo.Client.Nodes.Systems;
 
 public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtcSignalingReceiver
 {

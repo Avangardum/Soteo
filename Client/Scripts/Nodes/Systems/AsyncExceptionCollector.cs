@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace Soteo.Client.Nodes.Autoloads;
+namespace Soteo.Client.Nodes.Systems;
 
 public sealed class AsyncExceptionCollector : Node
 {

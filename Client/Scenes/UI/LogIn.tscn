@@ -20,12 +20,13 @@ margin_top = 280.0
 margin_right = 630.0
 margin_bottom = 315.0
 text = "Pa55_word"
+secret = true
 
-[node name="Player" type="Button" parent="."]
+[node name="LogIn" type="Button" parent="."]
 margin_left = 380.0
 margin_top = 345.0
 margin_right = 600.0
 margin_bottom = 390.0
 text = "Log in"
 
-[connection signal="button_up" from="Player" to="." method="OnPlayerButtonUp"]
+[connection signal="button_up" from="LogIn" to="." method="OnPlayerButtonUp"]
