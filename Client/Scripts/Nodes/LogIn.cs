@@ -16,7 +16,6 @@ public class LogIn : Control
     
     public override void _Ready()
     {
-        GD.Print("Ready");
         _emailLineEdit = GetNode<LineEdit>("Email");
         _passwordLineEdit = GetNode<LineEdit>("Password");
     }

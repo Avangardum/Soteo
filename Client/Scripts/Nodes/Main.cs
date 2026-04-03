@@ -24,7 +24,7 @@ public sealed class Main : Node2D, IShardLoader
         GetNodes();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
-        _serviceProvider = serviceCollection.BuildServiceProvider();
+        _serviceProvider = new SimpleServiceProvider(serviceCollection);
         InjectInto(this);
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
