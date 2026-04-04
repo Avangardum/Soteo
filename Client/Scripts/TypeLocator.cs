@@ -14,7 +14,8 @@ public static class TypeLocator
     static TypeLocator()
     {
         PacketHandlerTypes = typeof(IPacketHandler).Assembly.ExportedTypes
-            .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(IPacketHandler)))
+            .Where(it =>
+                !it.IsAbstract && it != typeof(UniversalPacketHandler) && it.IsAssignableTo(typeof(IPacketHandler)))
             .ToDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
     }
 }

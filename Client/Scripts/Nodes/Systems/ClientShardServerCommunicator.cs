@@ -26,14 +26,14 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
         _peerConnectionsAndChannels = [];
     private IMasterServerCommunicator _masterServerCommunicator = null!;
     private readonly IPacketSerializer _packetSerializer = new UniversalPacketSerializer();
-    private IServiceProvider _serviceProvider = null!;
+    private IPacketHandler _packetHandler = null!;
 
-    public void Inject(IMasterServerCommunicator masterServerCommunicator, IServiceProvider serviceProvider)
+    public void Inject(IMasterServerCommunicator masterServerCommunicator, IPacketHandler packetHandler)
     {
         _masterServerCommunicator = masterServerCommunicator;
         _masterServerCommunicator.ConnectionEstablished += OnMasterServerConnectionEstablished;
         
-        _serviceProvider = serviceProvider;
+        _packetHandler = packetHandler;
     }
     
     public override void _PhysicsProcess(float delta)
@@ -70,10 +70,7 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
             try
             {
                 Packet packet = _packetSerializer.Deserialize(bytes);
-                if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type? handlerType))
-                    throw new BadPacketException($"Can't handle packet of type {packet.Type}");
-                var handler = (IPacketHandler)_serviceProvider.GetRequiredService(handlerType);
-                handler.HandleAsync(packet, senderId).CollectException();
+                _packetHandler.HandleAsync(packet, senderId).CollectException();
             }
             catch (BadPacketException e)
             {

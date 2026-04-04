@@ -3,7 +3,7 @@ using Soteo.Shared.Packets.MasterServer;
 
 namespace Soteo.Client.PacketHandlers;
 
-public class SpawnCharacterPacketHandler(ICharacterSpawner spawner) : PacketHandler<SpawnCharacterPacket>
+public class SpawnCharacterPacketHandler(IEntitySpawner spawner) : PacketHandler<SpawnCharacterPacket>
 {
     protected override void Handle(SpawnCharacterPacket packet, Guid senderId)
     {

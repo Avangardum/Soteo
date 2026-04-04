@@ -2,9 +2,15 @@ using Soteo.Client.Interfaces;
 
 namespace Soteo.Client.Nodes.Systems;
 
-public sealed class CharacterSpawner : Node, ICharacterSpawner
+public sealed class EntitySpawner : Node, IEntitySpawner
 {
+    private IEntityRoots _entityRoots = null!;
     private PackedScene _playerCharacterScene = null!;
+    
+    public void Inject(IEntityRoots shard)
+    {
+        _entityRoots = shard;
+    }
     
     public override void _Ready()
     {
@@ -15,6 +21,6 @@ public sealed class CharacterSpawner : Node, ICharacterSpawner
     {
         var playerCharacter = _playerCharacterScene.Instance<PlayerCharacter>();
         playerCharacter.Name = characterId.ToString();
-        AddChild(playerCharacter); // todo use some other node as parent
+        _entityRoots.PlayerCharacterRoot.AddChild(playerCharacter);
     }
 }

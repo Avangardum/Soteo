@@ -20,16 +20,21 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     private readonly WebSocketClient _wsClient = new();
     private readonly IPacketSerializer _packetSerializer = new UniversalPacketSerializer();
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
-    private IServiceProvider _serviceProvider = null!;
+    private IPacketHandler _packetHandler = null!;
     private IShardLoader _shardLoader = null!;
+    private IUserIdRepository _userIdRepository = null!;
     
     private string _token = "";
     private Status _status;
 
-    public void Inject(IServiceProvider serviceProvider, IShardLoader shardLoader)
+    public void Inject(IPacketHandler packetHandler, IShardLoader shardLoader, IUserIdRepository userIdRepository)
     {
-        _serviceProvider = serviceProvider;
+        _packetHandler = packetHandler;
         _shardLoader = shardLoader;
+        _userIdRepository = userIdRepository;
+        
+        // When running the server from the editor, connect on button press
+        if (IsServer && !Main.EditorIsServer) ConnectAsShardServer();
     }
     
     public event Action ConnectionEstablished = delegate {};
@@ -44,8 +49,6 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
         
         AddChild(_httpRequest);
         _httpRequest.Connect("request_completed", this, nameof(OnAuthRequestCompleted));
-        
-        if (IsServer) ConnectAsShardServer();
     }
 
     public override void _PhysicsProcess(float delta)
@@ -89,8 +92,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     {
         byte[] bytes = _wsClient.GetPeer(1).GetPacket();
         Packet packet = _packetSerializer.Deserialize(bytes);
-        var handler = (IPacketHandler)_serviceProvider.GetRequiredService(TypeLocator.PacketHandlerTypes[packet.Type]);
-        handler.HandleAsync(packet, MasterServerId).CollectException();
+        _packetHandler.HandleAsync(packet, MasterServerId).CollectException();
     }
     
     public void OnServerCloseRequest(int code, string reason)
@@ -115,21 +117,11 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         string intercomSecret = ClrEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
             throw new InvalidOperationException("Intercom secret is not set.");
-        Guid id = GetLocalShardServerId();
+        Guid id = _userIdRepository.UserId;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(intercomSecret)}";
         string url = $"{AuthServerUrl}/token/service";
         _httpRequest.Request(url, method: HTTPClient.Method.Post, customHeaders: headers, requestData: body);
-    }
-    
-    private Guid GetLocalShardServerId()
-    {
-        if (!IsServer) throw new InvalidOperationException();
-        string[] args = OS.GetCmdlineArgs();
-        int idIndex = args.IndexOf("--server") + 1;
-        if (idIndex == 0 || idIndex == args.Length || !Guid.TryParse(args[idIndex], out var id))
-            throw new ArgumentException("No server id found in args");
-        return id;
     }
     
     public void OnAuthRequestCompleted(int result, int responseCode, string[] headers, byte[] body)
