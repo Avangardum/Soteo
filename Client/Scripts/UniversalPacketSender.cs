@@ -17,7 +17,8 @@ public sealed class UniversalPacketSender
 
     public void SendUnreliable(Packet packet, Guid receiverId)
     {
-        if (receiverId == MasterServerId) throw new InvalidOperationException();
+        if (receiverId == MasterServerId)
+            throw new InvalidOperationException("Master server doesn't support unreliable messages");
         clientShardServerSender.SendUnreliable(packet, receiverId);
     }
 

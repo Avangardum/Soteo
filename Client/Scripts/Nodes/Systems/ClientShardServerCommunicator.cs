@@ -38,7 +38,7 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
     
     public override void _PhysicsProcess(float delta)
     {
-        // Server polls in _PhysicsProcess so that the simulation code only runs on physics ticks
+        // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
         if (IsServer) Poll();
     }
 
@@ -190,7 +190,7 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
         
         async void SendTestPacket()
         {
-            await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
+            await ToSignal(GetTree().CreateTimer(3.0f), "timeout");
             GD.Print("Sending move");
             SendReliable(new MovePacket(), packet.PeerId);
             SendUnreliable(new MovePacket(), packet.PeerId);

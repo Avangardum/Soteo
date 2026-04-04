@@ -22,8 +22,8 @@ public abstract class PacketHandler<T> : IPacketHandler where T : Packet
         if (!condition) throw new BadPacketException(reason);
     }
     
-    protected void ValidateThisIsServer() => Validate(IsServer, "This packet can only be handled by a server");
+    protected void ValidateThisIsServer() => Validate(IsServer, $"{typeof(T)} can only be handled by a server");
     
     protected void ValidateIsMasterServer(Guid senderId) =>
-        Validate(senderId == MasterServerId, "Only the master server can send this");
+        Validate(senderId == MasterServerId, $"Only the master server can send {typeof(T)}");
 }

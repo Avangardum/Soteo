@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.Client.Extensions;
 using Soteo.Client.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Interfaces;
@@ -8,6 +9,7 @@ using Soteo.Shared.Packets.Shared;
 using Soteo.Shared.PacketSerializers.Shared;
 
 namespace Soteo.Client.Nodes.Systems;
+
 public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
 {
     private enum Status { Disconnected, Connecting, Connected }
@@ -48,7 +50,14 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
 
     public override void _PhysicsProcess(float delta)
     {
-        _wsClient.Poll();
+        // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
+        if (IsServer) _wsClient.Poll();
+    }
+    
+    public override void _Process(float delta)
+    {
+        // Client polls in _Process to minimize latency
+        if (!IsServer) _wsClient.Poll();
     }
 
     public void OnConnectionClosed(bool wasCleanClose)
@@ -81,7 +90,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
         byte[] bytes = _wsClient.GetPeer(1).GetPacket();
         Packet packet = _packetSerializer.Deserialize(bytes);
         var handler = (IPacketHandler)_serviceProvider.GetRequiredService(TypeLocator.PacketHandlerTypes[packet.Type]);
-        handler.HandleAsync(packet, MasterServerId);
+        handler.HandleAsync(packet, MasterServerId).CollectException();
     }
     
     public void OnServerCloseRequest(int code, string reason)
@@ -106,15 +115,16 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         string intercomSecret = ClrEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
             throw new InvalidOperationException("Intercom secret is not set.");
-        Guid id = GetShardServerId();
+        Guid id = GetLocalShardServerId();
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(intercomSecret)}";
         string url = $"{AuthServerUrl}/token/service";
         _httpRequest.Request(url, method: HTTPClient.Method.Post, customHeaders: headers, requestData: body);
     }
     
-    private Guid GetShardServerId()
+    private Guid GetLocalShardServerId()
     {
+        if (!IsServer) throw new InvalidOperationException();
         string[] args = OS.GetCmdlineArgs();
         int idIndex = args.IndexOf("--server") + 1;
         if (idIndex == 0 || idIndex == args.Length || !Guid.TryParse(args[idIndex], out var id))
@@ -129,10 +139,14 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
             GD.PrintErr($"Authentication error: {(HTTPRequest.Result)result}");
             _status = Status.Disconnected;
         }
-        else if (responseCode != 200)
+        else if (responseCode == 401)
         {
             GD.PrintErr("Incorrect credentials");
             _status = Status.Disconnected;
+        }
+        else if (responseCode != 200)
+        {
+            GD.PrintErr($"Auth server responded with code {responseCode}");
         }
         else
         {
