@@ -280,3 +280,8 @@ rect_pivot_offset = Vector2( 40, 4 )
 custom_fonts/font = SubResource( 66 )
 text = "000000000"
 align = 1
+
+[node name="AzimuthLine" type="Line2D" parent="."]
+points = PoolVector2Array( 0, -10, 0, -15 )
+width = 1.0
+default_color = Color( 1, 1, 1, 1 )

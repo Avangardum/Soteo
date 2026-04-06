@@ -8,5 +8,5 @@ namespace Soteo.Shared.Packets.PlayerShardServer;
 [PacketType(PacketType.Move)]
 public sealed record MovePacket : Packet
 {
-    public Vector2 Destination { get; set; }
+    public Vector2 Position { get; set; }
 }

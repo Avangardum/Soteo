@@ -1,5 +1,4 @@
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
 using Soteo.Client.Extensions;
 using Soteo.Client.Interfaces;
 using Soteo.Shared;
@@ -65,20 +64,17 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
 
     public void OnConnectionClosed(bool wasCleanClose)
     {
-        GD.Print("Master server connection closed");
         _status = Status.Disconnected;
     }
     
     public void OnConnectionError()
     {
-        GD.Print("Master server connection error");
         _status = Status.Disconnected;
     }
     
     public void OnConnectionEstablished(string protocol)
     {
         _status = Status.Connected;
-        GD.Print("Master server connection established, sending handshake packet");
         SendPacket(new MasterServerHandshakePacket { Token = _token, Version = Const.Version });
         ConnectionEstablished();
         if (!IsServer)
@@ -97,7 +93,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     
     public void OnServerCloseRequest(int code, string reason)
     {
-        GD.Print($"Master server closes connection with code {code} and reason {reason}");
+        
     }
     
     public void ConnectAsPlayer(string email, string password)
@@ -115,7 +111,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
         if (_status != Status.Disconnected) return;
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
-        string intercomSecret = ClrEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
+        string intercomSecret = SysEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
             throw new InvalidOperationException("Intercom secret is not set.");
         Guid id = _userIdRepository.UserId;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
@@ -136,7 +132,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
             GD.PrintErr("Incorrect credentials");
             _status = Status.Disconnected;
         }
-        else if (responseCode != 200)
+        else if (responseCode / 100 != 2)
         {
             GD.PrintErr($"Auth server responded with code {responseCode}");
         }

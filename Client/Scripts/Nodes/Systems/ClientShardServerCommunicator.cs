@@ -181,17 +181,6 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
             _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         if (connection == null) return;
         connection.SetRemoteDescription(type, packet.Sdp);
-        GD.Print("Set remote description");
-        GD.Print(packet.Sdp);
-        if (!IsServer) SendTestPacket(); // todo remove
-        
-        async void SendTestPacket()
-        {
-            await ToSignal(GetTree().CreateTimer(3.0f), "timeout");
-            GD.Print("Sending move");
-            SendReliable(new MovePacket(), packet.PeerId);
-            SendUnreliable(new MovePacket(), packet.PeerId);
-        }
     }
     
     public void AddRemoteIceCandidate(WebrtcIceCandidatePacket packet)
@@ -199,9 +188,5 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
         WebRTCPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         if (connection == null) return;
         connection.AddIceCandidate(packet.Media, packet.Index, packet.Name);
-        GD.Print("Added remote ice candidate");
-        GD.Print(packet.Media);
-        GD.Print(packet.Index);
-        GD.Print(packet.Name);
     }
 }

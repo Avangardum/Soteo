@@ -1,7 +1,10 @@
 global using Godot;
 global using System;
 global using static Soteo.Client.Globals;
-global using ClrEnvironment = System.Environment;
+global using SysEnvironment = System.Environment;
 global using GdEnvironment = Godot.Environment;
-global using ClrThread = System.Threading.Thread;
+global using SysThread = System.Threading.Thread;
 global using GdThread = Godot.Thread;
+global using GdArray = Godot.Collections.Array;
+global using GdVector2 = Godot.Vector2;
+global using SysVector2 = System.Numerics.Vector2;

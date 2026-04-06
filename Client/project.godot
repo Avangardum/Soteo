@@ -22,6 +22,14 @@ singletons=[ "res://webrtc/webrtc.tres" ]
 
 common/drop_mouse_on_gui_input_disabled=true
 
+[input]
+
+interact={
+"deadzone": 0.5,
+"events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":2,"canceled":false,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
+
 [mono]
 
 project/assembly_name="Soteo"
@@ -32,6 +40,7 @@ ssl/certificates="res://devcert.crt"
 
 [physics]
 
+common/physics_fps=20
 common/enable_pause_aware_picking=true
 
 [rendering]
