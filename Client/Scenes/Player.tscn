@@ -1,6 +1,6 @@
 [gd_scene load_steps=55 format=2]
 
-[ext_resource path="res://Scripts/Nodes/PlayerCharacter.cs" type="Script" id=1]
+[ext_resource path="res://Scripts/Client/Nodes/PlayerCharacter.cs" type="Script" id=1]
 [ext_resource path="res://Sprites/Cute Fantasy Free/Player/Player.png" type="Texture" id=2]
 [ext_resource path="res://Fonts/PixelOperator8.ttf" type="DynamicFontData" id=3]
 

@@ -1,4 +1,3 @@
-using System.Numerics;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Packets.Shared;

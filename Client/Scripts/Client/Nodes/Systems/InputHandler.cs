@@ -37,7 +37,7 @@ public sealed class InputHandler : Node2D
         }
         else
         {
-            _packetSender.SendReliable(new MovePacket { Position = position.Sys }, Const.TestShardId);
+            _packetSender.SendReliable(new MovePacket { Position = position }, Const.TestShardId);
         }
     }
 }

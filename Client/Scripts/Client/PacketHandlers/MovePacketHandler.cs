@@ -11,6 +11,6 @@ public sealed class MovePacketHandler(IEntitySpawner entitySpawner) : PacketHand
     protected override void Handle(MovePacket packet, Guid senderId)
     {
         ValidateThisIsServer();
-        entitySpawner.GetEntity<Unit>(senderId)?.SetCommand(new MoveCommand(packet.Position.Gd));
+        entitySpawner.GetEntity<Unit>(senderId)?.SetCommand(new MoveCommand(packet.Position));
     }
 }

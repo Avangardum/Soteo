@@ -1,5 +1,4 @@
 ﻿using System.Buffers.Binary;
-using System.Numerics;
 using System.Text;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Exceptions;
@@ -109,8 +108,8 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
 
     protected void SerializeVector2(Vector2 value, ref Span<byte> span)
     {
-        SerializeFloat(value.X, ref span);
-        SerializeFloat(value.Y, ref span);
+        SerializeFloat(value.x, ref span);
+        SerializeFloat(value.y, ref span);
     }
 
     protected Vector2 DeserializeVector2(ref Span<byte> span)
