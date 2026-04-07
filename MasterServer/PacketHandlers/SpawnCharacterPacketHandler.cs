@@ -23,6 +23,6 @@ public sealed class SpawnCharacterPacketHandler
         }
         Validate(character.ShardId == Guid.Empty, "Character is already spawned");
         character.ShardId = packet.PeerId;
-        await packetSender.RelayFromAsync(packet, sender.Id);
+        packetSender.RelayFrom(packet, sender.Id);
     }
 }

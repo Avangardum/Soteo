@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Soteo.MasterServer.Interfaces;
 using Soteo.MasterServer.PacketHandlers;
 using Soteo.Shared.Enums;
@@ -9,12 +8,12 @@ namespace Soteo.MasterServer;
 public static class TypeLocator
 {
     
-    public static readonly ImmutableDictionary<PacketType, Type> PacketHandlerTypes;
+    public static readonly Dictionary<PacketType, Type> PacketHandlerTypes;
     
     static TypeLocator()
     {
         PacketHandlerTypes = typeof(IPacketHandler).Assembly.ExportedTypes
             .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(IPacketHandler)))
-            .ToImmutableDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
+            .ToDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
     }
 }

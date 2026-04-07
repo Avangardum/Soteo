@@ -30,7 +30,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     // Fields for running a shard server from the editor
     public static bool EditorIsServer { get; private set; }
     public static Guid EditorLocalShardServerId { get; private set; }
-    [Export] private bool _editorIsServer;
+    [Export] private bool _editorIsServer = false;
     [Export] private string _editorLocalShardServerId = "";
 
     public override void _EnterTree()

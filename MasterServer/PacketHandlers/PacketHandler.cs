@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Soteo.MasterServer.GameState.DataObjects;
 using Soteo.MasterServer.Interfaces;
+using Soteo.Shared;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Packets.Shared;
 

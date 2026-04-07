@@ -11,6 +11,6 @@ public sealed class WebrtcIceCandidatePacketHandler(IPacketSender packetSender, 
     {
         if (!userRepo.TryGetValue(packet.PeerId, out User? receiver)) return;
         Validate(sender.IsPlayer && receiver.IsShard || sender.IsShard && receiver.IsPlayer, "WebRTC signaling can only happen between a player and a shard");
-        await packetSender.RelayFromAsync(packet, sender.Id);
+        packetSender.RelayFrom(packet, sender.Id);
     }
 }

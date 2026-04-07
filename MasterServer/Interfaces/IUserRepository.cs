@@ -5,6 +5,6 @@ namespace Soteo.MasterServer.Interfaces;
 
 public interface IUserRepository : IDictionary<Guid, User>
 {
-    void OnConnected(ClaimsPrincipal claims);
+    void OnConnected(Dictionary<string, object> claims);
     void OnDisconnected(Guid id);
 }
