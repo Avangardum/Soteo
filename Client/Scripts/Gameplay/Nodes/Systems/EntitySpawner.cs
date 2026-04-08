@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
 
@@ -29,16 +30,22 @@ public sealed class EntitySpawner : Node, IEntitySpawner
     
     public IEntity? GetEntity(Guid id) => _entities.GetOrDefault(id);
     
-    public void SpawnPlayerCharacter(Guid id) =>
-        SpawnEntity(id, _playerCharacterScene, _entityRoots.PlayerCharacterRoot);
-    
-    private void SpawnEntity(Guid id, PackedScene scene, Node2D root)
+    public PlayerCharacter SpawnPlayerCharacter(Guid id)
     {
-        var entity = scene.Instance<IEntity>();
+        var playerCharacter = SpawnEntity<PlayerCharacter>(id, _playerCharacterScene, _entityRoots.PlayerCharacterRoot);
+        playerCharacter.DisplayName = id.ToString()[^12..];
+        return playerCharacter;
+    }
+
+    private T SpawnEntity<T>(Guid id, PackedScene scene, Node2D root) where T : Node2D, IEntity
+    {
+        var entity = scene.Instance<T>();
         entity.Node.Name = id.ToString();
+        entity.Id = id;
         root.AddChild(entity.Node);
         _entities.Add(id, entity);
         entity.Node.Connect("tree_exited", this, nameof(OnEntityTreeExited), [id.ToByteArray()]);
+        return entity;
     }
     
     public void OnEntityTreeExited(byte[] id)

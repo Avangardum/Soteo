@@ -21,9 +21,9 @@ script = ExtResource( 3 )
 
 [node name="Map" type="Node2D" parent="."]
 
-[node name="Entities" type="Node2D" parent="."]
+[node name="Entities" type="YSort" parent="."]
 
-[node name="PlayerCharacters" type="Node2D" parent="Entities"]
+[node name="PlayerCharacters" type="YSort" parent="Entities"]
 
 [node name="NonPlayerCharacters" type="Node2D" parent="Entities"]
 

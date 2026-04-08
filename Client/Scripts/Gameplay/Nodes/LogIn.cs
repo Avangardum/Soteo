@@ -19,6 +19,16 @@ public class LogIn : Control
     {
         _emailLineEdit = GetNode<LineEdit>("Email");
         _passwordLineEdit = GetNode<LineEdit>("Password");
+        
+        LoadCredentialsFromCmdLineArgs();
+    }
+    
+    private void LoadCredentialsFromCmdLineArgs()
+    {
+        string[] args = OS.GetCmdlineArgs();
+        int emailIndex = args.IndexOf("--email") + 1;
+        if (emailIndex > 0 && emailIndex < args.Length)
+            _emailLineEdit.Text = args[emailIndex];
     }
 
     public void OnPlayerButtonUp()

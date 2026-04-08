@@ -244,9 +244,9 @@ animations = [ {
 "speed": 5.0
 } ]
 
-[sub_resource type="CapsuleShape2D" id=23]
-radius = 2.5
-height = 4.0
+[sub_resource type="CapsuleShape2D" id=67]
+radius = 2.0
+height = 5.0
 
 [sub_resource type="DynamicFont" id=66]
 size = 8
@@ -260,18 +260,18 @@ __meta__ = {
 }
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( 0.5, -5 )
 frames = SubResource( 7 )
 animation = "Idle Down"
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( -0.5, 4.5 )
 rotation = 1.5708
-shape = SubResource( 23 )
+shape = SubResource( 67 )
 
 [node name="Label" type="Label" parent="."]
 margin_left = -40.0
-margin_top = -19.0
+margin_top = -24.0
 margin_right = 40.0
 margin_bottom = -11.0
 grow_horizontal = 2
