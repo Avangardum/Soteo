@@ -21,11 +21,7 @@ public sealed class SynchronizationServer : Node
     
     public override void _Ready()
     {
-        if (!IsServer)
-        {
-            Free();
-            return;
-        }
+        if (!IsServer) QueueFree();
         ProcessPriority = (int)ProcessPriorityEnum.ReplicatorServer;
     }
 

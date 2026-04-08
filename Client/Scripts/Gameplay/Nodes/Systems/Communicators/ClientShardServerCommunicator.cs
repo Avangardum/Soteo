@@ -68,7 +68,7 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebrtc
             try
             {
                 Packet packet = _packetSerializer.Deserialize(bytes);
-                _packetHandler.HandleAsync(packet, senderId).CollectException();
+                _packetHandler.HandleAsync(packet, senderId).CollectException(); // todo async exception from client packets are not properly caught
             }
             catch (BadPacketException e)
             {

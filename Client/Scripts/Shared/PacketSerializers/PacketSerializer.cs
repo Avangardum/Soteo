@@ -79,7 +79,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
     
     protected void SerializeLong(long value, ref Span<byte> span)
     {
-        Span<byte> slice = SliceOff(sizeof(int), ref span);
+        Span<byte> slice = SliceOff(sizeof(long), ref span);
         BinaryPrimitives.WriteInt64BigEndian(slice, value);
     }
 

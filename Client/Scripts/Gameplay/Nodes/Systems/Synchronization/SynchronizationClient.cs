@@ -18,11 +18,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
     
     public override void _Ready()
     {
-        if (IsServer)
-        {
-            Free();
-            return;
-        }
+        if (IsServer) QueueFree();
     }
     
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet)

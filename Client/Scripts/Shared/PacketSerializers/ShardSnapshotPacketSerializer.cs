@@ -24,7 +24,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
 
     protected override int PacketSize(ShardSnapshotPacket packet)
     {
-        return base.PacketSize(packet) + SizeOf(packet.Tick) + packet.Snapshot.Entities.Sum(EntitySize);
+        return base.PacketSize(packet) + SizeOf(packet.Tick) + SizeOf(packet.Snapshot.Entities.Count) +
+            packet.Snapshot.Entities.Sum(EntitySize);
     }
     
     private int EntitySize(EntitySnapshot entity)
