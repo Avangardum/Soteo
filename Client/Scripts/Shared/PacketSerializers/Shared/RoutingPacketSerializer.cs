@@ -6,16 +6,16 @@ using Soteo.Shared.Packets.Shared;
 
 namespace Soteo.Shared.PacketSerializers.Shared;
 
-public sealed class UniversalPacketSerializer : IPacketSerializer
+public sealed class RoutingPacketSerializer : IPacketSerializer
 {
     private readonly Dictionary<PacketType, IPacketSerializer> _serializers;
 
-    public UniversalPacketSerializer()
+    public RoutingPacketSerializer()
     {
         _serializers = typeof(IPacketSerializer).Assembly.ExportedTypes
             .Where(it =>
                 !it.IsAbstract &&
-                it != typeof(UniversalPacketSerializer) &&
+                it != typeof(RoutingPacketSerializer) &&
                 it.IsAssignableTo(typeof(IPacketSerializer)))
             .ToDictionary
             (

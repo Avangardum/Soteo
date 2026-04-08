@@ -31,7 +31,7 @@ public sealed class MasterServer : Node
         services.AddSingleton<IUserRepository, UserRepository>();
         services.AddSingleton<ICharacterRepository, CharacterRepository>();
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
-        services.AddSingleton<IPacketSerializer, UniversalPacketSerializer>();
+        services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddSingleton<WebSocketCommunicator>();
         services.AddAlias<IPacketSender, WebSocketCommunicator>();
         

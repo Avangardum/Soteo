@@ -25,7 +25,7 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
     private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
         _peerConnectionsAndChannels = [];
     private IMasterServerCommunicator _masterServerCommunicator = null!;
-    private readonly IPacketSerializer _packetSerializer = new UniversalPacketSerializer();
+    private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
     private IPacketHandler _packetHandler = null!;
 
     public void Inject(IMasterServerCommunicator masterServerCommunicator, IPacketHandler packetHandler)

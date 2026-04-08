@@ -6,7 +6,7 @@ using Soteo.Shared.Packets.Shared;
 
 namespace Soteo.Client.PacketHandlers;
 
-public sealed class UniversalPacketHandler
+public sealed class RoutingPacketHandler
 (
     IServiceProvider rootServiceProvider,
     IShardServiceProvider shardServiceProvider,

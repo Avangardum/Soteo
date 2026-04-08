@@ -11,7 +11,7 @@ public sealed class SpawnCharacterPacketHandler
     IPacketSender packetSender
 ) : PacketHandler<SpawnCharacterPacket>
 {
-    public override async Task HandleAsync(SpawnCharacterPacket packet, User sender)
+    protected override void Handle(SpawnCharacterPacket packet, User sender)
     {
         userRepo.TryGetValue(packet.PeerId, out User? receiver);
         Validate(sender.IsPlayer && receiver is { IsShard: true },

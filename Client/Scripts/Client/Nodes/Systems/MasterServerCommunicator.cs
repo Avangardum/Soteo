@@ -17,7 +17,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     private const string AuthServerUrl = "https://localhost:3705";
 
     private readonly WebSocketClient _wsClient = new();
-    private readonly IPacketSerializer _packetSerializer = new UniversalPacketSerializer();
+    private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
     private IPacketHandler _packetHandler = null!;
     private IShardLoader _shardLoader = null!;

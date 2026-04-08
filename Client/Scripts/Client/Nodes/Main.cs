@@ -73,10 +73,10 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
         services.AddSingleton<IShardServiceProvider>(this);
         services.AddSingleton<IMasterServerCommunicator>(_masterServerCommunicator);
         services.AddSingleton<IPacketSender>(
-            new UniversalPacketSender(_masterServerCommunicator, _clientShardServerCommunicator));
+            new RoutingPacketSender(_masterServerCommunicator, _clientShardServerCommunicator));
         services.AddSingleton<IWebRtcSignalingReceiver>(_clientShardServerCommunicator);
         services.AddSingleton<IUserIdRepository, UserIdRepository>();
-        services.AddSingleton<IPacketHandler, UniversalPacketHandler>();
+        services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
         
         services.AddScoped<Shard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));

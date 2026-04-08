@@ -7,7 +7,7 @@ namespace Soteo.MasterServer.PacketHandlers;
 public sealed class WebrtcIceCandidatePacketHandler(IPacketSender packetSender, IUserRepository userRepo) :
     PacketHandler<WebrtcIceCandidatePacket>
 {
-    public override async Task HandleAsync(WebrtcIceCandidatePacket packet, User sender)
+    protected override void Handle(WebrtcIceCandidatePacket packet, User sender)
     {
         if (!userRepo.TryGetValue(packet.PeerId, out User? receiver)) return;
         Validate(sender.IsPlayer && receiver.IsShard || sender.IsShard && receiver.IsPlayer,

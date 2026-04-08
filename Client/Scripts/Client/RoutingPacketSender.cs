@@ -3,7 +3,7 @@ using Soteo.Shared.Packets.Shared;
 
 namespace Soteo.Client;
 
-public sealed class UniversalPacketSender
+public sealed class RoutingPacketSender
 (
     IMasterServerCommunicator masterSender,
     IPacketSender clientShardServerSender
