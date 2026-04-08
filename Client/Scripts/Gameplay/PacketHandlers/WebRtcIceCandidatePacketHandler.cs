@@ -3,11 +3,11 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.PacketHandlers;
 
-public sealed class WebRtcIceCandidatePacketHandler(IWebRtcSignalingReceiver receiver) :
+public sealed class WebRtcIceCandidatePacketHandler(IWebrtcPacketReceiver receiver) :
     PacketHandler<WebrtcIceCandidatePacket>
 {
     protected override void Handle(WebrtcIceCandidatePacket packet, Guid senderId)
     {
-        receiver.AddRemoteIceCandidate(packet);
+        receiver.ReceiveWebrtcIceCandidatePacket(packet);
     }
 }

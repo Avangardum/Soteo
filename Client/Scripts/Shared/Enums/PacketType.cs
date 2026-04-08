@@ -5,15 +5,16 @@ public enum PacketType : byte
     // Shared
     Ok,
     BadInput,
-    InternalServerError,
-    // Master server <--> *
+    // Master server <--> Client / Shard server
     MasterServerHandshake,
     SpawnCharacter,
     CharacterRecalled,
     WebrtcSdp,
     WebrtcIceCandidate,
-    // Client <--> Shard
+    // Client --> Shard server
     Move,
     Attack,
-    UseAbility
+    UseAbility,
+    // Shard Server --> Client
+    ShardSnapshot
 }

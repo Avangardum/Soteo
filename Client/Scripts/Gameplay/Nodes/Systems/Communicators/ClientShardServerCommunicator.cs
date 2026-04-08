@@ -1,6 +1,7 @@
 using Godot.Collections;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Shared.Attributes;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
@@ -9,7 +10,7 @@ using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 
-public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtcSignalingReceiver
+public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebrtcPacketReceiver
 {
     private record PeerConnectionAndChannels
     (
@@ -24,6 +25,7 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
     private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
     private IPacketHandler _packetHandler = null!;
 
+    [Inject]
     public void Inject(IMasterServerCommunicator masterServerCommunicator, IPacketHandler packetHandler)
     {
         _masterServerCommunicator = masterServerCommunicator;
@@ -170,7 +172,7 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
         channel.PutPacket(bytes);
     }
     
-    public void SetRemoteDescription(WebrtcSdpPacket packet)
+    public void ReceiveWebrtcSdpPacket(WebrtcSdpPacket packet)
     {
         string type = IsServer ? "offer" : "answer";
         WebRTCPeerConnection? connection = IsServer ? CreateConnection(packet.PeerId) :
@@ -179,7 +181,7 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebRtc
         connection.SetRemoteDescription(type, packet.Sdp);
     }
     
-    public void AddRemoteIceCandidate(WebrtcIceCandidatePacket packet)
+    public void ReceiveWebrtcIceCandidatePacket(WebrtcIceCandidatePacket packet)
     {
         WebRTCPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         if (connection == null) return;

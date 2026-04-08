@@ -1,5 +1,6 @@
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Shared.Attributes;
 using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Nodes.Systems;
@@ -8,6 +9,7 @@ public sealed class InputHandler : Node2D
 {
     private IPacketSender _packetSender = null!;
     
+    [Inject]
     public void Inject(IPacketSender packetSender)
     {
         _packetSender = packetSender;

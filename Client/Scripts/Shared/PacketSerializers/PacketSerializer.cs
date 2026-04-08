@@ -76,6 +76,18 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         Span<byte> slice = SliceOff(sizeof(int), ref span);
         return BinaryPrimitives.ReadInt32BigEndian(slice);
     }
+    
+    protected void SerializeLong(long value, ref Span<byte> span)
+    {
+        Span<byte> slice = SliceOff(sizeof(int), ref span);
+        BinaryPrimitives.WriteInt64BigEndian(slice, value);
+    }
+
+    protected long DeserializeLong(ref Span<byte> span)
+    {
+        Span<byte> slice = SliceOff(sizeof(long), ref span);
+        return BinaryPrimitives.ReadInt64BigEndian(slice);
+    }
 
     protected void SerializeUShort(ushort value, ref Span<byte> span)
     {
@@ -206,4 +218,5 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         sizeof(int) + array.Length * SizeOf<TElement>();
 
     protected int SizeOf(string s) => sizeof(int) + Encoding.UTF8.GetByteCount(s);
+    protected int SizeOfNullable<T>(T? nullable) where T : unmanaged => nullable == null ? 0 : SizeOf(nullable.Value);
 }

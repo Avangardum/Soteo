@@ -3,8 +3,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Systems;
 using Soteo.Gameplay.Nodes.Systems.Communicators;
+using Soteo.Gameplay.Nodes.Systems.Synchronization;
 using Soteo.Gameplay.PacketHandlers;
 using Soteo.Shared;
+using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes;
@@ -68,20 +70,21 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     
     private void RegisterServices(IServiceCollection services)
     {
+        services.AddSingleton(this);
         services.AddSingleton<IShardLoader>(this);
         services.AddSingleton<IShardServiceProvider>(this);
         services.AddSingleton<IMasterServerCommunicator>(_masterServerCommunicator);
         services.AddSingleton<IPacketSender>(
             new RoutingPacketSender(_masterServerCommunicator, _clientShardServerCommunicator));
-        services.AddSingleton<IWebRtcSignalingReceiver>(_clientShardServerCommunicator);
+        services.AddSingleton<IWebrtcPacketReceiver>(_clientShardServerCommunicator);
         services.AddSingleton<IUserIdRepository, UserIdRepository>();
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
         
         services.AddScoped<Shard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
-        services.AddScoped<IEntityRoots>(sp => sp.GetService<Shard>()!);
-        services.AddScoped<IEntitySpawner>(
-            sp => sp.GetRequiredService<Shard>().GetNode<EntitySpawner>("Systems/EntitySpawner"));
+        services.AddAlias<IEntityRoots, Shard>();
+        services.AddShardScopedNode<IEntitySpawner, EntitySpawner>();
+        services.AddShardScopedNode<ISynchronizationPacketReceiver, SynchronizationClient>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
     }
@@ -89,7 +92,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     private void InjectInto(Node node, IServiceProvider serviceProvider)
     {
         List<MethodInfo> injectMethods = node.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .Where(it => it.Name == "Inject")
+            .Where(it => it.HasAttribute<InjectAttribute>())
             .ToList();
         switch (injectMethods.Count)
         {

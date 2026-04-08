@@ -3,10 +3,10 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.PacketHandlers;
 
-public sealed class WebRtcSdpPacketHandler(IWebRtcSignalingReceiver receiver) : PacketHandler<WebrtcSdpPacket>
+public sealed class WebRtcSdpPacketHandler(IWebrtcPacketReceiver receiver) : PacketHandler<WebrtcSdpPacket>
 {
     protected override void Handle(WebrtcSdpPacket packet, Guid senderId)
     {
-        receiver.SetRemoteDescription(packet);
+        receiver.ReceiveWebrtcSdpPacket(packet);
     }
 }

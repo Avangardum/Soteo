@@ -1,6 +1,7 @@
 using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes;
+using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.PacketHandlers;

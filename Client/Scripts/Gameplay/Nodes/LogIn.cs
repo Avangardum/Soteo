@@ -1,4 +1,5 @@
 using Soteo.Gameplay.Interfaces;
+using Soteo.Shared.Attributes;
 
 namespace Soteo.Gameplay.Nodes;
 
@@ -8,6 +9,7 @@ public class LogIn : Control
     private LineEdit _passwordLineEdit = null!;
     private IMasterServerCommunicator _masterServerCommunicator = null!;
 
+    [Inject]
     public void Inject(IMasterServerCommunicator masterServerCommunicator)
     {
         _masterServerCommunicator = masterServerCommunicator;

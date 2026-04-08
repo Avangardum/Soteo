@@ -3,9 +3,9 @@ using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Extensions;
 
-namespace Soteo.Gameplay.Nodes;
+namespace Soteo.Gameplay.Nodes.Entities;
 
-public class Unit : KinematicBody2D
+public class Unit : KinematicBody2D, IEntity
 {
     [Export] private float _movementSpeed = 50;
     [Export] private float _rotationSpeedDeg = 360;
@@ -14,6 +14,10 @@ public class Unit : KinematicBody2D
     
     protected Queue<ICommand> Commands { get; } = [];
 
+    public Guid Id { get; set; }
+
+    Node2D IEntity.Node => this;
+    
     public float Azimuth
     {
         get;

@@ -1,6 +1,7 @@
 using System.Text;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
@@ -25,6 +26,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     private string _token = "";
     private Status _status;
 
+    [Inject]
     public void Inject(IPacketHandler packetHandler, IShardLoader shardLoader, IUserIdRepository userIdRepository)
     {
         _packetHandler = packetHandler;

@@ -6,17 +6,19 @@ namespace Soteo.Shared.Extensions;
 
 public static class ReflectionExtensions
 {
-    extension(Type self)
+    extension (MemberInfo self)
     {
-        public bool HasAttribute<T>() where T : Attribute =>
-            CustomAttributeExtensions.GetCustomAttribute<T>(self) != null;
+        public bool HasAttribute<T>() where T : Attribute => self.GetCustomAttribute<T>() != null;
         
         public T? GetCustomAttribute<T>() where T : Attribute =>
             (T)self.GetCustomAttribute(typeof(T));
         
         public T GetRequiredAttribute<T>() where T : Attribute =>
             self.GetCustomAttribute<T>() ?? throw new ArgumentException($"{typeof(T)} not found on {self}.");
-        
+    }
+    
+    extension (Type self)
+    {
         public IEnumerable<Type> BaseTypes
         {
             get
