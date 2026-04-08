@@ -27,7 +27,7 @@ public sealed class AuthController : Controller
     public async Task<IActionResult> GetPlayerToken(string email, string password)
     {
         if (!ModelState.IsValid) return BadRequest();
-        var user = await _userManager.FindByEmailAsync(email);
+        IdentityUser? user = await _userManager.FindByEmailAsync(email);
         if (user == null || !await _userManager.CheckPasswordAsync(user, password)) return Unauthorized();
         List<Claim> claims =
         [

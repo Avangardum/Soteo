@@ -5,5 +5,5 @@ namespace Soteo.MasterServer.Interfaces;
 
 public interface IPacketHandler
 {
-    Task HandleAsync(Packet packet, User user);
+    Task HandleAsync(Packet packet, User sender);
 }

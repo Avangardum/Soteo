@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Shared.Extensions;
 
-namespace Soteo.Client;
+namespace Soteo.Shared;
 
 /// <summary>
 /// Custom IServiceProvider implementation. The default implementation is avoided because it uses threading, which

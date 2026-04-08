@@ -14,6 +14,10 @@ config/name="Soteo"
 run/main_scene="res://Scenes/Main.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+AsyncExceptionCollector="*res://Scripts/Shared/AsyncExceptionCollector.cs"
+
 [gdnative]
 
 singletons=[ "res://webrtc/webrtc.tres" ]

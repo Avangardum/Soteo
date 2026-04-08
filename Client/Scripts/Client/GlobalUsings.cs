@@ -8,3 +8,4 @@ global using GdThread = Godot.Thread;
 global using GdArray = Godot.Collections.Array;
 global using GdVector2 = Godot.Vector2;
 global using SysVector2 = System.Numerics.Vector2;
+global using Object = Godot.Object;

@@ -5,7 +5,7 @@ namespace Soteo.MasterServer.GameState.Repositories;
 
 public class UserRepository : Dictionary<Guid, User>, IUserRepository
 {
-    public void OnConnected(Dictionary<string, object> claims)
+    public void OnConnected(IDictionary<string, object> claims)
     {
         Guid id = Guid.Parse((string)claims["sub"]);
         if (TryGetValue(id, out User? user))
@@ -18,8 +18,8 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
             {
                 Id = id,
                 IsConnected = true,
-                IsPlayer = (bool)claims["IsPlayer"],
-                IsShard = (bool)claims["IsShard"]
+                IsPlayer = claims.ContainsKey("player"),
+                IsShard = claims.ContainsKey("shard")
             };
             Add(id, user);
         }

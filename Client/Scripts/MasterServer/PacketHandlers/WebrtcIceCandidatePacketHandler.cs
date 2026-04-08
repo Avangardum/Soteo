@@ -10,7 +10,8 @@ public sealed class WebrtcIceCandidatePacketHandler(IPacketSender packetSender, 
     public override async Task HandleAsync(WebrtcIceCandidatePacket packet, User sender)
     {
         if (!userRepo.TryGetValue(packet.PeerId, out User? receiver)) return;
-        Validate(sender.IsPlayer && receiver.IsShard || sender.IsShard && receiver.IsPlayer, "WebRTC signaling can only happen between a player and a shard");
+        Validate(sender.IsPlayer && receiver.IsShard || sender.IsShard && receiver.IsPlayer,
+            "WebRTC signaling can only happen between a player and a shard");
         packetSender.RelayFrom(packet, sender.Id);
     }
 }
