@@ -1,5 +1,5 @@
 using Soteo.Shared.Attributes;
-using Soteo.Shared.Packets.Shared;
+using Soteo.Shared.Packets;
 
 namespace Soteo.Shared.Interfaces;
 

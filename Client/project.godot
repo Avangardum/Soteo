@@ -16,7 +16,8 @@ config/icon="res://icon.png"
 
 [autoload]
 
-AsyncExceptionCollector="*res://Scripts/Shared/AsyncExceptionCollector.cs"
+AsyncExceptionCollector="*res://Scripts/Shared/Nodes/Autoloads/AsyncExceptionCollector.cs"
+AppDomainValidator="*res://Scripts/Shared/Nodes/Autoloads/AppDomainValidator.cs"
 
 [gdnative]
 

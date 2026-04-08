@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Soteo.MasterServer.GameState.DataObjects;
 using Soteo.MasterServer.Interfaces;
 using Soteo.Shared.Exceptions;
-using Soteo.Shared.Packets.Shared;
+using Soteo.Shared.Packets;
 
 namespace Soteo.MasterServer.PacketHandlers;
 

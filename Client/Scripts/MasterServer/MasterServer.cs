@@ -1,11 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.MasterServer.Communicators;
 using Soteo.MasterServer.GameState.Repositories;
 using Soteo.MasterServer.Interfaces;
 using Soteo.MasterServer.PacketHandlers;
 using Soteo.Shared;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
-using Soteo.Shared.PacketSerializers.Shared;
+using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.MasterServer;
 
