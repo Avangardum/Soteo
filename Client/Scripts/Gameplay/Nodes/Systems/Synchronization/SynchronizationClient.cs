@@ -50,9 +50,12 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
     public override void _Process(float delta)
     {
         if (_tick == -1 && !TryInitialize()) return;
+        
         double prevSecondValue = _second;
         _second = _tick / _ticksPerSecond;
-        if ((long)_second > (long)prevSecondValue) _deltaToLastSnapshotTickHistoryRing[(long)_second] = float.MaxValue;
+        if ((long)_second > (long)prevSecondValue)
+            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, float.MaxValue);
+
         if (_tick > _lastSnapshotTick)
         {
             _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, -1);
