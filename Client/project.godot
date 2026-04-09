@@ -19,6 +19,11 @@ config/icon="res://icon.png"
 AsyncExceptionCollector="*res://Scripts/Shared/Nodes/Autoloads/AsyncExceptionCollector.cs"
 AppDomainValidator="*res://Scripts/Shared/Nodes/Autoloads/AppDomainValidator.cs"
 
+[display]
+
+window/stretch/mode="2d"
+window/stretch/aspect="expand"
+
 [gdnative]
 
 singletons=[ "res://webrtc/webrtc.tres" ]
