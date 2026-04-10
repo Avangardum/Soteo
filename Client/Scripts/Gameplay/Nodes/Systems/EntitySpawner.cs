@@ -25,6 +25,9 @@ public sealed class EntitySpawner : Node, IEntitySpawner
     }
     
     public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;
+    
+    public event Action<IEntity> EntityAdded = delegate {};
+    public event Action<Guid> EntityRemoved = delegate {};
 
     public T? GetEntity<T>(Guid id) => (T?)_entities.GetOrDefault(id);
     
@@ -34,6 +37,7 @@ public sealed class EntitySpawner : Node, IEntitySpawner
     {
         var playerCharacter = SpawnEntity<PlayerCharacter>(id, _playerCharacterScene, _entityRoots.PlayerCharacterRoot);
         playerCharacter.DisplayName = id.ToString()[^12..];
+        EntityAdded(playerCharacter);
         return playerCharacter;
     }
 
@@ -48,8 +52,10 @@ public sealed class EntitySpawner : Node, IEntitySpawner
         return entity;
     }
     
-    public void OnEntityTreeExited(byte[] id)
+    public void OnEntityTreeExited(byte[] idBytes)
     {
-        _entities.Remove(new Guid(id));
+        var id = new Guid(idBytes);
+        _entities.Remove(id);
+        EntityRemoved(id);
     }
 }

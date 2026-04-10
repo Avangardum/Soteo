@@ -56,12 +56,12 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
             LoadShard();
         }
         
-        if (EditorIsServer) GetNode<Button>("UI/ConnectAsServerButton").Visible = true;
+        if (EditorIsServer) GetNode<Button>("Ui/ConnectAsServerButton").Visible = true;
     }
     
     private void GetNodes()
     {
-        _logIn = GetNode<LogIn>("UI/LogIn");
+        _logIn = GetNode<LogIn>("Ui/LogIn");
         _shardRoot = GetNode<Node2D>("Shards");
         _masterServerCommunicator = GetNode<MasterServerCommunicator>("Systems/MasterServerCommunicator");
         _clientShardServerCommunicator =
@@ -70,27 +70,46 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     
     private void RegisterServices(IServiceCollection services)
     {
+        RegisterSharedServices(services);
+        if (IsServer) RegisterServerServices(services);
+        else RegisterClientServices(services);
+    }
+    
+    private void RegisterSharedServices(IServiceCollection services)
+    {
         services.AddSingleton(this);
         services.AddSingleton<IShardLoader>(this);
         services.AddSingleton<IShardServiceProvider>(this);
         services.AddSingleton<IMasterServerCommunicator>(_masterServerCommunicator);
         services.AddSingleton<IPacketSender>(
             new RoutingPacketSender(_masterServerCommunicator, _clientShardServerCommunicator));
-        services.AddSingleton<IWebrtcPacketReceiver>(_clientShardServerCommunicator);
-        services.AddSingleton<IUserIdRepository, UserIdRepository>();
+        services.AddSingleton<IWebrtcPacketReceiver>(_clientShardServerCommunicator); // todo rename to gameplay communicator
+        services.AddSingleton<IUserIdRepository, UserIdRepository>(); // todo rename to current...
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
         
         services.AddScoped<Shard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
         services.AddAlias<IEntityRoots, Shard>();
         services.AddShardScopedNode<IEntitySpawner, EntitySpawner>();
-        services.AddShardScopedNode<ISynchronizationPacketReceiver, SynchronizationClient>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
     }
     
+    private void RegisterServerServices(IServiceCollection services)
+    {
+        
+    }
+    
+    private void RegisterClientServices(IServiceCollection services)
+    {
+        services.AddShardScopedNode<ISynchronizationPacketReceiver, SynchronizationClient>();
+        services.AddSingletonNode<Camera2D>("Camera");
+    }
+    
     private void InjectInto(Node node, IServiceProvider serviceProvider)
     {
+        if (!IsInstanceValid(node) || node.IsQueuedForDeletion()) return;
+        
         List<MethodInfo> injectMethods = node.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
             .Where(it => it.HasAttribute<InjectAttribute>())
             .ToList();

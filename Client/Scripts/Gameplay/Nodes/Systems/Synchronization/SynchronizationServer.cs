@@ -22,7 +22,7 @@ public sealed class SynchronizationServer : Node
     public override void _Ready()
     {
         if (!IsServer) QueueFree();
-        ProcessPriority = (int)ProcessPriorityEnum.ReplicatorServer;
+        ProcessPriority = (int)ProcessPriorityEnum.SynchronizationServer;
     }
 
     public override void _PhysicsProcess(float delta)

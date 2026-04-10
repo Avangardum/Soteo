@@ -10,20 +10,24 @@ public static class ServiceCollectionExtensions
         public IServiceCollection AddAlias<TAlias, TRefersTo>() where TRefersTo : TAlias where TAlias : class =>
             self.AddTransient<TAlias>(sp => sp.GetService<TRefersTo>()!);
         
-        public IServiceCollection AddSingletonNode<TService, TImplementation>(string? path = null)
+        public IServiceCollection AddSingletonNode<TService>(string path) where TService : class =>
+            self.AddSingleton<TService>(sp => sp.GetRequiredService<Main>().GetNode<TService>(path));
+        
+        public IServiceCollection AddSingletonNode<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
         {
-            path ??= "Systems/" + typeof(TImplementation).Name;
-            return self.AddSingleton<TService>(sp => sp.GetRequiredService<Main>().GetNode<TImplementation>(path));
+            return self.AddSingletonNode<TService>("Systems/" + typeof(TImplementation).Name); // todo rename systems to services
         }
 
-        public IServiceCollection AddShardScopedNode<TService, TImplementation>(string? path = null)
+        public IServiceCollection AddShardScopedNode<TService>(string path) where TService : class =>
+            self.AddScoped<TService>(sp => sp.GetRequiredService<Shard>().GetNode<TService>(path));
+        
+        public IServiceCollection AddShardScopedNode<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
         {
-            path ??= "Systems/" + typeof(TImplementation).Name;
-            return self.AddScoped<TService>(sp => sp.GetRequiredService<Shard>().GetNode<TImplementation>(path));
+            return self.AddShardScopedNode<TService>("Systems/" + typeof(TImplementation).Name);
         }
     }
 }
