@@ -57,4 +57,6 @@ public static class SoteoMath
     public static double InverseLerp(double from, double to, double value) => (value - from) / (to - from);
     
     public static int PosMod(long value, int modulo) => (int)(value >= 0 ? value % modulo : value % modulo + modulo);
+    
+    public static float Log(float value, float newBase) => (float)Math.Log(value, newBase);
 }

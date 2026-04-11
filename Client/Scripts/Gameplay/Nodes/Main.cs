@@ -150,5 +150,6 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
         _shardServiceScopes[shardId] = scope;
     }
 
-    public IServiceProvider? GetServiceProviderForShard(Guid id) => _shardServiceScopes.GetOrDefault(id)?.ServiceProvider;
+    public IServiceProvider? GetServiceProviderForShard(Guid id) =>
+        _shardServiceScopes.GetOrDefault(id)?.ServiceProvider;
 }
