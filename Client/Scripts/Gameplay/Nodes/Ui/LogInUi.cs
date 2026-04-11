@@ -3,7 +3,7 @@ using Soteo.Shared.Attributes;
 
 namespace Soteo.Gameplay.Nodes;
 
-public class LogIn : Control
+public class LogInUi : Control
 {
     private LineEdit _emailLineEdit = null!;
     private LineEdit _passwordLineEdit = null!;

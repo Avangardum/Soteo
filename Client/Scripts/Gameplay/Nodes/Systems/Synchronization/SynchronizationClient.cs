@@ -8,7 +8,7 @@ namespace Soteo.Gameplay.Nodes.Systems.Synchronization;
 
 public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
 {
-    private IEntitySpawner _entitySpawner = null!;
+    private IEntityManager _entityManager = null!;
     
     private readonly int _ticksPerSecond;
     private double _tick = -1;
@@ -37,9 +37,9 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
     }
     
     [Inject]
-    public void Inject(IEntitySpawner entitySpawner)
+    public void Inject(IEntityManager entityManager)
     {
-        _entitySpawner = entitySpawner;
+        _entityManager = entityManager;
     }
     
     public override void _Ready()
@@ -129,22 +129,22 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
     
     private void ReplicateSnapshot(ShardSnapshot snapshot)
     {
-        IEnumerable<Guid> oldEntityIds = _entitySpawner.Entities.Keys;
+        IEnumerable<Guid> oldEntityIds = _entityManager.Entities.Keys;
         IEnumerable<Guid> newEntityIds = snapshot.Entities.Select(it => it.Id);
         IEnumerable<Guid> removedEntityIds = oldEntityIds.Except(newEntityIds);
         IEnumerable<Guid> addedEntityIds = newEntityIds.Except(oldEntityIds);
         
         foreach (Guid id in removedEntityIds)
         {
-            _entitySpawner.GetEntity<Node2D>(id)!.QueueFree();
+            _entityManager.GetEntity<Node2D>(id)!.QueueFree();
         }
         foreach (Guid id in addedEntityIds)
         {
-            _entitySpawner.SpawnPlayerCharacter(id);
+            _entityManager.SpawnPlayerCharacter(id);
         }
         foreach (EntitySnapshot entitySnapshot in snapshot.Entities)
         {
-            IEntity entity = _entitySpawner.GetEntity(entitySnapshot.Id)!;
+            IEntity entity = _entityManager.GetEntity(entitySnapshot.Id)!;
             entitySnapshot.ApplyToEntity(entity);
         }
     }

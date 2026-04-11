@@ -5,12 +5,16 @@ using Soteo.Shared.Attributes;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
+using Soteo.Shared.Nodes.Autoloads;
 using Soteo.Shared.Packets;
 using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 
-public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebrtcPacketReceiver
+/// <summary>
+/// Communicates between clients and shard servers
+/// </summary>
+public sealed class GameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver
 {
     private record PeerConnectionAndChannels
     (
@@ -65,16 +69,24 @@ public sealed class ClientShardServerCommunicator : Node, IPacketSender, IWebrtc
         while (channel.GetAvailablePacketCount() > 0)
         {
             byte[] bytes = channel.GetPacket();
-            try
-            {
-                Packet packet = _packetSerializer.Deserialize(bytes);
-                _packetHandler.HandleAsync(packet, senderId).CollectException(); // todo async exception from client packets are not properly caught
-            }
-            catch (BadPacketException e)
-            {
-                if (IsServer) SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
-                else throw;
-            }
+            HandlePacket(bytes, senderId);
+        }
+    }
+    
+    private async void HandlePacket(byte[] bytes, Guid senderId)
+    {
+        try
+        {
+            Packet packet = _packetSerializer.Deserialize(bytes);
+            await _packetHandler.HandleAsync(packet, senderId);
+        }
+        catch (BadPacketException e)
+        {
+            SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
+        }
+        catch (Exception e)
+        {
+            AsyncExceptionCollector.Collect(e);
         }
     }
     

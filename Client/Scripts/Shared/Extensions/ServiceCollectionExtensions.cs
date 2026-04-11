@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
             where TImplementation : class, TService
             where TService : class
         {
-            return self.AddSingletonNode<TService>("Systems/" + typeof(TImplementation).Name); // todo rename systems to services
+            return self.AddSingletonNode<TService>("Systems/" + typeof(TImplementation).Name);
         }
 
         public IServiceCollection AddShardScopedNode<TService>(string path) where TService : class =>

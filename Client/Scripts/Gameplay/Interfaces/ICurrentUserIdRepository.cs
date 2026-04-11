@@ -1,6 +1,6 @@
 namespace Soteo.Gameplay.Interfaces;
 
-public interface IUserIdRepository
+public interface ICurrentUserIdRepository
 {
     Guid UserId { get; set; }
 }

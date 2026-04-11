@@ -2,7 +2,7 @@ using Soteo.Gameplay.Nodes.Entities;
 
 namespace Soteo.Gameplay.Interfaces;
 
-public interface IEntitySpawner
+public interface IEntityManager
 {
     IReadOnlyDictionary<Guid, IEntity> Entities { get; }
     

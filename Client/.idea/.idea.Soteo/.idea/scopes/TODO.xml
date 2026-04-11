@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="TODO" pattern="file:*/&amp;&amp;!file:wwwroot//*" />
+</component>

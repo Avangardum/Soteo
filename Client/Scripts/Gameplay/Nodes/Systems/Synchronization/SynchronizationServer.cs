@@ -7,15 +7,15 @@ namespace Soteo.Gameplay.Nodes.Systems.Synchronization;
 
 public sealed class SynchronizationServer : Node
 {
-    private IEntitySpawner _entitySpawner = null!;
+    private IEntityManager _entityManager = null!;
     private IPacketSender _packetSender = null!;
     
     private long _tick;
     
     [Inject]
-    public void Inject(IEntitySpawner entitySpawner, IPacketSender packetSender)
+    public void Inject(IEntityManager entityManager, IPacketSender packetSender)
     {
-        _entitySpawner = entitySpawner;
+        _entityManager = entityManager;
         _packetSender = packetSender;
     }
     
@@ -27,7 +27,7 @@ public sealed class SynchronizationServer : Node
 
     public override void _PhysicsProcess(float delta)
     {
-        ImmutableList<EntitySnapshot> entitySnapshots = _entitySpawner.Entities.Values
+        ImmutableList<EntitySnapshot> entitySnapshots = _entityManager.Entities.Values
             .Select(entity => new EntitySnapshot
             {
                 Id = entity.Id,

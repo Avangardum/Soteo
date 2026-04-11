@@ -9,14 +9,14 @@ public sealed class RoutingPacketHandler
 (
     IServiceProvider rootServiceProvider,
     IShardServiceProvider shardServiceProvider,
-    IUserIdRepository userIdRepository,
+    ICurrentUserIdRepository currentUserIdRepository,
     IPacketSender packetSender
 ) : IPacketHandler
 {
     public async Task HandleAsync(Packet packet, Guid senderId)
     {
         IServiceProvider? serviceProvider =
-            IsServer ? shardServiceProvider.GetServiceProviderForShard(userIdRepository.UserId) :
+            IsServer ? shardServiceProvider.GetServiceProviderForShard(currentUserIdRepository.UserId) :
             senderId == MasterServerId ? rootServiceProvider :
             shardServiceProvider.GetServiceProviderForShard(senderId);
         if (serviceProvider == null) return;

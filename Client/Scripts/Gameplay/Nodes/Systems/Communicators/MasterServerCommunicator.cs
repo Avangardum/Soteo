@@ -21,17 +21,17 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
     private IPacketHandler _packetHandler = null!;
     private IShardLoader _shardLoader = null!;
-    private IUserIdRepository _userIdRepository = null!;
+    private ICurrentUserIdRepository _currentUserIdRepository = null!;
     
     private string _token = "";
     private Status _status;
 
     [Inject]
-    public void Inject(IPacketHandler packetHandler, IShardLoader shardLoader, IUserIdRepository userIdRepository)
+    public void Inject(IPacketHandler packetHandler, IShardLoader shardLoader, ICurrentUserIdRepository currentUserIdRepository)
     {
         _packetHandler = packetHandler;
         _shardLoader = shardLoader;
-        _userIdRepository = userIdRepository;
+        _currentUserIdRepository = currentUserIdRepository;
         
         // When running the server from the editor, connect on button press
         if (IsServer && !Main.EditorIsServer) ConnectAsShardServer();
@@ -114,7 +114,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         string intercomSecret = SysEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
             throw new InvalidOperationException("Intercom secret is not set.");
-        Guid id = _userIdRepository.UserId;
+        Guid id = _currentUserIdRepository.UserId;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(intercomSecret)}";
         string url = $"{AuthServerUrl}/token/service";

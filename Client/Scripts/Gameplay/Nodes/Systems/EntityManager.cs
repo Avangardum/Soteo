@@ -6,7 +6,7 @@ using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Systems;
 
-public sealed class EntitySpawner : Node, IEntitySpawner
+public sealed class EntityManager : Node, IEntityManager
 {
     private IEntityRoots _entityRoots = null!;
     private PackedScene _playerCharacterScene = null!;

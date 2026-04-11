@@ -3,12 +3,12 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.PacketHandlers;
 
-public class SpawnCharacterPacketHandler(IEntitySpawner spawner) : PacketHandler<SpawnCharacterPacket>
+public class SpawnCharacterPacketHandler(IEntityManager entityManager) : PacketHandler<SpawnCharacterPacket>
 {
     protected override void Handle(SpawnCharacterPacket packet, Guid senderId)
     {
         ValidateThisIsServer();
         ValidateIsMasterServer(senderId);
-        spawner.SpawnPlayerCharacter(packet.PeerId);
+        entityManager.SpawnPlayerCharacter(packet.PeerId);
     }
 }

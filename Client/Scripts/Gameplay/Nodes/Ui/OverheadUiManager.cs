@@ -15,11 +15,11 @@ public sealed class OverheadUiManager : Control
     }
 
     [Inject]
-    public void Inject(Camera2D camera, IEntitySpawner entitySpawner)
+    public void Inject(Camera2D camera, IEntityManager entityManager)
     {
         _camera = camera;
         
-        entitySpawner.EntityAdded += OnEntityAdded; // todo rename entity spawner to manager
+        entityManager.EntityAdded += OnEntityAdded;
     }
     
     private void OnEntityAdded(IEntity entity)

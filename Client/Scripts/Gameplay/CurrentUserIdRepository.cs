@@ -3,9 +3,9 @@ using Soteo.Gameplay.Nodes;
 
 namespace Soteo.Gameplay;
 
-public sealed class UserIdRepository : IUserIdRepository
+public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
 {
-    public UserIdRepository()
+    public CurrentUserIdRepository()
     {
         if (IsServer) UserId = Main.EditorIsServer ? Main.EditorLocalShardServerId : GetLocalShardServerId();
     }

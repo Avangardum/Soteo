@@ -18,10 +18,10 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
-    private LogIn _logIn = null!;
+    private LogInUi _logInUi = null!;
     private Node2D _shardRoot = null!;
     private MasterServerCommunicator _masterServerCommunicator = null!;
-    private ClientShardServerCommunicator _clientShardServerCommunicator = null!;
+    private GameplayCommunicator _gameplayCommunicator = null!;
     
     private PackedScene _shardScene = null!;
     private IServiceProvider _rootServiceProvider = null!;
@@ -52,7 +52,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
         
         if (IsServer)
         {
-            _logIn.Visible = false;
+            _logInUi.Visible = false;
             LoadShard();
         }
         
@@ -61,11 +61,11 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     
     private void GetNodes()
     {
-        _logIn = GetNode<LogIn>("Ui/LogIn");
+        _logInUi = GetNode<LogInUi>("Ui/LogIn");
         _shardRoot = GetNode<Node2D>("Shards");
         _masterServerCommunicator = GetNode<MasterServerCommunicator>("Systems/MasterServerCommunicator");
-        _clientShardServerCommunicator =
-            GetNode<ClientShardServerCommunicator>("Systems/ClientShardServerCommunicator");
+        _gameplayCommunicator =
+            GetNode<GameplayCommunicator>("Systems/ClientShardServerCommunicator");
     }
     
     private void RegisterServices(IServiceCollection services)
@@ -82,15 +82,15 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
         services.AddSingleton<IShardServiceProvider>(this);
         services.AddSingleton<IMasterServerCommunicator>(_masterServerCommunicator);
         services.AddSingleton<IPacketSender>(
-            new RoutingPacketSender(_masterServerCommunicator, _clientShardServerCommunicator));
-        services.AddSingleton<IWebrtcPacketReceiver>(_clientShardServerCommunicator); // todo rename to gameplay communicator
-        services.AddSingleton<IUserIdRepository, UserIdRepository>(); // todo rename to current...
+            new RoutingPacketSender(_masterServerCommunicator, _gameplayCommunicator));
+        services.AddSingleton<IWebrtcPacketReceiver>(_gameplayCommunicator);
+        services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
         
         services.AddScoped<Shard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
         services.AddAlias<IEntityRoots, Shard>();
-        services.AddShardScopedNode<IEntitySpawner, EntitySpawner>();
+        services.AddShardScopedNode<IEntityManager, EntityManager>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
     }

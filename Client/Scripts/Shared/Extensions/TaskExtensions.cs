@@ -9,10 +9,16 @@ public static class TaskExtensions
         /// <summary>
         /// Executes the action after the task is completed. Unlike ContinueWith, respects SynchronizationContext.
         /// </summary>
-        public async Task ContinueWithinContext(Action<Task> action)
+        public async void ContinueWithinContext(Action<Task> action)
         {
-            await self;
-            action(self);
+            try
+            {
+                await self;
+            }
+            finally
+            {
+                action(self);
+            }
         }
         
         public async void CollectException()
