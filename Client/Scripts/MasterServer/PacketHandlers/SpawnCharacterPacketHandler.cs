@@ -1,9 +1,11 @@
 using Soteo.MasterServer.GameState.DataObjects;
 using Soteo.MasterServer.Interfaces;
+using Soteo.Shared.Attributes;
 using Soteo.Shared.Packets;
 
 namespace Soteo.MasterServer.PacketHandlers;
 
+[AllowClientPackets]
 public sealed class SpawnCharacterPacketHandler
 (
     IUserRepository userRepo,

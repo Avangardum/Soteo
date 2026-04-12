@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Shared.Attributes;
 using Soteo.Shared.Exceptions;
+using Soteo.Shared.Extensions;
 using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.PacketHandlers;
@@ -21,18 +23,11 @@ public sealed class RoutingPacketHandler
             shardServiceProvider.GetServiceProviderForShard(senderId);
         if (serviceProvider == null) return;
 
-        try
-        {
-            // todo attribute authorization
-            if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type handlerType))
-                throw new BadPacketException($"Packet of type {packet.Type} can't be handled");
-            var handler = (IPacketHandler)serviceProvider.GetRequiredService(handlerType);
-            await handler.HandleAsync(packet, senderId);
-        }
-        catch (BadPacketException e)
-        {
-            if (IsServer) packetSender.SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
-            else throw;
-        }
+        if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type handlerType))
+            throw new BadPacketException($"Packet of type {packet.Type} can't be handled");
+        if (IsServer && senderId != MasterServerId && !handlerType.HasAttribute<AllowClientPacketsAttribute>())
+            throw new BadPacketException($"Clients are not allowed to send packets of type {packet.Type}");
+        var handler = (IPacketHandler)serviceProvider.GetRequiredService(handlerType);
+        await handler.HandleAsync(packet, senderId);
     }
 }

@@ -9,9 +9,6 @@ public sealed class CharacterRecalledPacketHandler(ICharacterRepository characte
 {
     protected override void Handle(CharacterRecalledPacket packet, User sender)
     {
-        characterRepository.TryGetValue(packet.CharacterId, out Character? character);
-        Validate(sender.IsShard, "Only shards can recall characters");
-        Validate(character?.ShardId == sender.Id, "Character is not in this shard");
-        character.ShardId = Guid.Empty;
+        characterRepository[sender.Id].ShardId = Guid.Empty;
     }
 }
