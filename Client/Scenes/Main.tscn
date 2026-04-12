@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Scenes/Ui/LogIn.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Main.cs" type="Script" id=2]
@@ -6,6 +6,7 @@
 [ext_resource path="res://Scripts/Gameplay/Nodes/Systems/Communicators/MasterServerCommunicator.cs" type="Script" id=4]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Systems/Communicators/GameplayCommunicator.cs" type="Script" id=5]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Ui/HideOnPressButton.cs" type="Script" id=6]
+[ext_resource path="res://Sprites/Stars.png" type="Texture" id=7]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Systems/InputHandler.cs" type="Script" id=8]
 
 [node name="Main" type="Node2D"]
@@ -49,5 +50,23 @@ margin_right = 163.0
 margin_bottom = 68.0
 text = "Connect"
 script = ExtResource( 6 )
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="."]
+scroll_ignore_camera_zoom = true
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
+motion_scale = Vector2( 0.01, 0.01 )
+motion_mirroring = Vector2( 32000, 32000 )
+
+[node name="TextureRect" type="TextureRect" parent="ParallaxBackground/ParallaxLayer"]
+margin_left = -4000.0
+margin_top = -4000.0
+margin_right = 4000.0
+margin_bottom = 4000.0
+rect_scale = Vector2( 4, 4 )
+mouse_filter = 2
+texture = ExtResource( 7 )
+expand = true
+stretch_mode = 2
 
 [connection signal="pressed" from="Ui/ConnectAsServerButton" to="Systems/MasterServerCommunicator" method="ConnectAsShardServer"]
