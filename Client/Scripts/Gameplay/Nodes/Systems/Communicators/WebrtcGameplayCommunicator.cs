@@ -14,7 +14,7 @@ namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 /// <summary>
 /// Communicates between clients and shard servers
 /// </summary>
-public sealed class GameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver
+public sealed class WebrtcGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver
 {
     private record PeerConnectionAndChannels
     (
@@ -37,7 +37,17 @@ public sealed class GameplayCommunicator : Node, IPacketSender, IWebrtcPacketRec
         
         _packetHandler = packetHandler;
     }
-    
+
+    public override void _Ready()
+    {
+        if (UseJsmq)
+        {
+            SetProcess(false);
+            SetPhysicsProcess(false);
+            QueueFree();
+        }
+    }
+
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks

@@ -11,7 +11,7 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.MasterServer.Communicators;
 
-public sealed class WebSocketCommunicator : Object, IPacketSender
+public sealed class WebSocketCommunicator : Object, ICommunicator
 {
     private readonly WebSocketServer _wsServer = new();
     private readonly IPacketSerializer _packetSerializer;

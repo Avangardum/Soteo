@@ -9,7 +9,7 @@ using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 
-public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
+public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommunicator
 {
     private enum Status { Disconnected, Connecting, Connected }
     
@@ -17,7 +17,7 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     private const string AuthServerUrl = "https://localhost:3705";
 
     private readonly WebSocketClient _wsClient = new();
-    private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
+    private IPacketSerializer _packetSerializer = null!;
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
     private IPacketHandler _packetHandler = null!;
     private IShardLoader _shardLoader = null!;
@@ -27,9 +27,16 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     private Status _status;
 
     [Inject]
-    public void Inject(IPacketHandler packetHandler, IShardLoader shardLoader, ICurrentUserIdRepository currentUserIdRepository)
+    public void Inject
+    (
+        IPacketHandler packetHandler,
+        IPacketSerializer packetSerializer,
+        IShardLoader shardLoader,
+        ICurrentUserIdRepository currentUserIdRepository
+    )
     {
         _packetHandler = packetHandler;
+        _packetSerializer = packetSerializer;
         _shardLoader = shardLoader;
         _currentUserIdRepository = currentUserIdRepository;
         
@@ -41,6 +48,14 @@ public sealed class MasterServerCommunicator : Node, IMasterServerCommunicator
     
     public override void _Ready()
     {
+        if (UseJsmq)
+        {
+            SetProcess(false);
+            SetPhysicsProcess(false);
+            QueueFree();
+            return;
+        }
+        
         _wsClient.Connect("connection_closed", this, nameof(OnConnectionClosed));
         _wsClient.Connect("connection_error", this, nameof(OnConnectionError));
         _wsClient.Connect("connection_established", this, nameof(OnConnectionEstablished));

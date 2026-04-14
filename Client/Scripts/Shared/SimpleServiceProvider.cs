@@ -125,8 +125,8 @@ public sealed class SimpleServiceProvider : IServiceProvider, IServiceScopeFacto
             case ServiceLifetime.Singleton:
                 return _singletonCache.TryGetValue(descriptor, out cachedService);
             case ServiceLifetime.Scoped:
-                if (_scopedCache == null)
-                    throw new InvalidOperationException("Can't resolve scoped service from the root provider");
+                if (_scopedCache == null) throw new InvalidOperationException(
+                    $"Can't resolve scoped service {descriptor.ServiceType} from the root provider");
                 return _scopedCache.TryGetValue(descriptor, out cachedService);
             case ServiceLifetime.Transient:
                 cachedService = null;

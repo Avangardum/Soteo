@@ -7,7 +7,7 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
 {
     public CurrentUserIdRepository()
     {
-        if (IsServer) UserId = Main.EditorIsServer ? Main.EditorLocalShardServerId : GetLocalShardServerId();
+        if (IsServer) UserId = GetLocalShardServerId();
     }
     
     public Guid UserId { get; set; } // todo get client user id from token
@@ -15,6 +15,7 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
     private Guid GetLocalShardServerId()
     {
         if (!IsServer) throw new InvalidOperationException();
+        if (Main.EditorIsServer) return Main.EditorLocalShardServerId;
         string[] args = OS.GetCmdlineArgs();
         int idIndex = args.IndexOf("--server") + 1;
         if (idIndex == 0 || idIndex == args.Length || !Guid.TryParse(args[idIndex], out var id))

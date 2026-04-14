@@ -12,14 +12,14 @@ namespace Soteo.MasterServer;
 
 public sealed class MasterServer : Node
 {
-    private WebSocketCommunicator _communicator = null!;
+    private ICommunicator _communicator = null!;
     
     public override void _Ready()
     {
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         var serviceProvider = new SimpleServiceProvider(serviceCollection);
-        _communicator = serviceProvider.GetRequiredService<WebSocketCommunicator>();
+        _communicator = serviceProvider.GetRequiredService<ICommunicator>();
     }
 
     public override void _Process(float delta)
@@ -33,8 +33,10 @@ public sealed class MasterServer : Node
         services.AddSingleton<ICharacterRepository, CharacterRepository>();
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
-        services.AddSingleton<WebSocketCommunicator>();
-        services.AddAlias<IPacketSender, WebSocketCommunicator>();
+        services.AddAlias<IPacketSender, ICommunicator>();
+        
+        if (UseJsmq) services.AddSingleton<ICommunicator, JsmqCommunicator>();
+        else services.AddSingleton<ICommunicator, WebSocketCommunicator>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
     }

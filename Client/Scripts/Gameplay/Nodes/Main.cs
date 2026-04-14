@@ -8,6 +8,8 @@ using Soteo.Gameplay.PacketHandlers;
 using Soteo.Shared;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
+using Soteo.Shared.Interfaces;
+using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay.Nodes;
 
@@ -20,8 +22,9 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     
     private LogInUi _logInUi = null!;
     private Node2D _shardRoot = null!;
-    private MasterServerCommunicator _masterServerCommunicator = null!;
-    private GameplayCommunicator _gameplayCommunicator = null!;
+    private WebSocketMasterServerCommunicator _webSocketMasterServerCommunicator = null!;
+    private WebrtcGameplayCommunicator _webRtcGameplayCommunicator = null!; // todo rename class
+    private JsmqCommunicator _jsmqCommunicator = null!;
     
     private PackedScene _shardScene = null!;
     private IServiceProvider _rootServiceProvider = null!;
@@ -63,9 +66,10 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     {
         _logInUi = GetNode<LogInUi>("Ui/LogIn");
         _shardRoot = GetNode<Node2D>("Shards");
-        _masterServerCommunicator = GetNode<MasterServerCommunicator>("Systems/MasterServerCommunicator");
-        _gameplayCommunicator =
-            GetNode<GameplayCommunicator>("Systems/ClientShardServerCommunicator");
+        _webSocketMasterServerCommunicator =
+            GetNode<WebSocketMasterServerCommunicator>("Systems/WebSocketMasterServerCommunicator");
+        _webRtcGameplayCommunicator = GetNode<WebrtcGameplayCommunicator>("Systems/WebRtcGameplayCommunicator");
+        _jsmqCommunicator = GetNode<JsmqCommunicator>("Systems/JsmqCommunicator");
     }
     
     private void RegisterServices(IServiceCollection services)
@@ -80,12 +84,9 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
         services.AddSingleton(this);
         services.AddSingleton<IShardLoader>(this);
         services.AddSingleton<IShardServiceProvider>(this);
-        services.AddSingleton<IMasterServerCommunicator>(_masterServerCommunicator);
-        services.AddSingleton<IPacketSender>(
-            new RoutingPacketSender(_masterServerCommunicator, _gameplayCommunicator));
-        services.AddSingleton<IWebrtcPacketReceiver>(_gameplayCommunicator);
         services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
+        services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         
         services.AddScoped<Shard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
@@ -93,6 +94,19 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
         services.AddShardScopedNode<IEntityManager, EntityManager>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
+        
+        if (UseJsmq)
+        {
+            services.AddSingleton<IMasterServerCommunicator>(_jsmqCommunicator);
+            services.AddSingleton<IPacketSender>(_jsmqCommunicator);
+        }
+        else
+        {
+            services.AddSingleton<IMasterServerCommunicator>(_webSocketMasterServerCommunicator);
+            services.AddSingleton<IPacketSender>(
+                new RoutingPacketSender(_webSocketMasterServerCommunicator, _webRtcGameplayCommunicator));
+            services.AddSingleton<IWebrtcPacketReceiver>(_webRtcGameplayCommunicator);
+        }
     }
     
     private void RegisterServerServices(IServiceCollection services)

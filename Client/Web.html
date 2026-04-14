@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>$GODOT_PROJECT_NAME</title>
+    <meta charset="UTF-8">
+    <style>
+        html {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <button onclick="startSingleplayer()">Singleplayer</button>
+    <button onclick="startMultiplayer()">Multiplayer</button>
+</div>
+<canvas id="clientCanvas"></canvas>
+<canvas id="masterServerCanvas" style="display: none"></canvas>
+<canvas id="shardServerCanvas" style="display: none"></canvas>
+<script src="$GODOT_URL"></script>
+<script>
+    class Jsmq {
+        constructor() {
+            this.queues = {};
+        }
+        
+        send(packet, receiverId) {
+            if (!this.queues[receiverId]) this.queues[receiverId] = [];
+            this.queues[receiverId].push(packet);
+        }
+        
+        receive(receiverId) {
+            if (!this.queues[receiverId]) return undefined;
+            return this.queues[receiverId].shift();
+        }
+    }
+
+    const jsmq = new Jsmq();
+    const config = $GODOT_CONFIG;
+
+    // Whether logs with L: prefix should be printed. These messages contain low level runtime information like
+    // assembly loading, garbage collection. Quite noisy, so better keep them off.
+    const printL = false;
+    
+    function print(text, func, source) {
+        if (!printL && text.startsWith("L:")) return;
+        if (source) func(`${source}: ${text}`);
+        else func(text);
+    }
+    
+    function startSingleplayer() {
+        const client = new Engine(config);
+        const masterServer = new Engine(config);
+        const shardServer = new Engine(config);
+
+        client.startGame({
+            unloadAfterInit: false,
+            canvasResizePolicy: 2,
+            args: ["--singleplayer"],
+            canvas: document.querySelector("#clientCanvas"),
+            onPrint: text => print(text, console.log, "Client"),
+            onPrintError: text => print(text, console.error, "Client"),
+        }).then(() =>
+            masterServer.startGame({
+                unloadAfterInit: false,
+                canvasResizePolicy: 0,
+                args: ["--singleplayer", "Scenes/MasterServer.tscn"],
+                canvas: document.querySelector("#masterServerCanvas"),
+                onPrint: text => print(text, console.log, "Master server"),
+                onPrintError: text => print(text, console.error, "Master server"),
+            })
+        ).then(() =>
+            shardServer.startGame({
+                unloadAfterInit: true,
+                canvasResizePolicy: 0,
+                args: ["--singleplayer", "--server", "00000000-0000-0000-0000-000000007e57"],
+                canvas: document.querySelector("#shardServerCanvas"),
+                onPrint: text => print(text, console.log, "Shard server"),
+                onPrintError: text => print(text, console.error, "Shard server"),
+            })
+        );
+    }
+
+    function startMultiplayer() {
+        const client = new Engine(config);
+        client.startGame({
+            unloadAfterInit: true,
+            canvasResizePolicy: 2,
+            args: [],
+            canvas: document.querySelector("#clientCanvas"),
+            onPrint: text => print(text, console.log),
+            onPrintError: text => print(text, console.error),
+        });
+    }
+</script>
+</body>
+</html>
