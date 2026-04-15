@@ -1,3 +1,4 @@
+using Soteo.Enums;
 using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
@@ -16,7 +17,21 @@ public class Unit : KinematicBody2D, IEntity
 
     public Guid Id { get; set; }
 
-    Node2D IEntity.Node => this;
+    public int CurrentHealth
+    {
+        get;
+        set => field = Mathf.Clamp(value, 0, MaxHealth);
+    }
+
+    public int CurrentMana
+    {
+        get;
+        set => field = Mathf.Clamp(value, 0, MaxMana);
+    }
+    
+    [field: Export] public int MaxHealth { get; }
+    [field: Export] public int MaxMana { get; }
+    public Faction Faction { get; set; }
     
     public float Azimuth
     {
@@ -28,9 +43,14 @@ public class Unit : KinematicBody2D, IEntity
         }
     }
     
+    Node2D IEntity.Node => this;
+    
     public override void _Ready()
     {
         _azimuthLine = GetNode<Line2D>("AzimuthLine");
+        
+        CurrentHealth = MaxHealth;
+        CurrentMana = MaxMana;
     }
 
     public override void _PhysicsProcess(float deltaTime)
@@ -113,4 +133,6 @@ public class Unit : KinematicBody2D, IEntity
     {
         Commands.Clear();
     }
+    
+    public bool IsAlliedTo(Unit other) => other.Faction == Faction;
 }

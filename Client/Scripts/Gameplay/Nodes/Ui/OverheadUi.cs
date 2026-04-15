@@ -82,6 +82,8 @@ public sealed class OverheadUi : Control
     {
         RectPosition = (_unit.Position - _camera.GetCameraPosition() + _offset) * _camera.TrueZoom;
         SelectVariant();
+        SetHealth(_unit.CurrentHealth, _unit.MaxHealth);
+        SetMana(_unit.CurrentMana, _unit.MaxMana);
     }
     
     private void SelectVariant()
@@ -91,6 +93,32 @@ public sealed class OverheadUi : Control
         float zoom = _camera.TrueZoom.x;
         CurrentVariant = zoom < tinyHealthMinZoom ? Variant.None : zoom <= tinyHealthMaxZoom ? Variant.TinyHealth :
             Variant.PlayerCharacter;
+    }
+    
+    private void SetHealth(int current, int max)
+    {
+        switch (CurrentVariant)
+        {
+            case Variant.PlayerCharacter:
+                _playerCharacterHealthBar.Value = current;
+                _playerCharacterHealthBar.MaxValue = max;
+                break;
+            case Variant.TinyHealth:
+                _tinyHealthBar.Value = current;
+                _tinyHealthBar.MaxValue = max;
+                break;
+        }
+    }
+    
+    private void SetMana(int current, int max)
+    {
+        switch (CurrentVariant)
+        {
+            case Variant.PlayerCharacter:
+                _playerCharacterManaBar.Value = current;
+                _playerCharacterManaBar.MaxValue = max;
+                break;
+        }
     }
     
     public void OnUnitRemoved()

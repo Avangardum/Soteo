@@ -11,8 +11,7 @@ public sealed class RoutingPacketHandler
 (
     IServiceProvider rootServiceProvider,
     IShardServiceProvider shardServiceProvider,
-    ICurrentUserIdRepository currentUserIdRepository,
-    IPacketSender packetSender
+    ICurrentUserIdRepository currentUserIdRepository
 ) : IPacketHandler
 {
     public async Task HandleAsync(Packet packet, Guid senderId)
