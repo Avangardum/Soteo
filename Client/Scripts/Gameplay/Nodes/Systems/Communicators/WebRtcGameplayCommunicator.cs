@@ -14,7 +14,7 @@ namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 /// <summary>
 /// Communicates between clients and shard servers
 /// </summary>
-public sealed class WebrtcGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver
+public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver
 {
     private record PeerConnectionAndChannels
     (

@@ -23,7 +23,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     private LogInUi _logInUi = null!;
     private Node2D _shardRoot = null!;
     private WebSocketMasterServerCommunicator _webSocketMasterServerCommunicator = null!;
-    private WebrtcGameplayCommunicator _webRtcGameplayCommunicator = null!; // todo rename class
+    private WebRtcGameplayCommunicator _webRtcGameplayCommunicator = null!; // todo rename class
     private JsmqCommunicator _jsmqCommunicator = null!;
     
     private PackedScene _shardScene = null!;
@@ -68,7 +68,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
         _shardRoot = GetNode<Node2D>("Shards");
         _webSocketMasterServerCommunicator =
             GetNode<WebSocketMasterServerCommunicator>("Systems/WebSocketMasterServerCommunicator");
-        _webRtcGameplayCommunicator = GetNode<WebrtcGameplayCommunicator>("Systems/WebRtcGameplayCommunicator");
+        _webRtcGameplayCommunicator = GetNode<WebRtcGameplayCommunicator>("Systems/WebRtcGameplayCommunicator");
         _jsmqCommunicator = GetNode<JsmqCommunicator>("Systems/JsmqCommunicator");
     }
     
