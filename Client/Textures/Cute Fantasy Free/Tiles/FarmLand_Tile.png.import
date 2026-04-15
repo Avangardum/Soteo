@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/White.png-44bdbb9fa2c3f02fcd48902eb0e1464c.stex"
+path="res://.import/FarmLand_Tile.png-279791dad20d2a5306dcdb3086a76488.stex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Textures/White.png"
-dest_files=[ "res://.import/White.png-44bdbb9fa2c3f02fcd48902eb0e1464c.stex" ]
+source_file="res://Textures/Cute Fantasy Free/Tiles/FarmLand_Tile.png"
+dest_files=[ "res://.import/FarmLand_Tile.png-279791dad20d2a5306dcdb3086a76488.stex" ]
 
 [params]
 
@@ -31,5 +31,5 @@ process/invert_color=false
 process/normal_map_invert_y=false
 stream=false
 size_limit=0
-detect_3d=true
+detect_3d=false
 svg/scale=1.0

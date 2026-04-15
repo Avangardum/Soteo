@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Themes/OverheadUI.tres" type="Theme" id=1]
-[ext_resource path="res://Sprites/White.png" type="Texture" id=2]
+[ext_resource path="res://Textures/White.png" type="Texture" id=2]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Ui/OverheadUi.cs" type="Script" id=3]
 
 [node name="OverheadUi" type="Control"]

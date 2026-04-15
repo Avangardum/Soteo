@@ -1,7 +1,7 @@
 [gd_scene load_steps=28 format=2]
 
-[ext_resource path="res://Sprites/Cute Fantasy Free/Tiles/Cliff_Tile_Transparent.png" type="Texture" id=1]
-[ext_resource path="res://Sprites/Cute Fantasy Free/Tiles/Cliff_Tile.png" type="Texture" id=4]
+[ext_resource path="res://Textures/Cute Fantasy Free/Tiles/Cliff_Tile_Transparent.png" type="Texture" id=1]
+[ext_resource path="res://Textures/Cute Fantasy Free/Tiles/Cliff_Tile.png" type="Texture" id=4]
 
 [sub_resource type="ConvexPolygonShape2D" id=11]
 points = PoolVector2Array( 16, 8, 0, 8, 0, 4, 16, 4 )
