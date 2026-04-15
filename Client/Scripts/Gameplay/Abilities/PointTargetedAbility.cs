@@ -2,7 +2,7 @@ using Soteo.Gameplay.Nodes.Entities;
 
 namespace Soteo.Gameplay.Abilities;
 
-public abstract class PointTargetedAbility(Unit owner) : Ability(owner)
+public abstract class PointTargetedAbility<T> : Ability<T> where T : PointTargetedAbility<T>, new()
 {
-    public abstract void Cast(Vector2 target);
+    public abstract void Cast(AbilityCastContext context, Vector2 target);
 }

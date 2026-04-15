@@ -1,4 +1,4 @@
-namespace Soteo.Enums;
+namespace Soteo.Gameplay.Enums;
 
 public enum Faction
 {

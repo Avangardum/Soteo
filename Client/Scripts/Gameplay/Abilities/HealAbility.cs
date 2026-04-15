@@ -2,39 +2,21 @@ using Soteo.Gameplay.Nodes.Entities;
 
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class HealAbility(Unit owner) : UnitTargetedAbility(owner)
+public sealed class HealAbility : UnitTargetedAbility<HealAbility>
 {
     public override int MaxLevel => 4;
 
-    public override int ManaCost => CurrentLevel switch
-    {
-        1 => 100,
-        2 => 120,
-        3 => 160,
-        4 => 180
-    };
+    public override Scalable<int> ManaCost => [100, 120, 160, 180];
     
-    private int Heal => CurrentLevel switch
-    {
-        1 => 200,
-        2 => 300,
-        3 => 400,
-        4 => 500
-    };
+    private Scalable<int> Heal => [200, 300, 400, 500];
 
-    public override float Cooldown => CurrentLevel switch
-    {
-        1 => 15,
-        2 => 13,
-        3 => 11,
-        4 => 9
-    };
+    public override Scalable<float> Cooldown => [15, 13, 11, 9];
 
-    public override float CastTimeSeconds => 0.5f;
+    public override Scalable<float> CastTimeSeconds => 0.5f;
 
-    public override float CastRange => 300;
+    public override Scalable<float> CastRange => 300;
 
-    public override bool IsValidTarget(Unit target) => target.IsAlliedTo(owner);
+    public override bool IsValidTarget(AbilityCastContext context, Unit target) => target.IsAlliedTo(context.Caster);
 
-    public override void Cast(Unit target) => target.CurrentHealth += Heal;
+    public override void Cast(AbilityCastContext context, Unit target) => target.CurrentHealth += Heal[context.Level];
 }

@@ -4,19 +4,15 @@ namespace Soteo.Gameplay.Abilities;
 
 public abstract class Ability
 {
-    public Unit Owner { get; }
-    public int CurrentLevel { get; set; } = 1;
-    public float CurrentCooldown { get; set; }
-    
     public virtual int MaxLevel => 1;
-    public virtual int HealthCost => 0;
-    public virtual int ManaCost => 0;
-    public virtual float Cooldown => 0;
-    public abstract float CastRange { get; }
-    public virtual float CastTimeSeconds => 0;
+    public virtual Scalable<int> HealthCost => 0;
+    public virtual Scalable<int> ManaCost => 0;
+    public virtual Scalable<float> Cooldown => 0;
+    public abstract Scalable<float> CastRange { get; }
+    public virtual Scalable<float> CastTimeSeconds => 0;
+}
 
-    protected Ability(Unit owner)
-    {
-        Owner = owner;
-    }
+public abstract class Ability<T> : Ability where T : Ability<T>, new()
+{
+    public static T Instance { get; } = new();
 }

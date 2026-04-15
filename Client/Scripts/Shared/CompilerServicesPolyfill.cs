@@ -10,6 +10,8 @@ namespace System.Runtime.CompilerServices
     public sealed class RequiredMemberAttribute : Attribute;
     
     public sealed class CompilerFeatureRequiredAttribute(string name) : Attribute;
+    
+    public sealed class CollectionBuilderAttribute(Type builderType, string methodName) : Attribute;
 }
 
 namespace System.Diagnostics.CodeAnalysis

@@ -1,19 +1,31 @@
-using Soteo.Enums;
+using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Commands;
+using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
 public class Unit : KinematicBody2D, IEntity
 {
+    public record AbilityState(Ability Ability)
+    {
+        public required int Level { get; set; }
+        public float Cooldown { get; set; }
+
+        public static AbilityState New<T>(int level) where T : Ability<T>, new() =>
+            new(Ability<T>.Instance) { Level = level };
+    }
+    
     [Export] private float _movementSpeed = 50;
     [Export] private float _rotationSpeedDeg = 360;
     
     private Line2D _azimuthLine = null!;
     
     protected Queue<ICommand> Commands { get; } = [];
+    public Dictionary<AbilitySlot, AbilityState> AbilityStates { get; } = [];
 
     public Guid Id { get; set; }
 
@@ -54,6 +66,15 @@ public class Unit : KinematicBody2D, IEntity
     }
 
     public override void _PhysicsProcess(float deltaTime)
+    {
+        if (!IsServer) return;
+        
+        foreach (AbilityState abilityState in AbilityStates.Values)
+            abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - deltaTime, 0);
+        ExecuteCommands(deltaTime);
+    }
+    
+    private void ExecuteCommands(float deltaTime)
     {
         float remainingDeltaTime = deltaTime;
         while (Commands.Count > 0 && remainingDeltaTime > 0)

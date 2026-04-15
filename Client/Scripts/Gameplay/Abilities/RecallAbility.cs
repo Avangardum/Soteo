@@ -1,16 +1,18 @@
+using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class RecallAbility(Unit owner, IPacketSender packetSender) : UntargetedAbility(owner)
+public sealed class RecallAbility : UntargetedAbility<RecallAbility>
 {
-    public override float CastTimeSeconds => 10;
+    public override Scalable<float> CastTimeSeconds => 10;
     
-    public override void Cast()
+    public override void Cast(AbilityCastContext context)
     {
-        owner.QueueFree();
-        packetSender.SendReliable(new CharacterRecalledPacket { CharacterId = owner.Id }, MasterServerId);
+        context.Caster.QueueFree();
+        context.GetRequiredService<IPacketSender>()
+            .SendReliable(new CharacterRecalledPacket { CharacterId = context.Caster.Id }, MasterServerId);
     }
 }
