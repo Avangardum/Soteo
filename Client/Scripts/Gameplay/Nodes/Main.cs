@@ -118,6 +118,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     {
         services.AddShardScopedNode<ISynchronizationPacketReceiver, SynchronizationClient>();
         services.AddSingletonNode<Camera2D>("Camera");
+        services.AddSingletonNode<IHud>("Ui/Hud");
     }
     
     private void InjectInto(Node node, IServiceProvider serviceProvider)

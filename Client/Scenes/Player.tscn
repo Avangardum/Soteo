@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=2]
+[gd_scene load_steps=54 format=2]
 
 [ext_resource path="res://Scripts/Gameplay/Nodes/Entities/PlayerCharacter.cs" type="Script" id=1]
 [ext_resource path="res://Sprites/Cute Fantasy Free/Player/Player.png" type="Texture" id=2]
@@ -247,12 +247,18 @@ animations = [ {
 radius = 2.0
 height = 5.0
 
+[sub_resource type="CapsuleShape2D" id=68]
+radius = 5.0
+height = 10.0
+
 [node name="Player" type="KinematicBody2D"]
 z_index = 10
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_group_": true
 }
+<MaxHealth>k__BackingField = 1000
+<MaxMana>k__BackingField = 800
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 position = Vector2( 0.5, -5 )
@@ -269,3 +275,14 @@ z_index = -1
 points = PoolVector2Array( 0, -14, 0, -18 )
 width = 1.0
 default_color = Color( 1, 1, 1, 1 )
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_layer = 256
+collision_mask = 0
+input_pickable = false
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+position = Vector2( 0, -6.5 )
+shape = SubResource( 68 )
