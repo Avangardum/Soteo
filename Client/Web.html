@@ -45,23 +45,25 @@
     
     function print(text, func, source) {
         if (!printL && text.startsWith("L:")) return;
+        
+        // This error is printed due to native WebRTC plugin not working in a browser, but we don't need it there.
+        if (text.endsWith("No library set for this platform")) return;
+        
+        // This error is always printed, even in an empty project.
+        if (text.endsWith("Mono: Core API hash mismatch.")) return;
+        
+        if (text.startsWith("Mono: Config attempting to parse:")) return;
+        
         if (source) func(`${source}: ${text}`);
         else func(text);
     }
     
     function startSingleplayer() {
-        const client = new Engine(config);
         const masterServer = new Engine(config);
         const shardServer = new Engine(config);
+        const client = new Engine(config);
 
-        client.startGame({
-            unloadAfterInit: false,
-            canvasResizePolicy: 2,
-            args: ["--singleplayer"],
-            canvas: document.querySelector("#clientCanvas"),
-            onPrint: text => print(text, console.log, "Client"),
-            onPrintError: text => print(text, console.error, "Client"),
-        }).then(() =>
+        Promise.resolve().then(() =>
             masterServer.startGame({
                 unloadAfterInit: false,
                 canvasResizePolicy: 0,
@@ -79,6 +81,15 @@
                 onPrint: text => print(text, console.log, "Shard server"),
                 onPrintError: text => print(text, console.error, "Shard server"),
             })
+        ).then(() =>
+            client.startGame({
+                unloadAfterInit: false,
+                canvasResizePolicy: 2,
+                args: ["--singleplayer"],
+                canvas: document.querySelector("#clientCanvas"),
+                onPrint: text => print(text, console.log, "Client"),
+                onPrintError: text => print(text, console.error, "Client"),
+            })    
         );
     }
 

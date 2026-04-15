@@ -29,6 +29,7 @@ window/stretch/aspect="expand"
 [gdnative]
 
 singletons=[ "res://webrtc/webrtc.tres" ]
+singletons_disabled=[  ]
 
 [gui]
 
