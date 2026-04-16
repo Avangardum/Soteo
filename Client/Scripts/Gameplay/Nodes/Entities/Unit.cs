@@ -11,22 +11,6 @@ namespace Soteo.Gameplay.Nodes.Entities;
 
 public class Unit : KinematicBody2D, IEntity
 {
-    public interface IAbilityState
-    {
-        Ability Ability { get; }
-        int Level { get; }
-        float Cooldown { get; }
-    }
-    
-    protected record AbilityStateInternal(Ability Ability) : IAbilityState
-    {
-        public required int Level { get; set; }
-        public float Cooldown { get; set; }
-
-        public static AbilityStateInternal New<T>(int level) where T : Ability<T>, new() =>
-            new(Ability<T>.Instance) { Level = level };
-    }
-    
     private Line2D _azimuthLine = null!;
     
     private Queue<ICommand> Commands { get; } = [];
@@ -34,8 +18,8 @@ public class Unit : KinematicBody2D, IEntity
     private Dictionary<Stat, float> StatsInternal { get; } = [];
     public IReadOnlyDictionary<Stat, float> Stats => StatsInternal;
     
-    protected Dictionary<AbilitySlot, AbilityStateInternal> AbilityStatesInternal { get; } = [];
-    public ICovariantReadOnlyDictionary<AbilitySlot, IAbilityState> AbilityStates =>
+    protected Dictionary<AbilitySlot, AbilityState> AbilityStatesInternal { get; } = [];
+    public ICovariantReadOnlyDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates =>
         AbilityStatesInternal.AsCovariant();
 
     public Guid Id { get; set; }
@@ -61,7 +45,9 @@ public class Unit : KinematicBody2D, IEntity
             Id = Id,
             Position = Position,
             Azimuth = Azimuth,
-            Stats = Stats.ToImmutableDictionary()
+            Stats = Stats.ToImmutableDictionary(),
+            AbilityStates = AbilityStatesInternal
+                .ToImmutableDictionary(it => it.Key, IReadOnlyAbilityState (it) => it.Value with {})
         };
     }
 
@@ -70,6 +56,8 @@ public class Unit : KinematicBody2D, IEntity
         if (snapshot.Position != null) Position = snapshot.Position.Value;
         if (snapshot.Azimuth != null) Azimuth = snapshot.Azimuth.Value;
         foreach ((Stat stat, float value) in snapshot.Stats) StatsInternal[stat] = value;
+        foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in snapshot.AbilityStates)
+            AbilityStatesInternal[slot] = new AbilityState(state);
     }
 
     public override void _Ready()
@@ -86,7 +74,7 @@ public class Unit : KinematicBody2D, IEntity
     {
         if (!IsServer) return;
         
-        foreach (AbilityStateInternal abilityState in AbilityStatesInternal.Values)
+        foreach (AbilityState abilityState in AbilityStatesInternal.Values)
             abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - deltaTime, 0);
         ExecuteCommands(deltaTime);
     }

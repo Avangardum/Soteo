@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 using static Soteo.Shared.SoteoMath;
@@ -11,6 +12,7 @@ public sealed record EntitySnapshot
     public Vector2? Position { get; init; }
     public float? Azimuth { get; init; }
     public ImmutableDictionary<Stat, float> Stats { get; init; } = [];
+    public ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates { get; init; } = [];
     
     public static EntitySnapshot Interpolate(EntitySnapshot from, EntitySnapshot to, float weight)
     {

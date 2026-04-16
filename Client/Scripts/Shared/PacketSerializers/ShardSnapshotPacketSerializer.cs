@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 using Soteo.Gameplay;
+using Soteo.Gameplay.Abilities;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Packets;
@@ -16,7 +18,10 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         Position = 1 << 1,
         Azimuth = 1 << 2,
         Stats = 1 << 3,
+        AbilityStates = 1 << 4,
     }
+    
+    private const int SizeOfAbilityState = sizeof(int) + sizeof(int) + sizeof(float);
 
     protected override int PacketSize(ShardSnapshotPacket packet)
     {
@@ -31,11 +36,9 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             sizeof(EntitySnapshotDataFlags) +
             SizeOfNullable(entity.Position) +
             SizeOfNullable(entity.Azimuth) +
-            SizeOfStats(entity.Stats);
+            SizeOf(entity.Stats) +
+            SizeOf(entity.AbilityStates, SizeOfAbilityState);
     }
-    
-    private int SizeOfStats(ImmutableDictionary<Stat, float> stats) =>
-        sizeof(int) + stats.Count * (sizeof(Stat) + sizeof(float));
 
     protected override void SerializeInternal(ShardSnapshotPacket packet, ref Span<byte> span)
     {
@@ -68,12 +71,12 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         if (entity.Stats.Count > 0)
         {
             dataFlags |= EntitySnapshotDataFlags.Stats;
-            SerializeInt(entity.Stats.Count, ref span);
-            foreach ((Stat stat, float value) in entity.Stats)
-            {
-                SerializeEnum(stat, ref span);
-                SerializeFloat(value, ref span);
-            }
+            SerializeDictionary(entity.Stats, SerializeEnum, SerializeFloat, ref span);
+        }
+        if (entity.AbilityStates.Count > 0)
+        {
+            dataFlags |= EntitySnapshotDataFlags.AbilityStates;
+            SerializeDictionary(entity.AbilityStates, SerializeEnum, SerializeAbilityState, ref span);
         }
             
         SerializeEnum(dataFlags, ref dataFlagsSpan);
@@ -103,15 +106,25 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Id = id,
             Position = dataFlags.HasFlag(EntitySnapshotDataFlags.Position) ? DeserializeVector2(ref span) : null,
             Azimuth = dataFlags.HasFlag(EntitySnapshotDataFlags.Azimuth) ? DeserializeFloat(ref span) : null,
-            Stats = dataFlags.HasFlag(EntitySnapshotDataFlags.Stats) ? DeserializeStats(ref span) : []
+            Stats = dataFlags.HasFlag(EntitySnapshotDataFlags.Stats) ?
+                DeserializeDictionary(ref span, DeserializeEnum<Stat>, DeserializeFloat) : [],
+            AbilityStates = dataFlags.HasFlag(EntitySnapshotDataFlags.AbilityStates) ?
+                DeserializeDictionary(ref span, DeserializeEnum<AbilitySlot>, DeserializeAbilityState) : [],
         };
     }
     
-    public ImmutableDictionary<Stat, float> DeserializeStats(ref Span<byte> span)
+    private void SerializeAbilityState(IReadOnlyAbilityState value, ref Span<byte> span)
     {
-        var pairs = new KeyValuePair<Stat, float>[DeserializeInt(ref span)];
-        for (int i = 0; i < pairs.Length; i++)
-            pairs[i] = new KeyValuePair<Stat, float>(DeserializeEnum<Stat>(ref span), DeserializeFloat(ref span));
-        return pairs.ToImmutableDictionary();
+        SerializeInt(Ability.All.IndexOf(value.Ability), ref span);
+        SerializeInt(value.Level, ref span);
+        SerializeFloat(value.Cooldown, ref span);
+    }
+    
+    private IReadOnlyAbilityState DeserializeAbilityState(ref Span<byte> span)
+    {
+        Ability ability = Ability.All[DeserializeInt(ref span)];
+        int level = DeserializeInt(ref span);
+        float cooldown = DeserializeFloat(ref span);
+        return new AbilityState(ability, level) { Cooldown = cooldown };
     }
 }

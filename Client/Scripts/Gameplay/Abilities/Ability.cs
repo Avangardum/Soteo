@@ -1,9 +1,25 @@
-using Soteo.Gameplay.Nodes.Entities;
+using System.Collections.Immutable;
+using System.Reflection;
+using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Abilities;
 
 public abstract class Ability
 {
+    public static ImmutableList<Ability> All
+    {
+        get
+        {
+            field ??= Assembly.GetExecutingAssembly().DefinedTypes
+                .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(Ability)))
+                .OrderBy(it => it.FullName)
+                .Select(it => (Ability)
+                    typeof(Ability<>).MakeGenericType(it).GetProperty(nameof(Ability<>.Instance))!.GetValue(null))
+                .ToImmutableList();
+            return field;
+        }
+    }
+    
     public virtual int MaxLevel => 1;
     public virtual Scalable<float> HealthCost => 0;
     public virtual Scalable<float> ManaCost => 0;

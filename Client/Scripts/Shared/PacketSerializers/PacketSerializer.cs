@@ -1,4 +1,5 @@
 ﻿using System.Buffers.Binary;
+using System.Collections.Immutable;
 using System.Text;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Exceptions;
@@ -210,7 +211,13 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
             int or uint or float => 4,
             long or ulong or double or Vector2 => 8,
             Guid or decimal => 16,
-            _ => throw new NotSupportedException()
+            Enum e => e.GetTypeCode() switch
+            {
+                TypeCode.Byte or TypeCode.SByte => 1,
+                TypeCode.Int16 or TypeCode.UInt16 => 2,
+                TypeCode.Int32 or TypeCode.UInt32 => 4,
+                TypeCode.Int64 or TypeCode.UInt64 => 8
+            }
         };
     }
     
@@ -218,5 +225,54 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         sizeof(int) + array.Length * SizeOf<TElement>();
 
     protected int SizeOf(string s) => sizeof(int) + Encoding.UTF8.GetByteCount(s);
+    
     protected int SizeOfNullable<T>(T? nullable) where T : unmanaged => nullable == null ? 0 : SizeOf(nullable.Value);
+    
+    protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, int sizeOfValue)
+        where TKey : unmanaged
+    {
+        return SizeOf(dictionary, _ => sizeOfValue);
+    }
+    
+    protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, Func<TValue, int> sizeOfValue)
+        where TKey : unmanaged
+    {
+        return sizeof(int) + dictionary.Count * SizeOf<TKey>() + dictionary.Values.Sum(sizeOfValue);
+    }
+    
+    protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary)
+        where TKey : unmanaged
+        where TValue : unmanaged
+    {
+        return sizeof(int) + dictionary.Count * (SizeOf<TKey>() + SizeOf<TValue>());
+    }
+
+    protected void SerializeDictionary<TKey, TValue>
+    (
+        IReadOnlyDictionary<TKey, TValue> dictionary,
+        Serializer<TKey> serializeKey,
+        Serializer<TValue> serializeValue,
+        ref Span<byte> span
+    )
+    {
+        SerializeInt(dictionary.Count, ref span);
+        foreach ((TKey key, TValue value) in dictionary)
+        {
+            serializeKey(key, ref span);
+            serializeValue(value, ref span);
+        }
+    }
+
+    protected ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue> 
+    (
+        ref Span<byte> span,
+        Deserializer<TKey> deserializeKey,
+        Deserializer<TValue> deserializeValue
+    ) where TKey : notnull
+    {
+        var pairs = new KeyValuePair<TKey, TValue>[DeserializeInt(ref span)];
+        for (int i = 0; i < pairs.Length; i++)
+            pairs[i] = new KeyValuePair<TKey, TValue>(deserializeKey(ref span), deserializeValue(ref span));
+        return pairs.ToImmutableDictionary();
+    }
 }
