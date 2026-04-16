@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Enums;
@@ -10,39 +11,35 @@ namespace Soteo.Gameplay.Nodes.Entities;
 
 public class Unit : KinematicBody2D, IEntity
 {
-    public record AbilityState(Ability Ability)
+    public interface IAbilityState
+    {
+        Ability Ability { get; }
+        int Level { get; }
+        float Cooldown { get; }
+    }
+    
+    protected record AbilityStateInternal(Ability Ability) : IAbilityState
     {
         public required int Level { get; set; }
         public float Cooldown { get; set; }
 
-        public static AbilityState New<T>(int level) where T : Ability<T>, new() =>
+        public static AbilityStateInternal New<T>(int level) where T : Ability<T>, new() =>
             new(Ability<T>.Instance) { Level = level };
     }
     
-    [Export] private float _movementSpeed = 50;
-    [Export] private float _rotationSpeedDeg = 360;
-    
     private Line2D _azimuthLine = null!;
     
-    protected Queue<ICommand> Commands { get; } = [];
-    public Dictionary<AbilitySlot, AbilityState> AbilityStates { get; } = [];
+    private Queue<ICommand> Commands { get; } = [];
+    
+    private Dictionary<Stat, float> StatsInternal { get; } = [];
+    public IReadOnlyDictionary<Stat, float> Stats => StatsInternal;
+    
+    protected Dictionary<AbilitySlot, AbilityStateInternal> AbilityStatesInternal { get; } = [];
+    public ICovariantReadOnlyDictionary<AbilitySlot, IAbilityState> AbilityStates =>
+        AbilityStatesInternal.AsCovariant();
 
     public Guid Id { get; set; }
 
-    public int CurrentHealth
-    {
-        get;
-        set => field = Mathf.Clamp(value, 0, MaxHealth);
-    }
-
-    public int CurrentMana
-    {
-        get;
-        set => field = Mathf.Clamp(value, 0, MaxMana);
-    }
-    
-    [field: Export] public int MaxHealth { get; }
-    [field: Export] public int MaxMana { get; }
     public Faction Faction { get; set; }
     
     public float Azimuth
@@ -56,20 +53,40 @@ public class Unit : KinematicBody2D, IEntity
     }
     
     Node2D IEntity.Node => this;
-    
+
+    public EntitySnapshot CreateSnapshot()
+    {
+        return new EntitySnapshot
+        {
+            Id = Id,
+            Position = Position,
+            Azimuth = Azimuth,
+            Stats = Stats.ToImmutableDictionary()
+        };
+    }
+
+    public void ReplicateSnapshot(EntitySnapshot snapshot)
+    {
+        if (snapshot.Position != null) Position = snapshot.Position.Value;
+        if (snapshot.Azimuth != null) Azimuth = snapshot.Azimuth.Value;
+        foreach ((Stat stat, float value) in snapshot.Stats) StatsInternal[stat] = value;
+    }
+
     public override void _Ready()
     {
         _azimuthLine = GetNode<Line2D>("AzimuthLine");
         
-        CurrentHealth = MaxHealth;
-        CurrentMana = MaxMana;
+        StatsInternal[Stat.CurrentHealth] = StatsInternal[Stat.MaxHealth] = 1000;
+        StatsInternal[Stat.CurrentMana] = StatsInternal[Stat.MaxMana] = 1000;
+        StatsInternal[Stat.MoveSpeed] = 50;
+        StatsInternal[Stat.TurnSpeed] = 360;
     }
 
     public override void _PhysicsProcess(float deltaTime)
     {
         if (!IsServer) return;
         
-        foreach (AbilityState abilityState in AbilityStates.Values)
+        foreach (AbilityStateInternal abilityState in AbilityStatesInternal.Values)
             abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - deltaTime, 0);
         ExecuteCommands(deltaTime);
     }
@@ -110,7 +127,7 @@ public class Unit : KinematicBody2D, IEntity
         if (desiredDeltaAzimuth > 180) desiredDeltaAzimuth -= 360;
         if (desiredDeltaAzimuth < -180) desiredDeltaAzimuth += 360;
         
-        float timeToComplete = Mathf.Abs(desiredDeltaAzimuth) / _rotationSpeedDeg;
+        float timeToComplete = Mathf.Abs(desiredDeltaAzimuth) / Stats[Stat.TurnSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
             Azimuth += desiredDeltaAzimuth;
@@ -119,7 +136,7 @@ public class Unit : KinematicBody2D, IEntity
         }
         else
         {
-            Azimuth += Mathf.Sign(desiredDeltaAzimuth) * remainingDeltaTime * _rotationSpeedDeg;
+            Azimuth += Mathf.Sign(desiredDeltaAzimuth) * remainingDeltaTime * Stats[Stat.TurnSpeed];
             remainingDeltaTime = 0;
         }
     }
@@ -130,7 +147,7 @@ public class Unit : KinematicBody2D, IEntity
         
         Vector2 desiredMovement = position - Position;
         float desiredMovementLength = desiredMovement.Length();
-        float timeToComplete = desiredMovementLength / _movementSpeed;
+        float timeToComplete = desiredMovementLength / Stats[Stat.MoveSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
             MoveAndCollide(desiredMovement);
@@ -139,7 +156,7 @@ public class Unit : KinematicBody2D, IEntity
         }
         else
         {
-            MoveAndCollide(desiredMovement / desiredMovementLength * _movementSpeed * remainingDeltaTime);
+            MoveAndCollide(desiredMovement / desiredMovementLength * Stats[Stat.MoveSpeed] * remainingDeltaTime);
             remainingDeltaTime = 0;
         }
     }
@@ -156,4 +173,16 @@ public class Unit : KinematicBody2D, IEntity
     }
     
     public bool IsAlliedTo(Unit other) => other.Faction == Faction;
+    
+    public void Heal(float amount, Unit source, Ability ability)
+    {
+        StatsInternal[Stat.CurrentHealth] =
+            Mathf.Clamp(StatsInternal[Stat.CurrentHealth] + amount, 0, Stats[Stat.MaxHealth]); 
+    }
+    
+    public void RestoreMana(float amount, Unit source, Ability ability)
+    {
+        StatsInternal[Stat.CurrentMana] =
+            Mathf.Clamp(StatsInternal[Stat.CurrentMana] + amount, 0, Stats[Stat.MaxMana]);
+    }
 }

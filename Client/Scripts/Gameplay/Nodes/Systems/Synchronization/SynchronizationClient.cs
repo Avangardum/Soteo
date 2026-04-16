@@ -145,7 +145,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
         foreach (EntitySnapshot entitySnapshot in snapshot.Entities)
         {
             IEntity entity = _entityManager.GetEntity(entitySnapshot.Id)!;
-            entitySnapshot.ApplyToEntity(entity);
+            entity.ReplicateSnapshot(entitySnapshot);
         }
     }
 

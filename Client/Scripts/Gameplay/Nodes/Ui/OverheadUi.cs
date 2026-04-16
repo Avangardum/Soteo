@@ -1,4 +1,5 @@
 using Soteo.Gameplay.Nodes.Entities;
+using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Ui;
@@ -82,8 +83,8 @@ public sealed class OverheadUi : Control
     {
         RectPosition = (_unit.Position - _camera.GetCameraPosition() + _offset) * _camera.TrueZoom;
         SelectVariant();
-        SetHealth(_unit.CurrentHealth, _unit.MaxHealth);
-        SetMana(_unit.CurrentMana, _unit.MaxMana);
+        SetHealth(_unit.Stats[Stat.CurrentHealth], _unit.Stats[Stat.MaxHealth]);
+        SetMana(_unit.Stats[Stat.CurrentMana], _unit.Stats[Stat.MaxMana]);
     }
     
     private void SelectVariant()
@@ -95,7 +96,7 @@ public sealed class OverheadUi : Control
             Variant.PlayerCharacter;
     }
     
-    private void SetHealth(int current, int max)
+    private void SetHealth(float current, float max)
     {
         switch (CurrentVariant)
         {
@@ -110,7 +111,7 @@ public sealed class OverheadUi : Control
         }
     }
     
-    private void SetMana(int current, int max)
+    private void SetMana(float current, float max)
     {
         switch (CurrentVariant)
         {

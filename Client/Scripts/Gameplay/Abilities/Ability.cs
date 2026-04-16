@@ -5,8 +5,8 @@ namespace Soteo.Gameplay.Abilities;
 public abstract class Ability
 {
     public virtual int MaxLevel => 1;
-    public virtual Scalable<int> HealthCost => 0;
-    public virtual Scalable<int> ManaCost => 0;
+    public virtual Scalable<float> HealthCost => 0;
+    public virtual Scalable<float> ManaCost => 0;
     public virtual Scalable<float> Cooldown => 0;
     public abstract Scalable<float> CastRange { get; }
     public virtual Scalable<float> CastTimeSeconds => 0;

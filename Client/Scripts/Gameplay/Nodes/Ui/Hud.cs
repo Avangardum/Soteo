@@ -1,5 +1,6 @@
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
+using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Nodes.Ui;
 
@@ -40,11 +41,11 @@ public sealed class Hud : Control, IHud
         }
 
         Visible = true;
-        _healthBar.Value = SelectedUnit.CurrentHealth;
-        _healthBar.MaxValue = SelectedUnit.MaxHealth;
-        _healthLabel.Text = $"{SelectedUnit.CurrentHealth} / {SelectedUnit.MaxHealth}";
-        _manaBar.Value = SelectedUnit.CurrentMana;
-        _manaBar.MaxValue = SelectedUnit.MaxMana;
-        _manaLabel.Text = $"{SelectedUnit.CurrentMana} / {SelectedUnit.MaxMana}";
+        _healthBar.Value = SelectedUnit.Stats[Stat.CurrentHealth];
+        _healthBar.MaxValue = SelectedUnit.Stats[Stat.MaxHealth];
+        _healthLabel.Text = $"{SelectedUnit.Stats[Stat.CurrentHealth]} / {SelectedUnit.Stats[Stat.MaxHealth]}";
+        _manaBar.Value = SelectedUnit.Stats[Stat.CurrentMana];
+        _manaBar.MaxValue = SelectedUnit.Stats[Stat.MaxMana];
+        _manaLabel.Text = $"{SelectedUnit.Stats[Stat.CurrentMana]} / {SelectedUnit.Stats[Stat.MaxMana]}";
     }
 }
