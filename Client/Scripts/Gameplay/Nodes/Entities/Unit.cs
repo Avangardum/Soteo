@@ -171,6 +171,16 @@ public class Unit : KinematicBody2D, IEntity
     
     public bool IsAlliedTo(Unit other) => other.Faction == Faction;
     
+    public void SpendHealth(float amount, Ability ability)
+    {
+        ChangeStat(Stat.CurrentHealth, -amount);
+    }
+    
+    public void SpendMana(float amount, Ability ability)
+    {
+        ChangeStat(Stat.CurrentMana, -amount);
+    }
+    
     public void Heal(float amount, Unit source, Ability ability)
     {
         StatsInternal[Stat.CurrentHealth] =
@@ -181,5 +191,19 @@ public class Unit : KinematicBody2D, IEntity
     {
         StatsInternal[Stat.CurrentMana] =
             Mathf.Clamp(StatsInternal[Stat.CurrentMana] + amount, 0, Stats[Stat.MaxMana]);
+    }
+    
+    protected void ChangeStat(Stat stat, float delta) => SetStat(stat, Stats[stat] + delta);
+
+    protected void SetStat(Stat stat, float value)
+    {
+        float min = 0;
+        float max = stat switch
+        {
+            Stat.CurrentHealth => Stats[Stat.MaxHealth],
+            Stat.CurrentMana => Stats[Stat.MaxMana],
+            _ => float.PositiveInfinity
+        };
+        StatsInternal[stat] = Mathf.Clamp(value, min, max);
     }
 }

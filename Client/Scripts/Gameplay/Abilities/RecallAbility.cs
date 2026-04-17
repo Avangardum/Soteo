@@ -5,12 +5,13 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class RecallAbility : UntargetedAbility<RecallAbility>
+public sealed class RecallAbility : Ability<RecallAbility>
 {
-    public override Scalable<float> CastTimeSeconds => 10;
+    public override Scalable<float> CastTimeSec => 10;
     
-    public override void Cast(AbilityCastContext context)
+    public override void OnCasted(AbilityCastContext context)
     {
+        base.OnCasted(context);
         context.Caster.QueueFree();
         context.GetRequiredService<IPacketSender>()
             .SendReliable(new CharacterRecalledPacket { CharacterId = context.Caster.Id }, MasterServerId);

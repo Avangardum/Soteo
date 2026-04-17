@@ -13,33 +13,48 @@ public static class SoteoMath
     
     /// <summary>
     /// Linear interpolation, but for modular arithmetics with possible wrapping around zero. Useful for azimuth
-    /// interpolation. Examples: f(350, 30, 0.5, 360) = 20, f(100, 80, 0.5, 360) = 90.
+    /// interpolation.<br />
+    /// Examples: f(350, 30, 0.5, 360) = 20, f(100, 80, 0.5, 360) = 90.
     /// </summary>
-    public static float ModularLerp(float from, float to, float weight, float modulo)
+    public static float ModularLerp(float from, float to, float weight, float modulo) =>
+        Mathf.PosMod(from + ModularDelta(from, to, modulo) * weight, modulo);
+
+    /// <summary>
+    /// Linear interpolation, but for modular arithmetics with possible wrapping around zero and only moving in positive
+    /// direction. Useful for animations.<br />
+    /// Examples: f(350, 30, 0.5, 360) = 20, f(100, 80, 0.5, 360) = 270.
+    /// </summary>
+    public static float ModularLerpPositive(float from, float to, float weight, float modulo) =>
+        Mathf.PosMod(from + ModularDeltaPositive(from, to, modulo) * weight, modulo);
+
+    /// <summary>
+    /// Find difference, but for modular arithmetics with possible wrapping around zero. Useful for azimuth.<br />
+    /// Examples: f(350, 30, 360) = +40, f(100, 80, 360) = -20.
+    /// </summary>
+    public static float ModularDelta(float from, float to, float modulo)
     {
         if (from < 0 || from >= modulo) throw new ArgumentException();
         if (to < 0 || to >= modulo) throw new ArgumentException();
         
-        float fullDelta = to - from;
-        if (fullDelta > modulo / 2) fullDelta -= modulo;
-        else if (fullDelta < -modulo / 2) fullDelta += modulo;
-        
-        return Mathf.PosMod(from + fullDelta * weight, modulo);
+        float delta = to - from;
+        if (delta > modulo / 2) delta -= modulo;
+        else if (delta < -modulo / 2) delta += modulo;
+        return delta;
     }
     
     /// <summary>
-    /// Linear interpolation, but for modular arithmetics with possible wrapping around zero and only moving in positive
-    /// direction. Useful for animations. Examples: f(350, 30, 0.5, 360) = 20, f(100, 80, 0.5, 360) = 270.
+    /// Find difference, but for modular arithmetics with possible wrapping around zero and only moving in positive
+    /// direction.<br />
+    /// Examples: f(350, 30, 360) = +40, f(100, 80, 360) = 340.
     /// </summary>
-    public static float ModularLerpPositive(float from, float to, float weight, float modulo)
+    public static float ModularDeltaPositive(float from, float to, float modulo)
     {
         if (from < 0 || from >= modulo) throw new ArgumentException();
         if (to < 0 || to >= modulo) throw new ArgumentException();
         
-        float fullDelta = to - from;
-        if (fullDelta < 0) fullDelta += modulo;
-        
-        return Mathf.PosMod(from + fullDelta * weight, modulo);
+        float delta = to - from;
+        if (delta < 0) delta += modulo;
+        return delta;
     }
     
     public static T? InterpolateNullable<T>(T? from, T? to, Func<T, T, T> interpolate) where T : struct
