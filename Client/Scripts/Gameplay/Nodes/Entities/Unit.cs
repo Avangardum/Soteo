@@ -22,6 +22,9 @@ public class Unit : KinematicBody2D, IEntity
     public ICovariantReadOnlyDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates =>
         AbilityStatesInternal.AsCovariant();
 
+    public AbilitySlot? CurrentAbilitySlot { get; private set; }
+    public float CurrentAbilityProgressSeconds { get; private set; } = -1;
+    
     public Guid Id { get; set; }
 
     public Faction Faction { get; set; }
@@ -47,7 +50,9 @@ public class Unit : KinematicBody2D, IEntity
             Azimuth = Azimuth,
             Stats = Stats.ToImmutableDictionary(),
             AbilityStates = AbilityStatesInternal
-                .ToImmutableDictionary(it => it.Key, IReadOnlyAbilityState (it) => it.Value with {})
+                .ToImmutableDictionary(it => it.Key, IReadOnlyAbilityState (it) => it.Value with {}),
+            CurrentAbilitySlot = CurrentAbilitySlot,
+            CurrentAbilityProgressSeconds = CurrentAbilityProgressSeconds
         };
     }
 
@@ -58,6 +63,10 @@ public class Unit : KinematicBody2D, IEntity
         foreach ((Stat stat, float value) in snapshot.Stats) StatsInternal[stat] = value;
         foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in snapshot.AbilityStates)
             AbilityStatesInternal[slot] = new AbilityState(state);
+        if (snapshot.CurrentAbilitySlot != null) CurrentAbilitySlot = snapshot.CurrentAbilitySlot.Value;
+        if (snapshot.CurrentAbilityProgressSeconds == -1) CurrentAbilitySlot = null;
+        if (snapshot.CurrentAbilityProgressSeconds != null)
+            CurrentAbilityProgressSeconds = snapshot.CurrentAbilityProgressSeconds.Value;
     }
 
     public override void _Ready()

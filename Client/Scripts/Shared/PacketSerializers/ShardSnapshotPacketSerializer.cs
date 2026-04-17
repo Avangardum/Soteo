@@ -19,6 +19,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         Azimuth = 1 << 2,
         Stats = 1 << 3,
         AbilityStates = 1 << 4,
+        CurrentAbilitySlot = 1 << 5,
+        CurrentAbilityProgressSeconds = 1 << 6
     }
     
     private const int SizeOfAbilityState = sizeof(int) + sizeof(int) + sizeof(float);
@@ -37,7 +39,9 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             SizeOfNullable(entity.Position) +
             SizeOfNullable(entity.Azimuth) +
             SizeOf(entity.Stats) +
-            SizeOf(entity.AbilityStates, SizeOfAbilityState);
+            SizeOf(entity.AbilityStates, SizeOfAbilityState) +
+            SizeOfNullable(entity.CurrentAbilitySlot) +
+            SizeOfNullable(entity.CurrentAbilityProgressSeconds);
     }
 
     protected override void SerializeInternal(ShardSnapshotPacket packet, ref Span<byte> span)
@@ -78,6 +82,16 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             dataFlags |= EntitySnapshotDataFlags.AbilityStates;
             SerializeDictionary(entity.AbilityStates, SerializeEnum, SerializeAbilityState, ref span);
         }
+        if (entity.CurrentAbilitySlot != null)
+        {
+            dataFlags |= EntitySnapshotDataFlags.CurrentAbilitySlot;
+            SerializeEnum(entity.CurrentAbilitySlot.Value, ref span);
+        }
+        if (entity.CurrentAbilityProgressSeconds != null)
+        {
+            dataFlags |= EntitySnapshotDataFlags.CurrentAbilityProgressSeconds;
+            SerializeFloat(entity.CurrentAbilityProgressSeconds.Value, ref span);
+        }
             
         SerializeEnum(dataFlags, ref dataFlagsSpan);
     }
@@ -107,9 +121,13 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Position = dataFlags.HasFlag(EntitySnapshotDataFlags.Position) ? DeserializeVector2(ref span) : null,
             Azimuth = dataFlags.HasFlag(EntitySnapshotDataFlags.Azimuth) ? DeserializeFloat(ref span) : null,
             Stats = dataFlags.HasFlag(EntitySnapshotDataFlags.Stats) ?
-                DeserializeDictionary(ref span, DeserializeEnum<Stat>, DeserializeFloat) : [],
+                DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, ref span) : [],
             AbilityStates = dataFlags.HasFlag(EntitySnapshotDataFlags.AbilityStates) ?
-                DeserializeDictionary(ref span, DeserializeEnum<AbilitySlot>, DeserializeAbilityState) : [],
+                DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, ref span) : [],
+            CurrentAbilitySlot = dataFlags.HasFlag(EntitySnapshotDataFlags.CurrentAbilitySlot) ?
+                DeserializeEnum<AbilitySlot>(ref span) : null,
+            CurrentAbilityProgressSeconds = dataFlags.HasFlag(EntitySnapshotDataFlags.CurrentAbilityProgressSeconds) ?
+                DeserializeFloat(ref span) : null
         };
     }
     

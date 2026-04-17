@@ -3,6 +3,7 @@ using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 using static Soteo.Shared.SoteoMath;
+using static Godot.Mathf;
 
 namespace Soteo.Gameplay;
 
@@ -13,6 +14,8 @@ public sealed record EntitySnapshot
     public float? Azimuth { get; init; }
     public ImmutableDictionary<Stat, float> Stats { get; init; } = [];
     public ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates { get; init; } = [];
+    public AbilitySlot? CurrentAbilitySlot { get; init; }
+    public float? CurrentAbilityProgressSeconds { get; init; }
     
     public static EntitySnapshot Interpolate(EntitySnapshot from, EntitySnapshot to, float weight)
     {
@@ -20,7 +23,9 @@ public sealed record EntitySnapshot
         return to with
         {
             Position = InterpolateNullable(from.Position, to.Position, (f, t) => f.Lerp(t, weight)),
-            Azimuth = InterpolateNullable(from.Azimuth, to.Azimuth, (f, t) => ModularLerp(f, t, weight, 360))
+            Azimuth = InterpolateNullable(from.Azimuth, to.Azimuth, (f, t) => ModularLerp(f, t, weight, 360)),
+            CurrentAbilityProgressSeconds = InterpolateNullable(from.CurrentAbilityProgressSeconds,
+                to.CurrentAbilityProgressSeconds, (f, t) => f < t ? Lerp(f, t, weight) : t)
         };
     }
 }

@@ -265,9 +265,9 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
 
     protected ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue> 
     (
-        ref Span<byte> span,
         Deserializer<TKey> deserializeKey,
-        Deserializer<TValue> deserializeValue
+        Deserializer<TValue> deserializeValue,
+        ref Span<byte> span
     ) where TKey : notnull
     {
         var pairs = new KeyValuePair<TKey, TValue>[DeserializeInt(ref span)];
