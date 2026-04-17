@@ -1,5 +1,4 @@
 using Soteo.Gameplay.Enums;
-using Soteo.Gameplay.Nodes.Entities;
 
 namespace Soteo.Gameplay.Abilities;
 

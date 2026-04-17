@@ -62,13 +62,13 @@ public abstract class Ability
         if (context.Cooldown > 0) return AbilityValidationResult.Cooldown;
         
         if (!TargetFlags.HasFlag(AbilityTargetFlags.Untargeted) &&
-            context.TargetPoint == null && context.TargetUnit == null)
+            context.TargetPosition == null && context.TargetUnit == null)
         {
             return AbilityValidationResult.InvalidTarget;
         }
-        if (context.TargetPoint != null && context.TargetUnit != null)
+        if (context.TargetPosition != null && context.TargetUnit != null)
             return AbilityValidationResult.InvalidTarget;
-        if (!TargetFlags.HasFlag(AbilityTargetFlags.Point) && context.TargetPoint != null)
+        if (!TargetFlags.HasFlag(AbilityTargetFlags.Position) && context.TargetPosition != null)
             return AbilityValidationResult.InvalidTarget;
         if (!TargetFlags.HasFlag(AbilityTargetFlags.Unit) && context.TargetUnit != null)
             return AbilityValidationResult.InvalidTarget;
@@ -82,7 +82,7 @@ public abstract class Ability
         if (context.Caster.Stats[Stat.CurrentMana] < ManaCost[context.Level])
             return AbilityValidationResult.NotEnoughMana;
         
-        if ((context.TargetPoint ?? context.TargetUnit?.Position) is Vector2 targetPosition)
+        if ((context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition)
         {
             Vector2 deltaPosition = targetPosition - context.Caster.Position;
             float rangeMultiplier = strict ? 1 : 1.5f;
