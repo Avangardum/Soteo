@@ -4,6 +4,7 @@ using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Shared.Attributes;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 
@@ -12,6 +13,9 @@ namespace Soteo.Gameplay.Nodes.Entities;
 public class Unit : KinematicBody2D, IEntity
 {
     private Line2D _azimuthLine = null!;
+    
+    private IServiceProvider _serviceProvider = null!;
+    private IEntityManager _entityManager = null!;
     
     private Queue<ICommand> Commands { get; } = [];
     
@@ -23,7 +27,7 @@ public class Unit : KinematicBody2D, IEntity
         AbilityStatesInternal.AsCovariant();
 
     public AbilitySlot? CurrentAbilitySlot { get; private set; }
-    public float CurrentAbilityProgressSeconds { get; private set; } = -1;
+    public float CurrentAbilityRemainingUseTime { get; private set; } = -1;
     
     public Guid Id { get; set; }
 
@@ -52,7 +56,7 @@ public class Unit : KinematicBody2D, IEntity
             AbilityStates = AbilityStatesInternal
                 .ToImmutableDictionary(it => it.Key, IReadOnlyAbilityState (it) => it.Value with {}),
             CurrentAbilitySlot = CurrentAbilitySlot,
-            CurrentAbilityProgressSeconds = CurrentAbilityProgressSeconds
+            CurrentAbilityRemainingUseTimeSec = CurrentAbilityRemainingUseTime
         };
     }
 
@@ -64,11 +68,18 @@ public class Unit : KinematicBody2D, IEntity
         foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in snapshot.AbilityStates)
             AbilityStatesInternal[slot] = new AbilityState(state);
         if (snapshot.CurrentAbilitySlot != null) CurrentAbilitySlot = snapshot.CurrentAbilitySlot.Value;
-        if (snapshot.CurrentAbilityProgressSeconds == -1) CurrentAbilitySlot = null;
-        if (snapshot.CurrentAbilityProgressSeconds != null)
-            CurrentAbilityProgressSeconds = snapshot.CurrentAbilityProgressSeconds.Value;
+        if (snapshot.CurrentAbilityRemainingUseTimeSec == -1) CurrentAbilitySlot = null;
+        if (snapshot.CurrentAbilityRemainingUseTimeSec != null)
+            CurrentAbilityRemainingUseTime = snapshot.CurrentAbilityRemainingUseTimeSec.Value;
     }
-
+    
+    [Inject]
+    public void Inject(IServiceProvider serviceProvider, IEntityManager entityManager)
+    {
+        _serviceProvider = serviceProvider;
+        _entityManager = entityManager;
+    }
+    
     public override void _Ready()
     {
         _azimuthLine = GetNode<Line2D>("AzimuthLine");
@@ -101,6 +112,9 @@ public class Unit : KinematicBody2D, IEntity
                 case MoveCommand command:
                     LookAtPosition(command.Position, ref remainingDeltaTime);
                     MoveToPosition(command.Position, ref remainingDeltaTime);
+                    break;
+                case UseAbilityCommand command:
+                    UseAbility(command, ref remainingDeltaTime);
                     break;
             }
         }
@@ -155,6 +169,51 @@ public class Unit : KinematicBody2D, IEntity
         {
             MoveAndCollide(desiredMovement / desiredMovementLength * Stats[Stat.MoveSpeed] * remainingDeltaTime);
             remainingDeltaTime = 0;
+        }
+    }
+    
+    private void UseAbility(UseAbilityCommand command, ref float remainingDeltaTime)
+    {
+        if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state) || state.Cooldown > 0)
+        {
+            Commands.Dequeue();
+            return;
+        }
+        
+        var context = new AbilityUseContext
+        {
+            Level = state.Level,
+            Caster = this,
+            ServiceProvider = _serviceProvider,
+            TargetPosition = command.TargetPosition,
+            TargetUnit = command.TargetUnitId == null ? null :
+                _entityManager.GetEntity(command.TargetUnitId.Value) as Unit,
+            TargetDirection = command.TargetDirection,
+            TargetShardId = command.TargetShardId
+        };
+        
+        if (state.Ability.Validate(context) != AbilityValidationResult.Ok)
+        {
+            Commands.Dequeue();
+            return;
+        }
+        
+        if (command.Slot != CurrentAbilitySlot) CurrentAbilityRemainingUseTime = state.Ability.UseTimeSec[state.Level];
+        CurrentAbilitySlot = command.Slot;
+        
+        if (remainingDeltaTime < CurrentAbilityRemainingUseTime)
+        {
+            CurrentAbilityRemainingUseTime -= remainingDeltaTime;
+            remainingDeltaTime = 0;
+        }
+        else
+        {
+            remainingDeltaTime -= CurrentAbilityRemainingUseTime;
+            state.Ability.TakeEffect(context);
+            state.Cooldown = state.Ability.Cooldown[state.Level];
+            CurrentAbilitySlot = null;
+            CurrentAbilityRemainingUseTime = -1;
+            Commands.Dequeue();
         }
     }
 

@@ -3,11 +3,11 @@ using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Commands;
 
-public sealed class UseAbilityCommand
+public sealed record UseAbilityCommand
 (
     AbilitySlot Slot,
+    Vector2? TargetPosition,
     Guid? TargetUnitId,
-    Vector2? TargetPoint,
     Vector2? TargetDirection,
     Guid? TargetShardId
 ) : ICommand;

@@ -8,14 +8,16 @@ namespace Soteo.Gameplay.Nodes.Systems;
 
 public sealed class EntityManager : Node, IEntityManager
 {
+    private IServiceProvider _serviceProvider = null!;
     private IEntityRoots _entityRoots = null!;
     private PackedScene _playerCharacterScene = null!;
     
     private Dictionary<Guid, IEntity> _entities = [];
     
     [Inject]
-    public void Inject(IEntityRoots entityRoots)
+    public void Inject(IServiceProvider serviceProvider, IEntityRoots entityRoots)
     {
+        _serviceProvider = serviceProvider;
         _entityRoots = entityRoots;
     }
     
@@ -37,6 +39,7 @@ public sealed class EntityManager : Node, IEntityManager
     {
         var playerCharacter = SpawnEntity<PlayerCharacter>(id, _playerCharacterScene, _entityRoots.PlayerCharacterRoot);
         playerCharacter.DisplayName = id.ToString()[^12..];
+        playerCharacter.Inject(_serviceProvider, this);
         EntityAdded(playerCharacter);
         return playerCharacter;
     }

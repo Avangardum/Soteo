@@ -20,7 +20,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         Stats = 1 << 3,
         AbilityStates = 1 << 4,
         CurrentAbilitySlot = 1 << 5,
-        CurrentAbilityProgressSeconds = 1 << 6
+        CurrentAbilityRemainingUseTimeSec = 1 << 6
     }
     
     private const int SizeOfAbilityState = sizeof(int) + sizeof(int) + sizeof(float);
@@ -36,12 +36,12 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return
             SizeOf(entity.Id) +
             sizeof(EntitySnapshotDataFlags) +
-            SizeOfNullable(entity.Position) +
-            SizeOfNullable(entity.Azimuth) +
+            SizeOfIgnoreNull(entity.Position) +
+            SizeOfIgnoreNull(entity.Azimuth) +
             SizeOf(entity.Stats) +
             SizeOf(entity.AbilityStates, SizeOfAbilityState) +
-            SizeOfNullable(entity.CurrentAbilitySlot) +
-            SizeOfNullable(entity.CurrentAbilityProgressSeconds);
+            SizeOfIgnoreNull(entity.CurrentAbilitySlot) +
+            SizeOfIgnoreNull(entity.CurrentAbilityRemainingUseTimeSec);
     }
 
     protected override void SerializeInternal(ShardSnapshotPacket packet, ref Span<byte> span)
@@ -87,10 +87,10 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             dataFlags |= EntitySnapshotDataFlags.CurrentAbilitySlot;
             SerializeEnum(entity.CurrentAbilitySlot.Value, ref span);
         }
-        if (entity.CurrentAbilityProgressSeconds != null)
+        if (entity.CurrentAbilityRemainingUseTimeSec != null)
         {
-            dataFlags |= EntitySnapshotDataFlags.CurrentAbilityProgressSeconds;
-            SerializeFloat(entity.CurrentAbilityProgressSeconds.Value, ref span);
+            dataFlags |= EntitySnapshotDataFlags.CurrentAbilityRemainingUseTimeSec;
+            SerializeFloat(entity.CurrentAbilityRemainingUseTimeSec.Value, ref span);
         }
             
         SerializeEnum(dataFlags, ref dataFlagsSpan);
@@ -126,7 +126,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
                 DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, ref span) : [],
             CurrentAbilitySlot = dataFlags.HasFlag(EntitySnapshotDataFlags.CurrentAbilitySlot) ?
                 DeserializeEnum<AbilitySlot>(ref span) : null,
-            CurrentAbilityProgressSeconds = dataFlags.HasFlag(EntitySnapshotDataFlags.CurrentAbilityProgressSeconds) ?
+            CurrentAbilityRemainingUseTimeSec = dataFlags.HasFlag(EntitySnapshotDataFlags.CurrentAbilityRemainingUseTimeSec) ?
                 DeserializeFloat(ref span) : null
         };
     }

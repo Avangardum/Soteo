@@ -59,8 +59,6 @@ public abstract class Ability
     {
         if (context.Level < 1 || context.Level > MaxLevel) return AbilityValidationResult.InvalidLevel;
         
-        if (context.Cooldown > 0) return AbilityValidationResult.Cooldown;
-        
         if (!TargetFlags.HasFlag(AbilityTargetFlags.Untargeted) &&
             context.TargetPosition == null && context.TargetUnit == null)
         {

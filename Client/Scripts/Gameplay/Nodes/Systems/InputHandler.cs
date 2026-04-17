@@ -1,8 +1,10 @@
 using Godot.Collections;
+using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared;
 using Soteo.Shared.Attributes;
+using Soteo.Shared.Enums;
 using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Nodes.Systems;
@@ -28,6 +30,14 @@ public sealed class InputHandler : Node2D
     {
         if (e.IsActionPressed("select")) HandleSelect();
         if (e.IsActionPressed("interact")) HandleInteract();
+        foreach (AbilitySlot slot in Enum.GetValues(typeof(AbilitySlot)))
+        {
+            var action = "use_ability_" + slot.ToString().ToLower();
+            if (InputMap.HasAction(action) && e.IsActionReleased(action))
+            {
+                HandleUseAbility(slot);
+            }
+        }
     }
     
     private void HandleSelect()
@@ -48,6 +58,12 @@ public sealed class InputHandler : Node2D
         {
             _packetSender.SendReliable(new MovePacket { Position = GetGlobalMousePosition() }, Const.TestShardId);
         }
+    }
+    
+    private void HandleUseAbility(AbilitySlot slot)
+    {
+        var command = new UseAbilityCommand(slot, null, null, null, null);
+        _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
     }
     
     private Unit? GetUnitUnderMouse()

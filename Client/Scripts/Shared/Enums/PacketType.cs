@@ -13,7 +13,6 @@ public enum PacketType : byte
     WebrtcIceCandidate,
     // Client --> Shard server
     Move,
-    Attack,
     UseAbility,
     // Shard Server --> Client
     ShardSnapshot

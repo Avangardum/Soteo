@@ -226,7 +226,15 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
 
     protected int SizeOf(string s) => sizeof(int) + Encoding.UTF8.GetByteCount(s);
     
-    protected int SizeOfNullable<T>(T? nullable) where T : unmanaged => nullable == null ? 0 : SizeOf(nullable.Value);
+    /// <summary>
+    /// Size of a nullable value when serialized as a regular value. If the value is null, it's not serialized at all.
+    /// </summary>
+    protected int SizeOfIgnoreNull<T>(T? nullable) where T : unmanaged => nullable == null ? 0 : SizeOf(nullable.Value);
+    
+    /// <summary>
+    /// Size of a nullable value when serialized as a pair of HasValue and Value.
+    /// </summary>
+    protected int SizeOfEncodeNull<T>(T? nullable) where T : unmanaged => 1 + SizeOf(default(T));
     
     protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, int sizeOfValue)
         where TKey : unmanaged

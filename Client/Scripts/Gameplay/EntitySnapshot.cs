@@ -15,7 +15,7 @@ public sealed record EntitySnapshot
     public ImmutableDictionary<Stat, float> Stats { get; init; } = [];
     public ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates { get; init; } = [];
     public AbilitySlot? CurrentAbilitySlot { get; init; }
-    public float? CurrentAbilityProgressSeconds { get; init; }
+    public float? CurrentAbilityRemainingUseTimeSec { get; init; }
     
     public static EntitySnapshot Interpolate(EntitySnapshot from, EntitySnapshot to, float weight)
     {
@@ -24,8 +24,8 @@ public sealed record EntitySnapshot
         {
             Position = InterpolateNullable(from.Position, to.Position, (f, t) => f.Lerp(t, weight)),
             Azimuth = InterpolateNullable(from.Azimuth, to.Azimuth, (f, t) => ModularLerp(f, t, weight, 360)),
-            CurrentAbilityProgressSeconds = InterpolateNullable(from.CurrentAbilityProgressSeconds,
-                to.CurrentAbilityProgressSeconds, (f, t) => f < t ? Lerp(f, t, weight) : t)
+            CurrentAbilityRemainingUseTimeSec = InterpolateNullable(from.CurrentAbilityRemainingUseTimeSec,
+                to.CurrentAbilityRemainingUseTimeSec, (f, t) => f > t ? Lerp(f, t, weight) : t)
         };
     }
 }

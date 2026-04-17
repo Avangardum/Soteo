@@ -10,8 +10,8 @@ public class PlayerCharacter : Unit
     public override void _Ready()
     {
         base._Ready();
-        AbilityStatesInternal[AbilitySlot.Unit0] = AbilityState.New<HealAbility>(1);
-        AbilityStatesInternal[AbilitySlot.Unit1] = AbilityState.New<BloodSacrificeAbility>(1);
+        AbilityStatesInternal[AbilitySlot.Class0] = AbilityState.New<BloodSacrificeAbility>(1);
+        AbilityStatesInternal[AbilitySlot.Class1] = AbilityState.New<HealAbility>(1);
         AbilityStatesInternal[AbilitySlot.Recall] = AbilityState.New<RecallAbility>(1);
     }
 }
