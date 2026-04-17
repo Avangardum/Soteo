@@ -27,7 +27,7 @@ public sealed record EntitySnapshot
             Azimuth = InterpolateNullable(from.Azimuth, to.Azimuth, (f, t) => ModularLerp(f, t, weight, 360)),
             AbilityStates = InterpolateAbilityStates(from.AbilityStates, to.AbilityStates, weight),
             CurrentAbilityRemainingUseTime = InterpolateNullable(from.CurrentAbilityRemainingUseTime,
-                to.CurrentAbilityRemainingUseTime, (f, t) => LerpDecrease(f, t, weight))
+                to.CurrentAbilityRemainingUseTime, (f, t) => t == -1 ? -1 : LerpDecrease(f, t, weight))
         };
     }
     

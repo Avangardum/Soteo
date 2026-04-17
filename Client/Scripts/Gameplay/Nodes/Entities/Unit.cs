@@ -221,6 +221,11 @@ public class Unit : KinematicBody2D, IEntity
     {
         Commands.Clear();
         Commands.Enqueue(command);
+        if (command is not UseAbilityCommand useAbilityCommand || useAbilityCommand.Slot != CurrentAbilitySlot)
+        {
+            CurrentAbilitySlot = null;
+            CurrentAbilityRemainingUseTime = -1;
+        }
     }
      
     public void CancelCommands()
