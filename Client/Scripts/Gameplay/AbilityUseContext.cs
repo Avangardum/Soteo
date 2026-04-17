@@ -2,7 +2,7 @@ using Soteo.Gameplay.Nodes.Entities;
 
 namespace Soteo.Gameplay;
 
-public sealed record AbilityCastContext(int Level, Unit Caster, float Cooldown, IServiceProvider Services)
+public sealed record AbilityUseContext(int Level, Unit Caster, float Cooldown, IServiceProvider Services)
     : IServiceProvider
 {
     public Vector2? TargetPosition { get; init; }

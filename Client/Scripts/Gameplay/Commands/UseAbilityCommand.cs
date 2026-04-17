@@ -3,7 +3,7 @@ using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Commands;
 
-public sealed class CastAbilityCommand
+public sealed class UseAbilityCommand
 (
     AbilitySlot Slot,
     Guid? TargetUnitId,

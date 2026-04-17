@@ -34,14 +34,14 @@ public abstract class Ability
     public virtual Scalable<float> Cooldown => 0;
     public virtual Scalable<float> Range => 0;
     public virtual Scalable<float> AngularRangeDeg => 30;
-    public virtual Scalable<float> CastTimeSec => 0;
+    public virtual Scalable<float> UseTimeSec => 0;
     public virtual AbilityTargetFlags TargetFlags => AbilityTargetFlags.Untargeted;
     
     /// <summary>
-    /// Called when an ability cast is completed and it takes effect.
+    /// Called when an ability usage is completed and it takes effect.
     /// This should be called only immediately after non-strict validation succeeds.
     /// </summary>
-    public virtual void OnCasted(AbilityCastContext context)
+    public virtual void TakeEffect(AbilityUseContext context)
     {
         AbilityValidationResult validationResult = Validate(context);
         if (validationResult != AbilityValidationResult.Ok)
@@ -51,11 +51,11 @@ public abstract class Ability
     }
     
     /// <summary>
-    /// Checks whether an ability can be cast and returns a reason if not.
-    /// Strict mode is used to determine whether cast can be initiated.
-    /// Non-strict mode is used to determine whether in-progress cast should be interrupted.
+    /// Checks whether an ability can be used and returns a reason if not.
+    /// Strict mode is used to determine whether usage can be initiated.
+    /// Non-strict mode is used to determine whether in-progress usage should be interrupted.
     /// </summary>
-    public virtual AbilityValidationResult Validate(AbilityCastContext context, bool strict = true)
+    public virtual AbilityValidationResult Validate(AbilityUseContext context, bool strict = true)
     {
         if (context.Level < 1 || context.Level > MaxLevel) return AbilityValidationResult.InvalidLevel;
         
