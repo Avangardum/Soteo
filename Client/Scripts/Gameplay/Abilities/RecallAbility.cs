@@ -7,7 +7,7 @@ namespace Soteo.Gameplay.Abilities;
 
 public sealed class RecallAbility : Ability<RecallAbility>
 {
-    public override Scalable<float> UseTimeSec => 10;
+    public override Scalable<float> UseTime => 10;
     
     public override void TakeEffect(AbilityUseContext context)
     {

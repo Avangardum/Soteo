@@ -33,12 +33,12 @@ public abstract class Ability
     public virtual Scalable<float> ManaCost => 0;
     public virtual Scalable<float> Cooldown => 0;
     public virtual Scalable<float> Range => 0;
-    public virtual Scalable<float> AngularRangeDeg => 30;
-    public virtual Scalable<float> UseTimeSec => 0;
+    public virtual Scalable<float> AngularRange => 30;
+    public virtual Scalable<float> UseTime => 0;
     public virtual AbilityTargetFlags TargetFlags => AbilityTargetFlags.Untargeted;
     
     /// <summary>
-    /// Called when an ability usage is completed and it takes effect.
+    /// Called when an ability use is completed and it takes effect.
     /// This should be called only immediately after non-strict validation succeeds.
     /// </summary>
     public virtual void TakeEffect(AbilityUseContext context)
@@ -52,8 +52,8 @@ public abstract class Ability
     
     /// <summary>
     /// Checks whether an ability can be used and returns a reason if not.
-    /// Strict mode is used to determine whether usage can be initiated.
-    /// Non-strict mode is used to determine whether in-progress usage should be interrupted.
+    /// Strict mode is used to determine whether use can be initiated.
+    /// Non-strict mode is used to determine whether in-progress use should be interrupted.
     /// </summary>
     public virtual AbilityValidationResult Validate(AbilityUseContext context, bool strict = true)
     {
@@ -89,7 +89,7 @@ public abstract class Ability
             
             float deltaAzimuth =
                 SoteoMath.ModularDelta(context.Caster.Azimuth, SoteoMath.DirectionToAzimuth(deltaPosition), 360);
-            if (Mathf.Abs(deltaAzimuth) > AngularRangeDeg[context.Level] * rangeMultiplier)
+            if (Mathf.Abs(deltaAzimuth) > AngularRange[context.Level] * rangeMultiplier)
                 return AbilityValidationResult.OutOfRange;
         }
 

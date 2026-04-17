@@ -56,7 +56,7 @@ public class Unit : KinematicBody2D, IEntity
             AbilityStates = AbilityStatesInternal
                 .ToImmutableDictionary(it => it.Key, IReadOnlyAbilityState (it) => it.Value with {}),
             CurrentAbilitySlot = CurrentAbilitySlot,
-            CurrentAbilityRemainingUseTimeSec = CurrentAbilityRemainingUseTime
+            CurrentAbilityRemainingUseTime = CurrentAbilityRemainingUseTime
         };
     }
 
@@ -68,9 +68,9 @@ public class Unit : KinematicBody2D, IEntity
         foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in snapshot.AbilityStates)
             AbilityStatesInternal[slot] = new AbilityState(state);
         if (snapshot.CurrentAbilitySlot != null) CurrentAbilitySlot = snapshot.CurrentAbilitySlot.Value;
-        if (snapshot.CurrentAbilityRemainingUseTimeSec == -1) CurrentAbilitySlot = null;
-        if (snapshot.CurrentAbilityRemainingUseTimeSec != null)
-            CurrentAbilityRemainingUseTime = snapshot.CurrentAbilityRemainingUseTimeSec.Value;
+        if (snapshot.CurrentAbilityRemainingUseTime == -1) CurrentAbilitySlot = null;
+        if (snapshot.CurrentAbilityRemainingUseTime != null)
+            CurrentAbilityRemainingUseTime = snapshot.CurrentAbilityRemainingUseTime.Value;
     }
     
     [Inject]
@@ -198,7 +198,7 @@ public class Unit : KinematicBody2D, IEntity
             return;
         }
         
-        if (command.Slot != CurrentAbilitySlot) CurrentAbilityRemainingUseTime = state.Ability.UseTimeSec[state.Level];
+        if (command.Slot != CurrentAbilitySlot) CurrentAbilityRemainingUseTime = state.Ability.UseTime[state.Level];
         CurrentAbilitySlot = command.Slot;
         
         if (remainingDeltaTime < CurrentAbilityRemainingUseTime)

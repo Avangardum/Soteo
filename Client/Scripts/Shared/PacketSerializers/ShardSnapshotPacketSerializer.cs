@@ -20,7 +20,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         Stats = 1 << 3,
         AbilityStates = 1 << 4,
         CurrentAbilitySlot = 1 << 5,
-        CurrentAbilityRemainingUseTimeSec = 1 << 6
+        CurrentAbilityRemainingUseTime = 1 << 6
     }
     
     private const int SizeOfAbilityState = sizeof(int) + sizeof(int) + sizeof(float);
@@ -41,7 +41,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             SizeOf(entity.Stats) +
             SizeOf(entity.AbilityStates, SizeOfAbilityState) +
             SizeOfIgnoreNull(entity.CurrentAbilitySlot) +
-            SizeOfIgnoreNull(entity.CurrentAbilityRemainingUseTimeSec);
+            SizeOfIgnoreNull(entity.CurrentAbilityRemainingUseTime);
     }
 
     protected override void SerializeInternal(ShardSnapshotPacket packet, ref Span<byte> span)
@@ -87,10 +87,10 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             dataFlags |= EntitySnapshotDataFlags.CurrentAbilitySlot;
             SerializeEnum(entity.CurrentAbilitySlot.Value, ref span);
         }
-        if (entity.CurrentAbilityRemainingUseTimeSec != null)
+        if (entity.CurrentAbilityRemainingUseTime != null)
         {
-            dataFlags |= EntitySnapshotDataFlags.CurrentAbilityRemainingUseTimeSec;
-            SerializeFloat(entity.CurrentAbilityRemainingUseTimeSec.Value, ref span);
+            dataFlags |= EntitySnapshotDataFlags.CurrentAbilityRemainingUseTime;
+            SerializeFloat(entity.CurrentAbilityRemainingUseTime.Value, ref span);
         }
             
         SerializeEnum(dataFlags, ref dataFlagsSpan);
@@ -126,7 +126,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
                 DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, ref span) : [],
             CurrentAbilitySlot = dataFlags.HasFlag(EntitySnapshotDataFlags.CurrentAbilitySlot) ?
                 DeserializeEnum<AbilitySlot>(ref span) : null,
-            CurrentAbilityRemainingUseTimeSec = dataFlags.HasFlag(EntitySnapshotDataFlags.CurrentAbilityRemainingUseTimeSec) ?
+            CurrentAbilityRemainingUseTime = dataFlags.HasFlag(EntitySnapshotDataFlags.CurrentAbilityRemainingUseTime) ?
                 DeserializeFloat(ref span) : null
         };
     }
