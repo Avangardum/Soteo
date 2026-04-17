@@ -43,7 +43,10 @@ public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketS
             SetProcess(false);
             SetPhysicsProcess(false);
             QueueFree();
+            return;
         }
+        
+        ProcessPriority = (int)ProcessPriorityEnum.Communicator;
     }
 
     public override void _Process(float delta)

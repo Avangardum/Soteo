@@ -45,7 +45,10 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
             SetProcess(false);
             SetPhysicsProcess(false);
             QueueFree();
+            return;
         }
+        
+        ProcessPriority = (int)ProcessPriorityEnum.Communicator;
     }
 
     public override void _PhysicsProcess(float delta)

@@ -56,6 +56,8 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
             return;
         }
         
+        ProcessPriority = (int)ProcessPriorityEnum.Communicator;
+        
         _wsClient.Connect("connection_closed", this, nameof(OnConnectionClosed));
         _wsClient.Connect("connection_error", this, nameof(OnConnectionError));
         _wsClient.Connect("connection_established", this, nameof(OnConnectionEstablished));
