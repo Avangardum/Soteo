@@ -1,14 +1,17 @@
+using static System.Math;
+using static Godot.Mathf;
+
 namespace Soteo.Shared;
 
 public static class SoteoMath
 {
     public static float DirectionToAzimuth(Vector2 direction) =>
-        Mathf.Rad2Deg(Mathf.PosMod(Mathf.Atan2(direction.y, direction.x) + Mathf.Pi / 2, 2 * Mathf.Pi));
+        Rad2Deg(Mathf.PosMod(Atan2(direction.y, direction.x) + Pi / 2, 2 * Pi));
     
     public static Vector2 AzimuthToDirection(float azimuth)
     {
-        float atan2 = Mathf.Deg2Rad(azimuth) - Mathf.Pi / 2;
-        return new Vector2(Mathf.Cos(atan2), Mathf.Sin(atan2));
+        float atan2 = Deg2Rad(azimuth) - Pi / 2;
+        return new Vector2(Cos(atan2), Sin(atan2));
     }
     
     /// <summary>
@@ -68,6 +71,10 @@ public static class SoteoMath
         if (from == null || to == null) return to;
         return interpolate(from, to);
     }
+    
+    public static float LerpDecrease(float from, float to, float weight) => from > to ? Lerp(from, to, weight) : to;
+    
+    public static float LerpIncrease(float from, float to, float weight) => from < to ? Lerp(from, to, weight) : to;
     
     public static double InverseLerp(double from, double to, double value) => (value - from) / (to - from);
     

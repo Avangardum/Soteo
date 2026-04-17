@@ -10,10 +10,7 @@ public enum AbilitySlot : byte
     Class3,
     Class4,
     Class5,
-    Class6,
-    Class7,
-    Class8,
-    Class9,
+    ClassLast = Class5,
     Item0,
     Item1,
     Item2,
@@ -24,4 +21,5 @@ public enum AbilitySlot : byte
     Item7,
     Item8,
     Item9,
+    ItemLast = Item9
 }

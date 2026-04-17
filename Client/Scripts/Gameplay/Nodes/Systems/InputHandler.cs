@@ -5,6 +5,7 @@ using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Enums;
+using Soteo.Shared.Extensions;
 using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Nodes.Systems;
@@ -30,7 +31,7 @@ public sealed class InputHandler : Node2D
     {
         if (e.IsActionPressed("select")) HandleSelect();
         if (e.IsActionPressed("interact")) HandleInteract();
-        foreach (AbilitySlot slot in Enum.GetValues(typeof(AbilitySlot)))
+        foreach (var slot in Enum.GetValues<AbilitySlot>().Distinct())
         {
             var action = "use_ability_" + slot.ToString().ToLower();
             if (InputMap.HasAction(action) && e.IsActionReleased(action))

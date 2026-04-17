@@ -9,3 +9,5 @@ global using GdArray = Godot.Collections.Array;
 global using GdVector2 = Godot.Vector2;
 global using SysVector2 = System.Numerics.Vector2;
 global using Object = Godot.Object;
+global using GdRange = Godot.Range;
+global using SysRange = System.Range;
