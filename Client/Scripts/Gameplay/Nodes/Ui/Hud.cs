@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
+using Soteo.Shared.Attributes;
 using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Nodes.Ui;
@@ -13,8 +14,18 @@ public sealed class Hud : Control, IHud
     private Label _manaLabel = null!;
     private ImmutableList<AbilityButton> _abilityButtons = null!;
     
+    private IEntityLocator _entityLocator = null!;
+    private ICurrentUserIdRepository _currentUserIdRepository = null!;
+    
     public Unit? SelectedUnit { get; set; }
 
+    [Inject]
+    public void Inject(IEntityLocator entityLocator, ICurrentUserIdRepository currentUserIdRepository)
+    {
+        _entityLocator = entityLocator;
+        _currentUserIdRepository = currentUserIdRepository;
+    }
+    
     public override void _Ready()
     {
         if (IsServer)
@@ -51,6 +62,10 @@ public sealed class Hud : Control, IHud
     public override void _Process(float delta)
     {
         if (SelectedUnit == null || !IsInstanceValid(SelectedUnit))
+        {
+            SelectedUnit = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepository.UserId, out _);
+        }
+        if (SelectedUnit == null)
         {
             Visible = false;
             return;

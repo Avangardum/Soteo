@@ -1,4 +1,5 @@
 using System.Text;
+using JWT.Builder;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Attributes;
@@ -83,6 +84,7 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
     public void OnConnectionClosed(bool wasCleanClose)
     {
         _status = Status.Disconnected;
+        _currentUserIdRepository.UserId = Guid.Empty;
     }
     
     public void OnConnectionError()
@@ -94,7 +96,9 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
     {
         _status = Status.Connected;
         SendPacket(new MasterServerHandshakePacket { Token = _token, Version = Const.Version });
+        _token = "";
         ConnectionEstablished();
+        
         if (!IsServer)
         {
             SendPacket(new SpawnCharacterPacket { PeerId = Const.TestShardId });
@@ -157,8 +161,15 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
         else
         {
             _token = Encoding.UTF8.GetString(body);
+            _currentUserIdRepository.UserId = GetPlayerIdFromTrustedToken(_token);
             _wsClient.ConnectToUrl(MasterServerUrl);
         }
+    }
+    
+    private Guid GetPlayerIdFromTrustedToken(string token)
+    {
+        var claims = new JwtBuilder().DoNotVerifySignature().Decode<Dictionary<string, object>>(token);
+        return Guid.Parse((string)claims["sub"]);
     }
 
     public void SendPacket(Packet packet)

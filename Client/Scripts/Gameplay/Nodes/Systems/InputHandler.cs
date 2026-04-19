@@ -1,5 +1,6 @@
 using Godot.Collections;
 using Soteo.Gameplay.Commands;
+using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared;
@@ -14,12 +15,22 @@ public sealed class InputHandler : Node2D
 {
     private IPacketSender _packetSender = null!;
     private IHud _hud = null!;
+    private IEntityLocator _entityLocator = null!;
+    private ICurrentUserIdRepository _currentUserIdRepo = null!;
     
     [Inject]
-    public void Inject(IPacketSender packetSender, IHud hud)
+    public void Inject
+    (
+        IPacketSender packetSender,
+        IHud hud,
+        IEntityLocator entityLocator,
+        ICurrentUserIdRepository currentUserIdRepo
+    )
     {
         _packetSender = packetSender;
         _hud = hud;
+        _entityLocator = entityLocator;
+        _currentUserIdRepo = currentUserIdRepo;
     }
 
     public override void _Ready()
@@ -63,10 +74,33 @@ public sealed class InputHandler : Node2D
     
     private void HandleUseAbility(AbilitySlot slot)
     {
-        var command = new UseAbilityCommand(slot, null, null, null, null);
+        PlayerCharacter? caster = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepo.UserId, out _);
+        if (caster == null || !caster.AbilityStates.TryGetValue(slot, out IReadOnlyAbilityState? state)) return;
+        
+        bool canTargetUnit = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Unit);
+        bool canTargetPosition = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Position);
+        bool canTargetNothing = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Untargeted);
+            
+        Unit? targetUnit = canTargetUnit ? GetUnitUnderMouse() : null;
+        GD.Print(targetUnit?.ToString() ?? "null");
+        // todo check if target unit is valid, consider multiple units under mouse
+        
+        Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition() : null;
+        
+        if (!canTargetNothing && targetUnit == null && targetPosition == null) return;
+        
+        var command = new UseAbilityCommand(slot, targetPosition, targetUnit?.Id, null, null);
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
     }
     
+    private int _hits;
+    private int _misses;
+
+    public override void _PhysicsProcess(float delta)
+    {
+        Input.ParseInputEvent(new InputEventAction { Action = "select", Pressed = true });
+    }
+
     private Unit? GetUnitUnderMouse()
     {
         GdArray intersections = GetWorld2d().DirectSpaceState.IntersectPoint
@@ -77,6 +111,8 @@ public sealed class InputHandler : Node2D
             collideWithBodies: false,
             collideWithAreas: true
         );
+        if (intersections.Count > 0) _hits++; else _misses++;
+        GD.Print($"Hits: {_hits}, Misses: {_misses}");
         if (intersections.Count == 0) return null;
         var clickArea = (Area2D)intersections.Cast<Dictionary>().Single()["collider"];
         return clickArea.GetParent() as Unit;

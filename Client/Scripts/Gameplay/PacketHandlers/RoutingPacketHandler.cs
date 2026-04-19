@@ -10,16 +10,16 @@ namespace Soteo.Gameplay.PacketHandlers;
 public sealed class RoutingPacketHandler
 (
     IServiceProvider rootServiceProvider,
-    IShardServiceProvider shardServiceProvider,
+    IShardServiceProviderSource shardServiceProviderSource,
     ICurrentUserIdRepository currentUserIdRepository
 ) : IPacketHandler
 {
     public async Task HandleAsync(Packet packet, Guid senderId)
     {
         IServiceProvider? serviceProvider =
-            IsServer ? shardServiceProvider.GetServiceProviderForShard(currentUserIdRepository.UserId) :
+            IsServer ? shardServiceProviderSource.ShardServiceProviders[currentUserIdRepository.UserId] :
             senderId == MasterServerId ? rootServiceProvider :
-            shardServiceProvider.GetServiceProviderForShard(senderId);
+            shardServiceProviderSource.ShardServiceProviders[senderId];
         if (serviceProvider == null) return;
 
         if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type handlerType))

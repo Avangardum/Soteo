@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Interfaces;
@@ -13,7 +14,7 @@ using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay.Nodes;
 
-public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
+public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
 {
     // This class handles scene loading and dependency injection.
     // A service scope corresponds to a shard.
@@ -23,7 +24,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     private LogInUi _logInUi = null!;
     private Node2D _shardRoot = null!;
     private WebSocketMasterServerCommunicator _webSocketMasterServerCommunicator = null!;
-    private WebRtcGameplayCommunicator _webRtcGameplayCommunicator = null!; // todo rename class
+    private WebRtcGameplayCommunicator _webRtcGameplayCommunicator = null!;
     private JsmqCommunicator _jsmqCommunicator = null!;
     
     private PackedScene _shardScene = null!;
@@ -36,6 +37,9 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     public static Guid EditorLocalShardServerId { get; private set; }
     [Export] private bool _editorIsServer = false;
     [Export] private string _editorLocalShardServerId = "";
+
+    public IReadOnlyDictionary<Guid, IServiceProvider> ShardServiceProviders =>
+        _shardServiceScopes.ToImmutableDictionary(it => it.Key, it => it.Value.ServiceProvider);
 
     public override void _EnterTree()
     {
@@ -83,7 +87,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
     {
         services.AddSingleton(this);
         services.AddSingleton<IShardLoader>(this);
-        services.AddSingleton<IShardServiceProvider>(this);
+        services.AddSingleton<IShardServiceProviderSource>(this);
         services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
@@ -119,6 +123,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
         services.AddShardScopedNode<ISynchronizationPacketReceiver, SynchronizationClient>();
         services.AddSingletonNode<Camera2D>("Camera");
         services.AddSingletonNode<IHud>("Ui/Hud");
+        services.AddSingleton<IEntityLocator, EntityLocator>();
     }
     
     private void InjectInto(Node node, IServiceProvider serviceProvider)
@@ -164,7 +169,4 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProvider
         InjectInto(shard, scope.ServiceProvider);
         _shardServiceScopes[shardId] = scope;
     }
-
-    public IServiceProvider? GetServiceProviderForShard(Guid id) =>
-        _shardServiceScopes.GetOrDefault(id)?.ServiceProvider;
 }

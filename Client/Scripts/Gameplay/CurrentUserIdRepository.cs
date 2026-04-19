@@ -10,7 +10,7 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
         if (IsServer) UserId = GetLocalShardServerId();
     }
     
-    public Guid UserId { get; set; } // todo get client user id from token
+    public Guid UserId { get; set; }
     
     private Guid GetLocalShardServerId()
     {
