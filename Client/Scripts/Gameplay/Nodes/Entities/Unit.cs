@@ -55,7 +55,7 @@ public class Unit : KinematicBody2D, IEntity
     public Vector2 VisualPosition
     {
         get => Position + _visuals.Position;
-        set => _visuals.Position = value - Position;
+        private set => _visuals.Position = value - Position;
     }
     
     public float Azimuth
@@ -171,7 +171,7 @@ public class Unit : KinematicBody2D, IEntity
     
     private void LookAtAzimuth(float azimuth, ref float remainingDeltaTime)
     {
-        if (remainingDeltaTime == 0) return;
+        if (remainingDeltaTime == 0 || Stats[Stat.TurnSpeed] == 0) return;
         
         float desiredDeltaAzimuth = azimuth - Azimuth;
         if (desiredDeltaAzimuth > 180) desiredDeltaAzimuth -= 360;
@@ -193,10 +193,15 @@ public class Unit : KinematicBody2D, IEntity
     
     private void MoveToPosition(Vector2 position, ref float remainingDeltaTime)
     {
-        if (remainingDeltaTime == 0) return;
+        if (remainingDeltaTime == 0 || Stats[Stat.MoveSpeed] == 0) return;
         
         Vector2 desiredMovement = position - Position;
         float desiredMovementLength = desiredMovement.Length();
+        if (desiredMovementLength == 0)
+        {
+            if (Commands.PeekOrDefault() is MoveCommand) Commands.Dequeue();
+            return;
+        }
         float timeToComplete = desiredMovementLength / Stats[Stat.MoveSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {

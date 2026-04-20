@@ -76,7 +76,8 @@ public static class SoteoMath
     
     public static float LerpIncrease(float from, float to, float weight) => from < to ? Lerp(from, to, weight) : to;
     
-    public static double InverseLerp(double from, double to, double value) => (value - from) / (to - from);
+    public static double InverseLerp(double from, double to, double value) =>
+        to == from ? 0.5f : (value - from) / (to - from);
     
     public static int PosMod(long value, int modulo) => (int)(value >= 0 ? value % modulo : value % modulo + modulo);
     
