@@ -203,17 +203,7 @@ public class Unit : KinematicBody2D, IEntity
             return;
         }
         
-        var context = new AbilityUseContext
-        {
-            Level = state.Level,
-            Caster = this,
-            ServiceProvider = _serviceProvider,
-            TargetPosition = command.TargetPosition,
-            TargetUnit = command.TargetUnitId == null ? null :
-                _entityManager.GetEntity(command.TargetUnitId.Value) as Unit,
-            TargetDirection = command.TargetDirection,
-            TargetShardId = command.TargetShardId
-        };
+        AbilityUseContext context = GetAbilityUseContext(command);
         
         if (state.Ability.Validate(context) != AbilityValidationResult.Ok)
         {
@@ -238,6 +228,23 @@ public class Unit : KinematicBody2D, IEntity
             CurrentAbilityRemainingUseTime = -1;
             Commands.Dequeue();
         }
+    }
+    
+    public AbilityUseContext GetAbilityUseContext(UseAbilityCommand command)
+    {
+        if (!AbilityStates.TryGetValue(command.Slot, out IReadOnlyAbilityState? state))
+            throw new ArgumentException($"Unit {Id} doesn't have an ability in slot {command.Slot}");
+        return new AbilityUseContext
+        {
+            Level = state.Level,
+            Caster = this,
+            ServiceProvider = _serviceProvider,
+            TargetPosition = command.TargetPosition,
+            TargetUnit = command.TargetUnitId == null ? null :
+                _entityManager.GetEntity(command.TargetUnitId.Value) as Unit,
+            TargetDirection = command.TargetDirection,
+            TargetShardId = command.TargetShardId
+        };
     }
 
     public void SetCommand(ICommand command)

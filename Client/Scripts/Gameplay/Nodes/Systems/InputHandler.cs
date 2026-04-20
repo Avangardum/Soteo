@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Godot.Collections;
 using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Enums;
@@ -54,17 +55,23 @@ public sealed class InputHandler : Node2D
     
     private void HandleSelect()
     {
-        Unit? unit = GetUnitUnderMouse();
+        Unit? unit = GetUnitsUnderMouse().FirstOrDefault();
         if (unit == null) return;
         _hud.SelectedUnit = unit;
     }
     
     private void HandleInteract()
     {
-        Unit? unit = GetUnitUnderMouse();
-        if (unit != null)
+        PlayerCharacter? user = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepo.UserId, out _);
+        if (user == null) return;
+        
+        // Unit? targetUnit = GetUnitsUnderMouse().FirstOrDefault(it =>
+        //     ValidateAbilityTargetUnit(character, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
+        Unit? targetUnit = null;
+        
+        if (targetUnit != null)
         {
-            GD.Print($"Right clicked on {unit}");
+            // todo attack
         }
         else
         {
@@ -74,16 +81,17 @@ public sealed class InputHandler : Node2D
     
     private void HandleUseAbility(AbilitySlot slot)
     {
-        PlayerCharacter? caster = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepo.UserId, out _);
-        if (caster == null || !caster.AbilityStates.TryGetValue(slot, out IReadOnlyAbilityState? state)) return;
+        PlayerCharacter? user = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepo.UserId, out _);
+        if (user == null || !user.AbilityStates.TryGetValue(slot, out IReadOnlyAbilityState? state)) return;
         
         bool canTargetUnit = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Unit);
         bool canTargetPosition = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Position);
         bool canTargetNothing = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Untargeted);
         bool alt = Input.IsActionPressed("alt");
-            
-        Unit? targetUnit = !canTargetUnit ? null : alt ? caster : GetUnitUnderMouse();
-        // todo check if target unit is valid, consider multiple units under mouse
+        
+        IReadOnlyList<Unit> candidateTargetUnits = !canTargetUnit ? [] : alt ? [user] : GetUnitsUnderMouse();
+        Unit? targetUnit = candidateTargetUnits
+            .FirstOrDefault(it => ValidateAbilityTargetUnit(user, slot, it) == AbilityValidationResult.Ok);
         
         Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition() : null;
         
@@ -93,23 +101,34 @@ public sealed class InputHandler : Node2D
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
     }
     
+    private AbilityValidationResult ValidateAbilityTargetUnit(Unit user, AbilitySlot slot, Unit target)
+    {
+        AbilityUseContext context = user.GetAbilityUseContext(new UseAbilityCommand(slot, TargetUnitId: target.Id));
+        return user.AbilityStates[slot].Ability.Validate(context);
+    }
+    
     public override void _PhysicsProcess(float delta)
     {
         Input.ParseInputEvent(new InputEventAction { Action = "select", Pressed = true });
     }
 
-    private Unit? GetUnitUnderMouse()
+    private IReadOnlyList<Unit> GetUnitsUnderMouse()
     {
         GdArray intersections = GetWorld2d().DirectSpaceState.IntersectPoint
         (
             GetGlobalMousePosition(),
-            maxResults: 1,
+            maxResults: 32,
             collisionLayer: (uint)CollisionLayer.ClickArea,
             collideWithBodies: false,
             collideWithAreas: true
         );
-        if (intersections.Count == 0) return null;
-        var clickArea = (Area2D)intersections.Cast<Dictionary>().Single()["collider"];
-        return clickArea.GetParent() as Unit;
+        return intersections
+            .Cast<Dictionary>()
+            .Select(it => (Area2D)it["collider"])
+            .Select(it => it.GetParent() as Unit)
+            .WhereNotNull()
+            .OrderByDescending(it => it.ZIndex)
+            .ThenByDescending(it => it.VisualPosition.y)
+            .ToImmutableList();
     }
 }

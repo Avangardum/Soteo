@@ -6,8 +6,8 @@ namespace Soteo.Gameplay.Commands;
 public sealed record UseAbilityCommand
 (
     AbilitySlot Slot,
-    Vector2? TargetPosition,
-    Guid? TargetUnitId,
-    Vector2? TargetDirection,
-    Guid? TargetShardId
+    Vector2? TargetPosition = null,
+    Guid? TargetUnitId = null,
+    Vector2? TargetDirection = null,
+    Guid? TargetShardId = null
 ) : ICommand;
