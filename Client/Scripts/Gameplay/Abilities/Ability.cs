@@ -67,8 +67,8 @@ public abstract class Ability
         AbilityValidationResult validationResult = Validate(context);
         if (validationResult != AbilityValidationResult.Ok)
             throw new InvalidOperationException($"Ability validation failed: {validationResult}");
-        context.Caster.SpendHealth(HealthCost(context), this);
-        context.Caster.SpendMana(ManaCost(context), this);
+        context.User.SpendHealth(HealthCost(context), this);
+        context.User.SpendMana(ManaCost(context), this);
     }
     
     /// <summary>
@@ -114,9 +114,9 @@ public abstract class Ability
     
     private AbilityValidationResult ValidateCost(AbilityUseContext context)
     {
-        if (context.Caster.Stats[Stat.CurrentHealth] <= HealthCost(context))
+        if (context.User.Stats[Stat.CurrentHealth] <= HealthCost(context))
             return AbilityValidationResult.NotEnoughHealth;
-        if (context.Caster.Stats[Stat.CurrentMana] < ManaCost(context))
+        if (context.User.Stats[Stat.CurrentMana] < ManaCost(context))
             return AbilityValidationResult.NotEnoughMana;
         return AbilityValidationResult.Ok;
     }
@@ -124,15 +124,15 @@ public abstract class Ability
     private AbilityValidationResult ValidateRange(AbilityUseContext context, bool strict)
     {
         if ((context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition &&
-            targetPosition != context.Caster.Position)
+            targetPosition != context.User.Position)
         {
-            Vector2 deltaPosition = targetPosition - context.Caster.Position;
+            Vector2 deltaPosition = targetPosition - context.User.Position;
             float rangeMultiplier = strict ? 1 : 1.5f;
             if (deltaPosition.Length() > Range(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfRange;
             
             float deltaAzimuth =
-                SoteoMath.ModularDelta(context.Caster.Azimuth, SoteoMath.DirectionToAzimuth(deltaPosition), 360);
+                SoteoMath.ModularDelta(context.User.Azimuth, SoteoMath.DirectionToAzimuth(deltaPosition), 360);
             if (Mathf.Abs(deltaAzimuth) > AngularRange(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfRange;
         }

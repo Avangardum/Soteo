@@ -15,7 +15,7 @@ public sealed class HealAbility : Ability<HealAbility>
     public override void TakeEffect(AbilityUseContext context)
     {
         base.TakeEffect(context);
-        context.TargetUnit!.Heal(Heal[context.Level], context.Caster, this);
+        context.TargetUnit!.Heal(Heal[context.Level], context.User, this);
     }
 
     public override AbilityValidationResult Validate(AbilityUseContext context, bool strict = true)
@@ -23,7 +23,7 @@ public sealed class HealAbility : Ability<HealAbility>
         AbilityValidationResult baseValidationResult = base.Validate(context, strict);
         if (baseValidationResult != AbilityValidationResult.Ok) return baseValidationResult;
         
-        if (!context.Caster.IsAlliedTo(context.TargetUnit!)) return AbilityValidationResult.InvalidTarget;
+        if (!context.User.IsAlliedTo(context.TargetUnit!)) return AbilityValidationResult.InvalidTarget;
         
         return AbilityValidationResult.Ok;
     }

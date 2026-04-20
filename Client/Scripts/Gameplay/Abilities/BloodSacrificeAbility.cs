@@ -10,6 +10,6 @@ public sealed class BloodSacrificeAbility : Ability<BloodSacrificeAbility>
     public override void TakeEffect(AbilityUseContext context)
     {
         base.TakeEffect(context);
-        context.Caster.RestoreMana(ManaRestored[context.Level], context.Caster, this);
+        context.User.RestoreMana(ManaRestored[context.Level], context.User, this);
     }
 }

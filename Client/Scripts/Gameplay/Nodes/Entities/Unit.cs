@@ -240,7 +240,7 @@ public class Unit : KinematicBody2D, IEntity
         return new AbilityUseContext
         {
             Level = state.Level,
-            Caster = this,
+            User = this,
             ServiceProvider = _serviceProvider,
             TargetPosition = command.TargetPosition,
             TargetUnit = command.TargetUnitId == null ? null :

@@ -5,7 +5,7 @@ namespace Soteo.Gameplay;
 public sealed record AbilityUseContext : IServiceProvider
 {
     public required int Level { get; init; }
-    public required Unit Caster { get; init; }
+    public required Unit User { get; init; }
     public required IServiceProvider ServiceProvider { get; init; }
     public Vector2? TargetPosition { get; init; }
     public Unit? TargetUnit { get; init; }

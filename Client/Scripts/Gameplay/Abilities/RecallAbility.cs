@@ -12,8 +12,8 @@ public sealed class RecallAbility : Ability<RecallAbility>
     public override void TakeEffect(AbilityUseContext context)
     {
         base.TakeEffect(context);
-        context.Caster.QueueFree();
+        context.User.QueueFree();
         context.GetRequiredService<IPacketSender>()
-            .SendReliable(new CharacterRecalledPacket { CharacterId = context.Caster.Id }, MasterServerId);
+            .SendReliable(new CharacterRecalledPacket { CharacterId = context.User.Id }, MasterServerId);
     }
 }
