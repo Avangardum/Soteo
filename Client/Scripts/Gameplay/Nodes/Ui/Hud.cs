@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared.Attributes;
@@ -99,19 +100,20 @@ public sealed class Hud : Control, IHud
             
             button.Visible = true;
             IReadOnlyAbilityState state = SelectedUnit.AbilityStates[slot];
+            AbilityUseContext context = SelectedUnit.GetAbilityUseContext(new UseAbilityCommand(slot));
             
             button.CooldownIndicator.Value = state.Cooldown;
-            button.CooldownIndicator.MaxValue = state.Ability.Cooldown[state.Level];
+            button.CooldownIndicator.MaxValue = state.Ability.Cooldown(context);
 
             button.UseProgressIndicator.Value = SelectedUnit.CurrentAbilitySlot != slot ? 0 :
-                state.Ability.UseTime[state.Level] - SelectedUnit.CurrentAbilityRemainingUseTime;
-            button.UseProgressIndicator.MaxValue = state.Ability.UseTime[state.Level];
+                state.Ability.UseTime(context) - SelectedUnit.CurrentAbilityRemainingUseTime;
+            button.UseProgressIndicator.MaxValue = state.Ability.UseTime(context);
             
-            button.HealthCostLabel.Text = Mathf.CeilToInt(state.Ability.HealthCost[state.Level]).ToString();
-            button.HealthCostLabel.Visible = state.Ability.HealthCost[state.Level] > 0;
+            button.HealthCostLabel.Text = Mathf.CeilToInt(state.Ability.HealthCost(context)).ToString();
+            button.HealthCostLabel.Visible = state.Ability.HealthCost(context) > 0;
             
-            button.ManaCostLabel.Text = Mathf.CeilToInt(state.Ability.ManaCost[state.Level]).ToString();
-            button.ManaCostLabel.Visible = state.Ability.ManaCost[state.Level] > 0;
+            button.ManaCostLabel.Text = Mathf.CeilToInt(state.Ability.ManaCost(context)).ToString();
+            button.ManaCostLabel.Visible = state.Ability.ManaCost(context) > 0;
         }
     }
 }

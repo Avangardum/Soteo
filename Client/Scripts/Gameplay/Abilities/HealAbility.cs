@@ -5,11 +5,11 @@ namespace Soteo.Gameplay.Abilities;
 public sealed class HealAbility : Ability<HealAbility>
 {
     public override int MaxLevel => 4;
-    public override Scalable<float> ManaCost => [100, 120, 160, 180];
+    public override Scalable<float> StaticManaCost => [100, 120, 160, 180];
     private Scalable<float> Heal => [200, 300, 400, 500];
-    public override Scalable<float> Cooldown => [15, 13, 11, 9];
-    public override Scalable<float> UseTime => 0.5f;
-    public override Scalable<float> Range => 300;
+    public override Scalable<float> StaticCooldown => [15, 13, 11, 9];
+    public override Scalable<float> StaticUseTime => 0.5f;
+    public override Scalable<float> StaticRange => 300;
     public override AbilityTargetFlags TargetFlags => AbilityTargetFlags.Unit;
 
     public override void TakeEffect(AbilityUseContext context)

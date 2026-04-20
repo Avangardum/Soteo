@@ -214,7 +214,7 @@ public class Unit : KinematicBody2D, IEntity
             return;
         }
         
-        if (command.Slot != CurrentAbilitySlot) CurrentAbilityRemainingUseTime = state.Ability.UseTime[state.Level];
+        if (command.Slot != CurrentAbilitySlot) CurrentAbilityRemainingUseTime = state.Ability.UseTime(context);
         CurrentAbilitySlot = command.Slot;
         
         if (remainingDeltaTime < CurrentAbilityRemainingUseTime)
@@ -226,7 +226,7 @@ public class Unit : KinematicBody2D, IEntity
         {
             remainingDeltaTime -= CurrentAbilityRemainingUseTime;
             state.Ability.TakeEffect(context);
-            state.Cooldown = state.Ability.Cooldown[state.Level];
+            state.Cooldown = state.Ability.Cooldown(context);
             CurrentAbilitySlot = null;
             CurrentAbilityRemainingUseTime = -1;
             if (!command.Repeat) Commands.Dequeue();
