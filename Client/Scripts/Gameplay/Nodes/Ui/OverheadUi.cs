@@ -81,7 +81,7 @@ public sealed class OverheadUi : Control
 
     public override void _Process(float delta)
     {
-        RectPosition = (_unit.Position - _camera.GetCameraPosition() + _offset) * _camera.TrueZoom;
+        RectPosition = (_unit.VisualPosition - _camera.GetCameraPosition() + _offset) * _camera.TrueZoom;
         SelectVariant();
         SetHealth(_unit.Stats[Stat.CurrentHealth], _unit.Stats[Stat.MaxHealth]);
         SetMana(_unit.Stats[Stat.CurrentMana], _unit.Stats[Stat.MaxMana]);

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Scenes/Ui/LogIn.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Main.cs" type="Script" id=2]
@@ -10,8 +10,6 @@
 [ext_resource path="res://Scripts/Gameplay/Nodes/Systems/InputHandler.cs" type="Script" id=8]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Systems/Communicators/JsmqCommunicator.cs" type="Script" id=9]
 [ext_resource path="res://Scenes/Ui/Hud.tscn" type="PackedScene" id=10]
-[ext_resource path="res://Scripts/Gameplay/Nodes/Ui/MousePositionMarker.cs" type="Script" id=11]
-[ext_resource path="res://Scenes/Player.tscn" type="PackedScene" id=12]
 
 [node name="Main" type="Node2D"]
 script = ExtResource( 2 )
@@ -77,16 +75,5 @@ mouse_filter = 2
 texture = ExtResource( 7 )
 expand = true
 stretch_mode = 2
-
-[node name="MousePositionMarker" type="Line2D" parent="."]
-scale = Vector2( 10, 10 )
-points = PoolVector2Array( 1, 0, 0.7, 0.7, 0, 1, -0.7, 0.7, -1, 0, -0.7, -0.7, 0, -1, 0.7, -0.7, 1, 0, 0.7, 0.7 )
-width = 0.1
-default_color = Color( 1, 1, 1, 1 )
-script = ExtResource( 11 )
-
-[node name="FakePlayer" parent="." instance=ExtResource( 12 )]
-position = Vector2( 36, 7 )
-script = null
 
 [connection signal="pressed" from="Ui/ConnectAsServerButton" to="Systems/WebSocketMasterServerCommunicator" method="ConnectAsShardServer"]

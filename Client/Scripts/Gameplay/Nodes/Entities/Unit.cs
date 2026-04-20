@@ -12,6 +12,7 @@ namespace Soteo.Gameplay.Nodes.Entities;
 
 public class Unit : KinematicBody2D, IEntity
 {
+    private Node2D _visuals = null!;
     private Line2D _azimuthLine = null!;
     
     private IServiceProvider _serviceProvider = null!;
@@ -32,6 +33,16 @@ public class Unit : KinematicBody2D, IEntity
     public Guid Id { get; set; }
 
     public Faction Faction { get; set; }
+    
+    /// <summary>
+    /// Visual position of the unit, separate from its physical position. Unlike physical position, this is safe to
+    /// set outside _PhysicsProcess, when updating physical position would introduce physics bugs.
+    /// </summary>
+    public Vector2 VisualPosition
+    {
+        get => Position + _visuals.Position;
+        set => _visuals.Position = value - Position;
+    }
     
     public float Azimuth
     {
@@ -62,7 +73,7 @@ public class Unit : KinematicBody2D, IEntity
 
     public void ReplicateSnapshot(EntitySnapshot snapshot)
     {
-        if (snapshot.Position != null) Position = snapshot.Position.Value;
+        if (snapshot.Position != null) VisualPosition = snapshot.Position.Value;
         if (snapshot.Azimuth != null) Azimuth = snapshot.Azimuth.Value;
         foreach ((Stat stat, float value) in snapshot.Stats) StatsInternal[stat] = value;
         foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in snapshot.AbilityStates)
@@ -71,6 +82,12 @@ public class Unit : KinematicBody2D, IEntity
         if (snapshot.CurrentAbilityRemainingUseTime == -1) CurrentAbilitySlot = null;
         if (snapshot.CurrentAbilityRemainingUseTime != null)
             CurrentAbilityRemainingUseTime = snapshot.CurrentAbilityRemainingUseTime.Value;
+    }
+    
+    private void MatchPhysicsPositionToVisualPosition()
+    {
+        Position += _visuals.Position;
+        _visuals.Position = Vector2.Zero;
     }
     
     [Inject]
@@ -82,7 +99,8 @@ public class Unit : KinematicBody2D, IEntity
     
     public override void _Ready()
     {
-        _azimuthLine = GetNode<Line2D>("AzimuthLine");
+        _visuals = GetNode<Node2D>("Visuals");
+        _azimuthLine = GetNode<Line2D>("Visuals/AzimuthLine");
         
         StatsInternal[Stat.CurrentHealth] = StatsInternal[Stat.MaxHealth] = 1000;
         StatsInternal[Stat.CurrentMana] = StatsInternal[Stat.MaxMana] = 1000;
@@ -92,11 +110,16 @@ public class Unit : KinematicBody2D, IEntity
 
     public override void _PhysicsProcess(float deltaTime)
     {
-        if (!IsServer) return;
-        
-        foreach (AbilityState abilityState in AbilityStatesInternal.Values)
-            abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - deltaTime, 0);
-        ExecuteCommands(deltaTime);
+        if (!IsServer)
+        {
+            MatchPhysicsPositionToVisualPosition();
+        }
+        else
+        {
+            foreach (AbilityState abilityState in AbilityStatesInternal.Values)
+                abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - deltaTime, 0);
+            ExecuteCommands(deltaTime);
+        }
     }
     
     private void ExecuteCommands(float deltaTime)

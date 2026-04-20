@@ -80,7 +80,8 @@ public abstract class Ability
         if (context.Caster.Stats[Stat.CurrentMana] < ManaCost[context.Level])
             return AbilityValidationResult.NotEnoughMana;
         
-        if ((context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition)
+        if ((context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition &&
+            targetPosition != context.Caster.Position)
         {
             Vector2 deltaPosition = targetPosition - context.Caster.Position;
             float rangeMultiplier = strict ? 1 : 1.5f;

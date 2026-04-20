@@ -258,21 +258,23 @@ __meta__ = {
 "_edit_group_": true
 }
 
-[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+[node name="Visuals" type="Node2D" parent="."]
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="Visuals"]
 position = Vector2( 0.5, -5 )
 frames = SubResource( 7 )
 animation = "Idle Down"
 playing = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-rotation = 1.5708
-shape = SubResource( 67 )
-
-[node name="AzimuthLine" type="Line2D" parent="."]
+[node name="AzimuthLine" type="Line2D" parent="Visuals"]
 z_index = -1
 points = PoolVector2Array( 0, -14, 0, -18 )
 width = 1.0
 default_color = Color( 1, 1, 1, 1 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+rotation = 1.5708
+shape = SubResource( 67 )
 
 [node name="Area2D" type="Area2D" parent="."]
 collision_layer = 256

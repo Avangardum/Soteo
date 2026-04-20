@@ -80,9 +80,9 @@ public sealed class InputHandler : Node2D
         bool canTargetUnit = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Unit);
         bool canTargetPosition = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Position);
         bool canTargetNothing = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Untargeted);
+        bool alt = Input.IsActionPressed("alt");
             
-        Unit? targetUnit = canTargetUnit ? GetUnitUnderMouse() : null;
-        GD.Print(targetUnit?.ToString() ?? "null");
+        Unit? targetUnit = !canTargetUnit ? null : alt ? caster : GetUnitUnderMouse();
         // todo check if target unit is valid, consider multiple units under mouse
         
         Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition() : null;
@@ -93,9 +93,6 @@ public sealed class InputHandler : Node2D
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
     }
     
-    private int _hits;
-    private int _misses;
-
     public override void _PhysicsProcess(float delta)
     {
         Input.ParseInputEvent(new InputEventAction { Action = "select", Pressed = true });
@@ -111,8 +108,6 @@ public sealed class InputHandler : Node2D
             collideWithBodies: false,
             collideWithAreas: true
         );
-        if (intersections.Count > 0) _hits++; else _misses++;
-        GD.Print($"Hits: {_hits}, Misses: {_misses}");
         if (intersections.Count == 0) return null;
         var clickArea = (Area2D)intersections.Cast<Dictionary>().Single()["collider"];
         return clickArea.GetParent() as Unit;
