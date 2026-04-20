@@ -106,11 +106,6 @@ public sealed class InputHandler : Node2D
         AbilityUseContext context = user.GetAbilityUseContext(new UseAbilityCommand(slot, TargetUnitId: target.Id));
         return user.AbilityStates[slot].Ability.Validate(context);
     }
-    
-    public override void _PhysicsProcess(float delta)
-    {
-        Input.ParseInputEvent(new InputEventAction { Action = "select", Pressed = true });
-    }
 
     private IReadOnlyList<Unit> GetUnitsUnderMouse()
     {

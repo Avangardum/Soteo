@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/Gameplay/Resources/Palette.cs" type="Script" id=1]
+
+[resource]
+script = ExtResource( 1 )
+<Neutral>k__BackingField = Color( 0.705882, 0, 0, 1 )
+<Empire>k__BackingField = Color( 0.254902, 0.254902, 1, 1 )
+<Syndicate>k__BackingField = Color( 0, 0.6, 0, 1 )

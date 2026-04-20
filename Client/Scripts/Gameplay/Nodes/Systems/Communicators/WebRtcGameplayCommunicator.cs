@@ -95,7 +95,8 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
         }
         catch (BadPacketException e)
         {
-            SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
+            if (IsServer) SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
+            else AsyncExceptionCollector.Collect(e);
         }
         catch (Exception e)
         {

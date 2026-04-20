@@ -66,6 +66,7 @@ public sealed class SoteoCamera : Camera2D
     
     private void Scroll(float delta)
     {
+        if (OS.GetCmdlineArgs().Contains("--no-scroll")) return;
         Vector2 viewportMousePos = GetViewport().GetMousePosition();
         Vector2 viewportSize = GetViewport().GetVisibleRect().Size;
         int xDirection = viewportMousePos.x < _scrollZoneThickness ? -1 :

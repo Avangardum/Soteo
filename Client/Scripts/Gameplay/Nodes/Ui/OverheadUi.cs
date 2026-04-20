@@ -1,3 +1,5 @@
+using Soteo.Gameplay.Enums;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
@@ -15,6 +17,7 @@ public sealed class OverheadUi : Control
 
     private Unit _unit = null!;
     private Camera2D _camera = null!;
+    private IPalette _palette = null!;
     
     private Control _playerCharacterPanel = null!;
     private Label _playerCharacterNameLabel = null!;
@@ -54,10 +57,11 @@ public sealed class OverheadUi : Control
         }
     }
     
-    public void Inject(Unit unit, Camera2D camera)
+    public void Inject(Unit unit, Camera2D camera, IPalette palette)
     {
         _unit = unit;
         _camera = camera;
+        _palette = palette;
         
         unit.Connect("tree_exited", this, nameof(OnUnitRemoved));
         
@@ -83,6 +87,7 @@ public sealed class OverheadUi : Control
     {
         RectPosition = (_unit.VisualPosition - _camera.GetCameraPosition() + _offset) * _camera.TrueZoom;
         SelectVariant();
+        SetFaction(_unit.Faction);
         SetHealth(_unit.Stats[Stat.CurrentHealth], _unit.Stats[Stat.MaxHealth]);
         SetMana(_unit.Stats[Stat.CurrentMana], _unit.Stats[Stat.MaxMana]);
     }
@@ -94,6 +99,25 @@ public sealed class OverheadUi : Control
         float zoom = _camera.TrueZoom.x;
         CurrentVariant = zoom < tinyHealthMinZoom ? Variant.None : zoom <= tinyHealthMaxZoom ? Variant.TinyHealth :
             Variant.PlayerCharacter;
+    }
+    
+    private void SetFaction(Faction faction)
+    {
+        Color color = faction switch
+        {
+            Faction.Empire => _palette.Empire,
+            Faction.Syndicate => _palette.Syndicate,
+            Faction.Neutral => _palette.Neutral
+        };
+        switch (CurrentVariant)
+        {
+            case Variant.PlayerCharacter:
+                _playerCharacterHealthBar.TintProgress = color;
+                break;
+            case Variant.TinyHealth:
+                _tinyHealthBar.TintProgress = color;
+                break;
+        }
     }
     
     private void SetHealth(float current, float max)

@@ -18,6 +18,20 @@ public class Unit : KinematicBody2D, IEntity
     private IServiceProvider _serviceProvider = null!;
     private IEntityManager _entityManager = null!;
     
+    public static readonly IReadOnlyDictionary<Stat, float> DefaultStats = new Dictionary<Stat, float>
+    {
+        [Stat.MaxHealth] = 1000,
+        [Stat.CurrentHealth] = 1000,
+        [Stat.MaxMana] = 1000,
+        [Stat.CurrentMana] = 1000,
+        [Stat.MoveSpeed] = 50,
+        [Stat.TurnSpeed] = 360,
+        [Stat.AttackDamage] = 50,
+        [Stat.AttackSpeed] = 1000,
+        [Stat.AttackUseTimeFraction] = 0.5f,
+        [Stat.AttackRange] = 100
+    }.ToImmutableDictionary(); 
+    
     private Queue<ICommand> Commands { get; } = [];
     
     private Dictionary<Stat, float> StatsInternal { get; } = [];
@@ -102,10 +116,9 @@ public class Unit : KinematicBody2D, IEntity
         _visuals = GetNode<Node2D>("Visuals");
         _azimuthLine = GetNode<Line2D>("Visuals/AzimuthLine");
         
-        StatsInternal[Stat.CurrentHealth] = StatsInternal[Stat.MaxHealth] = 1000;
-        StatsInternal[Stat.CurrentMana] = StatsInternal[Stat.MaxMana] = 1000;
-        StatsInternal[Stat.MoveSpeed] = 50;
-        StatsInternal[Stat.TurnSpeed] = 360;
+        foreach (Stat stat in Enum.GetValues<Stat>()) StatsInternal[stat] = DefaultStats[stat];
+        
+        Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
 
     public override void _PhysicsProcess(float deltaTime)
@@ -278,16 +291,19 @@ public class Unit : KinematicBody2D, IEntity
         ChangeStat(Stat.CurrentMana, -amount);
     }
     
+    public void DealDamage(float amount, Unit source, Ability ability)
+    {
+        ChangeStat(Stat.CurrentHealth, -amount);
+    }
+    
     public void Heal(float amount, Unit source, Ability ability)
     {
-        StatsInternal[Stat.CurrentHealth] =
-            Mathf.Clamp(StatsInternal[Stat.CurrentHealth] + amount, 0, Stats[Stat.MaxHealth]); 
+        ChangeStat(Stat.CurrentHealth, amount);
     }
     
     public void RestoreMana(float amount, Unit source, Ability ability)
     {
-        StatsInternal[Stat.CurrentMana] =
-            Mathf.Clamp(StatsInternal[Stat.CurrentMana] + amount, 0, Stats[Stat.MaxMana]);
+        ChangeStat(Stat.CurrentMana, amount);
     }
     
     protected void ChangeStat(Stat stat, float delta) => SetStat(stat, Stats[stat] + delta);

@@ -6,6 +6,7 @@ using Soteo.Gameplay.Nodes.Systems;
 using Soteo.Gameplay.Nodes.Systems.Communicators;
 using Soteo.Gameplay.Nodes.Systems.Synchronization;
 using Soteo.Gameplay.PacketHandlers;
+using Soteo.Gameplay.Resources;
 using Soteo.Shared;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
@@ -124,6 +125,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddSingletonNode<Camera2D>("Camera");
         services.AddSingletonNode<IHud>("Ui/Hud");
         services.AddSingleton<IEntityLocator, EntityLocator>();
+        services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
     }
     
     private void InjectInto(Node node, IServiceProvider serviceProvider)
