@@ -13,5 +13,6 @@ public class PlayerCharacter : Unit
         AbilityStatesInternal[AbilitySlot.Class0] = AbilityState.New<BloodSacrificeAbility>(1);
         AbilityStatesInternal[AbilitySlot.Class1] = AbilityState.New<HealAbility>(1);
         AbilityStatesInternal[AbilitySlot.Recall] = AbilityState.New<RecallAbility>(1);
+        AbilityStatesInternal[AbilitySlot.Attack] = AbilityState.New<HealAbility>(4);
     }
 }

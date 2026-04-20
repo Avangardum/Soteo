@@ -65,6 +65,18 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
     }
 
     protected byte DeserializeByte(ref Span<byte> span) => SliceOff(1, ref span)[0];
+    
+    protected void SerializeBool(bool value, ref Span<byte> span) => SerializeByte(value ? (byte)1 : (byte)0, ref span);
+    
+    protected bool DeserializeBool(ref Span<byte> span)
+    {
+        return DeserializeByte(ref span) switch
+        {
+            0 => false,
+            1 => true,
+            _ => throw new BadPacketException("Invalid bool")
+        };
+    }
 
     protected void SerializeInt(int value, ref Span<byte> span)
     {

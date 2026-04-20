@@ -65,13 +65,13 @@ public sealed class InputHandler : Node2D
         PlayerCharacter? user = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepo.UserId, out _);
         if (user == null) return;
         
-        // Unit? targetUnit = GetUnitsUnderMouse().FirstOrDefault(it =>
-        //     ValidateAbilityTargetUnit(character, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
-        Unit? targetUnit = null;
+        Unit? targetUnit = GetUnitsUnderMouse().FirstOrDefault(it =>
+            ValidateAbilityTargetUnit(user, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
         
         if (targetUnit != null)
         {
-            // todo attack
+            var command  = new UseAbilityCommand(Slot: AbilitySlot.Attack, Repeat: true, TargetUnitId: targetUnit.Id);
+            _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
         }
         else
         {
@@ -97,7 +97,7 @@ public sealed class InputHandler : Node2D
         
         if (!canTargetNothing && targetUnit == null && targetPosition == null) return;
         
-        var command = new UseAbilityCommand(slot, targetPosition, targetUnit?.Id, null, null);
+        var command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id);
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
     }
     

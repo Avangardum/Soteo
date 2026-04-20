@@ -11,6 +11,7 @@ public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPack
     {
         return base.PacketSize(packet) +
             SizeOf(packet.Command.Slot) +
+            SizeOf(packet.Command.Repeat) +
             sizeof(AbilityTargetFlags) +
             SizeOfIgnoreNull(packet.Command.TargetPosition) +
             SizeOfIgnoreNull(packet.Command.TargetUnitId) +
@@ -22,6 +23,7 @@ public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPack
     {
         base.SerializeInternal(packet, ref span);
         SerializeEnum(packet.Command.Slot, ref span);
+        SerializeBool(packet.Command.Repeat, ref span);
         Span<byte> targetFlagsSpan = SliceOff(sizeof(AbilityTargetFlags), ref span);
         var targetFlags = AbilityTargetFlags.None;
         
@@ -53,6 +55,7 @@ public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPack
     {
         var packet = base.DeserializeInternal(ref span);
         var slot = DeserializeEnum<AbilitySlot>(ref span);
+        var repeat = DeserializeBool(ref span);
         var targetFlags = DeserializeEnum<AbilityTargetFlags>(ref span);
         
         Vector2? targetPosition =
@@ -64,7 +67,8 @@ public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPack
         Guid? targetShardId =
             targetFlags.HasFlag(AbilityTargetFlags.HasShard) ? DeserializeGuid(ref span) : null;
         
-        packet.Command = new UseAbilityCommand(slot, targetPosition, targetUnitId, targetDirection, targetShardId);
+        packet.Command =
+            new UseAbilityCommand(slot, repeat, targetPosition, targetUnitId, targetDirection, targetShardId);
         return packet;
     }
 }

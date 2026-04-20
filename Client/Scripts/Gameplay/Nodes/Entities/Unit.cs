@@ -110,23 +110,26 @@ public class Unit : KinematicBody2D, IEntity
 
     public override void _PhysicsProcess(float deltaTime)
     {
-        if (!IsServer)
-        {
-            MatchPhysicsPositionToVisualPosition();
-        }
-        else
+        if (IsServer)
         {
             foreach (AbilityState abilityState in AbilityStatesInternal.Values)
                 abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - deltaTime, 0);
             ExecuteCommands(deltaTime);
+        }
+        else
+        {
+            MatchPhysicsPositionToVisualPosition();
         }
     }
     
     private void ExecuteCommands(float deltaTime)
     {
         float remainingDeltaTime = deltaTime;
-        while (Commands.Count > 0 && remainingDeltaTime > 0)
+        int iterations = 0;
+        const int maxIterations = 5;
+        while (Commands.Count > 0 && remainingDeltaTime > 0 && iterations < maxIterations)
         {
+            iterations++;
             switch (Commands.Peek())
             {
                 case LookCommand command:
@@ -199,7 +202,7 @@ public class Unit : KinematicBody2D, IEntity
     {
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state) || state.Cooldown > 0)
         {
-            Commands.Dequeue();
+            if (!command.Repeat) Commands.Dequeue();
             return;
         }
         
@@ -207,7 +210,7 @@ public class Unit : KinematicBody2D, IEntity
         
         if (state.Ability.Validate(context) != AbilityValidationResult.Ok)
         {
-            Commands.Dequeue();
+            if (!command.Repeat) Commands.Dequeue();
             return;
         }
         
@@ -226,7 +229,7 @@ public class Unit : KinematicBody2D, IEntity
             state.Cooldown = state.Ability.Cooldown[state.Level];
             CurrentAbilitySlot = null;
             CurrentAbilityRemainingUseTime = -1;
-            Commands.Dequeue();
+            if (!command.Repeat) Commands.Dequeue();
         }
     }
     
