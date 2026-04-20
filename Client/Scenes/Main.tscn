@@ -35,7 +35,6 @@ script = ExtResource( 8 )
 current = true
 zoom = Vector2( 0.25, 0.25 )
 script = ExtResource( 3 )
-_minZoomLog2 = -1.0
 _maxZoomLog2 = 4.0
 _defaultZoomLog2 = 2.0
 _zoomLog2Step = 0.12
@@ -44,6 +43,7 @@ _scrollZoneThickness = 30.0
 _limit = 1000.0
 
 [node name="Ui" type="CanvasLayer" parent="."]
+layer = 2
 
 [node name="LogIn" parent="Ui" instance=ExtResource( 1 )]
 

@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Soteo.Gameplay.Commands;
+using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared.Attributes;
@@ -17,14 +18,16 @@ public sealed class Hud : Control, IHud
     
     private IEntityLocator _entityLocator = null!;
     private ICurrentUserIdRepository _currentUserIdRepository = null!;
+    private IPalette _palette = null!;
     
     public Unit? SelectedUnit { get; set; }
 
     [Inject]
-    public void Inject(IEntityLocator entityLocator, ICurrentUserIdRepository currentUserIdRepository)
+    public void Inject(IEntityLocator entityLocator, ICurrentUserIdRepository currentUserIdRepository, IPalette palette)
     {
         _entityLocator = entityLocator;
         _currentUserIdRepository = currentUserIdRepository;
+        _palette = palette;
     }
     
     public override void _Ready()
@@ -79,6 +82,13 @@ public sealed class Hud : Control, IHud
     
     private void ProcessBars()
     {
+        _healthBar.TintProgress = SelectedUnit!.Faction switch
+        {
+            Faction.Neutral => _palette.Neutral,
+            Faction.Empire => _palette.Empire,
+            Faction.Syndicate => _palette.Syndicate
+        };
+        
         _healthBar.Value = SelectedUnit!.Stats[Stat.CurrentHealth];
         _healthBar.MaxValue = SelectedUnit.Stats[Stat.MaxHealth];
         _healthLabel.Text = $"{SelectedUnit.Stats[Stat.CurrentHealth]} / {SelectedUnit.Stats[Stat.MaxHealth]}";

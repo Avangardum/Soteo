@@ -24,6 +24,7 @@ public sealed class OverheadUi : Control
     private Label _playerCharacterLevelLabel = null!;
     private TextureProgress _playerCharacterHealthBar = null!;
     private TextureProgress _playerCharacterManaBar = null!;
+    private Control _tinyHealthPanel = null!;
     private TextureProgress _tinyHealthBar = null!;
     
     private Vector2 _offset;
@@ -39,16 +40,16 @@ public sealed class OverheadUi : Control
             {
                 case Variant.None:
                     _playerCharacterPanel.Visible = false;
-                    _tinyHealthBar.Visible = false;
+                    _tinyHealthPanel.Visible = false;
                     break;
                 case Variant.PlayerCharacter:
                     _playerCharacterPanel.Visible = true;
-                    _tinyHealthBar.Visible = false;
+                    _tinyHealthPanel.Visible = false;
                     _offset = new Vector2(0, -18);
                     break;
                 case Variant.TinyHealth:
                     _playerCharacterPanel.Visible = false;
-                    _tinyHealthBar.Visible = true;
+                    _tinyHealthPanel.Visible = true;
                     _offset = new Vector2(0, -20);
                     break;
                 default:
@@ -76,11 +77,12 @@ public sealed class OverheadUi : Control
         ProcessPriority = (int)ProcessPriorityEnum.OverheadUi;
         
         _playerCharacterPanel = GetNode<Control>("PlayerCharacter");
-        _playerCharacterNameLabel = GetNode<Label>("PlayerCharacter/VBoxContainer/HBoxContainer/Name");
-        _playerCharacterLevelLabel = GetNode<Label>("PlayerCharacter/VBoxContainer/HBoxContainer/Level");
-        _playerCharacterHealthBar = GetNode<TextureProgress>("PlayerCharacter/VBoxContainer/Health");
-        _playerCharacterManaBar = GetNode<TextureProgress>("PlayerCharacter/VBoxContainer/Mana");
-        _tinyHealthBar = GetNode<TextureProgress>("TinyHealth");
+        _playerCharacterNameLabel = GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Name");
+        _playerCharacterLevelLabel = GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Level");
+        _playerCharacterHealthBar = GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Health");
+        _playerCharacterManaBar = GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Mana");
+        _tinyHealthPanel = GetNode<Control>("TinyHealth");
+        _tinyHealthBar = GetNode<TextureProgress>("TinyHealth/MarginContainer/Health");
     }
 
     public override void _Process(float delta)
