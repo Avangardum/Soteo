@@ -4,9 +4,9 @@ public enum AbilityValidationResult
 {
     Ok,
     OutOfRange,
+    OutOfAngularRange,
     InvalidTarget,
     NotEnoughHealth,
     NotEnoughMana,
-    InvalidLevel,
-    Cooldown
+    InvalidLevel
 }

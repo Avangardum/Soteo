@@ -213,7 +213,6 @@ public class Unit : KinematicBody2D, IEntity
                     LookAtPosition(command.Position, ref remainingDeltaTime);
                     break;
                 case MoveCommand command:
-                    LookAtPosition(command.Position, ref remainingDeltaTime);
                     MoveToPosition(command.Position, ref remainingDeltaTime);
                     break;
                 case UseAbilityCommand command:
@@ -257,6 +256,7 @@ public class Unit : KinematicBody2D, IEntity
     
     private void MoveToPosition(Vector2 position, ref float remainingDeltaTime)
     {
+        LookAtPosition(position, ref remainingDeltaTime);
         if (remainingDeltaTime == 0 || Stats[Stat.MoveSpeed] == 0) return;
         
         Vector2 desiredMovement = position - Position;
@@ -284,17 +284,16 @@ public class Unit : KinematicBody2D, IEntity
     {
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state) || state.Cooldown > 0)
         {
-            if (!command.Repeat) Commands.Dequeue();
+            if (command.Repeat) remainingDeltaTime = 0;
+            else Commands.Dequeue();
             return;
         }
         
         AbilityUseContext context = GetAbilityUseContext(command);
         
-        if (state.Ability.Validate(context) != AbilityValidationResult.Ok)
-        {
-            if (!command.Repeat) Commands.Dequeue();
-            return;
-        }
+        AbilityValidationResult validationResult =
+            ValidateAbilityWithCorrection(state.Ability, context, command, ref remainingDeltaTime);
+        if (validationResult != AbilityValidationResult.Ok || remainingDeltaTime == 0) return;
         
         if (command.Slot != CurrentAbilitySlot) CurrentAbilityRemainingUseTime = state.Ability.UseTime(context);
         CurrentAbilitySlot = command.Slot;
@@ -330,6 +329,45 @@ public class Unit : KinematicBody2D, IEntity
             TargetDirection = command.TargetDirection,
             TargetShardId = command.TargetShardId
         };
+    }
+    
+    /// <summary>
+    /// Validate an ability and if validation fails, try to make it pass
+    /// </summary>
+    private AbilityValidationResult ValidateAbilityWithCorrection
+    (
+        Ability ability,
+        AbilityUseContext context,
+        UseAbilityCommand command,
+        ref float remainingDeltaTime
+    )
+    {
+        Vector2? targetPosition = context.TargetUnit?.Position ?? context.TargetPosition;
+        AbilityValidationResult abilityValidationResult;
+        int iterations = 0;
+        const int maxIterations = 5;
+        do
+        {
+            iterations++;
+            abilityValidationResult = ability.Validate(context);
+            switch (abilityValidationResult)
+            {
+                case AbilityValidationResult.Ok:
+                    return abilityValidationResult;
+                case AbilityValidationResult.OutOfRange:
+                    MoveToPosition(targetPosition!.Value, ref remainingDeltaTime);
+                    break;
+                case AbilityValidationResult.OutOfAngularRange:
+                    LookAtAzimuth(SoteoMath.DirectionToAzimuth(targetPosition!.Value - Position),
+                        ref remainingDeltaTime);
+                    break;
+                default:
+                    if (command.Repeat) remainingDeltaTime = 0;
+                    else Commands.Dequeue();
+                    return abilityValidationResult;
+            }
+        } while (remainingDeltaTime > 0 && iterations < maxIterations);
+        return abilityValidationResult;
     }
 
     public void SetCommand(ICommand command)

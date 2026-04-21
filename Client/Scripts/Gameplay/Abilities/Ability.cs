@@ -134,7 +134,7 @@ public abstract class Ability
             float deltaAzimuth =
                 SoteoMath.ModularDelta(context.User.Azimuth, SoteoMath.DirectionToAzimuth(deltaPosition), 360);
             if (Mathf.Abs(deltaAzimuth) > AngularRange(context) * rangeMultiplier)
-                return AbilityValidationResult.OutOfRange;
+                return AbilityValidationResult.OutOfAngularRange;
         }
         
         return AbilityValidationResult.Ok;

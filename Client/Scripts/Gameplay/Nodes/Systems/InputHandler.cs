@@ -66,7 +66,7 @@ public sealed class InputHandler : Node2D
         if (user == null) return;
         
         Unit? targetUnit = GetUnitsUnderMouse().FirstOrDefault(it =>
-            ValidateAbilityTargetUnit(user, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
+            ValidateAbility(user, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
         
         if (targetUnit != null)
         {
@@ -78,7 +78,7 @@ public sealed class InputHandler : Node2D
             _packetSender.SendReliable(new MovePacket { Position = GetGlobalMousePosition() }, Const.TestShardId);
         }
     }
-    
+
     private void HandleUseAbility(AbilitySlot slot)
     {
         PlayerCharacter? user = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepo.UserId, out _);
@@ -91,20 +91,31 @@ public sealed class InputHandler : Node2D
         
         IReadOnlyList<Unit> candidateTargetUnits = !canTargetUnit ? [] : alt ? [user] : GetUnitsUnderMouse();
         Unit? targetUnit = candidateTargetUnits
-            .FirstOrDefault(it => ValidateAbilityTargetUnit(user, slot, it) == AbilityValidationResult.Ok);
+            .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
         
         Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition() : null;
-        
-        if (!canTargetNothing && targetUnit == null && targetPosition == null) return;
-        
         var command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id);
+        if (targetUnit == null && ValidateAbility(user, command) != AbilityValidationResult.Ok) return;
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
     }
+
+    private AbilityValidationResult ValidateAbility(Unit user, AbilitySlot slot, Unit targetUnit) =>
+        ValidateAbility(user, new UseAbilityCommand(slot, TargetUnitId: targetUnit.Id));
     
-    private AbilityValidationResult ValidateAbilityTargetUnit(Unit user, AbilitySlot slot, Unit target)
+    private AbilityValidationResult ValidateAbility
+    (
+        Unit user,
+        UseAbilityCommand command
+    )
     {
-        AbilityUseContext context = user.GetAbilityUseContext(new UseAbilityCommand(slot, TargetUnitId: target.Id));
-        return user.AbilityStates[slot].Ability.Validate(context);
+        AbilityUseContext context = user.GetAbilityUseContext(command);
+        AbilityValidationResult result = user.AbilityStates[command.Slot].Ability.Validate(context);
+        
+        // Out of range errors are automatically corrected by a server by moving the character
+        if (result is AbilityValidationResult.OutOfRange or AbilityValidationResult.OutOfAngularRange)
+            return AbilityValidationResult.Ok;
+        
+        return result;
     }
 
     private IReadOnlyList<Unit> GetUnitsUnderMouse()
