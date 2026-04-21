@@ -282,14 +282,25 @@ public class Unit : KinematicBody2D, IEntity
     
     private void UseAbility(UseAbilityCommand command, ref float remainingDeltaTime)
     {
-        if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state) || state.Cooldown > 0)
+        if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
         {
-            if (command.Repeat) remainingDeltaTime = 0;
-            else Commands.Dequeue();
+            Commands.Dequeue();
             return;
         }
         
         AbilityUseContext context = GetAbilityUseContext(command);
+        
+        if (state.Cooldown > 0)
+        {
+            if (command.Repeat)
+            {
+                Vector2? targetPosition = context.TargetPosition ?? context.TargetUnit?.Position;
+                if (targetPosition != null) LookAtPosition(targetPosition.Value, ref remainingDeltaTime);
+                remainingDeltaTime = 0;
+            }
+            else Commands.Dequeue();
+            return;
+        }
         
         AbilityValidationResult validationResult =
             ValidateAbilityWithCorrection(state.Ability, context, command, ref remainingDeltaTime);
