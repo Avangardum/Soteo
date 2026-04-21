@@ -6,7 +6,7 @@ namespace Soteo.Gameplay.Nodes.Ui;
 
 public sealed class OverheadUiManager : Control
 {
-    private Camera2D _camera = null!;
+    private ICamera _camera = null!;
     private IPalette _palette = null!;
     private readonly PackedScene _overheadUiScene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/OverheadUi.tscn");
 
@@ -16,7 +16,7 @@ public sealed class OverheadUiManager : Control
     }
 
     [Inject]
-    public void Inject(Camera2D camera, IEntityManager entityManager, IPalette palette)
+    public void Inject(ICamera camera, IEntityManager entityManager, IPalette palette)
     {
         _camera = camera;
         _palette = palette;

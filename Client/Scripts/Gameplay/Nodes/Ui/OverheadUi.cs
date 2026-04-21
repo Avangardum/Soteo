@@ -16,7 +16,7 @@ public sealed class OverheadUi : Control
     }
 
     private Unit _unit = null!;
-    private Camera2D _camera = null!;
+    private ICamera _camera = null!;
     private IPalette _palette = null!;
     
     private Control _playerCharacterPanel = null!;
@@ -58,7 +58,7 @@ public sealed class OverheadUi : Control
         }
     }
     
-    public void Inject(Unit unit, Camera2D camera, IPalette palette)
+    public void Inject(Unit unit, ICamera camera, IPalette palette)
     {
         _unit = unit;
         _camera = camera;
@@ -87,7 +87,7 @@ public sealed class OverheadUi : Control
 
     public override void _Process(float delta)
     {
-        RectPosition = (_unit.VisualPosition - _camera.GetCameraPosition() + _offset) * _camera.TrueZoom;
+        RectPosition = (_unit.VisualPosition - _camera.Position + _offset) * _camera.TrueZoom;
         SelectVariant();
         SetFaction(_unit.Faction);
         SetHealth(_unit.Stats[Stat.CurrentHealth], _unit.Stats[Stat.MaxHealth]);
@@ -98,7 +98,7 @@ public sealed class OverheadUi : Control
     {
         const float tinyHealthMinZoom = 0.9f;
         const float tinyHealthMaxZoom = 2.4f;
-        float zoom = _camera.TrueZoom.x;
+        float zoom = _camera.TrueZoom;
         CurrentVariant = zoom < tinyHealthMinZoom ? Variant.None : zoom <= tinyHealthMaxZoom ? Variant.TinyHealth :
             Variant.PlayerCharacter;
     }

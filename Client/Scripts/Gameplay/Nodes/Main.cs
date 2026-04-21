@@ -122,7 +122,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     private void RegisterClientServices(IServiceCollection services)
     {
         services.AddShardScopedNode<ISynchronizationPacketReceiver, SynchronizationClient>();
-        services.AddSingletonNode<Camera2D>("Camera");
+        services.AddSingletonNode<ICamera>("Camera");
         services.AddSingletonNode<IHud>("Ui/Hud");
         services.AddSingleton<IEntityLocator, EntityLocator>();
         services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));

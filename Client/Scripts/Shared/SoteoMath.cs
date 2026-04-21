@@ -82,4 +82,19 @@ public static class SoteoMath
     public static int PosMod(long value, int modulo) => (int)(value >= 0 ? value % modulo : value % modulo + modulo);
     
     public static float Log(float value, float newBase) => (float)Math.Log(value, newBase);
+    
+    /// <summary>
+    /// Round a value to the nearest noninteger multiple of 0.5
+    /// </summary>
+    public static float RoundToNonIntHalf(float value) => Mathf.Floor(value - 0.5f) + 0.5f;
+    
+    public static float RoundToMultipleOf(float multipleOf, float value) =>
+        multipleOf == 0 ? 0 : Round(value / multipleOf) * multipleOf;
+    
+    /// <summary>
+    /// Round a value to a multiple of a given number plus half of that number.
+    /// For example, specifying multipleOf: 10 rounds to one of the following: ..., -15, -5, 5, 15, ... 
+    /// </summary>
+    public static float RoundToMultipleOfPlusHalf(float multipleOf, float value) =>
+        multipleOf == 0 ? 0 : RoundToNonIntHalf(value / multipleOf) * multipleOf;
 }

@@ -39,7 +39,7 @@ public sealed class EntityManager : Node, IEntityManager
     {
         var playerCharacter = SpawnEntity<PlayerCharacter>(id, _playerCharacterScene, _entityRoots.PlayerCharacterRoot);
         playerCharacter.DisplayName = id.ToString()[^12..];
-        playerCharacter.Inject(_serviceProvider, this);
+        playerCharacter.Inject(_serviceProvider);
         EntityAdded(playerCharacter);
         return playerCharacter;
     }
