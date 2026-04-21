@@ -114,7 +114,7 @@ public abstract class Ability
     
     private AbilityValidationResult ValidateCost(AbilityUseContext context)
     {
-        if (context.User.Stats[Stat.CurrentHealth] <= HealthCost(context))
+        if (HealthCost(context) > 0 && context.User.Stats[Stat.CurrentHealth] <= HealthCost(context))
             return AbilityValidationResult.NotEnoughHealth;
         if (context.User.Stats[Stat.CurrentMana] < ManaCost(context))
             return AbilityValidationResult.NotEnoughMana;
