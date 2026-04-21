@@ -5,6 +5,7 @@ using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Systems;
 using Soteo.Gameplay.Nodes.Systems.Communicators;
 using Soteo.Gameplay.Nodes.Systems.Synchronization;
+using Soteo.Gameplay.Nodes.Ui;
 using Soteo.Gameplay.PacketHandlers;
 using Soteo.Gameplay.Resources;
 using Soteo.Shared;

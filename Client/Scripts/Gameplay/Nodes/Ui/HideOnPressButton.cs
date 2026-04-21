@@ -1,4 +1,4 @@
-namespace Soteo.Gameplay.Nodes;
+namespace Soteo.Gameplay.Nodes.Ui;
 
 public sealed class HideOnPressButton : Button
 {

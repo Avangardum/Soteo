@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Packets;

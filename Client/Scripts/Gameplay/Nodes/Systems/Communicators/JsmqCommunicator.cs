@@ -1,3 +1,4 @@
+using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Attributes;

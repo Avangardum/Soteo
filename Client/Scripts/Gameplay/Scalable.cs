@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
+using Soteo.Shared;
 
 namespace Soteo.Gameplay;
 

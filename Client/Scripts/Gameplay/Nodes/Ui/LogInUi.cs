@@ -1,7 +1,7 @@
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Attributes;
 
-namespace Soteo.Gameplay.Nodes;
+namespace Soteo.Gameplay.Nodes.Ui;
 
 public class LogInUi : Control
 {

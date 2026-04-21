@@ -1,5 +1,6 @@
 using System.Text;
 using JWT.Builder;
+using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Attributes;
