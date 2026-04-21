@@ -1,5 +1,5 @@
 <Project>
     <PropertyGroup>
-        <NoWarn>$(NoWarn), CS9107, CS8509, CS0649</NoWarn>
+        <NoWarn>$(NoWarn), CS9107, CS8509, CS0649, CS8524</NoWarn>
     </PropertyGroup>
 </Project>
