@@ -2,6 +2,8 @@ namespace Soteo.Gameplay.Interfaces;
 
 public interface ICamera
 {
+    event Action ZoomChanged;
+    
     Vector2 Position { get; }
     
     /// <summary>

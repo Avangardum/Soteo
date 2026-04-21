@@ -16,6 +16,8 @@ public sealed class SoteoCamera : Camera2D, ICamera
     
     private Vector2 _prevGlobalMousePos;
     private bool _wasDraggingInPrevFrame;
+    
+    public event Action ZoomChanged = delegate {};
 
     /// <inheritdoc/>
     public float TrueZoom
@@ -23,9 +25,11 @@ public sealed class SoteoCamera : Camera2D, ICamera
         get => 1 / Zoom.x;
         private set
         {
+            if (value == TrueZoom) return;
             Vector2 mousePosBefore = GetGlobalMousePosition();
             Zoom = Vector2.One / value;
             Position += mousePosBefore - GetGlobalMousePosition();
+            ZoomChanged();
         }
     }
 

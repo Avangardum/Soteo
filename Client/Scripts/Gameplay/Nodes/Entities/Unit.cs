@@ -160,6 +160,8 @@ public class Unit : KinematicBody2D, IEntity
         _serviceProvider = serviceProvider;
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
         _camera = serviceProvider.GetService<ICamera>();
+        
+        _camera?.ZoomChanged += OnZoomChanged;
     }
     
     public override void _Ready()
@@ -170,6 +172,17 @@ public class Unit : KinematicBody2D, IEntity
         foreach (Stat stat in Enum.GetValues<Stat>()) StatsInternal[stat] = DefaultStats[stat];
         
         Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
+    }
+
+    public override void _ExitTree()
+    {
+        _camera?.ZoomChanged -= OnZoomChanged;
+    }
+    
+    private void OnZoomChanged()
+    {
+        // Recalculate VisualPosition because it depends on zoom
+        VisualPosition = VisualPosition;
     }
 
     public override void _PhysicsProcess(float deltaTime)
