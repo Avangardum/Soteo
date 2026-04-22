@@ -8,6 +8,15 @@ public abstract class Projectile : Area2D, IEntity
 {
     private readonly ICamera? _camera;
     
+    protected Projectile(Guid id, Unit source, Ability ability, float speed, ICamera? camera) // todo one sided dependency wrapper
+    {
+        Id = id;
+        Source = source;
+        Ability = ability;
+        Speed = speed;
+        _camera = camera;
+    }
+    
     public Guid Id { get; set; } // todo get only
     public float Azimuth { get; set; }
     protected Unit? Source { get => field.AsValid(); set; }
@@ -35,14 +44,6 @@ public abstract class Projectile : Area2D, IEntity
         if (snapshot.Azimuth != null) Azimuth = snapshot.Azimuth.Value;
         if (snapshot.Ability != null) Ability = snapshot.Ability;
         if (snapshot.Speed != null) Speed = snapshot.Speed.Value;
-    }
-    
-    protected Projectile(Guid id, Unit source, Ability ability, ICamera? camera) // todo one sided dependency wrapper
-    {
-        Id = id;
-        Source = source;
-        Ability = ability;
-        _camera = camera;
     }
     
     // todo pixel perfect rendering

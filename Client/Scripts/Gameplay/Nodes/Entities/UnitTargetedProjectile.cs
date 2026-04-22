@@ -10,11 +10,10 @@ public abstract class UnitTargetedProjectile : Projectile
     
     protected Unit? Target { get => field.AsValid(); set; }
 
-    protected UnitTargetedProjectile(Guid id, Unit source, Ability ability, ICamera? camera, Unit target, float speed) :
-        base(id, source, ability, camera)
+    protected UnitTargetedProjectile(Guid id, Unit source, Ability ability, float speed, ICamera? camera, Unit target) :
+        base(id, source, ability, speed, camera)
     {
         Target = target;
-        Speed = speed; // todo initialize Speed in Projectile
     }
 
     public override void _PhysicsProcess(float delta)
