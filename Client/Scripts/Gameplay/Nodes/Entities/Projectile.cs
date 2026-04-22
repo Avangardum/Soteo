@@ -14,7 +14,7 @@ public abstract class Projectile : Area2D, IEntity
     protected Ability Ability { get; private set; }
     protected float Speed { get; set; }
 
-    public Node2D Node => this; // todo null if invalid
+    public Node2D Node => this;
     
     public EntitySnapshot CreateSnapshot()
     {

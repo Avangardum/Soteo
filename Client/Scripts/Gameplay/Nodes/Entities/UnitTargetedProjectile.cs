@@ -6,6 +6,8 @@ namespace Soteo.Gameplay.Nodes.Entities;
 
 public abstract class UnitTargetedProjectile : Projectile
 {
+    private bool _didHit;
+    
     protected Unit? Target { get => field.AsValid(); set; }
 
     protected UnitTargetedProjectile(Guid id, Unit source, Ability ability, ICamera? camera, Unit target, float speed) :
@@ -20,7 +22,7 @@ public abstract class UnitTargetedProjectile : Projectile
         base._PhysicsProcess(delta);
         if (!IsServer) return;
         
-        if (Target == null)
+        if (_didHit || Target == null)
         {
             QueueFree();
             return;
@@ -35,8 +37,11 @@ public abstract class UnitTargetedProjectile : Projectile
         else
         {
             Hit();
-            // todo defer free
-            QueueFree();
+            // Update position for the last time and defer freeing the node to the next frame so that clients receive a
+            // snapshot where the projectile reaches the target, to prevent it from visually disappearing near the
+            // target
+            Position = Target.Position;
+            _didHit = true;
         }
     }
     

@@ -6,6 +6,7 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Nodes.Systems.Synchronization;
 
+// todo test with simulated latency
 public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
 {
     private IEntityManager _entityManager = null!;
