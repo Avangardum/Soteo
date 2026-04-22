@@ -21,6 +21,7 @@ script = ExtResource( 4 )
 script = ExtResource( 3 )
 
 [node name="Map" type="Node2D" parent="."]
+z_index = -10
 
 [node name="Entities" type="YSort" parent="."]
 
@@ -30,7 +31,7 @@ script = ExtResource( 3 )
 
 [node name="Buildings" type="Node2D" parent="Entities"]
 
-[node name="Projectiles" type="Node2D" parent="Entities"]
+[node name="Projectiles" type="YSort" parent="Entities"]
 
 [node name="Ui" type="CanvasLayer" parent="."]
 

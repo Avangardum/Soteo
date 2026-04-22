@@ -268,7 +268,6 @@ segments = PoolVector2Array( 16, 4, 16, 4, 16, 4, 16, 8, 16, 8, 8, 8, 8, 8, 8, 0
 [node name="Test" type="Node2D"]
 
 [node name="TileMap" type="TileMap" parent="."]
-z_index = -1
 tile_set = SubResource( 10 )
 cell_size = Vector2( 16, 16 )
 format = 1
