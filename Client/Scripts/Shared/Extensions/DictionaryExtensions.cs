@@ -53,4 +53,15 @@ public static class DictionaryExtensions
         public TValue? GetOrDefault(TKey key, TValue? defaultValue = default) =>
             self.TryGetValue(key, out TValue? value) ? value : defaultValue;
     }
+    
+    extension<TKey, TValue> (IDictionary<TKey, TValue> self)
+    {
+        public TValue GetOrAdd(TKey key, Func<TValue> valueFactory)
+        {
+            if (self.TryGetValue(key, out TValue? value)) return value;
+            value = valueFactory();
+            self[key] = value;
+            return value;
+        }
+    }
 }

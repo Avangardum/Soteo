@@ -38,7 +38,8 @@ public class Unit : KinematicBody2D, IEntity
         [Stat.AttackDamage] = 50,
         [Stat.AttackSpeed] = 1000,
         [Stat.AttackUseTimeFraction] = 0.5f,
-        [Stat.AttackRange] = 100
+        [Stat.AttackRange] = 100,
+        [Stat.AttackProjectileSpeed] = 500
     }.ToImmutableDictionary(); 
     
     private Queue<ICommand> Commands { get; } = [];
@@ -136,6 +137,7 @@ public class Unit : KinematicBody2D, IEntity
         };
     }
 
+    // todo set real position on spawn
     public void ReplicateSnapshot(EntitySnapshot snapshot)
     {
         if (snapshot.Position != null) VisualPosition = snapshot.Position.Value;
@@ -409,12 +411,12 @@ public class Unit : KinematicBody2D, IEntity
         ChangeStat(Stat.CurrentMana, -amount);
     }
     
-    public void DealDamage(float amount, Unit source, Ability ability)
+    public void TakeDamage(float amount, Unit source, Ability ability)
     {
         ChangeStat(Stat.CurrentHealth, -amount);
     }
     
-    public void Heal(float amount, Unit source, Ability ability)
+    public void RestoreHealth(float amount, Unit source, Ability ability)
     {
         ChangeStat(Stat.CurrentHealth, amount);
     }
@@ -436,5 +438,10 @@ public class Unit : KinematicBody2D, IEntity
             _ => float.PositiveInfinity
         };
         StatsInternal[stat] = Mathf.Clamp(value, min, max);
+    }
+    
+    public void DealAttackDamageTo(Unit target, Ability ability)
+    {
+        target.TakeDamage(Stats[Stat.AttackDamage], this, ability);
     }
 }

@@ -16,7 +16,7 @@ using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay.Nodes;
 
-public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
+public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
 {
     // This class handles scene loading and dependency injection.
     // A service scope corresponds to a shard.
@@ -29,6 +29,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     private WebRtcGameplayCommunicator _webRtcGameplayCommunicator = null!;
     private JsmqCommunicator _jsmqCommunicator = null!;
     
+    private Dictionary<string, PackedScene> _scenes = [];
     private PackedScene _shardScene = null!;
     private IServiceProvider _rootServiceProvider = null!;
     private Shard? _newScopeShard;
@@ -88,7 +89,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     private void RegisterSharedServices(IServiceCollection services)
     {
         services.AddSingleton(this);
-        services.AddSingleton<IShardLoader>(this);
+        services.AddSingleton<ISceneLoader>(this);
         services.AddSingleton<IShardServiceProviderSource>(this);
         services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
@@ -96,7 +97,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         services.AddScoped<Shard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
-        services.AddAlias<IEntityRoots, Shard>();
+        services.AddAlias<IShard, Shard>(); // todo reference IShard only
         services.AddShardScopedNode<IEntityManager, EntityManager>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
@@ -158,6 +159,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         Vector2 position = new Vector2(0, 0);
 
         var shard = _shardScene.Instance<Shard>();
+        shard.Id = shardId;
         shard.Name = shardId.ToString();
         shard.Position = position;
         _shardRoot.AddChild(shard);
@@ -171,5 +173,32 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         _newScopeShard = null;
         InjectInto(shard, scope.ServiceProvider);
         _shardServiceScopes[shardId] = scope;
+    }
+    
+    public T InstanceScene<T>(string path, Guid shardId, Func<Type, IServiceProvider, Node> nodeFactory) where T : Node
+    {
+        PackedScene scene = _scenes.GetOrAdd(path, () => ResourceLoader.Load<PackedScene>(path));
+        Node node = scene.Instance();
+        node = ReplaceProxies(node, shardId, nodeFactory);
+        return (T)node;
+    }
+    
+    private Node ReplaceProxies(Node node, Guid shardId, Func<Type, IServiceProvider, Node> nodeFactory) // todo Guid?
+    {
+        if (node is ProxyNode proxy)
+        {
+            IServiceProvider serviceProvider =
+                shardId == Guid.Empty ? _rootServiceProvider : ShardServiceProviders[shardId];
+            Node replacement = nodeFactory(proxy.ReplacementType, serviceProvider);
+            if (replacement.GetType() != proxy.ReplacementType) throw new InvalidOperationException(
+                $"nodeFactory returned {replacement.GetType()}, but expected {proxy.ReplacementType}");
+            proxy.ReplaceBy(replacement);
+            proxy.Free();
+            node = replacement;
+        }
+        
+        foreach (Node child in node.GetChildren()) ReplaceProxies(child, shardId, nodeFactory);
+        
+        return node;
     }
 }

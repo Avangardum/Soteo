@@ -10,6 +10,7 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapshotPacket>
 {
+    // todo remove this, encode nullables as usual
     [Flags]
     private enum EntitySnapshotDataFlags : ushort
     {
@@ -38,8 +39,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             sizeof(EntitySnapshotDataFlags) +
             SizeOfIgnoreNull(entity.Position) +
             SizeOfIgnoreNull(entity.Azimuth) +
-            SizeOf(entity.Stats) +
-            SizeOf(entity.AbilityStates, SizeOfAbilityState) +
+            SizeOfIgnoreEmpty(entity.Stats) +
+            SizeOfIgnoreEmpty(entity.AbilityStates, SizeOfAbilityState) +
             SizeOfIgnoreNull(entity.CurrentAbilitySlot) +
             SizeOfIgnoreNull(entity.CurrentAbilityRemainingUseTime);
     }

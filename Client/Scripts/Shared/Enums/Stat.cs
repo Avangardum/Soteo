@@ -26,5 +26,9 @@ public enum Stat : byte
     /// <summary>
     /// Attack range in pixels
     /// </summary>
-    AttackRange
+    AttackRange,
+    /// <summary>
+    /// Attack projectile speed in pixels per seconds
+    /// </summary>
+    AttackProjectileSpeed
 }

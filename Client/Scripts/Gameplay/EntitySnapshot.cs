@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
@@ -8,6 +9,7 @@ using static Godot.Mathf;
 
 namespace Soteo.Gameplay;
 
+// todo split into several types
 public sealed record EntitySnapshot
 {
     public required Guid Id { get; init; }
@@ -17,6 +19,11 @@ public sealed record EntitySnapshot
     public ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates { get; init; } = [];
     public AbilitySlot? CurrentAbilitySlot { get; init; }
     public float? CurrentAbilityRemainingUseTime { get; init; }
+    // todo serialize the following
+    public Guid? SourceId { get; init; }
+    public Guid? TargetId { get; init; }
+    public Ability? Ability { get; init; }
+    public float? Speed { get; init; }
     
     public static EntitySnapshot Interpolate(EntitySnapshot from, EntitySnapshot to, float weight)
     {

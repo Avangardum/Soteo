@@ -37,9 +37,18 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
     
     public TPacket Deserialize(Span<byte> bytes)
     {
-        TPacket packet = DeserializeInternal(ref bytes);
-        if (!bytes.IsEmpty) throw new BadPacketException("Packet contains extra bytes");
-        return packet;
+        try
+        {
+            Span<byte> remainingBytes = bytes;
+            TPacket packet = DeserializeInternal(ref remainingBytes);
+            if (!remainingBytes.IsEmpty) throw new BadPacketException(
+                $"Packet deserialized as {packet}, but contains {remainingBytes.Length} extra bytes");
+            return packet;
+        }
+        catch (BadPacketException e)
+        {
+            throw new AggregateException($"Bad packet\n{BitConverter.ToString(bytes.ToArray())}\n", e);
+        }
     }
     
     protected virtual TPacket DeserializeInternal(ref Span<byte> span)
@@ -254,10 +263,25 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         return SizeOf(dictionary, _ => sizeOfValue);
     }
     
+    protected int SizeOfIgnoreEmpty<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, int sizeOfValue)
+        where TKey : unmanaged
+    {
+        return dictionary.Count == 0 ? 0 : SizeOf(dictionary, sizeOfValue);
+    }
+    
     protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, Func<TValue, int> sizeOfValue)
         where TKey : unmanaged
     {
         return sizeof(int) + dictionary.Count * SizeOf<TKey>() + dictionary.Values.Sum(sizeOfValue);
+    }
+    
+    protected int SizeOfIgnoreEmpty<TKey, TValue>
+    (
+        IReadOnlyDictionary<TKey, TValue> dictionary,
+        Func<TValue, int> sizeOfValue
+    ) where TKey : unmanaged
+    {
+        return dictionary.Count == 0 ? 0 : SizeOf(dictionary, sizeOfValue);
     }
     
     protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary)
@@ -265,6 +289,13 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         where TValue : unmanaged
     {
         return sizeof(int) + dictionary.Count * (SizeOf<TKey>() + SizeOf<TValue>());
+    }
+    
+    protected int SizeOfIgnoreEmpty<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary)
+        where TKey : unmanaged
+        where TValue : unmanaged
+    {
+        return dictionary.Count == 0 ? 0 : SizeOf(dictionary);
     }
 
     protected void SerializeDictionary<TKey, TValue>

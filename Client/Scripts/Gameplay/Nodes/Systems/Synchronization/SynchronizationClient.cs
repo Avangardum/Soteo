@@ -129,24 +129,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
     
     private void ReplicateSnapshot(ShardSnapshot snapshot)
     {
-        IEnumerable<Guid> oldEntityIds = _entityManager.Entities.Keys;
-        IEnumerable<Guid> newEntityIds = snapshot.Entities.Select(it => it.Id);
-        IEnumerable<Guid> removedEntityIds = oldEntityIds.Except(newEntityIds);
-        IEnumerable<Guid> addedEntityIds = newEntityIds.Except(oldEntityIds);
-        
-        foreach (Guid id in removedEntityIds)
-        {
-            _entityManager.GetEntity<Node2D>(id)!.QueueFree();
-        }
-        foreach (Guid id in addedEntityIds)
-        {
-            _entityManager.SpawnPlayerCharacter(id);
-        }
-        foreach (EntitySnapshot entitySnapshot in snapshot.Entities)
-        {
-            IEntity entity = _entityManager.GetEntity(entitySnapshot.Id)!;
-            entity.ReplicateSnapshot(entitySnapshot);
-        }
+        _entityManager.ReplicateSnapshotEntities(snapshot);
     }
 
     private void WriteDeltaToLastSnapshotTickHistory()

@@ -15,7 +15,7 @@ public sealed class HealAbility : Ability<HealAbility>
     public override void TakeEffect(AbilityUseContext context)
     {
         base.TakeEffect(context);
-        context.TargetUnit!.Heal(Heal[context.Level], context.User, this);
+        context.TargetUnit!.RestoreHealth(Heal[context.Level], context.User, this);
     }
 
     public override AbilityValidationResult Validate(AbilityUseContext context, bool strict = true)

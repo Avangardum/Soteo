@@ -1,7 +1,9 @@
 namespace Soteo.Gameplay.Interfaces;
 
-public interface IEntityRoots
+public interface IShard
 {
+    Guid Id { get; }
+    
     Node2D PlayerCharacterRoot { get; }
     Node2D NonPlayerCharacterRoot { get; }
     Node2D BuildingRoot { get; }
