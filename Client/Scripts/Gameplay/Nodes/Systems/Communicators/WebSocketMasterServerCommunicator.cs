@@ -22,7 +22,7 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
     private IPacketSerializer _packetSerializer = null!;
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
     private IPacketHandler _packetHandler = null!;
-    private ISceneLoader _sceneLoader = null!;
+    private IShardLoader _shardLoader = null!;
     private ICurrentUserIdRepository _currentUserIdRepository = null!;
     
     private string _token = "";
@@ -33,13 +33,13 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
     (
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer,
-        ISceneLoader sceneLoader,
+        IShardLoader shardLoader,
         ICurrentUserIdRepository currentUserIdRepository
     )
     {
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
-        _sceneLoader = sceneLoader;
+        _shardLoader = shardLoader;
         _currentUserIdRepository = currentUserIdRepository;
         
         // When running the server from the editor, connect on button press
@@ -103,7 +103,7 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
         if (!IsServer)
         {
             SendPacket(new SpawnCharacterPacket { PeerId = Const.TestShardId });
-            _sceneLoader.LoadShard();
+            _shardLoader.LoadShard();
         }
     }
     

@@ -4,7 +4,7 @@ public static class PacketSceneExtensions
 {
     extension (PackedScene self)
     {
-        public void InstanceAndReparent(Node newParent)
+        public void InstanceAndReparentTo(Node newParent)
         {
             Node instance = self.Instance();
             instance.ReplaceBy(newParent);

@@ -5,13 +5,12 @@ using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Attributes;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
-public class Unit : KinematicBody2D, IEntity
+public abstract class Unit : KinematicBody2D, IEntity
 {
     // If the sprite has position with .5 as fractional part in any dimension (used to center sprites with odd sizes),
     // the following fields help compensate it by ensuring that the Visuals node's global position also has .5 fraction
@@ -22,10 +21,21 @@ public class Unit : KinematicBody2D, IEntity
     
     private Node2D _visuals = null!;
     private Line2D _azimuthLine = null!;
-    private ClientDependency<ICamera> _camera = null!;
     
-    private IServiceProvider _serviceProvider = null!;
-    private IEntityManager _entityManager = null!;
+    private readonly ClientDependency<ICamera> _camera;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IEntityManager _entityManager;
+    
+    protected Unit(Guid id, PackedScene scene, IServiceProvider serviceProvider)
+    {
+        Id = id;
+        _serviceProvider = serviceProvider;
+        _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
+        _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
+        
+        _camera.Value?.ZoomChanged += OnZoomChanged;
+        scene.InstanceAndReparentTo(this);
+    }
     
     public static readonly IReadOnlyDictionary<Stat, float> DefaultStats = new Dictionary<Stat, float>
     {
@@ -155,15 +165,6 @@ public class Unit : KinematicBody2D, IEntity
     {
         Position += _visuals.Position;
         _visuals.Position = Vector2.Zero;
-    }
-    
-    public void Inject(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-        _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
-        _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
-        
-        _camera.Value?.ZoomChanged += OnZoomChanged;
     }
     
     public override void _Ready()

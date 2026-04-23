@@ -3,9 +3,19 @@ using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
-public class PlayerCharacter : Unit
+public sealed class PlayerCharacter : Unit
 {
-    public string DisplayName { get; set; } = "";
+    private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Player.tscn");
+    
+    public PlayerCharacter(Guid id, IServiceProvider serviceProvider) : base(id, Scene, serviceProvider)
+    {
+        DisplayName = id.ToString()[^12..];
+    }
+    
+    public PlayerCharacter(EntitySnapshot snapshot, IServiceProvider serviceProvider) :
+        this(snapshot.Id, serviceProvider) { }
+    
+    public string DisplayName { get; }
 
     public override void _Ready()
     {

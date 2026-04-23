@@ -16,7 +16,7 @@ public abstract class Projectile : Area2D, IEntity
         Speed = speed;
         _camera = camera;
         
-        Scene.InstanceAndReparent(this);
+        Scene.InstanceAndReparentTo(this);
         Name = id.ToString();
     }
     

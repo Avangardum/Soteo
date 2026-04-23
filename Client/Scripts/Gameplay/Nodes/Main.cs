@@ -16,7 +16,7 @@ using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay.Nodes;
 
-public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
+public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
 {
     // This class handles scene loading and dependency injection.
     // A service scope corresponds to a shard.
@@ -92,7 +92,7 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
         services.AddTransient(typeof(ClientDependency<>));
         
         services.AddSingleton(this);
-        services.AddSingleton<ISceneLoader>(this);
+        services.AddSingleton<IShardLoader>(this);
         services.AddSingleton<IShardServiceProviderSource>(this);
         services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
@@ -178,32 +178,5 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
         _newScopeShard = null;
         InjectInto(shard, scope.ServiceProvider);
         _shardServiceScopes[shardId] = scope;
-    }
-    
-    public T InstanceScene<T>(string path, Guid shardId, Func<Type, IServiceProvider, Node> nodeFactory) where T : Node
-    {
-        PackedScene scene = _scenes.GetOrAdd(path, () => ResourceLoader.Load<PackedScene>(path));
-        Node node = scene.Instance();
-        node = ReplaceProxies(node, shardId, nodeFactory);
-        return (T)node;
-    }
-    
-    private Node ReplaceProxies(Node node, Guid shardId, Func<Type, IServiceProvider, Node> nodeFactory) // todo Guid?
-    {
-        if (node is Proxy proxy)
-        {
-            IServiceProvider serviceProvider =
-                shardId == Guid.Empty ? _rootServiceProvider : ShardServiceProviders[shardId];
-            Node replacement = nodeFactory(proxy.ReplacementType, serviceProvider);
-            if (replacement.GetType() != proxy.ReplacementType) throw new InvalidOperationException(
-                $"nodeFactory returned {replacement.GetType()}, but expected {proxy.ReplacementType}");
-            proxy.ReplaceBy(replacement);
-            proxy.QueueFree();
-            node = replacement;
-        }
-        
-        foreach (Node child in node.GetChildren()) ReplaceProxies(child, shardId, nodeFactory);
-        
-        return node;
     }
 }

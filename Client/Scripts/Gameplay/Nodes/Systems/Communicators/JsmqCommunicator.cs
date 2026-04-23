@@ -16,7 +16,7 @@ public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketS
     private ICurrentUserIdRepository _currentUserIdRepository = null!;
     private IPacketSerializer _packetSerializer = null!;
     private IPacketHandler _packetHandler = null!;
-    private ISceneLoader _sceneLoader = null!;
+    private IShardLoader _shardLoader = null!;
     
     public event Action ConnectionEstablished = delegate {};
     
@@ -26,13 +26,13 @@ public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketS
         ICurrentUserIdRepository currentUserIdRepository,
         IPacketSerializer packetSerializer,
         IPacketHandler packetHandler,
-        ISceneLoader sceneLoader
+        IShardLoader shardLoader
     )
     {
         _currentUserIdRepository = currentUserIdRepository;
         _packetSerializer = packetSerializer;
         _packetHandler = packetHandler;
-        _sceneLoader = sceneLoader;
+        _shardLoader = shardLoader;
         
         if (IsServer) ConnectAsShardServer();
     }
@@ -70,7 +70,7 @@ public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketS
         if (!IsServer)
         {
             SendReliable(new SpawnCharacterPacket { PeerId = Const.TestShardId }, MasterServerId);
-            _sceneLoader.LoadShard();
+            _shardLoader.LoadShard();
         }
     }
 

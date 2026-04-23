@@ -1,8 +1,6 @@
-using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
-using Soteo.Shared;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
 
@@ -14,9 +12,7 @@ public sealed class EntityManager : Node, IEntityManager
     private IShard _shard = null!;
     private ClientDependency<ICamera> _camera = null!;
     
-    private PackedScene _playerCharacterScene = null!;
-    
-    private Dictionary<Guid, IEntity> _entities = [];
+    private readonly Dictionary<Guid, IEntity> _entities = [];
     
     [Inject]
     public void Inject(IServiceProvider serviceProvider, IShard shard, ClientDependency<ICamera> camera)
@@ -24,11 +20,6 @@ public sealed class EntityManager : Node, IEntityManager
         _serviceProvider = serviceProvider;
         _shard = shard;
         _camera = camera;
-    }
-    
-    public override void _Ready()
-    {
-        _playerCharacterScene = GD.Load<PackedScene>(Scenes.Player);
     }
     
     public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;
@@ -46,14 +37,17 @@ public sealed class EntityManager : Node, IEntityManager
         foreach (EntitySnapshot entitySnapshot in snapshot.Entities)
         {
             ids.Add(entitySnapshot.Id);
-            IEntity entity = GetEntity(entitySnapshot.Id) ?? SpawnEntityFromSnapshot(entitySnapshot);
-            entity.ReplicateSnapshot(entitySnapshot);
-            // todo defer snapshot replication to after all new entities are spawned to ensure entity references
-            // replicate correctly
+            if (GetEntity(entitySnapshot.Id) == null) SpawnEntityFromSnapshot(entitySnapshot);
         }
         foreach (Guid id in _entities.Keys.Except(ids).ToArray())
         {
             _entities[id].Node.QueueFree();
+        }
+        foreach (EntitySnapshot entitySnapshot in snapshot.Entities)
+        {
+            // Entity snapshots are replicated only after all entities are spawned so that references between entities
+            // can be replicated correctly.
+            GetEntity(entitySnapshot.Id)!.ReplicateSnapshot(entitySnapshot);
         }
     }
     
@@ -62,59 +56,31 @@ public sealed class EntityManager : Node, IEntityManager
         // todo detect type from identity
         if (snapshot.Stats.Count > 0)
         {
-            // todo use special constructor
-            var playerCharacter = SpawnPlayerCharacter(snapshot.Id);
-            playerCharacter.ReplicateSnapshot(snapshot);
-            return playerCharacter;
+            return Add(new PlayerCharacter(snapshot, _serviceProvider));
         }
         else
         {
-            return SpawnAttackProjectile(snapshot);
+            return Add(new AttackProjectile(snapshot, _camera));
         }
     }
     
-    // todo use SpawnEntityV2
-    public PlayerCharacter SpawnPlayerCharacter(Guid id)
-    {
-        var playerCharacter = SpawnEntity<PlayerCharacter>(id, _playerCharacterScene, _shard.EntityRoot);
-        playerCharacter.DisplayName = id.ToString()[^12..];
-        playerCharacter.Inject(_serviceProvider);
-        EntityAdded(playerCharacter);
-        return playerCharacter;
-    }
-    
+    public PlayerCharacter SpawnPlayerCharacter(Guid id) => Add(new PlayerCharacter(id, _serviceProvider));
+
     public AttackProjectile SpawnAttackProjectile(Unit source, Ability ability, Unit target, float speed)
     {
         // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
         // of the projectile over the source
-        // todo move to Projectile constructor after source is properly injected
         Vector2 position = source.Position + Vector2.Up;
-        return AddEntity(
+        return Add(
             new AttackProjectile(Guid.NewGuid(), source, ability, _camera, target, speed) { Position = position });
     }
-    
-    public AttackProjectile SpawnAttackProjectile(EntitySnapshot snapshot)
-    {
-        return AddEntity(new AttackProjectile(snapshot, _camera));
-    }
-    
-    private T AddEntity<T>(T entity) where T : Node2D, IEntity 
+
+    private T Add<T>(T entity) where T : Node2D, IEntity 
     {
         entity.Node.Connect("tree_exited", this, nameof(OnEntityExitedTree), [entity.Id.ToByteArray()]);
         _entities.Add(entity.Id, entity);
         _shard.EntityRoot.AddChild(entity);
         EntityAdded(entity);
-        return entity;
-    }
-
-    private T SpawnEntity<T>(Guid id, PackedScene scene, Node2D root) where T : Node2D, IEntity
-    {
-        var entity = scene.Instance<T>();
-        entity.Node.Name = id.ToString();
-        entity.Id = id;
-        root.AddChild(entity.Node);
-        _entities.Add(id, entity);
-        entity.Node.Connect("tree_exited", this, nameof(OnEntityExitedTree), [id.ToByteArray()]);
         return entity;
     }
     
