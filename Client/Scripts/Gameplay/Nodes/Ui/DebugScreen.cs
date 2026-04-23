@@ -51,7 +51,6 @@ public sealed class DebugScreen : Label
              fps: {fps:N0}
              ping: {ToMillisecondsString(ping)}
              sync latency: {ToMillisecondsString(synchronizationClient?.Latency)}
-             snapshots replicated: {synchronizationClient?.SnapshotsReplicated ?? 0}
              """;
     }
     

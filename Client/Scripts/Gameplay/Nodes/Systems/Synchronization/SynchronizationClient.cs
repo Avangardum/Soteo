@@ -25,14 +25,12 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     // same time it's desirable to keep it as low as possible, without risking it going below 0, in order to minimize
     // latency and recover from past pauses caused by one-off network issues. Therefore, if all recent values are above
     // _deltaToLastSnapshotTickMinValueToFastForward, synchronization will fast-forward accordingly.
-    private readonly float[] _deltaToLastSnapshotTickHistoryRing = new float[10];
+    private readonly float[] _deltaToLastSnapshotTickHistoryRing = new float[5];
     private readonly float _deltaToLastSnapshotTickMinSafeValue;
     private readonly float _deltaToLastSnapshotTickMinValueToFastForward;
     
     public float? Latency =>
         _tick == -1 || _serverTick == -1 ? null : (float)((_serverTick - _tick) / _ticksPerSecond);
-    
-    public long SnapshotsReplicated { get; private set; }
     
     private long SnapshotRingEarliestValidTick => _lastSnapshotTick - _snapshotRing.Length + 1;
 
@@ -128,7 +126,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     {
         _snapshotRing.RingSet(packet.Tick, packet.Snapshot);
         float? halfPingTicks = _pingMeasurer.Ping(_shard.Id) * _ticksPerSecond / 2;
-        _serverTick = halfPingTicks == null ? -1 : Math.Max(_serverTick, packet.Tick + halfPingTicks.Value);
+        _serverTick = halfPingTicks == null ? -1 : packet.Tick + halfPingTicks.Value;
         
         if (_lastSnapshotTick != -1 && packet.Tick > _lastSnapshotTick && _lastSnapshotTick != packet.Tick - 1)
         {
@@ -144,7 +142,6 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     private void ReplicateSnapshot(ShardSnapshot snapshot)
     {
         _entityManager.ReplicateSnapshotEntities(snapshot);
-        SnapshotsReplicated++;
     }
 
     private void WriteDeltaToLastSnapshotTickHistory()
