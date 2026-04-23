@@ -24,7 +24,6 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
         WebRTCDataChannel UnreliableChannel
     );
     
-    
     private const float PingInterval = 1;
     private float _timeSinceLastPing;
     private Guid _lastPingId;
@@ -35,29 +34,22 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
     
     private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
     
-    private IMasterServerCommunicator _masterServerCommunicator = null!;
+    private readonly IMasterServerCommunicator _masterServerCommunicator;
     private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
-    private IPacketHandler _packetHandler = null!;
+    private readonly IPacketHandler _packetHandler;
 
-    [Inject]
-    public void Inject(IMasterServerCommunicator masterServerCommunicator, IPacketHandler packetHandler)
+    public WebRtcGameplayCommunicator(IMasterServerCommunicator masterServerCommunicator, IPacketHandler packetHandler)
     {
         _masterServerCommunicator = masterServerCommunicator;
         _masterServerCommunicator.ConnectionEstablished += OnMasterServerConnectionEstablished;
         
         _packetHandler = packetHandler;
+        
+        Name = nameof(WebRtcGameplayCommunicator);
     }
 
     public override void _Ready()
     {
-        if (UseJsmq)
-        {
-            SetProcess(false);
-            SetPhysicsProcess(false);
-            QueueFree();
-            return;
-        }
-        
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
     }
 

@@ -7,7 +7,6 @@ using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
-using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 
@@ -19,17 +18,16 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
     private const string AuthServerUrl = "https://localhost:3705";
 
     private readonly WebSocketClient _wsClient = new();
-    private IPacketSerializer _packetSerializer = null!;
+    private readonly IPacketSerializer _packetSerializer;
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
-    private IPacketHandler _packetHandler = null!;
-    private IShardLoader _shardLoader = null!;
-    private ICurrentUserIdRepository _currentUserIdRepository = null!;
+    private readonly IPacketHandler _packetHandler;
+    private readonly IShardLoader _shardLoader;
+    private readonly ICurrentUserIdRepository _currentUserIdRepository;
     
     private string _token = "";
     private Status _status;
 
-    [Inject]
-    public void Inject
+    public WebSocketMasterServerCommunicator
     (
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer,
@@ -42,22 +40,13 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
         _shardLoader = shardLoader;
         _currentUserIdRepository = currentUserIdRepository;
         
-        // When running the server from the editor, connect on button press
-        if (IsServer && !Main.EditorIsServer) ConnectAsShardServer();
+        Name = nameof(WebSocketMasterServerCommunicator);
     }
     
     public event Action ConnectionEstablished = delegate {};
     
     public override void _Ready()
     {
-        if (UseJsmq)
-        {
-            SetProcess(false);
-            SetPhysicsProcess(false);
-            QueueFree();
-            return;
-        }
-        
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
         
         _wsClient.Connect("connection_closed", this, nameof(OnConnectionClosed));
@@ -68,6 +57,8 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
         
         AddChild(_httpRequest);
         _httpRequest.Connect("request_completed", this, nameof(OnAuthRequestCompleted));
+        
+        if (IsServer) ConnectAsShardServer();
     }
 
     public override void _PhysicsProcess(float delta)

@@ -25,11 +25,10 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private LogInUi _logInUi = null!;
     private Node2D _shardRoot = null!;
-    private WebSocketMasterServerCommunicator _webSocketMasterServerCommunicator = null!;
-    private WebRtcGameplayCommunicator _webRtcGameplayCommunicator = null!;
-    private JsmqCommunicator _jsmqCommunicator = null!;
+    private WebSocketMasterServerCommunicator? _webSocketMasterServerCommunicator;
+    private WebRtcGameplayCommunicator? _webRtcGameplayCommunicator;
+    private JsmqCommunicator? _jsmqCommunicator;
     
-    private Dictionary<string, PackedScene> _scenes = [];
     private PackedScene _shardScene = null!;
     private IServiceProvider _rootServiceProvider = null!;
     private Shard? _newScopeShard;
@@ -52,31 +51,44 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
 
     public override void _Ready()
     {
-        GetNodes();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
+        GetNodes();
+        AddNodes();
         InjectInto(this, _rootServiceProvider);
         
-        _shardScene = ResourceLoader.Load<PackedScene>(Scenes.Shard);
+        _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
         if (IsServer)
         {
             _logInUi.Visible = false;
             LoadShard();
         }
-        
-        if (EditorIsServer) GetNode<Button>("Ui/ConnectAsServerButton").Visible = true;
     }
     
     private void GetNodes()
     {
         _logInUi = GetNode<LogInUi>("Ui/LogIn");
         _shardRoot = GetNode<Node2D>("Shards");
-        _webSocketMasterServerCommunicator =
-            GetNode<WebSocketMasterServerCommunicator>("Systems/WebSocketMasterServerCommunicator");
-        _webRtcGameplayCommunicator = GetNode<WebRtcGameplayCommunicator>("Systems/WebRtcGameplayCommunicator");
-        _jsmqCommunicator = GetNode<JsmqCommunicator>("Systems/JsmqCommunicator");
+    }
+    
+    private void AddNodes()
+    {
+        if (UseJsmq)
+        {
+            _jsmqCommunicator = ActivatorUtilities.CreateInstance<JsmqCommunicator>(_rootServiceProvider);
+            AddChild(_jsmqCommunicator);
+        }
+        else
+        {
+            _webSocketMasterServerCommunicator =
+                ActivatorUtilities.CreateInstance<WebSocketMasterServerCommunicator>(_rootServiceProvider);
+            AddChild(_webSocketMasterServerCommunicator);
+            _webRtcGameplayCommunicator =
+                ActivatorUtilities.CreateInstance<WebRtcGameplayCommunicator>(_rootServiceProvider);
+            AddChild(_webRtcGameplayCommunicator);
+        }
     }
     
     private void RegisterServices(IServiceCollection services)
@@ -107,17 +119,17 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         if (UseJsmq)
         {
-            services.AddSingleton<IMasterServerCommunicator>(_jsmqCommunicator);
-            services.AddSingleton<IPacketSender>(_jsmqCommunicator);
-            services.AddSingleton<IPingMeasurer>(_ => _jsmqCommunicator);
+            services.AddSingleton<IMasterServerCommunicator>(_ => _jsmqCommunicator.Required);
+            services.AddSingleton<IPacketSender>(_ => _jsmqCommunicator.Required);
+            services.AddSingleton<IPingMeasurer>(_ => _jsmqCommunicator.Required);
         }
         else
         {
-            services.AddSingleton<IMasterServerCommunicator>(_webSocketMasterServerCommunicator);
-            services.AddSingleton<IPacketSender>(
-                new RoutingPacketSender(_webSocketMasterServerCommunicator, _webRtcGameplayCommunicator));
-            services.AddSingleton<IWebrtcPacketReceiver>(_webRtcGameplayCommunicator);
-            services.AddSingleton<IPingMeasurer>(_webRtcGameplayCommunicator);
+            services.AddSingleton<IMasterServerCommunicator>(_ => _webSocketMasterServerCommunicator.Required);
+            services.AddSingleton<IPacketSender>(_ => new RoutingPacketSender(
+                _webSocketMasterServerCommunicator.Required, _webRtcGameplayCommunicator.Required));
+            services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
+            services.AddSingleton<IPingMeasurer>(_ => _webRtcGameplayCommunicator.Required);
         }
     }
     

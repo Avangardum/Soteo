@@ -13,15 +13,14 @@ namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 /// </summary>
 public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketSender, IPingMeasurer // todo rename
 {
-    private ICurrentUserIdRepository _currentUserIdRepository = null!;
-    private IPacketSerializer _packetSerializer = null!;
-    private IPacketHandler _packetHandler = null!;
-    private IShardLoader _shardLoader = null!;
+    private readonly ICurrentUserIdRepository _currentUserIdRepository;
+    private readonly IPacketSerializer _packetSerializer;
+    private readonly IPacketHandler _packetHandler;
+    private readonly IShardLoader _shardLoader;
     
     public event Action ConnectionEstablished = delegate {};
     
-    [Inject]
-    public void Inject
+    public JsmqCommunicator
     (
         ICurrentUserIdRepository currentUserIdRepository,
         IPacketSerializer packetSerializer,
@@ -34,20 +33,13 @@ public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketS
         _packetHandler = packetHandler;
         _shardLoader = shardLoader;
         
-        if (IsServer) ConnectAsShardServer();
+        Name = nameof(JsmqCommunicator);
     }
 
     public override void _Ready()
     {
-        if (!UseJsmq)
-        {
-            SetProcess(false);
-            SetPhysicsProcess(false);
-            QueueFree();
-            return;
-        }
-        
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
+        if (IsServer) ConnectAsShardServer();
     }
 
     public override void _Process(float delta)
