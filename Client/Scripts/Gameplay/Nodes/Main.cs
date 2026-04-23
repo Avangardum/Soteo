@@ -23,14 +23,14 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
-    private LogInUi _logInUi = null!;
-    private Node2D _shardRoot = null!;
+    private LogInUi? _logInUi;
+    private Node2D? _shardRoot;
     private WebSocketMasterServerCommunicator? _webSocketMasterServerCommunicator;
     private WebRtcGameplayCommunicator? _webRtcGameplayCommunicator;
     private JsmqCommunicator? _jsmqCommunicator;
     
-    private PackedScene _shardScene = null!;
-    private IServiceProvider _rootServiceProvider = null!;
+    private PackedScene? _shardScene;
+    private IServiceProvider? _rootServiceProvider;
     private Shard? _newScopeShard;
     private readonly Dictionary<Guid, IServiceScope> _shardServiceScopes = [];
     
@@ -55,7 +55,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         RegisterServices(serviceCollection);
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
         GetNodes();
-        AddNodes();
+        CreateNodes();
         InjectInto(this, _rootServiceProvider);
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
@@ -73,21 +73,30 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         _shardRoot = GetNode<Node2D>("Shards");
     }
     
-    private void AddNodes()
+    private void CreateNodes()
     {
         if (UseJsmq)
         {
-            _jsmqCommunicator = ActivatorUtilities.CreateInstance<JsmqCommunicator>(_rootServiceProvider);
+            _jsmqCommunicator = ActivatorUtilities.CreateInstance<JsmqCommunicator>(_rootServiceProvider.Required);
             AddChild(_jsmqCommunicator);
         }
         else
         {
             _webSocketMasterServerCommunicator =
-                ActivatorUtilities.CreateInstance<WebSocketMasterServerCommunicator>(_rootServiceProvider);
+                ActivatorUtilities.CreateInstance<WebSocketMasterServerCommunicator>(_rootServiceProvider.Required);
             AddChild(_webSocketMasterServerCommunicator);
             _webRtcGameplayCommunicator =
                 ActivatorUtilities.CreateInstance<WebRtcGameplayCommunicator>(_rootServiceProvider);
             AddChild(_webRtcGameplayCommunicator);
+        }
+        
+        if (IsServer)
+        {
+            
+        }
+        else
+        {
+            AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));
         }
     }
     
@@ -175,16 +184,16 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         Guid shardId = Const.TestShardId;
         Vector2 position = new Vector2(0, 0);
 
-        var shard = _shardScene.Instance<Shard>();
+        var shard = _shardScene.Required.Instance<Shard>();
         shard.Id = shardId;
         shard.Name = shardId.ToString();
         shard.Position = position;
-        _shardRoot.AddChild(shard);
+        _shardRoot.Required.AddChild(shard);
         
         var map = ResourceLoader.Load<PackedScene>(mapPath).Instance<Node2D>();
         shard.GetNode<Node2D>("Map").AddChild(map);
         
-        var scope = _rootServiceProvider.CreateScope();
+        var scope = _rootServiceProvider.Required.CreateScope();
         _newScopeShard = shard;
         scope.ServiceProvider.GetRequiredService<Shard>();
         _newScopeShard = null;

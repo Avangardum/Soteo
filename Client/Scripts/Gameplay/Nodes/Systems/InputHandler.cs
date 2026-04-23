@@ -5,7 +5,6 @@ using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared;
-using Soteo.Shared.Attributes;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Packets;
@@ -14,13 +13,12 @@ namespace Soteo.Gameplay.Nodes.Systems;
 
 public sealed class InputHandler : Node2D
 {
-    private IPacketSender _packetSender = null!;
-    private IHud _hud = null!;
-    private IEntityLocator _entityLocator = null!;
-    private ICurrentUserIdRepository _currentUserIdRepo = null!;
+    private readonly IPacketSender _packetSender;
+    private readonly IHud _hud;
+    private readonly IEntityLocator _entityLocator;
+    private readonly ICurrentUserIdRepository _currentUserIdRepo;
     
-    [Inject]
-    public void Inject
+    public InputHandler
     (
         IPacketSender packetSender,
         IHud hud,
@@ -32,6 +30,8 @@ public sealed class InputHandler : Node2D
         _hud = hud;
         _entityLocator = entityLocator;
         _currentUserIdRepo = currentUserIdRepo;
+        
+        Name = nameof(InputHandler);
     }
 
     public override void _Ready()
