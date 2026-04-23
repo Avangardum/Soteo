@@ -15,6 +15,9 @@ public abstract class Projectile : Area2D, IEntity
         Ability = ability;
         Speed = speed;
         _camera = camera;
+        
+        Scene.InstanceAndReparent(this);
+        Name = id.ToString();
     }
     
     public Guid Id { get; set; } // todo get only
@@ -24,6 +27,7 @@ public abstract class Projectile : Area2D, IEntity
     protected float Speed { get; set; }
 
     public Node2D Node => this;
+    protected abstract PackedScene Scene { get; }
     
     public EntitySnapshot CreateSnapshot()
     {

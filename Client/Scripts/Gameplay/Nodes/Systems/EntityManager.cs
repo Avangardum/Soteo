@@ -12,18 +12,18 @@ public sealed class EntityManager : Node, IEntityManager
 {
     private IServiceProvider _serviceProvider = null!;
     private IShard _shard = null!;
-    private ISceneLoader _sceneLoader = null!;
+    private ClientDependency<ICamera> _camera = null!;
     
     private PackedScene _playerCharacterScene = null!;
     
     private Dictionary<Guid, IEntity> _entities = [];
     
     [Inject]
-    public void Inject(IServiceProvider serviceProvider, IShard shard, ISceneLoader sceneLoader)
+    public void Inject(IServiceProvider serviceProvider, IShard shard, ClientDependency<ICamera> camera)
     {
         _serviceProvider = serviceProvider;
         _shard = shard;
-        _sceneLoader = sceneLoader;
+        _camera = camera;
     }
     
     public override void _Ready()
@@ -85,50 +85,24 @@ public sealed class EntityManager : Node, IEntityManager
     
     public AttackProjectile SpawnAttackProjectile(Unit source, Ability ability, Unit target, float speed)
     {
-        return SpawnEntityV2<AttackProjectile>
-        (
-            Scenes.AttackProjectile,
-            _shard.ProjectileRoot,
-            // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
-            // of the projectile over the source
-            source.Position + Vector2.Up,
-            (_, serviceProvider) =>
-            {
-                var camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
-                return new AttackProjectile(Guid.NewGuid(), source, ability, camera, target, speed);
-            }
-        );
+        // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
+        // of the projectile over the source
+        // todo move to Projectile constructor after source is properly injected
+        Vector2 position = source.Position + Vector2.Up;
+        return AddEntity(
+            new AttackProjectile(Guid.NewGuid(), source, ability, _camera, target, speed) { Position = position });
     }
     
     public AttackProjectile SpawnAttackProjectile(EntitySnapshot snapshot)
     {
-        return SpawnEntityV2<AttackProjectile>
-        (
-            Scenes.AttackProjectile,
-            _shard.ProjectileRoot,
-            Vector2.Zero,
-            (_, serviceProvider) =>
-            {
-                var camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
-                return new AttackProjectile(snapshot, camera);
-            }
-        );
+        return AddEntity(new AttackProjectile(snapshot, _camera));
     }
     
-    private T SpawnEntityV2<T>
-    (
-        string scenePath,
-        Node2D root,
-        Vector2 position,
-        Func<Type, IServiceProvider, Node> nodeFactory
-    ) where T : Node2D, IEntity
+    private T AddEntity<T>(T entity) where T : Node2D, IEntity 
     {
-        T entity = _sceneLoader.InstanceScene<T>(scenePath, _shard.Id, nodeFactory);
-        entity.Name = entity.Id.ToString();
-        entity.Position = position;
         entity.Node.Connect("tree_exited", this, nameof(OnEntityExitedTree), [entity.Id.ToByteArray()]);
-        root.AddChild(entity);
         _entities.Add(entity.Id, entity);
+        _shard.PlayerCharacterRoot.AddChild(entity); // todo leave 1 entity root
         EntityAdded(entity);
         return entity;
     }

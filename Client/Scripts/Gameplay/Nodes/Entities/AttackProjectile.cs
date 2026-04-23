@@ -6,6 +6,9 @@ namespace Soteo.Gameplay.Nodes.Entities;
 // todo remake by sending a callback to the ability
 public sealed class AttackProjectile : UnitTargetedProjectile
 {
+    protected override PackedScene Scene =>
+        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Projectiles/AttackProjectile.tscn"); 
+
     public AttackProjectile(Guid id, Unit source, Ability ability, ClientDependency<ICamera> camera, Unit target, float speed) :
         base(id, source, ability, speed, camera, target) { }
     
