@@ -16,9 +16,10 @@ public abstract class UnitTargetedProjectile : Projectile
         Unit source,
         Ability ability,
         float speed,
-        ClientDependency<ICamera> camera,
-        Unit target
-    ) : base(id, source, ability, speed, camera)
+        Unit target,
+        PackedScene scene,
+        ClientDependency<ICamera> camera
+    ) : base(id, source, ability, speed, scene, camera)
     {
         Target = target;
     }

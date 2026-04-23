@@ -72,7 +72,7 @@ public sealed class EntityManager : Node, IEntityManager
         // of the projectile over the source
         Vector2 position = source.Position + Vector2.Up;
         return Add(
-            new AttackProjectile(Guid.NewGuid(), source, ability, _camera, target, speed) { Position = position });
+            new AttackProjectile(Guid.NewGuid(), source, ability, speed, target, _camera) { Position = position });
     }
 
     private T Add<T>(T entity) where T : Node2D, IEntity 

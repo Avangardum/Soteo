@@ -8,7 +8,15 @@ public abstract class Projectile : Area2D, IEntity
 {
     private readonly ClientDependency<ICamera> _camera;
     
-    protected Projectile(Guid id, Unit source, Ability ability, float speed, ClientDependency<ICamera> camera)
+    protected Projectile
+    (
+        Guid id,
+        Unit source,
+        Ability ability,
+        float speed,
+        PackedScene scene,
+        ClientDependency<ICamera> camera
+    )
     {
         Id = id;
         Source = source;
@@ -16,7 +24,7 @@ public abstract class Projectile : Area2D, IEntity
         Speed = speed;
         _camera = camera;
         
-        Scene.InstanceAndReparentTo(this);
+        scene.InstanceAndReparentTo(this);
         Name = id.ToString();
     }
     
@@ -27,7 +35,6 @@ public abstract class Projectile : Area2D, IEntity
     protected float Speed { get; set; }
 
     public Node2D Node => this;
-    protected abstract PackedScene Scene { get; }
     
     public EntitySnapshot CreateSnapshot()
     {
