@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Ui;
@@ -12,12 +11,13 @@ public sealed class DebugScreen : Label
     
     private float _timeSinceUpdate;
     
-    private IPingMeasurer _pingMeasurer = null!;
-    private IShardServiceProviderSource _shardServiceProviderSource = null!;
+    private readonly IPingMeasurer _pingMeasurer;
+    private readonly IShardServiceProviderSource _shardServiceProviderSource;
     
-    [Inject]
-    public void Inject(IPingMeasurer pingMeasurer, IShardServiceProviderSource shardServiceProviderSource)
+    public DebugScreen(IPingMeasurer pingMeasurer, IShardServiceProviderSource shardServiceProviderSource)
     {
+        Visible = false;
+        
         _pingMeasurer = pingMeasurer;
         _shardServiceProviderSource = shardServiceProviderSource;
     }

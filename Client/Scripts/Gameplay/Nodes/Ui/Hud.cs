@@ -3,42 +3,42 @@ using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
+using Soteo.Shared;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Enums;
+using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Ui;
 
 public sealed class Hud : Control, IHud
 {
-    private TextureProgress _healthBar = null!;
-    private TextureProgress _manaBar = null!;
-    private Label _healthLabel = null!;
-    private Label _manaLabel = null!;
-    private ImmutableList<AbilityButton> _abilityButtons = null!;
+    private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/Hud.tscn"); 
     
-    private IEntityLocator _entityLocator = null!;
-    private ICurrentUserIdRepository _currentUserIdRepository = null!;
-    private IPalette _palette = null!;
+    private readonly TextureProgress _healthBar;
+    private readonly TextureProgress _manaBar;
+    private readonly Label _healthLabel;
+    private readonly Label _manaLabel;
+    private readonly ImmutableList<AbilityButton> _abilityButtons;
+    
+    private readonly IEntityLocator _entityLocator;
+    private readonly ICurrentUserIdRepository _currentUserIdRepository;
+    private readonly IPalette _palette;
     
     public Unit? SelectedUnit { get; set; }
 
-    [Inject]
-    public void Inject(IEntityLocator entityLocator, ICurrentUserIdRepository currentUserIdRepository, IPalette palette)
+    public Hud(IEntityLocator entityLocator, ICurrentUserIdRepository currentUserIdRepository, IPalette palette)
     {
+        // todo fix editor crashes
         _entityLocator = entityLocator;
         _currentUserIdRepository = currentUserIdRepository;
         _palette = palette;
-    }
-    
-    public override void _Ready()
-    {
-        if (IsServer)
-        {
-            SetProcess(false);
-            QueueFree();
-            return;
-        }
         
+        Name = nameof(Hud);
+        AnchorBottom = 1;
+        AnchorRight = 1;
+        MouseFilter = MouseFilterEnum.Ignore;
+        
+        Scene.InstanceAndReparentTo(this);
         _healthBar = GetNode<TextureProgress>("UnitPanel/VBoxContainer/Health");
         _manaBar = GetNode<TextureProgress>("UnitPanel/VBoxContainer/Mana");
         _healthLabel = _healthBar.GetNode<Label>("Label");
@@ -46,7 +46,7 @@ public sealed class Hud : Control, IHud
         _abilityButtons =
             GetNode("UnitPanel/VBoxContainer/Abilities").GetChildren().Cast<AbilityButton>().ToImmutableList();
 
-        for (var i = 0; i < _abilityButtons.Count; i++)
+        for (int i = 0; i < _abilityButtons.Count; i++)
         {
             _abilityButtons[i].Connect("button_down", this, nameof(OnButtonDown), [i]);
             _abilityButtons[i].Connect("button_up", this, nameof(OnButtonUp), [i]);

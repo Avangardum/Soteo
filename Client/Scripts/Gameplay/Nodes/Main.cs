@@ -23,7 +23,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
-    private LogInUi? _logInUi;
+    private Hud? _hud;
     private Node2D? _shardRoot;
     private WebSocketMasterServerCommunicator? _webSocketMasterServerCommunicator;
     private WebRtcGameplayCommunicator? _webRtcGameplayCommunicator;
@@ -60,16 +60,11 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
-        if (IsServer)
-        {
-            _logInUi.Visible = false;
-            LoadShard();
-        }
+        if (IsServer) LoadShard();
     }
     
     private void GetNodes()
     {
-        _logInUi = GetNode<LogInUi>("Ui/LogIn");
         _shardRoot = GetNode<Node2D>("Shards");
     }
     
@@ -96,7 +91,12 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         }
         else
         {
+            var ui = GetNode<CanvasLayer>("Ui");
+            _hud = ActivatorUtilities.CreateInstance<Hud>(_rootServiceProvider);
+            ui.AddChild(_hud);
             AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));
+            ui.AddChild(ActivatorUtilities.CreateInstance<LogInUi>(_rootServiceProvider));
+            ui.AddChild(ActivatorUtilities.CreateInstance<DebugScreen>(_rootServiceProvider));
         }
     }
     
@@ -151,7 +151,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     {
         services.AddShardScopedNode<ISynchronizationClient, SynchronizationClient>();
         services.AddSingletonNode<ICamera>("Camera");
-        services.AddSingletonNode<IHud>("Ui/Hud");
+        services.AddSingleton<IHud>(_ => _hud.Required);
         services.AddSingleton<IEntityLocator, EntityLocator>();
         services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
     }
