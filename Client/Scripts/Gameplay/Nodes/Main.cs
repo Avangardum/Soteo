@@ -196,7 +196,7 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
             if (replacement.GetType() != proxy.ReplacementType) throw new InvalidOperationException(
                 $"nodeFactory returned {replacement.GetType()}, but expected {proxy.ReplacementType}");
             proxy.ReplaceBy(replacement);
-            proxy.Free();
+            proxy.QueueFree();
             node = replacement;
         }
         
