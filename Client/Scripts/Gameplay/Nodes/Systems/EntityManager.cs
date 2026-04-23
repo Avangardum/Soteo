@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
+using Soteo.Shared;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
 
@@ -86,7 +87,7 @@ public sealed class EntityManager : Node, IEntityManager
     {
         return SpawnEntityV2<AttackProjectile>
         (
-            "res://Scenes/Entities/Projectiles/AttackProjectile.tscn", // todo extract to constant
+            Scenes.AttackProjectile,
             _shard.ProjectileRoot,
             // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
             // of the projectile over the source
@@ -103,7 +104,7 @@ public sealed class EntityManager : Node, IEntityManager
     {
         return SpawnEntityV2<AttackProjectile>
         (
-            "res://Scenes/Entities/Projectiles/AttackProjectile.tscn",
+            Scenes.AttackProjectile,
             _shard.ProjectileRoot,
             Vector2.Zero,
             (_, serviceProvider) =>
