@@ -64,7 +64,7 @@ public abstract class Unit : KinematicBody2D, IEntity
     public AbilitySlot? CurrentAbilitySlot { get; private set; }
     public float CurrentAbilityRemainingUseTime { get; private set; } = -1;
     
-    public Guid Id { get; set; }
+    public Guid Id { get; }
 
     public Faction Faction { get; set; }
     

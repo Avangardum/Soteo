@@ -28,7 +28,7 @@ public abstract class Projectile : Area2D, IEntity
         Name = id.ToString();
     }
     
-    public Guid Id { get; set; } // todo get only
+    public Guid Id { get; }
     public float Azimuth { get; set; }
     protected Unit? Source { get => field.AsValid(); set; }
     protected Ability Ability { get; private set; }
