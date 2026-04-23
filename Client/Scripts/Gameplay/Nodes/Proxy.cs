@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace Soteo.Gameplay.Nodes;
 
-public sealed class ProxyNode : Node
+public sealed class Proxy : Node
 {
     [Export] private string _replacementScriptFullName = "";
     

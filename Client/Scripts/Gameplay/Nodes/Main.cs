@@ -188,7 +188,7 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
     
     private Node ReplaceProxies(Node node, Guid shardId, Func<Type, IServiceProvider, Node> nodeFactory) // todo Guid?
     {
-        if (node is ProxyNode proxy)
+        if (node is Proxy proxy)
         {
             IServiceProvider serviceProvider =
                 shardId == Guid.Empty ? _rootServiceProvider : ShardServiceProviders[shardId];
