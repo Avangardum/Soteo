@@ -1,5 +1,6 @@
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
+using Soteo.Shared;
 using Soteo.Shared.Attributes;
 
 namespace Soteo.Gameplay.Nodes.Ui;
@@ -8,7 +9,7 @@ public sealed class OverheadUiManager : Control
 {
     private ICamera _camera = null!;
     private IPalette _palette = null!;
-    private readonly PackedScene _overheadUiScene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/OverheadUi.tscn");
+    private readonly PackedScene _overheadUiScene = ResourceLoader.Load<PackedScene>(Scenes.OverheadUi);
 
     public override void _Ready()
     {

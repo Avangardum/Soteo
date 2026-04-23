@@ -28,7 +28,7 @@ public sealed class EntityManager : Node, IEntityManager
     
     public override void _Ready()
     {
-        _playerCharacterScene = GD.Load<PackedScene>("res://Scenes/Player.tscn");
+        _playerCharacterScene = GD.Load<PackedScene>(Scenes.Player);
     }
     
     public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;

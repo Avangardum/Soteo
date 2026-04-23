@@ -58,7 +58,7 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
         InjectInto(this, _rootServiceProvider);
         
-        _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
+        _shardScene = ResourceLoader.Load<PackedScene>(Scenes.Shard);
         
         if (IsServer)
         {
@@ -157,7 +157,7 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
     
     public void LoadShard()
     {
-        string mapPath = "res://Scenes/Maps/Test.tscn";
+        string mapPath = Scenes.TestMap;
         Guid shardId = Const.TestShardId;
         Vector2 position = new Vector2(0, 0);
 
