@@ -88,7 +88,9 @@ public sealed class EntityManager : Node, IEntityManager
         (
             "res://Scenes/Entities/Projectiles/AttackProjectile.tscn", // todo extract to constant
             _shard.ProjectileRoot,
-            source.Position,
+            // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
+            // of the projectile over the source
+            source.Position + Vector2.Up,
             (_, serviceProvider) =>
             {
                 var camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
