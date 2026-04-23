@@ -3,7 +3,6 @@ using Soteo.MasterServer.Communicators;
 using Soteo.MasterServer.GameState.Repositories;
 using Soteo.MasterServer.Interfaces;
 using Soteo.MasterServer.PacketHandlers;
-using Soteo.Shared;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.PacketSerializers;
@@ -18,7 +17,7 @@ public sealed class MasterServer : Node
     {
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
-        var serviceProvider = new SimpleServiceProvider(serviceCollection);
+        var serviceProvider = serviceCollection.BuildAutofacServiceProvider();
         _communicator = serviceProvider.GetRequiredService<ICommunicator>();
     }
 

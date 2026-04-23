@@ -1,3 +1,5 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Nodes;
 
@@ -7,6 +9,16 @@ public static class ServiceCollectionExtensions
 {
     extension (IServiceCollection self)
     {
+        public IServiceProvider BuildAutofacServiceProvider()
+        {
+            // Autofac is used instead of built-in .NET DI container because the latter uses threading, which
+            // breaks the engine in web export. https://github.com/godotengine/godot/issues/118124
+            var builder = new ContainerBuilder();
+            builder.Populate(self);
+            IContainer container = builder.Build();
+            return new AutofacServiceProvider(container);
+        }
+        
         public IServiceCollection AddAlias<TAlias, TRefersTo>() where TRefersTo : TAlias where TAlias : class =>
             self.AddTransient<TAlias>(sp => sp.GetService<TRefersTo>()!);
         

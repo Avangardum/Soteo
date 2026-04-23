@@ -1,7 +1,5 @@
 using System.Collections.Immutable;
 using System.Reflection;
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Systems;
@@ -57,7 +55,7 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
         GetNodes();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
-        _rootServiceProvider = BuildAutofacServiceProvider(serviceCollection);
+        _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
         InjectInto(this, _rootServiceProvider);
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
@@ -133,16 +131,6 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
         services.AddSingletonNode<IHud>("Ui/Hud");
         services.AddSingleton<IEntityLocator, EntityLocator>();
         services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
-    }
-    
-    private IServiceProvider BuildAutofacServiceProvider(IServiceCollection serviceCollection)
-    {
-        // Autofac is used instead of built-in .NET DI container because the latter uses threading, which
-        // breaks the engine in web export. https://github.com/godotengine/godot/issues/118124
-        var builder = new ContainerBuilder();
-        builder.Populate(serviceCollection);
-        IContainer container = builder.Build();
-        return new AutofacServiceProvider(container);
     }
     
     private void InjectInto(Node node, IServiceProvider serviceProvider)
