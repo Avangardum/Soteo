@@ -11,7 +11,7 @@ namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 /// <summary>
 /// Communicator using the JavaScript message queue instead of WebSockets / WebRTC. Used for singleplayer in browser.
 /// </summary>
-public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketSender
+public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketSender, IPingMeasurer // todo rename
 {
     private ICurrentUserIdRepository _currentUserIdRepository = null!;
     private IPacketSerializer _packetSerializer = null!;
@@ -111,4 +111,6 @@ public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketS
     public void BroadcastUnreliable(Packet packet) => BroadcastReliable(packet);
 
     void IMasterServerCommunicator.SendPacket(Packet packet) => SendReliable(packet, MasterServerId);
+    
+    public float? Ping(Guid peerId) => 0;
 }

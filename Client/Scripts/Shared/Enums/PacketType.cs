@@ -5,6 +5,7 @@ public enum PacketType : byte
     // Shared
     Ok,
     BadInput,
+    Ping,
     // Master server <--> Client / Shard server
     MasterServerHandshake,
     SpawnCharacter,

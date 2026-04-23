@@ -109,6 +109,7 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
         {
             services.AddSingleton<IMasterServerCommunicator>(_jsmqCommunicator);
             services.AddSingleton<IPacketSender>(_jsmqCommunicator);
+            services.AddSingleton<IPingMeasurer>(_ => _jsmqCommunicator);
         }
         else
         {
@@ -116,6 +117,7 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
             services.AddSingleton<IPacketSender>(
                 new RoutingPacketSender(_webSocketMasterServerCommunicator, _webRtcGameplayCommunicator));
             services.AddSingleton<IWebrtcPacketReceiver>(_webRtcGameplayCommunicator);
+            services.AddSingleton<IPingMeasurer>(_webRtcGameplayCommunicator);
         }
     }
     

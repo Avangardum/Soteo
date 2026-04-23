@@ -15,7 +15,7 @@ namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 /// <summary>
 /// Communicates between clients and shard servers
 /// </summary>
-public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver
+public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver, IPingMeasurer
 {
     private record PeerConnectionAndChannels
     (
@@ -24,8 +24,14 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
         WebRTCDataChannel UnreliableChannel
     );
     
+    
+    private const float PingInterval = 1;
+    private float _timeSinceLastPing;
+    private Guid _lastPingId;
     private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
         _peerConnectionsAndChannels = [];
+    private readonly System.Collections.Generic.Dictionary<Guid, (Guid PingId, float ResponseTime)> _ping = [];
+    
     private IMasterServerCommunicator _masterServerCommunicator = null!;
     private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
     private IPacketHandler _packetHandler = null!;
@@ -55,16 +61,16 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (IsServer) Poll();
+        if (IsServer) Poll(delta);
     }
 
     public override void _Process(float delta)
     {
         // Client polls in _Process to minimize latency
-        if (!IsServer) Poll();
+        if (!IsServer) Poll(delta);
     }
 
-    private void Poll()
+    private void Poll(float delta)
     {
         foreach 
         ((
@@ -75,6 +81,19 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
             connection.Poll();
             HandlePackets(reliableChannel, peerId);
             HandlePackets(unreliableChannel, peerId);
+        }
+        
+        if (!IsServer)
+        {
+            _timeSinceLastPing += delta;
+            if (_timeSinceLastPing >= PingInterval)
+            {
+                foreach ((Guid peerId, (Guid pingId, _)) in _ping)
+                    if (pingId != _lastPingId) _ping.Remove(peerId);
+                _timeSinceLastPing = 0;
+                _lastPingId = Guid.NewGuid();
+                BroadcastUnreliable(new PingPacket { Id = _lastPingId });
+            }
         }
     }
     
@@ -92,6 +111,11 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
         try
         {
             Packet packet = _packetSerializer.Deserialize(bytes);
+            if (packet is PingPacket pingPacket)
+            {
+                HandlePingPacket(pingPacket, senderId);
+                return;
+            }
             await _packetHandler.HandleAsync(packet, senderId);
         }
         catch (BadPacketException e)
@@ -102,6 +126,21 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
         catch (Exception e)
         {
             AsyncExceptionCollector.Collect(e);
+        }
+    }
+    
+    private void HandlePingPacket(PingPacket packet, Guid senderId)
+    {
+        if (packet.IsResponse)
+        {
+            if (packet.Id == _lastPingId)
+            {
+                _ping[senderId] = (packet.Id, _timeSinceLastPing);
+            }
+        }
+        else
+        {
+            SendUnreliable(packet with { IsResponse = true }, senderId);
         }
     }
     
@@ -172,7 +211,6 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
     
     public void BroadcastReliable(Packet packet)
     {
-        if (!IsServer) throw new InvalidOperationException();
         byte[] bytes = _packetSerializer.Serialize(packet);
         foreach (var receiverId in _peerConnectionsAndChannels.Keys)
             Send(bytes, receiverId, it => it.ReliableChannel);
@@ -180,7 +218,6 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
     
     public void BroadcastUnreliable(Packet packet)
     {
-        if (!IsServer) throw new InvalidOperationException();
         byte[] bytes = _packetSerializer.Serialize(packet);
         foreach (var receiverId in _peerConnectionsAndChannels.Keys)
             Send(bytes, receiverId, it => it.UnreliableChannel);
@@ -214,4 +251,7 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
         if (connection == null) return;
         connection.AddIceCandidate(packet.Media, packet.Index, packet.Name);
     }
+
+    public float? Ping(Guid peerId) =>
+        _ping.TryGetValue(peerId, out var tuple) ? tuple.ResponseTime : null;
 }
