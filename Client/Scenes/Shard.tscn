@@ -25,14 +25,6 @@ z_index = -10
 
 [node name="Entities" type="YSort" parent="."]
 
-[node name="PlayerCharacters" type="YSort" parent="Entities"]
-
-[node name="NonPlayerCharacters" type="Node2D" parent="Entities"]
-
-[node name="Buildings" type="Node2D" parent="Entities"]
-
-[node name="Projectiles" type="YSort" parent="Entities"]
-
 [node name="Ui" type="CanvasLayer" parent="."]
 
 [node name="OverheadUiManager" type="Control" parent="Ui"]

@@ -76,7 +76,7 @@ public sealed class EntityManager : Node, IEntityManager
     // todo use SpawnEntityV2
     public PlayerCharacter SpawnPlayerCharacter(Guid id)
     {
-        var playerCharacter = SpawnEntity<PlayerCharacter>(id, _playerCharacterScene, _shard.PlayerCharacterRoot);
+        var playerCharacter = SpawnEntity<PlayerCharacter>(id, _playerCharacterScene, _shard.EntityRoot);
         playerCharacter.DisplayName = id.ToString()[^12..];
         playerCharacter.Inject(_serviceProvider);
         EntityAdded(playerCharacter);
@@ -102,7 +102,7 @@ public sealed class EntityManager : Node, IEntityManager
     {
         entity.Node.Connect("tree_exited", this, nameof(OnEntityExitedTree), [entity.Id.ToByteArray()]);
         _entities.Add(entity.Id, entity);
-        _shard.PlayerCharacterRoot.AddChild(entity); // todo leave 1 entity root
+        _shard.EntityRoot.AddChild(entity);
         EntityAdded(entity);
         return entity;
     }
