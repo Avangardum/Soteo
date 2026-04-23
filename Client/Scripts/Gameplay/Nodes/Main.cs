@@ -128,7 +128,7 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
     
     private void RegisterClientServices(IServiceCollection services)
     {
-        services.AddShardScopedNode<ISynchronizationPacketReceiver, SynchronizationClient>();
+        services.AddShardScopedNode<ISynchronizationClient, SynchronizationClient>();
         services.AddSingletonNode<ICamera>("Camera");
         services.AddSingletonNode<IHud>("Ui/Hud");
         services.AddSingleton<IEntityLocator, EntityLocator>();

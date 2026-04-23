@@ -7,12 +7,15 @@ using Soteo.Shared.Packets;
 namespace Soteo.Gameplay.Nodes.Systems.Synchronization;
 
 // todo test with simulated latency
-public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
+public sealed class SynchronizationClient : Node, ISynchronizationClient
 {
     private IEntityManager _entityManager = null!;
+    private IShard _shard = null!;
+    private IPingMeasurer _pingMeasurer = null!;
     
     private readonly int _ticksPerSecond;
     private double _tick = -1;
+    private double _serverTick = -1;
     private long _lastSnapshotTick = -1;
     private readonly ShardSnapshot?[] _snapshotRing;
     private double _second = -1;
@@ -26,6 +29,9 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
     private readonly float _deltaToLastSnapshotTickMinSafeValue;
     private readonly float _deltaToLastSnapshotTickMinValueToFastForward;
     
+    public float? Latency =>
+        _tick == -1 || _serverTick == -1 ? null : (float)((_serverTick - _tick) / _ticksPerSecond);
+    
     private long SnapshotRingEarliestValidTick => _lastSnapshotTick - _snapshotRing.Length + 1;
 
     public SynchronizationClient()
@@ -38,9 +44,11 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
     }
     
     [Inject]
-    public void Inject(IEntityManager entityManager)
+    public void Inject(IEntityManager entityManager, IShard shard, IPingMeasurer pingMeasurer)
     {
         _entityManager = entityManager;
+        _shard = shard;
+        _pingMeasurer = pingMeasurer;
     }
     
     public override void _Ready()
@@ -53,6 +61,8 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
         if (_tick == -1 && !TryInitialize()) return;
         
         double prevSecondValue = _second;
+        _tick += delta * _ticksPerSecond;
+        if (_serverTick != -1) _serverTick += delta * _ticksPerSecond;
         _second = _tick / _ticksPerSecond;
         if ((long)_second > (long)prevSecondValue)
             _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, float.MaxValue);
@@ -74,8 +84,6 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
         
         WriteDeltaToLastSnapshotTickHistory();
         TryFastForward();
-        
-        _tick += delta * _ticksPerSecond;
     }
     
     private bool TryInitialize()
@@ -116,6 +124,8 @@ public sealed class SynchronizationClient : Node, ISynchronizationPacketReceiver
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet)
     {
         _snapshotRing.RingSet(packet.Tick, packet.Snapshot);
+        float? halfPingTicks = _pingMeasurer.Ping(_shard.Id) * _ticksPerSecond / 2;
+        _serverTick = halfPingTicks == null ? -1 : Math.Max(_serverTick, packet.Tick + halfPingTicks.Value);
         
         if (_lastSnapshotTick != -1 && packet.Tick > _lastSnapshotTick && _lastSnapshotTick != packet.Tick - 1)
         {
