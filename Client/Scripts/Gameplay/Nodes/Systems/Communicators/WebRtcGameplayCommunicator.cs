@@ -28,9 +28,12 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
     private const float PingInterval = 1;
     private float _timeSinceLastPing;
     private Guid _lastPingId;
+    
     private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
         _peerConnectionsAndChannels = [];
     private readonly System.Collections.Generic.Dictionary<Guid, (Guid PingId, float ResponseTime)> _ping = [];
+    
+    private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
     
     private IMasterServerCommunicator _masterServerCommunicator = null!;
     private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
@@ -60,23 +63,23 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
 
     public override void _PhysicsProcess(float delta)
     {
-        // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (IsServer) Poll(delta);
+        if (IsServer)
+        {
+            while (_packetQueue.Count > 0)
+            {
+                (Packet packet, Guid senderId) = _packetQueue.Dequeue();
+                Try(senderId, () => _packetHandler.HandleAsync(packet, senderId));
+            }
+        }
     }
 
     public override void _Process(float delta)
-    {
-        // Client polls in _Process to minimize latency
-        if (!IsServer) Poll(delta);
-    }
-
-    private void Poll(float delta)
     {
         foreach 
         ((
              Guid peerId, 
              (WebRTCPeerConnection connection, WebRTCDataChannel reliableChannel, WebRTCDataChannel unreliableChannel)
-        ) in _peerConnectionsAndChannels)
+         ) in _peerConnectionsAndChannels)
         {
             connection.Poll();
             HandlePackets(reliableChannel, peerId);
@@ -106,9 +109,9 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
         }
     }
     
-    private async void HandlePacket(byte[] bytes, Guid senderId)
+    private void HandlePacket(byte[] bytes, Guid senderId)
     {
-        try
+        Try(senderId, async () =>
         {
             Packet packet = _packetSerializer.Deserialize(bytes);
             if (packet is PingPacket pingPacket)
@@ -116,7 +119,20 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
                 HandlePingPacket(pingPacket, senderId);
                 return;
             }
-            await _packetHandler.HandleAsync(packet, senderId);
+            
+            // Server defers packet handling to _PhysicsProcess to ensure that all game logic is executed in it only
+            if (IsServer)
+                _packetQueue.Enqueue((packet, senderId));
+            else
+                await _packetHandler.HandleAsync(packet, senderId);
+        });
+    }
+    
+    public async void Try(Guid senderId, Func<Task> func)
+    {
+        try
+        {
+            await func();
         }
         catch (BadPacketException e)
         {
