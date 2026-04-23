@@ -10,8 +10,15 @@ public abstract class UnitTargetedProjectile : Projectile
     
     protected Unit? Target { get => field.AsValid(); set; }
 
-    protected UnitTargetedProjectile(Guid id, Unit source, Ability ability, float speed, ICamera? camera, Unit target) :
-        base(id, source, ability, speed, camera)
+    protected UnitTargetedProjectile
+    (
+        Guid id,
+        Unit source,
+        Ability ability,
+        float speed,
+        ClientDependency<ICamera> camera,
+        Unit target
+    ) : base(id, source, ability, speed, camera)
     {
         Target = target;
     }

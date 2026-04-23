@@ -6,9 +6,9 @@ namespace Soteo.Gameplay.Nodes.Entities;
 
 public abstract class Projectile : Area2D, IEntity
 {
-    private readonly ICamera? _camera;
+    private readonly ClientDependency<ICamera> _camera;
     
-    protected Projectile(Guid id, Unit source, Ability ability, float speed, ICamera? camera) // todo one sided dependency wrapper
+    protected Projectile(Guid id, Unit source, Ability ability, float speed, ClientDependency<ICamera> camera)
     {
         Id = id;
         Source = source;

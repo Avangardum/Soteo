@@ -22,7 +22,7 @@ public class Unit : KinematicBody2D, IEntity
     
     private Node2D _visuals = null!;
     private Line2D _azimuthLine = null!;
-    private ICamera? _camera;
+    private ClientDependency<ICamera> _camera = null!;
     
     private IServiceProvider _serviceProvider = null!;
     private IEntityManager _entityManager = null!;
@@ -68,8 +68,8 @@ public class Unit : KinematicBody2D, IEntity
         get => Position + _visuals.Position;
         private set
         {
-            Vector2 roundedValue = _camera == null ? value : RoundVisualPositionToPixelPerfect(
-                value, _camera.TrueZoom, _halfPixelXVisualOffset, _halfPixelYVisualOffset);
+            Vector2 roundedValue = _camera.Value == null ? value : RoundVisualPositionToPixelPerfect(
+                value, _camera.Value.TrueZoom, _halfPixelXVisualOffset, _halfPixelYVisualOffset);
             _visuals.Position = roundedValue - Position;
         }
     }
@@ -161,9 +161,9 @@ public class Unit : KinematicBody2D, IEntity
     {
         _serviceProvider = serviceProvider;
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
-        _camera = serviceProvider.GetService<ICamera>();
+        _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
         
-        _camera?.ZoomChanged += OnZoomChanged;
+        _camera.Value?.ZoomChanged += OnZoomChanged;
     }
     
     public override void _Ready()
@@ -178,7 +178,7 @@ public class Unit : KinematicBody2D, IEntity
 
     public override void _ExitTree()
     {
-        _camera?.ZoomChanged -= OnZoomChanged;
+        _camera.Value?.ZoomChanged -= OnZoomChanged;
     }
     
     private void OnZoomChanged()

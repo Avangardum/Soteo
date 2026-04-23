@@ -88,6 +88,9 @@ public sealed class Main : Node2D, ISceneLoader, IShardServiceProviderSource
     
     private void RegisterSharedServices(IServiceCollection services)
     {
+        services.AddTransient(typeof(ServerDependency<>));
+        services.AddTransient(typeof(ClientDependency<>));
+        
         services.AddSingleton(this);
         services.AddSingleton<ISceneLoader>(this);
         services.AddSingleton<IShardServiceProviderSource>(this);

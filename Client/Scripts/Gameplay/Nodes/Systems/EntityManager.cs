@@ -91,7 +91,7 @@ public sealed class EntityManager : Node, IEntityManager
             source.Position,
             (_, serviceProvider) =>
             {
-                ICamera? camera = serviceProvider.GetService<ICamera>();
+                var camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
                 return new AttackProjectile(Guid.NewGuid(), source, ability, camera, target, speed);
             }
         );
@@ -106,7 +106,7 @@ public sealed class EntityManager : Node, IEntityManager
             Vector2.Zero,
             (_, serviceProvider) =>
             {
-                ICamera? camera = serviceProvider.GetService<ICamera>();
+                var camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
                 return new AttackProjectile(snapshot, camera);
             }
         );
