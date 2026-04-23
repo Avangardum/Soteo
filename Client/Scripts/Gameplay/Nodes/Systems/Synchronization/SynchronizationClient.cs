@@ -25,12 +25,14 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     // same time it's desirable to keep it as low as possible, without risking it going below 0, in order to minimize
     // latency and recover from past pauses caused by one-off network issues. Therefore, if all recent values are above
     // _deltaToLastSnapshotTickMinValueToFastForward, synchronization will fast-forward accordingly.
-    private float[] _deltaToLastSnapshotTickHistoryRing = new float[10];
+    private readonly float[] _deltaToLastSnapshotTickHistoryRing = new float[10];
     private readonly float _deltaToLastSnapshotTickMinSafeValue;
     private readonly float _deltaToLastSnapshotTickMinValueToFastForward;
     
     public float? Latency =>
         _tick == -1 || _serverTick == -1 ? null : (float)((_serverTick - _tick) / _ticksPerSecond);
+    
+    public long SnapshotsReplicated { get; private set; }
     
     private long SnapshotRingEarliestValidTick => _lastSnapshotTick - _snapshotRing.Length + 1;
 
@@ -60,18 +62,19 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     {
         if (_tick == -1 && !TryInitialize()) return;
         
-        double prevSecondValue = _second;
-        _tick += delta * _ticksPerSecond;
         if (_serverTick != -1) _serverTick += delta * _ticksPerSecond;
-        _second = _tick / _ticksPerSecond;
-        if ((long)_second > (long)prevSecondValue)
-            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, float.MaxValue);
-
+        
         if (_tick > _lastSnapshotTick)
         {
             _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, -1);
             return;
         }
+        
+        double prevSecondValue = _second;
+        _tick += delta * _ticksPerSecond;
+        _second = _tick / _ticksPerSecond;
+        if ((long)_second > (long)prevSecondValue)
+            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, float.MaxValue);
 
         if (TryGetNearestSnapshotTicks(out int fromTick, out int toTick))
         {
@@ -103,7 +106,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     
     private bool TryGetNearestSnapshotTicks(out int fromTick, out int toTick)
     {
-        const int maxSkippedTicks = 3;
+        int maxSkippedTicks = _ticksPerSecond;
         int skippedTicks = 0;
         fromTick = (int)Math.Floor(_tick);
         toTick = -1;
@@ -141,6 +144,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     private void ReplicateSnapshot(ShardSnapshot snapshot)
     {
         _entityManager.ReplicateSnapshotEntities(snapshot);
+        SnapshotsReplicated++;
     }
 
     private void WriteDeltaToLastSnapshotTickHistory()
