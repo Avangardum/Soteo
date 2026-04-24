@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Textures/icon.png" type="Texture" id=1]
+[ext_resource path="res://Scripts/Shared/Proxy.gd" type="Script" id=2]
 
-[node name="AttackProjectile" type="Node2D"]
+[node name="AttackProjectile" type="Node"]
+script = ExtResource( 2 )
 
 [node name="Sprite" type="Sprite" parent="."]
 scale = Vector2( 0.1, 0.1 )

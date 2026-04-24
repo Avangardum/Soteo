@@ -8,6 +8,16 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Node",
+"class": "Proxy",
+"language": "GDScript",
+"path": "res://Scripts/Shared/Proxy.gd"
+} ]
+_global_script_class_icons={
+"Proxy": "res://Textures/rpgiab_icon_pack_v1.3/16x16/script_text_delete.png"
+}
+
 [application]
 
 config/name="Soteo"
