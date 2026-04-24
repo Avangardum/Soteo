@@ -224,6 +224,18 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         Span<byte> slice = SliceOff(byteCount, ref span);
         return Encoding.UTF8.GetString(slice.ToArray());
     }
+    
+    protected void SerializeNullable<T>(T? nullable, Serializer<T> serializer, ref Span<byte> span) where T : struct
+    {
+        SerializeBool(nullable.HasValue, ref span);
+        if (nullable.HasValue) serializer(nullable.Value, ref span);
+    }
+    
+    protected T? DeserializeNullable<T>(Deserializer<T> deserializer, ref Span<byte> span) where T : struct
+    {
+        bool hasValue = DeserializeBool(ref span);
+        return hasValue ? deserializer(ref span) : null;
+    }
 
     protected int SizeOf<TValue>(TValue value = default) where TValue : unmanaged
     {
@@ -257,7 +269,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
     /// <summary>
     /// Size of a nullable value when serialized as a pair of HasValue and Value.
     /// </summary>
-    protected int SizeOfEncodeNull<T>(T? nullable) where T : unmanaged => 1 + SizeOf(default(T));
+    protected int SizeOf<T>(T? nullable) where T : unmanaged => nullable == null ? 1 : 1 + SizeOf<T>();
     
     protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, int sizeOfValue)
         where TKey : unmanaged
