@@ -8,15 +8,16 @@ namespace Soteo.Gameplay.Nodes.Systems;
 
 public sealed class EntityManager : Node, IEntityManager
 {
-    private IServiceProvider _serviceProvider = null!;
-    private IShard _shard = null!;
-    private ClientDependency<ICamera> _camera = null!;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IShard _shard;
+    private readonly ClientDependency<ICamera> _camera;
     
     private readonly Dictionary<Guid, IEntity> _entities = [];
     
-    [Inject]
-    public void Inject(IServiceProvider serviceProvider, IShard shard, ClientDependency<ICamera> camera)
+    public EntityManager(IServiceProvider serviceProvider, IShard shard, ClientDependency<ICamera> camera)
     {
+        Name = nameof(EntityManager);
+        
         _serviceProvider = serviceProvider;
         _shard = shard;
         _camera = camera;

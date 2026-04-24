@@ -39,7 +39,7 @@ public static class ServiceCollectionExtensions
             where TImplementation : class, TService
             where TService : class
         {
-            return self.AddShardScopedNode<TService>("Systems/" + typeof(TImplementation).Name);
+            return self.AddShardScopedNode<TService>(typeof(TImplementation).Name);
         }
     }
 }

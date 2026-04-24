@@ -1,6 +1,5 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://Scripts/Gameplay/Nodes/Systems/EntityManager.cs" type="Script" id=1]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Shard.cs" type="Script" id=2]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Systems/Synchronization/SynchronizationServer.cs" type="Script" id=3]
 [ext_resource path="res://Scripts/Gameplay/Nodes/Systems/Synchronization/SynchronizationClient.cs" type="Script" id=4]
@@ -10,9 +9,6 @@
 script = ExtResource( 2 )
 
 [node name="Systems" type="Node" parent="."]
-
-[node name="EntityManager" type="Node" parent="Systems"]
-script = ExtResource( 1 )
 
 [node name="SynchronizationClient" type="Node" parent="Systems"]
 script = ExtResource( 4 )

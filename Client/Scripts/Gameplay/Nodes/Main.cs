@@ -149,7 +149,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private void RegisterClientServices(IServiceCollection services)
     {
-        services.AddShardScopedNode<ISynchronizationClient, SynchronizationClient>();
+        services.AddShardScopedNode<ISynchronizationClient>("Systems/SynchronizationClient");
         services.AddSingletonNode<ICamera>("Camera");
         services.AddSingleton<IHud>(_ => _hud.Required);
         services.AddSingleton<IEntityLocator, EntityLocator>();
@@ -197,7 +197,13 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         _newScopeShard = shard;
         scope.ServiceProvider.GetRequiredService<Shard>();
         _newScopeShard = null;
+        CreateShardNodes(shard, scope.ServiceProvider);
         InjectInto(shard, scope.ServiceProvider);
         _shardServiceScopes[shardId] = scope;
+    }
+    
+    private void CreateShardNodes(Shard shard, IServiceProvider serviceProvider)
+    {
+        shard.AddChild(ActivatorUtilities.CreateInstance<EntityManager>(serviceProvider));
     }
 }
