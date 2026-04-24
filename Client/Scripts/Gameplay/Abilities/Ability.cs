@@ -43,26 +43,26 @@ public abstract class Ability
     // By default, they are same as static values, but if an ability has a value that can't be declared statically, it
     // should override the matching dynamic value method, in which case the static value is used for ability description
     // only and should be 0 to hide it in most cases.
-    protected virtual float DynamicHealthCost(AbilityUseContext context) => StaticHealthCost[context.Level];
-    protected virtual float DynamicManaCost(AbilityUseContext context) => StaticManaCost[context.Level];
-    protected virtual float DynamicCooldown(AbilityUseContext context) => StaticCooldown[context.Level];
-    protected virtual float DynamicRange(AbilityUseContext context) => StaticRange[context.Level];
-    protected virtual float DynamicAngularRange(AbilityUseContext context) => StaticAngularRange[context.Level];
-    protected virtual float DynamicUseTime(AbilityUseContext context) => StaticUseTime[context.Level];
+    protected virtual float DynamicHealthCost(AbilityContext context) => StaticHealthCost[context.Level];
+    protected virtual float DynamicManaCost(AbilityContext context) => StaticManaCost[context.Level];
+    protected virtual float DynamicCooldown(AbilityContext context) => StaticCooldown[context.Level];
+    protected virtual float DynamicRange(AbilityContext context) => StaticRange[context.Level];
+    protected virtual float DynamicAngularRange(AbilityContext context) => StaticAngularRange[context.Level];
+    protected virtual float DynamicUseTime(AbilityContext context) => StaticUseTime[context.Level];
     
     // Unprefixed values are values after applying status effect modifiers and are used in actual gameplay.
-    public float HealthCost(AbilityUseContext context) => DynamicHealthCost(context);
-    public float ManaCost(AbilityUseContext context) => DynamicManaCost(context);
-    public float Cooldown(AbilityUseContext context) => DynamicCooldown(context);
-    public float Range(AbilityUseContext context) => DynamicRange(context);
-    public float AngularRange(AbilityUseContext context) => DynamicAngularRange(context);
-    public float UseTime(AbilityUseContext context) => DynamicUseTime(context);
+    public float HealthCost(AbilityContext context) => DynamicHealthCost(context);
+    public float ManaCost(AbilityContext context) => DynamicManaCost(context);
+    public float Cooldown(AbilityContext context) => DynamicCooldown(context);
+    public float Range(AbilityContext context) => DynamicRange(context);
+    public float AngularRange(AbilityContext context) => DynamicAngularRange(context);
+    public float UseTime(AbilityContext context) => DynamicUseTime(context);
     
     /// <summary>
     /// Called when an ability use is completed and it takes effect.
     /// This should be called only immediately after non-strict validation succeeds.
     /// </summary>
-    public virtual void TakeEffect(AbilityUseContext context)
+    public virtual void TakeEffect(AbilityContext context)
     {
         AbilityValidationResult validationResult = Validate(context);
         if (validationResult != AbilityValidationResult.Ok)
@@ -76,7 +76,7 @@ public abstract class Ability
     /// Strict mode is used to determine whether use can be initiated.
     /// Non-strict mode is used to determine whether in-progress use should be interrupted.
     /// </summary>
-    public virtual AbilityValidationResult Validate(AbilityUseContext context, bool strict = true)
+    public virtual AbilityValidationResult Validate(AbilityContext context, bool strict = true)
     {
         if (context.Level < 1 || context.Level > MaxLevel) return AbilityValidationResult.InvalidLevel;
         
@@ -92,7 +92,7 @@ public abstract class Ability
         return AbilityValidationResult.Ok;
     }
     
-    private AbilityValidationResult ValidateTarget(AbilityUseContext context)
+    private AbilityValidationResult ValidateTarget(AbilityContext context)
     {
         if (!Targeting.HasFlag(CanTarget.Nothing) && context.TargetPosition == null && context.TargetUnit == null)
             return AbilityValidationResult.InvalidTarget;
@@ -112,7 +112,7 @@ public abstract class Ability
         return AbilityValidationResult.Ok;
     }
     
-    private AbilityValidationResult ValidateTargetUnit(AbilityUseContext context) // todo drop use
+    private AbilityValidationResult ValidateTargetUnit(AbilityContext context)
     {
         if (context.User.IsAlliedTo(context.TargetUnit.Required))
         {
@@ -128,7 +128,7 @@ public abstract class Ability
         return AbilityValidationResult.Ok;
     }
     
-    private AbilityValidationResult ValidateCost(AbilityUseContext context)
+    private AbilityValidationResult ValidateCost(AbilityContext context)
     {
         if (HealthCost(context) > 0 && context.User.Stats[Stat.CurrentHealth] <= HealthCost(context))
             return AbilityValidationResult.NotEnoughHealth;
@@ -137,7 +137,7 @@ public abstract class Ability
         return AbilityValidationResult.Ok;
     }
     
-    private AbilityValidationResult ValidateRange(AbilityUseContext context, bool strict)
+    private AbilityValidationResult ValidateRange(AbilityContext context, bool strict)
     {
         if ((context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition &&
             targetPosition != context.User.Position)

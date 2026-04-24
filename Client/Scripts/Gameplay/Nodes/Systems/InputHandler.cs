@@ -105,7 +105,7 @@ public sealed class InputHandler : Node2D
         UseAbilityCommand command
     )
     {
-        AbilityUseContext context = user.GetAbilityUseContext(command);
+        AbilityContext context = user.GetAbilityUseContext(command);
         AbilityValidationResult result = user.AbilityStates[command.Slot].Ability.Validate(context);
         
         // Out of range errors are automatically corrected by a server by moving the character

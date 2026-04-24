@@ -2,7 +2,7 @@ using Soteo.Gameplay.Nodes.Entities;
 
 namespace Soteo.Gameplay;
 
-public sealed record AbilityUseContext : IServiceProvider
+public sealed record AbilityContext : IServiceProvider
 {
     public required int Level { get; init; }
     public required Unit User { get; init; }

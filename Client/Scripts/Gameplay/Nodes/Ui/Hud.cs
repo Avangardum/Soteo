@@ -110,7 +110,7 @@ public sealed class Hud : Control, IHud
             
             button.Visible = true;
             IReadOnlyAbilityState state = SelectedUnit.AbilityStates[slot];
-            AbilityUseContext context = SelectedUnit.GetAbilityUseContext(new UseAbilityCommand(slot));
+            AbilityContext context = SelectedUnit.GetAbilityUseContext(new UseAbilityCommand(slot));
             
             button.CooldownIndicator.Value = state.Cooldown;
             button.CooldownIndicator.MaxValue = state.Ability.Cooldown(context);

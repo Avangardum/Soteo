@@ -9,7 +9,7 @@ public sealed class RecallAbility : Ability<RecallAbility>
 {
     public override Scalable<float> StaticUseTime => 10;
     
-    public override void TakeEffect(AbilityUseContext context)
+    public override void TakeEffect(AbilityContext context)
     {
         base.TakeEffect(context);
         context.User.QueueFree();

@@ -6,7 +6,7 @@ namespace Soteo.Gameplay.Abilities;
 
 public sealed class RangedAttack : Attack<RangedAttack>
 {
-    public override void TakeEffect(AbilityUseContext context)
+    public override void TakeEffect(AbilityContext context)
     {
         base.TakeEffect(context);
         context.GetRequiredService<IEntityManager>().SpawnAttackProjectile(context.User, this, context.TargetUnit!,

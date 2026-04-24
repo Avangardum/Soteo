@@ -291,7 +291,7 @@ public abstract class Unit : KinematicBody2D, IEntity
             return;
         }
         
-        AbilityUseContext context = GetAbilityUseContext(command);
+        AbilityContext context = GetAbilityUseContext(command);
         
         if (state.Cooldown > 0)
         {
@@ -328,11 +328,11 @@ public abstract class Unit : KinematicBody2D, IEntity
         }
     }
     
-    public AbilityUseContext GetAbilityUseContext(UseAbilityCommand command)
+    public AbilityContext GetAbilityUseContext(UseAbilityCommand command)
     {
         if (!AbilityStates.TryGetValue(command.Slot, out IReadOnlyAbilityState? state))
             throw new ArgumentException($"Unit {Id} doesn't have an ability in slot {command.Slot}");
-        return new AbilityUseContext
+        return new AbilityContext
         {
             Level = state.Level,
             User = this,
@@ -351,7 +351,7 @@ public abstract class Unit : KinematicBody2D, IEntity
     private AbilityValidationResult ValidateAbilityWithCorrection
     (
         Ability ability,
-        AbilityUseContext context,
+        AbilityContext context,
         UseAbilityCommand command,
         ref float remainingDeltaTime
     )

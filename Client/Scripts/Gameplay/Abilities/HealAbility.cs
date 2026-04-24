@@ -12,7 +12,7 @@ public sealed class HealAbility : Ability<HealAbility>
     public override Scalable<float> StaticRange => 300;
     public override CanTarget Targeting => CanTarget.Ally | CanTarget.Character;
 
-    public override void TakeEffect(AbilityUseContext context)
+    public override void TakeEffect(AbilityContext context)
     {
         base.TakeEffect(context);
         context.TargetUnit!.RestoreHealth(Heal[context.Level], context.User, this);
