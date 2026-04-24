@@ -1,6 +1,7 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes;
 
 namespace Soteo.Shared.Extensions;
@@ -29,11 +30,11 @@ public static class ServiceCollectionExtensions
             where TImplementation : class, TService
             where TService : class
         {
-            return self.AddSingletonNode<TService>("Systems/" + typeof(TImplementation).Name);
+            return self.AddSingletonNode<TService>(typeof(TImplementation).Name);
         }
 
         public IServiceCollection AddShardScopedNode<TService>(string path) where TService : class =>
-            self.AddScoped<TService>(sp => sp.GetRequiredService<Shard>().GetNode<TService>(path));
+            self.AddScoped<TService>(sp => sp.GetRequiredService<IShard>().Node.GetNode<TService>(path));
         
         public IServiceCollection AddShardScopedNode<TService, TImplementation>()
             where TImplementation : class, TService

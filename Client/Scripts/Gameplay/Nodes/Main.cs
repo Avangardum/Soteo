@@ -116,9 +116,8 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         
-        services.AddScoped<Shard>(
+        services.AddScoped<IShard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
-        services.AddAlias<IShard, Shard>(); // todo reference IShard only
         services.AddShardScopedNode<IEntityManager, EntityManager>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
@@ -170,7 +169,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         var scope = _rootServiceProvider.Required.CreateScope();
         _newScopeShard = shard;
-        scope.ServiceProvider.GetRequiredService<Shard>();
+        scope.ServiceProvider.GetRequiredService<IShard>();
         _newScopeShard = null;
         CreateShardNodes(shard, scope.ServiceProvider);
         _shardServiceScopes[shardId] = scope;
