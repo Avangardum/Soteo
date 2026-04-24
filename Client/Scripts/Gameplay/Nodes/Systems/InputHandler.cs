@@ -81,18 +81,15 @@ public sealed class InputHandler : Node2D
 
     private void HandleUseAbility(AbilitySlot slot)
     {
-        PlayerCharacter? user = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepo.UserId, out _);
+        Unit? user = _entityLocator.FindEntity<Unit>(_currentUserIdRepo.UserId, out _);
         if (user == null || !user.AbilityStates.TryGetValue(slot, out IReadOnlyAbilityState? state)) return;
-        
-        bool canTargetUnit = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Unit);
-        bool canTargetPosition = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Position);
-        bool canTargetNothing = state.Ability.TargetFlags.HasFlag(AbilityTargetFlags.Untargeted);
-        bool alt = Input.IsActionPressed("alt");
-        
-        IReadOnlyList<Unit> candidateTargetUnits = !canTargetUnit ? [] : alt ? [user] : GetUnitsUnderMouse();
+
+        IReadOnlyList<Unit> candidateTargetUnits =
+            Input.IsActionPressed("alt") ? [user] : GetUnitsUnderMouse();
         Unit? targetUnit = candidateTargetUnits
             .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
         
+        bool canTargetPosition = state.Ability.Targeting.HasFlag(CanTarget.Position);
         Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition() : null;
         var command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id);
         if (targetUnit == null && ValidateAbility(user, command) != AbilityValidationResult.Ok) return;

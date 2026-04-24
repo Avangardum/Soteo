@@ -29,7 +29,7 @@ public abstract class Ability
     }
     
     public virtual int MaxLevel => 1;
-    public virtual AbilityTargetFlags TargetFlags => AbilityTargetFlags.Untargeted;
+    public virtual CanTarget Targeting => CanTarget.Nothing;
     
     // Static values define what is shown in ability description. They are constant and independent of context.
     public virtual Scalable<float> StaticHealthCost => 0;
@@ -94,21 +94,37 @@ public abstract class Ability
     
     private AbilityValidationResult ValidateTarget(AbilityUseContext context)
     {
-        if (!TargetFlags.HasFlag(AbilityTargetFlags.Untargeted) &&
-            context.TargetPosition == null && context.TargetUnit == null)
-        {
+        if (!Targeting.HasFlag(CanTarget.Nothing) && context.TargetPosition == null && context.TargetUnit == null)
             return AbilityValidationResult.InvalidTarget;
-        }
         if (context.TargetPosition != null && context.TargetUnit != null)
             return AbilityValidationResult.InvalidTarget;
-        if (!TargetFlags.HasFlag(AbilityTargetFlags.Position) && context.TargetPosition != null)
+        if (!Targeting.HasFlag(CanTarget.Position) && context.TargetPosition != null)
             return AbilityValidationResult.InvalidTarget;
-        if (!TargetFlags.HasFlag(AbilityTargetFlags.Unit) && context.TargetUnit != null)
+        if (context.TargetUnit != null)
+        {
+            AbilityValidationResult targetUnitValidationResult = ValidateTargetUnit(context);
+            if (targetUnitValidationResult != AbilityValidationResult.Ok) return targetUnitValidationResult;
+        }
+        if (Targeting.HasFlag(CanTarget.WithDirection) != context.TargetDirection.HasValue)
             return AbilityValidationResult.InvalidTarget;
-        if (TargetFlags.HasFlag(AbilityTargetFlags.HasDirection) != context.TargetDirection.HasValue)
+        if (Targeting.HasFlag(CanTarget.WithShard) != context.TargetShardId.HasValue)
             return AbilityValidationResult.InvalidTarget;
-        if (TargetFlags.HasFlag(AbilityTargetFlags.HasShard) != context.TargetShardId.HasValue)
-            return AbilityValidationResult.InvalidTarget;
+        return AbilityValidationResult.Ok;
+    }
+    
+    private AbilityValidationResult ValidateTargetUnit(AbilityUseContext context) // todo drop use
+    {
+        if (context.User.IsAlliedTo(context.TargetUnit.Required))
+        {
+            if (!Targeting.HasFlag(CanTarget.Ally)) return AbilityValidationResult.InvalidTarget;
+        }
+        else
+        {
+            if (!Targeting.HasFlag(CanTarget.Enemy)) return AbilityValidationResult.InvalidTarget;
+        }
+        
+        // todo validate character / building
+        
         return AbilityValidationResult.Ok;
     }
     
