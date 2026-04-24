@@ -168,6 +168,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         Type underlyingType = Enum.GetUnderlyingType(typeof(TEnum));
         if (underlyingType == typeof(byte)) SerializeByte((byte)(object)value, ref span);
         else if (underlyingType == typeof(ushort)) SerializeUShort((ushort)(object)value, ref span);
+        else if (underlyingType == typeof(int)) SerializeInt((int)(object)value, ref span);
         else throw new NotSupportedException();
     }
 
@@ -184,6 +185,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         Type underlyingType = Enum.GetUnderlyingType(typeof(TEnum));
         if (underlyingType == typeof(byte)) return (TEnum)(object)DeserializeByte(ref span);
         if (underlyingType == typeof(ushort)) return (TEnum)(object)DeserializeUShort(ref span);
+        if (underlyingType == typeof(int)) return (TEnum)(object)DeserializeInt(ref span);
         throw new NotSupportedException();
     }
 
