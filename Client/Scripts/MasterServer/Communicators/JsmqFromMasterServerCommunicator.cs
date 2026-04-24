@@ -10,7 +10,7 @@ namespace Soteo.MasterServer.Communicators;
 /// <summary>
 /// Communicator using the JavaScript message queue instead of WebSockets. Used for singleplayer in browser.
 /// </summary>
-public sealed class JsmqCommunicator
+public sealed class JsmqFromMasterServerCommunicator
 (
     IPacketSerializer packetSerializer,
     IPacketHandler packetHandler,

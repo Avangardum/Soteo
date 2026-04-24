@@ -23,9 +23,9 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private Hud? _hud;
     private Node2D? _shardRoot;
-    private WebSocketMasterServerCommunicator? _webSocketMasterServerCommunicator;
-    private WebRtcGameplayCommunicator? _webRtcGameplayCommunicator;
-    private JsmqCommunicator? _jsmqCommunicator;
+    private WebSocketFromGameplayToMasterServerCommunicator? _webSocketMasterServerCommunicator;
+    private WebRtcFromGameplayToGameplayCommunicator? _webRtcGameplayCommunicator;
+    private JsmqFromGameplayCommunicator? _jsmqCommunicator;
     
     private PackedScene? _shardScene;
     private IServiceProvider? _rootServiceProvider;
@@ -69,16 +69,16 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     {
         if (UseJsmq)
         {
-            _jsmqCommunicator = ActivatorUtilities.CreateInstance<JsmqCommunicator>(_rootServiceProvider.Required);
+            _jsmqCommunicator = ActivatorUtilities.CreateInstance<JsmqFromGameplayCommunicator>(_rootServiceProvider.Required);
             AddChild(_jsmqCommunicator);
         }
         else
         {
             _webSocketMasterServerCommunicator =
-                ActivatorUtilities.CreateInstance<WebSocketMasterServerCommunicator>(_rootServiceProvider.Required);
+                ActivatorUtilities.CreateInstance<WebSocketFromGameplayToMasterServerCommunicator>(_rootServiceProvider.Required);
             AddChild(_webSocketMasterServerCommunicator);
             _webRtcGameplayCommunicator =
-                ActivatorUtilities.CreateInstance<WebRtcGameplayCommunicator>(_rootServiceProvider);
+                ActivatorUtilities.CreateInstance<WebRtcFromGameplayToGameplayCommunicator>(_rootServiceProvider);
             AddChild(_webRtcGameplayCommunicator);
         }
         

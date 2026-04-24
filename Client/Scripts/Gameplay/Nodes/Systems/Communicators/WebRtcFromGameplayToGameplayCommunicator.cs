@@ -2,7 +2,6 @@ using Godot.Collections;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Attributes;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
@@ -15,7 +14,7 @@ namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 /// <summary>
 /// Communicates between clients and shard servers
 /// </summary>
-public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver, IPingMeasurer
+public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver, IPingMeasurer
 {
     private record PeerConnectionAndChannels
     (
@@ -38,14 +37,14 @@ public sealed class WebRtcGameplayCommunicator : Node, IPacketSender, IWebrtcPac
     private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
     private readonly IPacketHandler _packetHandler;
 
-    public WebRtcGameplayCommunicator(IMasterServerCommunicator masterServerCommunicator, IPacketHandler packetHandler)
+    public WebRtcFromGameplayToGameplayCommunicator(IMasterServerCommunicator masterServerCommunicator, IPacketHandler packetHandler)
     {
         _masterServerCommunicator = masterServerCommunicator;
         _masterServerCommunicator.ConnectionEstablished += OnMasterServerConnectionEstablished;
         
         _packetHandler = packetHandler;
         
-        Name = nameof(WebRtcGameplayCommunicator);
+        Name = nameof(WebRtcFromGameplayToGameplayCommunicator);
     }
 
     public override void _Ready()

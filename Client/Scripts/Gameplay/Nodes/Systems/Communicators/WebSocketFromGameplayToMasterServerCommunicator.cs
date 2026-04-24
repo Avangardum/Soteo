@@ -3,14 +3,13 @@ using JWT.Builder;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 
-public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommunicator
+public sealed class WebSocketFromGameplayToMasterServerCommunicator : Node, IMasterServerCommunicator
 {
     private enum Status { Disconnected, Connecting, Connected }
     
@@ -27,7 +26,7 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
     private string _token = "";
     private Status _status;
 
-    public WebSocketMasterServerCommunicator
+    public WebSocketFromGameplayToMasterServerCommunicator
     (
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer,
@@ -40,7 +39,7 @@ public sealed class WebSocketMasterServerCommunicator : Node, IMasterServerCommu
         _shardLoader = shardLoader;
         _currentUserIdRepository = currentUserIdRepository;
         
-        Name = nameof(WebSocketMasterServerCommunicator);
+        Name = nameof(WebSocketFromGameplayToMasterServerCommunicator);
     }
     
     public event Action ConnectionEstablished = delegate {};

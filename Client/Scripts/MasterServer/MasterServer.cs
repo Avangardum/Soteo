@@ -34,8 +34,8 @@ public sealed class MasterServer : Node
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IPacketSender, ICommunicator>();
         
-        if (UseJsmq) services.AddSingleton<ICommunicator, JsmqCommunicator>();
-        else services.AddSingleton<ICommunicator, WebSocketCommunicator>();
+        if (UseJsmq) services.AddSingleton<ICommunicator, JsmqFromMasterServerCommunicator>();
+        else services.AddSingleton<ICommunicator, WebSocketMasterServerToGameplayCommunicator>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
     }

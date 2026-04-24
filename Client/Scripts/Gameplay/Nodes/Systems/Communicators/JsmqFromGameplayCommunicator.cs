@@ -1,7 +1,6 @@
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Attributes;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
@@ -11,7 +10,7 @@ namespace Soteo.Gameplay.Nodes.Systems.Communicators;
 /// <summary>
 /// Communicator using the JavaScript message queue instead of WebSockets / WebRTC. Used for singleplayer in browser.
 /// </summary>
-public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketSender, IPingMeasurer // todo rename
+public sealed class JsmqFromGameplayCommunicator : Node, IMasterServerCommunicator, IPacketSender, IPingMeasurer
 {
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPacketSerializer _packetSerializer;
@@ -20,7 +19,7 @@ public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketS
     
     public event Action ConnectionEstablished = delegate {};
     
-    public JsmqCommunicator
+    public JsmqFromGameplayCommunicator
     (
         ICurrentUserIdRepository currentUserIdRepository,
         IPacketSerializer packetSerializer,
@@ -33,7 +32,7 @@ public sealed class JsmqCommunicator : Node, IMasterServerCommunicator, IPacketS
         _packetHandler = packetHandler;
         _shardLoader = shardLoader;
         
-        Name = nameof(JsmqCommunicator);
+        Name = nameof(JsmqFromGameplayCommunicator);
     }
 
     public override void _Ready()
