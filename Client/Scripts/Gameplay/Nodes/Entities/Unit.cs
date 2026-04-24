@@ -70,7 +70,7 @@ public abstract class Unit : KinematicBody2D, IEntity
     
     /// <summary>
     /// Visual position of the unit, separate from its physical position. Unlike physical position, this is safe to
-    /// set outside _PhysicsProcess, when updating physical position would introduce physics bugs. Also it ensures
+    /// set outside _PhysicsProcess, when updating physical position would introduce physics bugs. Also, it ensures
     /// pixel perfect rendering by rounding the value to avoid rendering anything between screen pixels.
     /// </summary>
     public Vector2 VisualPosition
@@ -78,6 +78,7 @@ public abstract class Unit : KinematicBody2D, IEntity
         get => Position + _visuals.Position;
         private set
         {
+            if (IsServer) throw new InvalidOperationException("Server should set unit position directly");
             Vector2 roundedValue = _camera.Value == null ? value : RoundVisualPositionToPixelPerfect(
                 value, _camera.Value.TrueZoom, _halfPixelXVisualOffset, _halfPixelYVisualOffset);
             _visuals.Position = roundedValue - Position;
@@ -147,10 +148,14 @@ public abstract class Unit : KinematicBody2D, IEntity
         };
     }
 
-    // todo set real position on spawn
     public void ReplicateSnapshot(EntitySnapshot snapshot)
     {
-        if (snapshot.Position != null) VisualPosition = snapshot.Position.Value;
+        if (snapshot.Position != null)
+        {
+            if (IsServer) Position = snapshot.Position.Value;
+            else VisualPosition = snapshot.Position.Value;
+        }
+
         if (snapshot.Azimuth != null) Azimuth = snapshot.Azimuth.Value;
         foreach ((Stat stat, float value) in snapshot.Stats) StatsInternal[stat] = value;
         foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in snapshot.AbilityStates)
@@ -291,7 +296,7 @@ public abstract class Unit : KinematicBody2D, IEntity
             return;
         }
         
-        AbilityContext context = GetAbilityUseContext(command);
+        AbilityContext context = GetAbilityContext(command);
         
         if (state.Cooldown > 0)
         {
@@ -328,7 +333,7 @@ public abstract class Unit : KinematicBody2D, IEntity
         }
     }
     
-    public AbilityContext GetAbilityUseContext(UseAbilityCommand command)
+    public AbilityContext GetAbilityContext(UseAbilityCommand command)
     {
         if (!AbilityStates.TryGetValue(command.Slot, out IReadOnlyAbilityState? state))
             throw new ArgumentException($"Unit {Id} doesn't have an ability in slot {command.Slot}");

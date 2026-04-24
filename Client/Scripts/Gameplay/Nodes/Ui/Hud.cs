@@ -28,7 +28,6 @@ public sealed class Hud : Control, IHud
 
     public Hud(IEntityLocator entityLocator, ICurrentUserIdRepository currentUserIdRepository, IPalette palette)
     {
-        // todo fix editor crashes
         _entityLocator = entityLocator;
         _currentUserIdRepository = currentUserIdRepository;
         _palette = palette;
@@ -110,7 +109,7 @@ public sealed class Hud : Control, IHud
             
             button.Visible = true;
             IReadOnlyAbilityState state = SelectedUnit.AbilityStates[slot];
-            AbilityContext context = SelectedUnit.GetAbilityUseContext(new UseAbilityCommand(slot));
+            AbilityContext context = SelectedUnit.GetAbilityContext(new UseAbilityCommand(slot));
             
             button.CooldownIndicator.Value = state.Cooldown;
             button.CooldownIndicator.MaxValue = state.Ability.Cooldown(context);
