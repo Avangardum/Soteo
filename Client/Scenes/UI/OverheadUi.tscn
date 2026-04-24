@@ -94,7 +94,7 @@ value = 40.0
 texture_under = ExtResource( 2 )
 texture_progress = ExtResource( 2 )
 tint_under = Color( 0, 0, 0, 1 )
-tint_progress = Color( 0.74902, 0.686275, 0, 1 )
+tint_progress = Color( 0.254902, 0.254902, 1, 1 )
 nine_patch_stretch = true
 
 [node name="TinyHealth" type="PanelContainer" parent="."]

@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource( 1 )
-<Neutral>k__BackingField = Color( 0.705882, 0, 0, 1 )
-<Empire>k__BackingField = Color( 0.254902, 0.254902, 1, 1 )
+<Neutral>k__BackingField = Color( 0.74902, 0.686275, 0, 1 )
+<Empire>k__BackingField = Color( 0.705882, 0, 0, 1 )
 <Syndicate>k__BackingField = Color( 0, 0.6, 0, 1 )

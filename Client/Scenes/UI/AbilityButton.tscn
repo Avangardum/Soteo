@@ -56,5 +56,5 @@ anchor_bottom = 1.0
 margin_right = -2.0
 grow_horizontal = 0
 grow_vertical = 0
-custom_colors/font_color = Color( 0.74902, 0.686275, 0, 1 )
+custom_colors/font_color = Color( 0.254902, 0.254902, 1, 1 )
 text = "100"

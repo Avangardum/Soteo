@@ -90,7 +90,7 @@ value = 70.0
 texture_under = ExtResource( 1 )
 texture_progress = ExtResource( 1 )
 tint_under = Color( 0, 0, 0, 1 )
-tint_progress = Color( 0.74902, 0.686275, 0, 1 )
+tint_progress = Color( 0.254902, 0.254902, 1, 1 )
 nine_patch_stretch = true
 
 [node name="Label" type="Label" parent="UnitPanel/VBoxContainer/Mana"]
