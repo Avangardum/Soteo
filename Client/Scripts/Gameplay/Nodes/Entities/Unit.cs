@@ -12,15 +12,9 @@ namespace Soteo.Gameplay.Nodes.Entities;
 
 public abstract class Unit : KinematicBody2D, IEntity
 {
-    // If the sprite has position with .5 as fractional part in any dimension (used to center sprites with odd sizes),
-    // the following fields help compensate it by ensuring that the Visuals node's global position also has .5 fraction
-    // in matching dimensions, so that global position of the sprite ends up whole, which is necessary to achieve
-    // pixel perfection and avoid artifacts.
-    [Export] private bool _halfPixelXVisualOffset;
-    [Export] private bool _halfPixelYVisualOffset;
-    
     private Node2D _visuals = null!;
     private Line2D _azimuthLine = null!;
+    private UnitProperties _properties = null!;
     
     private readonly ClientDependency<ICamera> _camera;
     private readonly IServiceProvider _serviceProvider;
@@ -30,6 +24,7 @@ public abstract class Unit : KinematicBody2D, IEntity
     {
         Id = id;
         _serviceProvider = serviceProvider;
+        
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
         _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
         
@@ -79,8 +74,8 @@ public abstract class Unit : KinematicBody2D, IEntity
         private set
         {
             if (IsServer) throw new InvalidOperationException("Server should set unit position directly");
-            Vector2 roundedValue = _camera.Value == null ? value : RoundVisualPositionToPixelPerfect(
-                value, _camera.Value.TrueZoom, _halfPixelXVisualOffset, _halfPixelYVisualOffset);
+            Vector2 roundedValue = RoundVisualPositionToPixelPerfect(
+                value, _camera.Value, _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset);
             _visuals.Position = roundedValue - Position;
         }
     }
@@ -90,7 +85,7 @@ public abstract class Unit : KinematicBody2D, IEntity
     /// the sprite's pixels having noninteger position, therefore rendering between screen pixels
     /// </summary>
     /// <param name="value">Value to round</param>
-    /// <param name="zoom">Current camera zoom</param>
+    /// <param name="camera">Camera</param>
     /// <param name="halfPixelXOffset">
     /// Whether a half screen pixel x offset should be applied. Use when the sprite's x position ends in .5
     /// </param>
@@ -100,20 +95,20 @@ public abstract class Unit : KinematicBody2D, IEntity
     private Vector2 RoundVisualPositionToPixelPerfect
     (
         Vector2 value,
-        float zoom,
+        ICamera? camera,
         bool halfPixelXOffset,
         bool halfPixelYOffset
     )
     {
         // If zoom is not an integer, pixel perfect rendering is impossible
-        if (zoom % 1 != 0) return value;
+        if (camera == null || camera.TrueZoom % 1 != 0) return value;
         
         // If zoom is even, a world pixel with half pixel offset will be rendered as even number of screen pixels,
         // which will distribute equally in all directions, so pixel perfect rendering is possible without having
         // to compensate for this offset.
-        if (zoom % 2 == 0) halfPixelXOffset = halfPixelYOffset = false;
+        if (camera.TrueZoom % 2 == 0) halfPixelXOffset = halfPixelYOffset = false;
         
-        float screenPixelSizeInWorldPixels = 1 / zoom;
+        float screenPixelSizeInWorldPixels = 1 / camera.TrueZoom;
         float roundedX = halfPixelXOffset ? SoteoMath.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.x) :
             SoteoMath.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.x);
         float roundedY = halfPixelYOffset ? SoteoMath.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.y) :
@@ -176,6 +171,7 @@ public abstract class Unit : KinematicBody2D, IEntity
     {
         _visuals = GetNode<Node2D>("Visuals");
         _azimuthLine = GetNode<Line2D>("Visuals/AzimuthLine");
+        _properties = GetNode<UnitProperties>("Properties");
         
         foreach (Stat stat in Enum.GetValues<Stat>()) StatsInternal[stat] = DefaultStats[stat];
         
