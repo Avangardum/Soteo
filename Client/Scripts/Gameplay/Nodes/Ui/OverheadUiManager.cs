@@ -7,18 +7,15 @@ namespace Soteo.Gameplay.Nodes.Ui;
 
 public sealed class OverheadUiManager : Control
 {
-    private ICamera _camera = null!;
-    private IPalette _palette = null!;
-    private readonly PackedScene _overheadUiScene = ResourceLoader.Load<PackedScene>(Scenes.OverheadUi);
-
-    public override void _Ready()
+    private readonly ICamera _camera;
+    private readonly IPalette _palette;
+    private readonly PackedScene _overheadUiScene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/OverheadUi.tscn");
+    
+    public OverheadUiManager(ICamera camera, IEntityManager entityManager, IPalette palette)
     {
-        if (IsServer) QueueFree();
-    }
-
-    [Inject]
-    public void Inject(ICamera camera, IEntityManager entityManager, IPalette palette)
-    {
+        Name = nameof(OverheadUiManager);
+        AnchorLeft = AnchorRight = AnchorTop = AnchorBottom = 0.5f;
+        
         _camera = camera;
         _palette = palette;
         
@@ -29,8 +26,6 @@ public sealed class OverheadUiManager : Control
     {
         if (entity is not Unit unit) return;
         
-        var overheadUi = _overheadUiScene.Instance<OverheadUi>();
-        AddChild(overheadUi);
-        overheadUi.Inject(unit, _camera, _palette);
+        AddChild(new OverheadUi(unit, _camera, _palette));
     }
 }

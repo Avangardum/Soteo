@@ -56,7 +56,6 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
         GetNodes();
         CreateNodes();
-        InjectInto(this, _rootServiceProvider);
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
@@ -156,31 +155,9 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
     }
     
-    private void InjectInto(Node node, IServiceProvider serviceProvider)
-    {
-        if (!IsInstanceValid(node) || node.IsQueuedForDeletion()) return;
-        
-        List<MethodInfo> injectMethods = node.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .Where(it => it.HasAttribute<InjectAttribute>())
-            .ToList();
-        switch (injectMethods.Count)
-        {
-            case > 1:
-                throw new InvalidOperationException($"{node.GetType()} has multiple Inject methods");
-            case 1:
-                MethodInfo injectMethod = injectMethods.Single();
-                object[] parameters = injectMethod.GetParameters()
-                    .Select(it => serviceProvider.GetRequiredService(it.ParameterType))
-                    .ToArray();
-                injectMethod.Invoke(node, parameters);
-                break;
-        }
-        foreach (Node child in node.GetChildren()) InjectInto(child, serviceProvider);
-    }
-    
     public void LoadShard()
     {
-        string mapPath = Scenes.TestMap;
+        string mapPath = "res://Scenes/Maps/Test.tscn";
         Guid shardId = Const.TestShardId;
         Vector2 position = new Vector2(0, 0);
 
@@ -198,13 +175,13 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         scope.ServiceProvider.GetRequiredService<Shard>();
         _newScopeShard = null;
         CreateShardNodes(shard, scope.ServiceProvider);
-        InjectInto(shard, scope.ServiceProvider);
         _shardServiceScopes[shardId] = scope;
     }
     
     private void CreateShardNodes(Shard shard, IServiceProvider serviceProvider)
     {
         shard.AddChild(ActivatorUtilities.CreateInstance<EntityManager>(serviceProvider));
+        
         if (IsServer)
         {
             shard.AddChild(ActivatorUtilities.CreateInstance<SynchronizationServer>(serviceProvider));
@@ -212,6 +189,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         else
         {
             shard.AddChild(ActivatorUtilities.CreateInstance<SynchronizationClient>(serviceProvider));
+            shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
         }
     }
 }

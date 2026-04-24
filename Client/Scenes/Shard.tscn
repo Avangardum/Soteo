@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=2 format=2]
 
 [ext_resource path="res://Scripts/Gameplay/Nodes/Shard.cs" type="Script" id=2]
-[ext_resource path="res://Scripts/Gameplay/Nodes/Ui/OverheadUiManager.cs" type="Script" id=5]
 
 [node name="Shard" type="Node2D"]
 script = ExtResource( 2 )
@@ -12,11 +11,3 @@ z_index = -10
 [node name="Entities" type="YSort" parent="."]
 
 [node name="Ui" type="CanvasLayer" parent="."]
-
-[node name="OverheadUiManager" type="Control" parent="Ui"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-mouse_filter = 2
-script = ExtResource( 5 )

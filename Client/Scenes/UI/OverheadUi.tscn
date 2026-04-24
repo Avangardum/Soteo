@@ -1,8 +1,7 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Themes/OverheadUI.tres" type="Theme" id=1]
 [ext_resource path="res://Textures/White.png" type="Texture" id=2]
-[ext_resource path="res://Scripts/Gameplay/Nodes/Ui/OverheadUi.cs" type="Script" id=3]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.145098, 0.145098, 0.164706, 1 )
@@ -17,7 +16,6 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 mouse_filter = 2
 theme = ExtResource( 1 )
-script = ExtResource( 3 )
 
 [node name="PlayerCharacter" type="PanelContainer" parent="."]
 visible = false
