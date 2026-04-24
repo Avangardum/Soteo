@@ -189,23 +189,23 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         throw new NotSupportedException();
     }
 
-    protected void SerializeArray<TElement>
+    protected void SerializeList<TElement>
     (
-        Span<TElement> value,
+        IReadOnlyList<TElement> value,
         Serializer<TElement> serializeElement,
         ref Span<byte> span
     )
     {
-        SerializeInt(value.Length, ref span);
-        for (var i = 0; i < value.Length; i++) serializeElement(value[i], ref span);
+        SerializeInt(value.Count, ref span);
+        foreach (var element in value) serializeElement(element, ref span);
     }
 
-    protected TElement[] DeserializeArray<TElement>(Deserializer<TElement> deserializeValue, ref Span<byte> span)
+    protected TElement[] DeserializeList<TElement>(Deserializer<TElement> deserializeElement, ref Span<byte> span)
     {
         int length = DeserializeInt(ref span);
         if (length < 0 || length > span.Length) throw new BadPacketException("Invalid array length");
         var result = new TElement[length];
-        for (int i = 0; i < length; i++) result[i] = deserializeValue(ref span);
+        for (int i = 0; i < length; i++) result[i] = deserializeElement(ref span);
         return result;
     }
 
@@ -256,15 +256,13 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         };
     }
     
-    protected int SizeOf<TElement>(TElement[] array) where TElement : unmanaged =>
-        sizeof(int) + array.Length * SizeOf<TElement>();
+    protected int SizeOf<TElement>(IReadOnlyList<TElement> value) where TElement : unmanaged =>
+        sizeof(int) + value.Count * SizeOf<TElement>();
+    
+    protected int SizeOf<TElement>(IReadOnlyList<TElement> value, Func<TElement, int> sizeOfElement) =>
+        sizeof(int) + value.Sum(sizeOfElement);
 
     protected int SizeOf(string s) => sizeof(int) + Encoding.UTF8.GetByteCount(s);
-    
-    /// <summary>
-    /// Size of a nullable value when serialized as a regular value. If the value is null, it's not serialized at all.
-    /// </summary>
-    protected int SizeOfIgnoreNull<T>(T? nullable) where T : unmanaged => nullable == null ? 0 : SizeOf(nullable.Value);
     
     /// <summary>
     /// Size of a nullable value when serialized as a pair of HasValue and Value.
@@ -277,25 +275,10 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         return SizeOf(dictionary, _ => sizeOfValue);
     }
     
-    protected int SizeOfIgnoreEmpty<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, int sizeOfValue)
-        where TKey : unmanaged
-    {
-        return dictionary.Count == 0 ? 0 : SizeOf(dictionary, sizeOfValue);
-    }
-    
     protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, Func<TValue, int> sizeOfValue)
         where TKey : unmanaged
     {
         return sizeof(int) + dictionary.Count * SizeOf<TKey>() + dictionary.Values.Sum(sizeOfValue);
-    }
-    
-    protected int SizeOfIgnoreEmpty<TKey, TValue>
-    (
-        IReadOnlyDictionary<TKey, TValue> dictionary,
-        Func<TValue, int> sizeOfValue
-    ) where TKey : unmanaged
-    {
-        return dictionary.Count == 0 ? 0 : SizeOf(dictionary, sizeOfValue);
     }
     
     protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary)
@@ -305,13 +288,6 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         return sizeof(int) + dictionary.Count * (SizeOf<TKey>() + SizeOf<TValue>());
     }
     
-    protected int SizeOfIgnoreEmpty<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary)
-        where TKey : unmanaged
-        where TValue : unmanaged
-    {
-        return dictionary.Count == 0 ? 0 : SizeOf(dictionary);
-    }
-
     protected void SerializeDictionary<TKey, TValue>
     (
         IReadOnlyDictionary<TKey, TValue> dictionary,

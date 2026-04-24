@@ -28,6 +28,8 @@ public abstract class Ability
         }
     }
     
+    public int Id => All.IndexOf(this);
+    
     public virtual int MaxLevel => 1;
     public virtual CanTarget Targeting => CanTarget.Nothing;
     
