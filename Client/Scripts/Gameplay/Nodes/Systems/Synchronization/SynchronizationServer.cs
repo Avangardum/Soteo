@@ -8,14 +8,15 @@ namespace Soteo.Gameplay.Nodes.Systems.Synchronization;
 
 public sealed class SynchronizationServer : Node
 {
-    private IEntityManager _entityManager = null!;
-    private IPacketSender _packetSender = null!;
+    private readonly IEntityManager _entityManager;
+    private readonly IPacketSender _packetSender;
     
     private long _tick;
     
-    [Inject]
-    public void Inject(IEntityManager entityManager, IPacketSender packetSender)
+    public SynchronizationServer(IEntityManager entityManager, IPacketSender packetSender)
     {
+        Name = nameof(SynchronizationServer);
+        
         _entityManager = entityManager;
         _packetSender = packetSender;
     }

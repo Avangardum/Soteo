@@ -33,21 +33,19 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     
     private long SnapshotRingEarliestValidTick => _lastSnapshotTick - _snapshotRing.Length + 1;
 
-    public SynchronizationClient()
+    public SynchronizationClient(IEntityManager entityManager, IShard shard, IPingMeasurer pingMeasurer)
     {
+        Name = nameof(SynchronizationClient);
+        
+        _entityManager = entityManager;
+        _shard = shard;
+        _pingMeasurer = pingMeasurer;
+        
         _ticksPerSecond = (int)ProjectSettings.GetSetting("physics/common/physics_fps");
         _snapshotRing = new ShardSnapshot[10 * _ticksPerSecond];
         
         _deltaToLastSnapshotTickMinSafeValue = 0.05f * _ticksPerSecond;
         _deltaToLastSnapshotTickMinValueToFastForward = _deltaToLastSnapshotTickMinSafeValue + 0.01f * _ticksPerSecond;
-    }
-    
-    [Inject]
-    public void Inject(IEntityManager entityManager, IShard shard, IPingMeasurer pingMeasurer)
-    {
-        _entityManager = entityManager;
-        _shard = shard;
-        _pingMeasurer = pingMeasurer;
     }
     
     public override void _Ready()
