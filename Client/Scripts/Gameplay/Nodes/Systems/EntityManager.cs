@@ -42,7 +42,7 @@ public sealed class EntityManager : Node, IEntityManager
         }
         foreach (Guid id in _entities.Keys.Except(ids).ToArray())
         {
-            _entities[id].Node.QueueFree();
+            _entities[id].Remove();
         }
         foreach (EntitySnapshot entitySnapshot in snapshot.Entities)
         {
