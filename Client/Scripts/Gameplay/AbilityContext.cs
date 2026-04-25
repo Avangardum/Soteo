@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Nodes.Entities;
 using Soteo.Shared.Extensions;
@@ -9,6 +10,7 @@ public sealed record AbilityContext : IServiceProvider
 {
     public sealed record Deflated
     {
+        public required int AbilityId { get; init; }
         public required int Level { get; init; }
         public required Guid UserId { get; init; }
         public Vector2? TargetPosition { get; init; }
@@ -21,6 +23,7 @@ public sealed record AbilityContext : IServiceProvider
             var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
             return new AbilityContext
             {
+                Ability = Ability.All[AbilityId],
                 Level = Level,
                 User = entityManager.GetEntity<Unit>(UserId).Required,
                 ServiceProvider = serviceProvider,
@@ -32,6 +35,7 @@ public sealed record AbilityContext : IServiceProvider
         }
     }
     
+    public required Ability Ability { get; init; }
     public required int Level { get; init; }
     public required Unit User { get; init; }
     public required IServiceProvider ServiceProvider { get; init; }
@@ -46,6 +50,7 @@ public sealed record AbilityContext : IServiceProvider
     {
         return new Deflated
         {
+            AbilityId = Ability.Id,
             Level = Level,
             UserId = User.Id,
             TargetPosition = TargetPosition,

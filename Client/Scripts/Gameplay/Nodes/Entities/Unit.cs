@@ -303,6 +303,7 @@ public abstract class Unit : KinematicBody2D, IEntity
             throw new ArgumentException($"Unit {Id} doesn't have an ability in slot {command.Slot}");
         return new AbilityContext
         {
+            Ability = state.Ability,
             Level = state.Level,
             User = this,
             ServiceProvider = _serviceProvider,
