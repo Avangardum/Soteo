@@ -8,7 +8,7 @@ public interface IEntityManager
     IReadOnlyDictionary<Guid, IEntity> Entities { get; }
     
     event Action<IEntity> EntityAdded;
-    event Action<Guid> EntityRemoved;
+    event Action<IEntity> EntityRemoved;
     
     void ReplicateSnapshotEntities(ShardSnapshot snapshot);
     PlayerCharacter SpawnPlayerCharacter(Guid id);

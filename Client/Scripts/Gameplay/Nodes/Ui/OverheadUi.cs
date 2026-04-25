@@ -17,19 +17,46 @@ public sealed class OverheadUi : Control
     
     private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/OverheadUi.tscn");
 
-    private Unit _unit = null!;
-    private ICamera _camera = null!;
-    private IPalette _palette = null!;
+    private readonly Unit _unit;
+    private readonly ICamera _camera;
+    private readonly IPalette _palette;
     
-    private Control _playerCharacterPanel = null!;
-    private Label _playerCharacterNameLabel = null!;
-    private Label _playerCharacterLevelLabel = null!;
-    private TextureProgress _playerCharacterHealthBar = null!;
-    private TextureProgress _playerCharacterManaBar = null!;
-    private Control _tinyHealthPanel = null!;
-    private TextureProgress _tinyHealthBar = null!;
+    private readonly Control _playerCharacterPanel;
+    private readonly Label _playerCharacterNameLabel;
+    private readonly Label _playerCharacterLevelLabel;
+    private readonly TextureProgress _playerCharacterHealthBar;
+    private readonly TextureProgress _playerCharacterManaBar;
+    private readonly Control _tinyHealthPanel;
+    private readonly TextureProgress _tinyHealthBar;
     
     private Vector2 _offset;
+    
+    public OverheadUi(Unit unit, ICamera camera, IPalette palette)
+    {
+        Name = $"{nameof(OverheadUi)} {unit.Id}";
+        ProcessPriority = (int)ProcessPriorityEnum.OverheadUi;
+        
+        _unit = unit;
+        _camera = camera;
+        _palette = palette;
+        
+        Scene.InstanceAndReparentTo(this);
+        
+        _playerCharacterPanel = GetNode<Control>("PlayerCharacter");
+        _playerCharacterNameLabel = GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Name");
+        _playerCharacterLevelLabel = GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Level");
+        _playerCharacterHealthBar = GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Health");
+        _playerCharacterManaBar = GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Mana");
+        _tinyHealthPanel = GetNode<Control>("TinyHealth");
+        _tinyHealthBar = GetNode<TextureProgress>("TinyHealth/MarginContainer/Health");
+        
+        unit.Removed += OnUnitRemoved;
+        
+        if (unit is PlayerCharacter playerCharacter)
+        {
+            _playerCharacterNameLabel.Text = playerCharacter.DisplayName;
+        }
+    }
     
     private Variant CurrentVariant
     {
@@ -57,33 +84,6 @@ public sealed class OverheadUi : Control
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
-        }
-    }
-    
-    public OverheadUi(Unit unit, ICamera camera, IPalette palette)
-    {
-        Name = $"{nameof(OverheadUi)} {unit.Id}";
-        ProcessPriority = (int)ProcessPriorityEnum.OverheadUi;
-        
-        _unit = unit;
-        _camera = camera;
-        _palette = palette;
-        
-        Scene.InstanceAndReparentTo(this);
-        
-        _playerCharacterPanel = GetNode<Control>("PlayerCharacter");
-        _playerCharacterNameLabel = GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Name");
-        _playerCharacterLevelLabel = GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Level");
-        _playerCharacterHealthBar = GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Health");
-        _playerCharacterManaBar = GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Mana");
-        _tinyHealthPanel = GetNode<Control>("TinyHealth");
-        _tinyHealthBar = GetNode<TextureProgress>("TinyHealth/MarginContainer/Health");
-        
-        unit.Connect("tree_exited", this, nameof(OnUnitRemoved));
-        
-        if (unit is PlayerCharacter playerCharacter)
-        {
-            _playerCharacterNameLabel.Text = playerCharacter.DisplayName;
         }
     }
 

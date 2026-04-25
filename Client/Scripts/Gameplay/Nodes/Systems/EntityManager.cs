@@ -26,7 +26,7 @@ public sealed class EntityManager : Node, IEntityManager
     public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;
     
     public event Action<IEntity> EntityAdded = delegate {};
-    public event Action<Guid> EntityRemoved = delegate {};
+    public event Action<IEntity> EntityRemoved = delegate {};
 
     public T? GetEntity<T>(Guid id) => (T?)_entities.GetOrDefault(id);
     
@@ -74,17 +74,17 @@ public sealed class EntityManager : Node, IEntityManager
 
     private T Add<T>(T entity) where T : Node2D, IEntity 
     {
-        entity.Node.Connect("tree_exited", this, nameof(OnEntityExitedTree), [entity.Id.ToByteArray()]);
+        entity.Removed += () => OnEntityRemoved(entity);
         _entities.Add(entity.Id, entity);
         _shard.EntityRoot.AddChild(entity);
         EntityAdded(entity);
         return entity;
     }
     
-    public void OnEntityExitedTree(byte[] idBytes)
+    public void OnEntityRemoved(IEntity entity)
     {
-        var id = new Guid(idBytes);
-        _entities.Remove(id);
-        EntityRemoved(id);
+        _entities.Remove(entity.Id);
+        EntityRemoved(entity);
+        entity.Node.QueueFree();
     }
 }

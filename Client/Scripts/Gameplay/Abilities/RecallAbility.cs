@@ -12,7 +12,7 @@ public sealed class RecallAbility : Ability<RecallAbility>
     public override void TakeEffect(AbilityContext context)
     {
         base.TakeEffect(context);
-        context.User.QueueFree();
+        context.User.Remove();
         context.GetRequiredService<IPacketSender>()
             .SendReliable(new CharacterRecalledPacket { CharacterId = context.User.Id }, MasterServerId);
     }

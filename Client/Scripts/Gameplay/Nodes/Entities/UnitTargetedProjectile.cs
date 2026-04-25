@@ -31,7 +31,7 @@ public abstract class UnitTargetedProjectile : Projectile
         
         if (_didHit || Target == null)
         {
-            QueueFree();
+            Remove();
             return;
         }
         

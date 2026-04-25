@@ -33,6 +33,8 @@ public abstract class Projectile : Area2D, IEntity
         _properties = GetNode<EntityProperties>("Properties");
     }
     
+    public event Action Removed = delegate {};
+    
     public Guid Id { get; }
     public float Azimuth { get; set; }
     protected Unit? Source { get => field.AsValid(); set; }
@@ -62,4 +64,16 @@ public abstract class Projectile : Area2D, IEntity
         if (s.Ability != null) Ability = s.Ability;
         if (s.Speed != null) Speed = s.Speed.Value;
     }
+    
+    public void Remove()
+    {
+        GetParent().RemoveChild(this);
+        Removed();
+    }
+    
+    [Obsolete(FreeErrorMessage, true)]
+    public new void Free() => throw new InvalidOperationException(FreeErrorMessage);
+    
+    [Obsolete(FreeErrorMessage, true)]
+    public new void QueueFree() => throw new InvalidOperationException(FreeErrorMessage);
 }

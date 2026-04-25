@@ -5,6 +5,9 @@ namespace Soteo.Gameplay.Nodes.Entities;
 
 public static class Entity
 {
+    public const string FreeErrorMessage =
+        "Calling Free or QueueFree on entities is allowed only from EntityManager. Call Remove instead.";
+    
     /// <summary>
     /// Round a visual position value to a value that will allow pixel perfect rendering without artifacts due to
     /// the sprite's pixels having noninteger position, therefore rendering between screen pixels

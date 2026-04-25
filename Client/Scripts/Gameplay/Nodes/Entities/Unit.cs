@@ -33,6 +33,8 @@ public abstract class Unit : KinematicBody2D, IEntity
         scene.InstanceAndReparentTo(this);
     }
     
+    public event Action Removed = delegate {};
+    
     public static readonly IReadOnlyDictionary<Stat, float> DefaultStats = new Dictionary<Stat, float>
     {
         [Stat.MaxHealth] = 1000,
@@ -412,4 +414,16 @@ public abstract class Unit : KinematicBody2D, IEntity
     {
         target.TakeDamage(Stats[Stat.AttackDamage], this, ability);
     }
+    
+    public void Remove()
+    {
+        GetParent().RemoveChild(this);
+        Removed();
+    }
+    
+    [Obsolete(FreeErrorMessage, true)]
+    public new void Free() => throw new InvalidOperationException(FreeErrorMessage);
+    
+    [Obsolete(FreeErrorMessage, true)]
+    public new void QueueFree() => throw new InvalidOperationException(FreeErrorMessage);
 }
