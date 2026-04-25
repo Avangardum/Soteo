@@ -1,55 +1,28 @@
-using System.Collections.Immutable;
-using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
-using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 using static Soteo.Shared.SoteoMath;
-using static Godot.Mathf;
 
 namespace Soteo.Gameplay;
 
-// todo split into several types
-public sealed record EntitySnapshot
+public abstract record EntitySnapshot(Guid Id)
 {
-    public required Guid Id { get; init; }
     public Vector2? Position { get; init; }
     public float? Azimuth { get; init; }
-    public ImmutableDictionary<Stat, float> Stats { get; init; } = [];
-    public ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates { get; init; } = [];
-    public AbilitySlot? CurrentAbilitySlot { get; init; }
-    public float? CurrentAbilityRemainingUseTime { get; init; }
-    // todo serialize the following
-    public Guid? SourceId { get; init; }
-    public Guid? TargetId { get; init; }
-    public Ability? Ability { get; init; }
-    public float? Speed { get; init; }
     
-    public static EntitySnapshot Interpolate(EntitySnapshot from, EntitySnapshot to, float weight)
+    public abstract EntitySnapshot Interpolate(EntitySnapshot to, float weight);
+}
+
+public abstract record EntitySnapshot<T>(Guid Id) : EntitySnapshot(Id) where T : EntitySnapshot<T>
+{
+    public virtual T Interpolate(T to, float weight)
     {
+        EntitySnapshot<T> from = this;
         if (from.Id != to.Id) throw new ArgumentException();
         return to with
         {
             Position = InterpolateNullable(from.Position, to.Position, (f, t) => f.Lerp(t, weight)),
-            Azimuth = InterpolateNullable(from.Azimuth, to.Azimuth, (f, t) => ModularLerp(f, t, weight, 360)),
-            AbilityStates = InterpolateAbilityStates(from.AbilityStates, to.AbilityStates, weight),
-            CurrentAbilityRemainingUseTime = InterpolateNullable(from.CurrentAbilityRemainingUseTime,
-                to.CurrentAbilityRemainingUseTime, (f, t) => t == -1 ? -1 : LerpDecrease(f, t, weight))
+            Azimuth = InterpolateNullable(from.Azimuth, to.Azimuth, (f, t) => ModularLerp(f, t, weight, 360))
         };
     }
-    
-    private static ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> InterpolateAbilityStates
-    (
-        ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> from,
-        ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> to,
-        float weight
-    )
-    {
-        return to.ToImmutableDictionary(pair => pair.Key, pair =>
-        {
-            IReadOnlyAbilityState t = pair.Value;
-            if (!from.TryGetValue(pair.Key, out IReadOnlyAbilityState? f)) return t;
-            return new AbilityState(t) { Cooldown = LerpDecrease(f.Cooldown, t.Cooldown, weight) };
-        });
-    }
+
+    public sealed override EntitySnapshot Interpolate(EntitySnapshot to, float weight) => Interpolate((T)to, weight);
 }

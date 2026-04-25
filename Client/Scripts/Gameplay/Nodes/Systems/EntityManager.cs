@@ -54,15 +54,11 @@ public sealed class EntityManager : Node, IEntityManager
     
     private IEntity SpawnEntityFromSnapshot(EntitySnapshot snapshot)
     {
-        // todo detect type from identity
-        if (snapshot.Stats.Count > 0)
+        return snapshot switch
         {
-            return Add(new PlayerCharacter(snapshot, _serviceProvider));
-        }
-        else
-        {
-            return Add(new AttackProjectile(snapshot, _camera));
-        }
+            UnitSnapshot s => Add(new PlayerCharacter(s, _serviceProvider)),
+            ProjectileSnapshot s => Add(new AttackProjectile(s, _camera))
+        };
     }
     
     public PlayerCharacter SpawnPlayerCharacter(Guid id) => Add(new PlayerCharacter(id, _serviceProvider));

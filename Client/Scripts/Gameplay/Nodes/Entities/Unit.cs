@@ -95,9 +95,8 @@ public abstract class Unit : KinematicBody2D, IEntity
 
     public EntitySnapshot CreateSnapshot()
     {
-        return new EntitySnapshot
+        return new UnitSnapshot(Id)
         {
-            Id = Id,
             Position = Position,
             Azimuth = Azimuth,
             Stats = Stats.ToImmutableDictionary(),
@@ -110,20 +109,22 @@ public abstract class Unit : KinematicBody2D, IEntity
 
     public void ReplicateSnapshot(EntitySnapshot snapshot)
     {
-        if (snapshot.Position != null)
+        var s = (UnitSnapshot)snapshot;
+        
+        if (s.Position != null)
         {
-            if (IsServer) Position = snapshot.Position.Value;
-            else VisualPosition = snapshot.Position.Value;
+            if (IsServer) Position = s.Position.Value;
+            else VisualPosition = s.Position.Value;
         }
 
-        if (snapshot.Azimuth != null) Azimuth = snapshot.Azimuth.Value;
-        foreach ((Stat stat, float value) in snapshot.Stats) StatsInternal[stat] = value;
-        foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in snapshot.AbilityStates)
+        if (s.Azimuth != null) Azimuth = s.Azimuth.Value;
+        foreach ((Stat stat, float value) in s.Stats) StatsInternal[stat] = value;
+        foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in s.AbilityStates)
             AbilityStatesInternal[slot] = new AbilityState(state);
-        if (snapshot.CurrentAbilitySlot != null) CurrentAbilitySlot = snapshot.CurrentAbilitySlot.Value;
-        if (snapshot.CurrentAbilityRemainingUseTime == -1) CurrentAbilitySlot = null;
-        if (snapshot.CurrentAbilityRemainingUseTime != null)
-            CurrentAbilityRemainingUseTime = snapshot.CurrentAbilityRemainingUseTime.Value;
+        if (s.CurrentAbilitySlot != null) CurrentAbilitySlot = s.CurrentAbilitySlot.Value;
+        if (s.CurrentAbilityRemainingUseTime == -1) CurrentAbilitySlot = null;
+        if (s.CurrentAbilityRemainingUseTime != null)
+            CurrentAbilityRemainingUseTime = s.CurrentAbilityRemainingUseTime.Value;
     }
     
     private void MatchPhysicsPositionToVisualPosition()

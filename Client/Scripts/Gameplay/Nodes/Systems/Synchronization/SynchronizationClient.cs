@@ -76,7 +76,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
             ShardSnapshot fromSnapshot = _snapshotRing.RingGet(fromTick)!;
             ShardSnapshot toSnapshot = _snapshotRing.RingGet(toTick)!;
             float weight = (float)SoteoMath.InverseLerp(fromTick, toTick, _tick);
-            ShardSnapshot interpolatedSnapshot = ShardSnapshot.Interpolate(fromSnapshot, toSnapshot, weight);
+            ShardSnapshot interpolatedSnapshot = fromSnapshot.Interpolate(toSnapshot, weight);
             ReplicateSnapshot(interpolatedSnapshot);
         }
         

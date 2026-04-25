@@ -19,7 +19,7 @@ public sealed class AttackProjectile : UnitTargetedProjectile
         ClientDependency<ICamera> camera
     ) : base(id, source, ability, speed, target, Scene, camera) { }
     
-    public AttackProjectile(EntitySnapshot snapshot, ClientDependency<ICamera> camera) :
+    public AttackProjectile(ProjectileSnapshot snapshot, ClientDependency<ICamera> camera) :
         this(snapshot.Id, null!, snapshot.Ability!, snapshot.Speed ?? 0, null!, camera) { } // todo remove redundant !, remove ?? 0 
     
     protected override void Hit()

@@ -9,6 +9,12 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapshotPacket>
 {
+    private enum EntityKind : byte
+    {
+        Unit = 0,
+        Projectile = 1
+    }
+    
     private const int SizeOfAbilityState = sizeof(int) + sizeof(int) + sizeof(float);
 
     protected override int PacketSize(ShardSnapshotPacket packet)
@@ -18,14 +24,35 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     
     private int EntitySize(EntitySnapshot entity)
     {
+        return entity switch
+        {
+            UnitSnapshot unit => UnitSize(unit),
+            ProjectileSnapshot projectile => ProjectileSize(projectile)
+        };
+    }
+    
+    private int BaseEntitySize(EntitySnapshot entity)
+    {
         return
+            sizeof(EntityKind) +
             SizeOf(entity.Id) +
             SizeOf(entity.Position) +
-            SizeOf(entity.Azimuth) +
-            SizeOf(entity.Stats) +
-            SizeOf(entity.AbilityStates, SizeOfAbilityState) +
-            SizeOf(entity.CurrentAbilitySlot) +
-            SizeOf(entity.CurrentAbilityRemainingUseTime);
+            SizeOf(entity.Azimuth);
+    }
+    
+    private int UnitSize(UnitSnapshot unit)
+    {
+        return
+            BaseEntitySize(unit) +
+            SizeOf(unit.Stats) +
+            SizeOf(unit.AbilityStates, SizeOfAbilityState) +
+            SizeOf(unit.CurrentAbilitySlot) +
+            SizeOf(unit.CurrentAbilityRemainingUseTime);
+    }
+    
+    private int ProjectileSize(ProjectileSnapshot projectile)
+    {
+        return BaseEntitySize(projectile);
     }
 
     protected override void SerializeInternal(ShardSnapshotPacket packet, ref Span<byte> span)
@@ -37,13 +64,38 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     
     private void SerializeEntity(EntitySnapshot entity, ref Span<byte> span)
     {
-        SerializeGuid(entity.Id, ref span);
-        SerializeNullable(entity.Position, SerializeVector2, ref span);
-        SerializeNullable(entity.Azimuth, SerializeFloat, ref span);
-        SerializeDictionary(entity.Stats, SerializeEnum, SerializeFloat, ref span);
-        SerializeDictionary(entity.AbilityStates, SerializeEnum, SerializeAbilityState, ref span);
-        SerializeNullable(entity.CurrentAbilitySlot, SerializeEnum, ref span);
-        SerializeNullable(entity.CurrentAbilityRemainingUseTime, SerializeFloat, ref span);
+        switch (entity)
+        {
+            case UnitSnapshot unit:
+                SerializeUnit(unit, ref span);
+                break;
+            case ProjectileSnapshot projectile:
+                SerializeProjectile(projectile, ref span);
+                break;
+        }
+    }
+    
+    private void SerializeBaseEntity(EntitySnapshot unit, ref Span<byte> span)
+    {
+        SerializeGuid(unit.Id, ref span);
+        SerializeNullable(unit.Position, SerializeVector2, ref span);
+        SerializeNullable(unit.Azimuth, SerializeFloat, ref span);
+    }
+    
+    private void SerializeUnit(UnitSnapshot unit, ref Span<byte> span)
+    {
+        SerializeEnum(EntityKind.Unit, ref span);
+        SerializeBaseEntity(unit, ref span);
+        SerializeDictionary(unit.Stats, SerializeEnum, SerializeFloat, ref span);
+        SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilityState, ref span);
+        SerializeNullable(unit.CurrentAbilitySlot, SerializeEnum, ref span);
+        SerializeNullable(unit.CurrentAbilityRemainingUseTime, SerializeFloat, ref span);
+    }
+    
+    private void SerializeProjectile(ProjectileSnapshot projectile, ref Span<byte> span)
+    {
+        SerializeEnum(EntityKind.Projectile, ref span);
+        SerializeBaseEntity(projectile, ref span);
     }
 
     protected override ShardSnapshotPacket DeserializeInternal(ref Span<byte> span)
@@ -57,15 +109,32 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     
     private EntitySnapshot DeserializeEntity(ref Span<byte> span)
     {
-        return new EntitySnapshot
+        return DeserializeEnum<EntityKind>(ref span) switch
         {
-            Id = DeserializeGuid(ref span),
+            EntityKind.Unit => DeserializeUnit(ref span),
+            EntityKind.Projectile => DeserializeProjectile(ref span)
+        };
+    }
+    
+    private UnitSnapshot DeserializeUnit(ref Span<byte> span)
+    {
+        return new UnitSnapshot(DeserializeGuid(ref span))
+        {
             Position = DeserializeNullable(DeserializeVector2, ref span),
             Azimuth = DeserializeNullable(DeserializeFloat, ref span),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, ref span),
             AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, ref span),
             CurrentAbilitySlot = DeserializeNullable(DeserializeEnum<AbilitySlot>, ref span),
             CurrentAbilityRemainingUseTime = DeserializeNullable(DeserializeFloat, ref span)
+        };
+    }
+    
+    private ProjectileSnapshot DeserializeProjectile(ref Span<byte> span)
+    {
+        return new ProjectileSnapshot(DeserializeGuid(ref span))
+        {
+            Position = DeserializeNullable(DeserializeVector2, ref span),
+            Azimuth = DeserializeNullable(DeserializeFloat, ref span)
         };
     }
 

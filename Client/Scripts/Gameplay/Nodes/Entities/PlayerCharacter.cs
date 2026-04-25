@@ -12,7 +12,7 @@ public sealed class PlayerCharacter : Unit
         DisplayName = id.ToString()[^12..];
     }
     
-    public PlayerCharacter(EntitySnapshot snapshot, IServiceProvider serviceProvider) :
+    public PlayerCharacter(UnitSnapshot snapshot, IServiceProvider serviceProvider) :
         this(snapshot.Id, serviceProvider) { }
     
     public string DisplayName { get; }

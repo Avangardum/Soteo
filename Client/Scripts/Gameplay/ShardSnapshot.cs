@@ -8,15 +8,15 @@ public sealed record ShardSnapshot
 {
     public required ImmutableList<EntitySnapshot> Entities { get; init; }
     
-    public static ShardSnapshot Interpolate(ShardSnapshot from, ShardSnapshot to, float weight)
+    public ShardSnapshot Interpolate(ShardSnapshot to, float weight)
     {
+        ShardSnapshot from = this;
         ImmutableDictionary<Guid, EntitySnapshot> fromEntities = from.Entities.ToImmutableDictionary(it => it.Id);
         
-        return new()
+        return new ShardSnapshot
         {
             Entities = to.Entities
-                .Select(t => fromEntities.TryGetValue(t.Id, out EntitySnapshot? f) ?
-                    EntitySnapshot.Interpolate(f, t, weight) : t)
+                .Select(t => fromEntities.TryGetValue(t.Id, out EntitySnapshot? f) ? f.Interpolate(t, weight) : t)
                 .ToImmutableList()
         };
     }

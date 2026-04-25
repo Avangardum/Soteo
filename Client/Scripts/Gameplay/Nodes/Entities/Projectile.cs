@@ -43,23 +43,23 @@ public abstract class Projectile : Area2D, IEntity
     
     public EntitySnapshot CreateSnapshot()
     {
-        return new EntitySnapshot
+        return new ProjectileSnapshot(Id)
         {
-            Id = Id,
             Position = Position,
             Azimuth = Azimuth,
             Ability = Ability,
-            Speed = Speed,
+            Speed = Speed
         };
         // todo source and target
     }
 
     public void ReplicateSnapshot(EntitySnapshot snapshot)
     {
-        if (snapshot.Position != null) Position = RoundVisualPositionToPixelPerfect(snapshot.Position.Value,
+        var s = (ProjectileSnapshot)snapshot;
+        if (s.Position != null) Position = RoundVisualPositionToPixelPerfect(s.Position.Value,
             _camera.Value, _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset);
-        if (snapshot.Azimuth != null) Azimuth = snapshot.Azimuth.Value;
-        if (snapshot.Ability != null) Ability = snapshot.Ability;
-        if (snapshot.Speed != null) Speed = snapshot.Speed.Value;
+        if (s.Azimuth != null) Azimuth = s.Azimuth.Value;
+        if (s.Ability != null) Ability = s.Ability;
+        if (s.Speed != null) Speed = s.Speed.Value;
     }
 }
