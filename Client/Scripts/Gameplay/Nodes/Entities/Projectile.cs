@@ -1,12 +1,15 @@
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Extensions;
+using static Soteo.Gameplay.Nodes.Entities.Entity;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
 public abstract class Projectile : Area2D, IEntity
 {
     private readonly ClientDependency<ICamera> _camera;
+    
+    private readonly EntityProperties _properties;
     
     protected Projectile
     (
@@ -18,6 +21,8 @@ public abstract class Projectile : Area2D, IEntity
         ClientDependency<ICamera> camera
     )
     {
+        Name = id.ToString();
+        
         Id = id;
         Source = source;
         Ability = ability;
@@ -25,7 +30,7 @@ public abstract class Projectile : Area2D, IEntity
         _camera = camera;
         
         scene.InstanceAndReparentTo(this);
-        Name = id.ToString();
+        _properties = GetNode<EntityProperties>("Properties");
     }
     
     public Guid Id { get; }
@@ -51,11 +56,10 @@ public abstract class Projectile : Area2D, IEntity
 
     public void ReplicateSnapshot(EntitySnapshot snapshot)
     {
-        if (snapshot.Position != null) Position = snapshot.Position.Value;
+        if (snapshot.Position != null) Position = RoundVisualPositionToPixelPerfect(snapshot.Position.Value,
+            _camera.Value, _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset);
         if (snapshot.Azimuth != null) Azimuth = snapshot.Azimuth.Value;
         if (snapshot.Ability != null) Ability = snapshot.Ability;
         if (snapshot.Speed != null) Speed = snapshot.Speed.Value;
     }
-    
-    // todo pixel perfect rendering
 }

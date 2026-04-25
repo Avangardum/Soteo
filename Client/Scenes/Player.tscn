@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Scripts/Shared/Proxy.gd" type="Script" id=1]
 [ext_resource path="res://Textures/Cute Fantasy Free/Player/Player.png" type="Texture" id=2]
-[ext_resource path="res://Scripts/Gameplay/Nodes/Entities/UnitProperties.cs" type="Script" id=3]
+[ext_resource path="res://Scripts/Gameplay/Nodes/Entities/EntityProperties.cs" type="Script" id=3]
 
 [sub_resource type="AtlasTexture" id=24]
 atlas = ExtResource( 2 )
