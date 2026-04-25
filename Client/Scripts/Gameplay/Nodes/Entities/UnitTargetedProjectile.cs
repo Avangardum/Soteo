@@ -18,16 +18,17 @@ public abstract class UnitTargetedProjectile : Projectile
         float speed,
         Unit target,
         PackedScene scene,
-        ClientDependency<ICamera> camera
-    ) : base(id, source, ability, speed, scene, camera)
+        ClientDependency<ICamera> camera,
+        IShard shard
+    ) : base(id, source, ability, speed, scene, camera, shard)
     {
         Target = target;
     }
 
-    public override void _PhysicsProcess(float delta)
+    public override void _PhysicsProcessServer(float delta)
     {
-        base._PhysicsProcess(delta);
-        if (!IsServer) return;
+        base._PhysicsProcessServer(delta);
+        Node.Position = Node.Position;
         
         if (_didHit || Target == null)
         {
@@ -44,10 +45,11 @@ public abstract class UnitTargetedProjectile : Projectile
         else
         {
             Hit();
-            // Update position for the last time and defer freeing the node to the next frame so that clients receive a
-            // snapshot where the projectile reaches the target, to prevent it from visually disappearing near the
-            // target
-            Position = Target.Position;
+            // Update position for the last time and defer removing the entity to the next frame so that clients receive
+            // a snapshot where the projectile reaches the target, to prevent it from visually disappearing near the
+            // target. Offset it 1 pixel up so that when coming from above it doesn't flicker for 1 frame in front of
+            // the target.
+            Position = Target.Position + Vector2.Up;
             _didHit = true;
         }
     }

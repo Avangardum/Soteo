@@ -16,11 +16,12 @@ public sealed class AttackProjectile : UnitTargetedProjectile
         Ability ability,
         float speed,
         Unit target,
-        ClientDependency<ICamera> camera
-    ) : base(id, source, ability, speed, target, Scene, camera) { }
+        ClientDependency<ICamera> camera,
+        IShard shard
+    ) : base(id, source, ability, speed, target, Scene, camera, shard) { }
     
-    public AttackProjectile(ProjectileSnapshot snapshot, ClientDependency<ICamera> camera) :
-        this(snapshot.Id, null!, snapshot.Ability!, snapshot.Speed ?? 0, null!, camera) { } // todo remove redundant !, remove ?? 0 
+    public AttackProjectile(ProjectileSnapshot snapshot, ClientDependency<ICamera> camera, IShard shard) :
+        this(snapshot.Id, null!, snapshot.Ability!, snapshot.Speed ?? 0, null!, camera, shard) { } // todo remove redundant !, remove ?? 0 
     
     protected override void Hit()
     {

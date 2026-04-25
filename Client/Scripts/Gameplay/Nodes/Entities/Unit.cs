@@ -31,6 +31,7 @@ public abstract class Unit : KinematicBody2D, IEntity
         
         _camera.Value?.ZoomChanged += OnZoomChanged;
         scene.InstanceAndReparentTo(this);
+        serviceProvider.GetRequiredService<IShard>().EntityRoot.AddChild(this);
     }
     
     public event Action Removed = delegate {};
@@ -93,8 +94,6 @@ public abstract class Unit : KinematicBody2D, IEntity
         }
     }
     
-    Node2D IEntity.Node => this;
-
     public EntitySnapshot CreateSnapshot()
     {
         return new UnitSnapshot(Id)

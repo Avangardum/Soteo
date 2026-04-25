@@ -57,7 +57,7 @@ public sealed class EntityManager : Node, IEntityManager
         return snapshot switch
         {
             UnitSnapshot s => Add(new PlayerCharacter(s, _serviceProvider)),
-            ProjectileSnapshot s => Add(new AttackProjectile(s, _camera))
+            ProjectileSnapshot s => Add(new AttackProjectile(s, _camera, _shard))
         };
     }
     
@@ -68,15 +68,16 @@ public sealed class EntityManager : Node, IEntityManager
         // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
         // of the projectile over the source
         Vector2 position = source.Position + Vector2.Up;
-        return Add(
-            new AttackProjectile(Guid.NewGuid(), source, ability, speed, target, _camera) { Position = position });
+        return Add(new AttackProjectile(Guid.NewGuid(), source, ability, speed, target, _camera, _shard)
+        {
+            Position = position
+        });
     }
 
-    private T Add<T>(T entity) where T : Node2D, IEntity 
+    private T Add<T>(T entity) where T : IEntity 
     {
         entity.Removed += () => OnEntityRemoved(entity);
         _entities.Add(entity.Id, entity);
-        _shard.EntityRoot.AddChild(entity);
         EntityAdded(entity);
         return entity;
     }
@@ -85,6 +86,5 @@ public sealed class EntityManager : Node, IEntityManager
     {
         _entities.Remove(entity.Id);
         EntityRemoved(entity);
-        entity.Node.QueueFree();
     }
 }

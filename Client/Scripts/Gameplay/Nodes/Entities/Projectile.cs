@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Extensions;
@@ -5,8 +6,16 @@ using static Soteo.Gameplay.Nodes.Entities.Entity;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
-public abstract class Projectile : Area2D, IEntity
+public abstract class Projectile : IEntity
 {
+    protected sealed class ProjectileNode(Projectile projectile) : Area2D
+    {
+        public override void _PhysicsProcess(float delta)
+        {
+            if (IsServer) projectile._PhysicsProcessServer(delta);
+        }
+    }
+    
     private readonly ClientDependency<ICamera> _camera;
     
     private readonly EntityProperties _properties;
@@ -18,30 +27,32 @@ public abstract class Projectile : Area2D, IEntity
         Ability ability,
         float speed,
         PackedScene scene,
-        ClientDependency<ICamera> camera
+        ClientDependency<ICamera> camera,
+        IShard shard
     )
     {
-        Name = id.ToString();
-        
         Id = id;
         Source = source;
         Ability = ability;
         Speed = speed;
         _camera = camera;
         
-        scene.InstanceAndReparentTo(this);
-        _properties = GetNode<EntityProperties>("Properties");
+        Node = new ProjectileNode(this) { Name = $"{GetType().Name} {id}" };
+        scene.InstanceAndReparentTo(Node);
+        _properties = Node.GetNode<EntityProperties>("Properties");
+        shard.EntityRoot.AddChild(Node);
     }
     
     public event Action Removed = delegate {};
     
     public Guid Id { get; }
+    [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
+    public Vector2 Position { get; set; }
     public float Azimuth { get; set; }
     protected Unit? Source { get => field.AsValid(); set; }
     protected Ability Ability { get; private set; }
     protected float Speed { get; set; }
-
-    public Node2D Node => this;
+    protected ProjectileNode? Node => field.AsValid();
     
     public EntitySnapshot CreateSnapshot()
     {
@@ -57,9 +68,14 @@ public abstract class Projectile : Area2D, IEntity
 
     public void ReplicateSnapshot(EntitySnapshot snapshot)
     {
+        if (IsRemoved) return;
         var s = (ProjectileSnapshot)snapshot;
-        if (s.Position != null) Position = RoundVisualPositionToPixelPerfect(s.Position.Value,
-            _camera.Value, _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset);
+        if (s.Position != null)
+        {
+            Position = s.Position.Value;
+            Node.Position = RoundVisualPositionToPixelPerfect(s.Position.Value, _camera.Value,
+                _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset);
+        }
         if (s.Azimuth != null) Azimuth = s.Azimuth.Value;
         if (s.Ability != null) Ability = s.Ability;
         if (s.Speed != null) Speed = s.Speed.Value;
@@ -67,13 +83,15 @@ public abstract class Projectile : Area2D, IEntity
     
     public void Remove()
     {
-        GetParent().RemoveChild(this);
+        if (IsRemoved) return;
+        IsRemoved = true;
+        Node.QueueFree();
         Removed();
     }
     
-    [Obsolete(FreeErrorMessage, true)]
-    public new void Free() => throw new InvalidOperationException(FreeErrorMessage);
-    
-    [Obsolete(FreeErrorMessage, true)]
-    public new void QueueFree() => throw new InvalidOperationException(FreeErrorMessage);
+    [MemberNotNull(nameof(Node))]
+    public virtual void _PhysicsProcessServer(float delta)
+    {
+        Node.Required.Position = Position;
+    }
 }
