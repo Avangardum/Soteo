@@ -11,7 +11,7 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.MasterServer.Communicators;
 
-public sealed class WebSocketMasterServerToGameplayCommunicator : Object, ICommunicator
+public sealed class WebSocketFromMasterServerToGameplayCommunicator : Object, ICommunicator
 {
     private readonly WebSocketServer _wsServer = new();
     private readonly IPacketSerializer _packetSerializer;
@@ -21,7 +21,7 @@ public sealed class WebSocketMasterServerToGameplayCommunicator : Object, ICommu
 
     private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = [];
     
-    public WebSocketMasterServerToGameplayCommunicator
+    public WebSocketFromMasterServerToGameplayCommunicator
     (
         IPacketSerializer packetSerializer,
         IPacketHandler packetHandler,

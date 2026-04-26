@@ -23,7 +23,7 @@ public sealed class SpawnCharacterPacketHandler
             character = new Character { Id = sender.Id };
             charRepo.Add(character);
         }
-        Validate(character.ShardId == Guid.Empty, "Character is already spawned");
+        if (character.ShardId != Guid.Empty) return;
         character.ShardId = packet.PeerId;
         packetSender.RelayFrom(packet, sender.Id);
     }

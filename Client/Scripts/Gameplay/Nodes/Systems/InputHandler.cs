@@ -41,8 +41,11 @@ public sealed class InputHandler : Node2D
 
     public override void _UnhandledInput(InputEvent e)
     {
-        if (e.IsActionPressed("select")) HandleSelect();
-        if (e.IsActionPressed("interact")) HandleInteract();
+        if (e.IsActionPressed("select"))
+            HandleSelect();
+        if (e.IsActionPressed("interact"))
+            HandleInteract();
+        
         foreach (var slot in Enum.GetValues<AbilitySlot>().Distinct())
         {
             var action = "use_ability_" + slot.ToString().ToLower();

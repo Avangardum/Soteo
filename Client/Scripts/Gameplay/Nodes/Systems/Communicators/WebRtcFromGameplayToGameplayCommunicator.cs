@@ -166,9 +166,11 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
     
     private WebRTCPeerConnection CreateConnection(Guid peerId)
     {
-        // todo support reconnection
-        if (_peerConnectionsAndChannels.ContainsKey(peerId)) throw new InvalidOperationException("Already created");
-        
+        if (_peerConnectionsAndChannels.TryGetValue(peerId, out PeerConnectionAndChannels existing))
+        {
+            existing.Connection.Close();
+        }
+
         var connection = new WebRTCPeerConnection();
         byte[] peerIdBytes = peerId.ToByteArray();
         connection.Connect("session_description_created", this, nameof(OnSessionDescriptionCreated), [peerIdBytes]);
