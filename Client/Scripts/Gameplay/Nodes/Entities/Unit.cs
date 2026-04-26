@@ -77,6 +77,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
 
     public AbilitySlot? CurrentAbilitySlot { get; private set; }
     public float CurrentAbilityRemainingUseTime { get; private set; } = -1;
+    [MemberNotNullWhen(false, nameof(Node))] public override bool IsRemoved { get; protected set; }
     protected override UnitNode? Node => field.AsValid();
     public Faction Faction { get; set; }
 
@@ -87,7 +88,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
         {
             field = value;
             if (IsServer) Node.Position = Position;
-            else _visuals.Position = RoundVisualPositionToPixelPerfect(Position, Camera.Value,
+            else _visuals.Position = RoundVisualPositionToPixelPerfect(Position,
                 _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset) - Node.Position;
         }
     }

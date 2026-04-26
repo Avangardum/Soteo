@@ -25,7 +25,6 @@ public sealed class AttackProjectile : UnitTargetedProjectile
     
     protected override void Hit()
     {
-        if (Source == null || Target == null) return;
         Source.DealAttackDamageTo(Target, Ability);
     }
 }

@@ -7,7 +7,7 @@ public abstract class UnitTargetedProjectile : Projectile
 {
     private bool _didHit;
     
-    protected Unit Target { get; set; }
+    protected Unit Target { get; private set; }
 
     protected UnitTargetedProjectile
     (
@@ -27,9 +27,8 @@ public abstract class UnitTargetedProjectile : Projectile
     public override void _PhysicsProcessServer(float delta)
     {
         base._PhysicsProcessServer(delta);
-        Node.Position = Node.Position;
         
-        if (_didHit || Target == null)
+        if (_didHit)
         {
             Remove();
             return;

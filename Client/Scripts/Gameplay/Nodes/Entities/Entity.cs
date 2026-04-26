@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
@@ -17,20 +16,11 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D
     public event Action Removed = delegate {};
 
     protected ClientDependency<ICamera> Camera { get; }
-    
-    [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
-    
+    [MemberNotNullWhen(false, nameof(Node))] public abstract bool IsRemoved { get; protected set; }
     protected abstract TNode? Node { get; }
-
     public Guid Id { get; }
-
     public abstract Vector2 Position { get; set; }
-
-    public virtual float Azimuth
-    {
-        get;
-        set => field = Mathf.PosMod(value, 360);
-    }
+    public virtual float Azimuth { get; set => field = Mathf.PosMod(value, 360); }
 
     public abstract EntitySnapshot CreateSnapshot();
 
@@ -62,20 +52,19 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D
     public Vector2 RoundVisualPositionToPixelPerfect
     (
         Vector2 value,
-        ICamera? camera,
         bool halfPixelXOffset,
         bool halfPixelYOffset
     )
     {
         // If zoom is not an integer, pixel perfect rendering is impossible
-        if (camera == null || camera.TrueZoom % 1 != 0) return value;
+        if (Camera.Value == null || Camera.Value.TrueZoom % 1 != 0) return value;
         
         // If zoom is even, a world pixel with half pixel offset will be rendered as even number of screen pixels,
         // which will distribute equally in all directions, so pixel perfect rendering is possible without having
         // to compensate for this offset.
-        if (camera.TrueZoom % 2 == 0) halfPixelXOffset = halfPixelYOffset = false;
+        if (Camera.Value.TrueZoom % 2 == 0) halfPixelXOffset = halfPixelYOffset = false;
         
-        float screenPixelSizeInWorldPixels = 1 / camera.TrueZoom;
+        float screenPixelSizeInWorldPixels = 1 / Camera.Value.TrueZoom;
         float roundedX = halfPixelXOffset ? SoteoMath.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.x) :
             SoteoMath.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.x);
         float roundedY = halfPixelYOffset ? SoteoMath.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.y) :

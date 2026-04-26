@@ -7,17 +7,24 @@ namespace Soteo.Gameplay.Nodes.Entities;
 
 public abstract class Projectile : Entity<Projectile.ProjectileNode>
 {
-    public sealed class ProjectileNode(Projectile projectile) : Area2D
+    public sealed class ProjectileNode : Area2D
     {
+        private readonly Projectile _projectile;
+        public EntityProperties Properties { get; }
+
+        public ProjectileNode(Projectile projectile, PackedScene scene, IShard shard)
+        {
+            _projectile = projectile;
+            scene.InstanceAndReparentTo(this);
+            shard.EntityRoot.AddChild(this);
+            Properties = GetNode<EntityProperties>("Properties");
+        }
+
         public override void _PhysicsProcess(float delta)
         {
-            if (IsServer) projectile._PhysicsProcessServer(delta);
+            if (IsServer) _projectile._PhysicsProcessServer(delta);
         }
     }
-    
-    private readonly ClientDependency<ICamera> _camera;
-    
-    private readonly EntityProperties _properties;
     
     protected Projectile
     (
@@ -33,30 +40,28 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
         Source = source;
         Ability = ability;
         Speed = speed;
-        _camera = camera;
         
-        Node = new ProjectileNode(this) { Name = $"{GetType().Name} {id}" };
-        scene.InstanceAndReparentTo(Node);
-        _properties = Node.GetNode<EntityProperties>("Properties");
-        shard.EntityRoot.AddChild(Node);
+        Node = new ProjectileNode(this, scene, shard) { Name = $"{GetType().Name} {id}" };
     }
 
-    protected override ProjectileNode Node { get; }
+    [MemberNotNullWhen(false, nameof(Node))] public override bool IsRemoved { get; protected set; }
+    protected override ProjectileNode? Node => field.AsValid();
 
     public override Vector2 Position
     {
         get;
         set
         {
+            if (IsRemoved) return;
             field = value;
-            Node.Position = RoundVisualPositionToPixelPerfect(value, _camera.Value,
-                _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset);
+            Node.Position = RoundVisualPositionToPixelPerfect(value, Node.Properties.HalfPixelXVisualOffset,
+                Node.Properties.HalfPixelYVisualOffset);
         }
     }
     
-    protected Unit Source { get; set; }
+    protected Unit Source { get; private set; }
     protected Ability Ability { get; private set; }
-    protected float Speed { get; set; }
+    protected float Speed { get; private set; }
     
     public override EntitySnapshot CreateSnapshot()
     {
