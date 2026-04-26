@@ -112,7 +112,7 @@ public sealed class Hud : Control, IHud
             button.CooldownIndicator.MaxValue = state.Ability.Cooldown(context);
 
             button.UseProgressIndicator.Value = SelectedUnit.CurrentAbilitySlot != slot ? 0 :
-                state.Ability.UseTime(context) - SelectedUnit.CurrentAbilityRemainingUseTime;
+                state.Ability.UseTime(context) - SelectedUnit.CurrentAbilityRemainingUseTime!.Value;
             button.UseProgressIndicator.MaxValue = state.Ability.UseTime(context);
             
             button.HealthCostLabel.Text = Mathf.CeilToInt(state.Ability.HealthCost(context)).ToString();

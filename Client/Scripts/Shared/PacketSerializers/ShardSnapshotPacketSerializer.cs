@@ -82,8 +82,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     private void SerializeBaseEntity(EntitySnapshot unit, ref Span<byte> span)
     {
         SerializeGuid(unit.Id, ref span);
-        SerializeNullable(unit.Position, SerializeVector2, ref span);
-        SerializeNullable(unit.Azimuth, SerializeFloat, ref span);
+        SerializeVector2(unit.Position, ref span);
+        SerializeFloat(unit.Azimuth, ref span);
     }
     
     private void SerializeUnit(UnitSnapshot unit, ref Span<byte> span)
@@ -124,10 +124,11 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     
     private UnitSnapshot DeserializeUnit(ref Span<byte> span)
     {
-        return new UnitSnapshot(DeserializeGuid(ref span))
+        return new UnitSnapshot
         {
-            Position = DeserializeNullable(DeserializeVector2, ref span),
-            Azimuth = DeserializeNullable(DeserializeFloat, ref span),
+            Id = DeserializeGuid(ref span),
+            Position = DeserializeVector2(ref span),
+            Azimuth = DeserializeFloat(ref span),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, ref span),
             AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, ref span),
             CurrentAbilitySlot = DeserializeNullable(DeserializeEnum<AbilitySlot>, ref span),
@@ -137,10 +138,11 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     
     private ProjectileSnapshot DeserializeProjectile(ref Span<byte> span)
     {
-        return new ProjectileSnapshot(DeserializeGuid(ref span))
+        return new ProjectileSnapshot
         {
-            Position = DeserializeNullable(DeserializeVector2, ref span),
-            Azimuth = DeserializeNullable(DeserializeFloat, ref span),
+            Id = DeserializeGuid(ref span),
+            Position = DeserializeVector2(ref span),
+            Azimuth = DeserializeFloat(ref span),
             Speed = DeserializeFloat(ref span),
             AbilityContext = DeserializeAbilityContext(ref span)
         };

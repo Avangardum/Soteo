@@ -3,15 +3,16 @@ using static Soteo.Shared.SoteoMath;
 
 namespace Soteo.Gameplay;
 
-public abstract record EntitySnapshot(Guid Id)
+public abstract record EntitySnapshot
 {
-    public Vector2? Position { get; init; }
-    public float? Azimuth { get; init; }
+    public required Guid Id { get; init; }
+    public required Vector2 Position { get; init; }
+    public required float Azimuth { get; init; }
     
     public abstract EntitySnapshot Interpolate(EntitySnapshot to, float weight);
 }
 
-public abstract record EntitySnapshot<T>(Guid Id) : EntitySnapshot(Id) where T : EntitySnapshot<T>
+public abstract record EntitySnapshot<T> : EntitySnapshot where T : EntitySnapshot<T>
 {
     public virtual T Interpolate(T to, float weight)
     {
@@ -19,8 +20,8 @@ public abstract record EntitySnapshot<T>(Guid Id) : EntitySnapshot(Id) where T :
         if (from.Id != to.Id) throw new ArgumentException();
         return to with
         {
-            Position = InterpolateNullable(from.Position, to.Position, (f, t) => f.Lerp(t, weight)),
-            Azimuth = InterpolateNullable(from.Azimuth, to.Azimuth, (f, t) => ModularLerp(f, t, weight, 360))
+            Position = from.Position.Lerp(to.Position, weight),
+            Azimuth = ModularLerp(from.Azimuth, to.Azimuth, weight, 360)
         };
     }
 

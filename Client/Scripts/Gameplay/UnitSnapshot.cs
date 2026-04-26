@@ -5,12 +5,12 @@ using static Soteo.Shared.SoteoMath;
 
 namespace Soteo.Gameplay;
 
-public sealed record UnitSnapshot(Guid Id) : EntitySnapshot<UnitSnapshot>(Id)
+public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
 {
-    public ImmutableDictionary<Stat, float> Stats { get; init; } = [];
-    public ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates { get; init; } = [];
-    public AbilitySlot? CurrentAbilitySlot { get; init; }
-    public float? CurrentAbilityRemainingUseTime { get; init; }
+    public required ImmutableDictionary<Stat, float> Stats { get; init; }
+    public required ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates { get; init; }
+    public required AbilitySlot? CurrentAbilitySlot { get; init; }
+    public required float? CurrentAbilityRemainingUseTime { get; init; }
     
     public override UnitSnapshot Interpolate(UnitSnapshot to, float weight)
     {
@@ -19,7 +19,7 @@ public sealed record UnitSnapshot(Guid Id) : EntitySnapshot<UnitSnapshot>(Id)
         {
             AbilityStates = InterpolateAbilityStates(from.AbilityStates, to.AbilityStates, weight),
             CurrentAbilityRemainingUseTime = InterpolateNullable(from.CurrentAbilityRemainingUseTime,
-                to.CurrentAbilityRemainingUseTime, (f, t) => t == -1 ? -1 : LerpDecrease(f, t, weight))
+                to.CurrentAbilityRemainingUseTime, (f, t) => LerpDecrease(f, t, weight))
         };
     }
     

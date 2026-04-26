@@ -72,15 +72,15 @@ public abstract class Unit : Entity<Unit.UnitNode>
     
     private Queue<ICommand> Commands { get; } = [];
     
-    private Dictionary<Stat, float> StatsInternal { get; } = [];
+    private Dictionary<Stat, float> StatsInternal { get; set; } = [];
     public IReadOnlyDictionary<Stat, float> Stats => StatsInternal;
     
-    protected Dictionary<AbilitySlot, AbilityState> AbilityStatesInternal { get; } = [];
+    protected Dictionary<AbilitySlot, AbilityState> AbilityStatesInternal { get; set; } = [];
     public ICovariantReadOnlyDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates =>
         AbilityStatesInternal.AsCovariant();
 
     public AbilitySlot? CurrentAbilitySlot { get; private set; }
-    public float CurrentAbilityRemainingUseTime { get; private set; } = -1;
+    public float? CurrentAbilityRemainingUseTime { get; private set; }
     [MemberNotNullWhen(false, nameof(Node))] public override bool IsRemoved { get; protected set; }
     protected override UnitNode? Node => field.AsValid();
     public Faction Faction { get; set; }
@@ -111,8 +111,9 @@ public abstract class Unit : Entity<Unit.UnitNode>
     
     public override EntitySnapshot CreateSnapshot()
     {
-        return new UnitSnapshot(Id)
+        return new UnitSnapshot
         {
+            Id = Id,
             Position = Position,
             Azimuth = Azimuth,
             Stats = Stats.ToImmutableDictionary(),
@@ -127,15 +128,12 @@ public abstract class Unit : Entity<Unit.UnitNode>
     {
         var s = (UnitSnapshot)snapshot;
         
-        if (s.Position != null) Position = s.Position.Value;
-        if (s.Azimuth != null) Azimuth = s.Azimuth.Value;
-        foreach ((Stat stat, float value) in s.Stats) StatsInternal[stat] = value;
-        foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in s.AbilityStates)
-            AbilityStatesInternal[slot] = new AbilityState(state);
-        if (s.CurrentAbilitySlot != null) CurrentAbilitySlot = s.CurrentAbilitySlot.Value;
-        if (s.CurrentAbilityRemainingUseTime == -1) CurrentAbilitySlot = null;
-        if (s.CurrentAbilityRemainingUseTime != null)
-            CurrentAbilityRemainingUseTime = s.CurrentAbilityRemainingUseTime.Value;
+        Position = s.Position;
+        Azimuth = s.Azimuth;
+        StatsInternal = s.Stats.ToDictionary(it => it.Key, it => it.Value);
+        AbilityStatesInternal = s.AbilityStates.ToDictionary(it => it.Key, it => new AbilityState(it.Value));
+        CurrentAbilitySlot = s.CurrentAbilitySlot;
+        CurrentAbilityRemainingUseTime = s.CurrentAbilityRemainingUseTime;
     }
 
     protected override void OnZoomChanged()
@@ -243,6 +241,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
         return collision;
     }
 
+    // todo shorten
     private void UseAbility(UseAbilityCommand command, ref float remainingDeltaTime, UnitNode node)
     {
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
@@ -272,18 +271,18 @@ public abstract class Unit : Entity<Unit.UnitNode>
         if (command.Slot != CurrentAbilitySlot) CurrentAbilityRemainingUseTime = state.Ability.UseTime(context);
         CurrentAbilitySlot = command.Slot;
         
-        if (remainingDeltaTime < CurrentAbilityRemainingUseTime)
+        if (remainingDeltaTime < CurrentAbilityRemainingUseTime!.Value)
         {
             CurrentAbilityRemainingUseTime -= remainingDeltaTime;
             remainingDeltaTime = 0;
         }
         else
         {
-            remainingDeltaTime -= CurrentAbilityRemainingUseTime;
+            remainingDeltaTime -= CurrentAbilityRemainingUseTime.Value;
             state.Ability.TakeEffect(context);
             state.Cooldown = state.Ability.Cooldown(context);
             CurrentAbilitySlot = null;
-            CurrentAbilityRemainingUseTime = -1;
+            CurrentAbilityRemainingUseTime = null;
             if (!command.Repeat) Commands.Dequeue();
         }
     }

@@ -65,8 +65,9 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
     
     public override EntitySnapshot CreateSnapshot()
     {
-        return new ProjectileSnapshot(Id)
+        return new ProjectileSnapshot
         {
+            Id = Id,
             Position = Position,
             Azimuth = Azimuth,
             AbilityContext = AbilityContext.Deflate(),
@@ -77,8 +78,8 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {
         var s = (ProjectileSnapshot)snapshot;
-        if (s.Position != null) Position = s.Position.Value;
-        if (s.Azimuth != null) Azimuth = s.Azimuth.Value;
+        Position = s.Position;
+        Azimuth = s.Azimuth;
         AbilityContext = s.AbilityContext.Inflate(_serviceProvider);
         Speed = s.Speed;
     }
