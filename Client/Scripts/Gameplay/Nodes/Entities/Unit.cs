@@ -13,20 +13,30 @@ namespace Soteo.Gameplay.Nodes.Entities;
 
 public abstract class Unit : Entity<Unit.UnitNode>
 {
-    public sealed class UnitNode(Unit unit) : KinematicBody2D
+    public sealed class UnitNode : KinematicBody2D
     {
-        public Unit Unit => unit;
+        public UnitNode(Unit unit, PackedScene scene, IShard shard)
+        {
+            scene.InstanceAndReparentTo(this);
+            shard.EntityRoot.AddChild(this);
+            
+            Unit = unit;
+            Visuals = GetNode<Node2D>("Visuals");
+            AzimuthLine = GetNode<Line2D>("Visuals/AzimuthLine");
+            Properties = GetNode<EntityProperties>("Properties");
+        }
+        
+        public Unit Unit { get; }
+        public Node2D Visuals { get; }
+        public Line2D AzimuthLine { get; }
+        public EntityProperties Properties { get; }
         
         public override void _PhysicsProcess(float delta)
         {
-            if (IsServer) unit._PhysicsProcessServer(delta);
-            else unit._PhysicsProcessClient(delta);
+            if (IsServer) Unit._PhysicsProcessServer(this, delta);
+            else Unit._PhysicsProcessClient(this, delta);
         }
     }
-    
-    private readonly Node2D _visuals;
-    private readonly Line2D _azimuthLine;
-    private readonly EntityProperties _properties;
     
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
@@ -35,16 +45,10 @@ public abstract class Unit : Entity<Unit.UnitNode>
         base(id, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
     {
         _serviceProvider = serviceProvider;
-        
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
         
-        Node = new UnitNode(this) { Name = $"{GetType().Name} {id}"};
-        scene.InstanceAndReparentTo(Node);
-        serviceProvider.GetRequiredService<IShard>().EntityRoot.AddChild(Node);
-        
-        _visuals = Node.GetNode<Node2D>("Visuals");
-        _azimuthLine = Node.GetNode<Line2D>("Visuals/AzimuthLine");
-        _properties = Node.GetNode<EntityProperties>("Properties");
+        Node = new UnitNode(this, scene, serviceProvider.GetRequiredService<IShard>());
+        Node.Name = $"{GetType().Name} {id}";
         
         foreach (Stat stat in Enum.GetValues<Stat>()) StatsInternal[stat] = DefaultStats[stat];
         
@@ -87,9 +91,10 @@ public abstract class Unit : Entity<Unit.UnitNode>
         set
         {
             field = value;
+            if (IsRemoved) return;
             if (IsServer) Node.Position = Position;
-            else _visuals.Position = RoundVisualPositionToPixelPerfect(Position,
-                _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset) - Node.Position;
+            else Node.Visuals.Position = RoundVisualPositionToPixelPerfect(Position,
+                Node.Properties.HalfPixelXVisualOffset, Node.Properties.HalfPixelYVisualOffset) - Node.Position;
         }
     }
     
@@ -99,7 +104,8 @@ public abstract class Unit : Entity<Unit.UnitNode>
         set
         {
             base.Azimuth = value;
-            _azimuthLine.RotationDegrees = value;
+            if (IsRemoved) return;
+            Node.AzimuthLine.RotationDegrees = value;
         }
     }
     
@@ -138,20 +144,20 @@ public abstract class Unit : Entity<Unit.UnitNode>
         Position = Position;
     }
 
-    public virtual void _PhysicsProcessServer(float deltaTime)
+    public virtual void _PhysicsProcessServer(UnitNode node, float delta)
     {
         foreach (AbilityState abilityState in AbilityStatesInternal.Values)
-            abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - deltaTime, 0);
-        ExecuteCommands(deltaTime);
+            abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - delta, 0);
+        ExecuteCommands(node, delta);
     }
 
-    public virtual void _PhysicsProcessClient(float deltaTime)
+    public virtual void _PhysicsProcessClient(UnitNode node, float delta)
     {
-        Node.Position = Position;
-        _visuals.Position = Vector2.Zero;
+        node.Position = Position;
+        node.Visuals.Position = Vector2.Zero;
     }
 
-    private void ExecuteCommands(float deltaTime)
+    private void ExecuteCommands(UnitNode node, float deltaTime)
     {
         float remainingDeltaTime = deltaTime;
         int iterations = 0;
@@ -165,10 +171,10 @@ public abstract class Unit : Entity<Unit.UnitNode>
                     LookAtPosition(command.Position, ref remainingDeltaTime);
                     break;
                 case MoveCommand command:
-                    MoveToPosition(command.Position, ref remainingDeltaTime);
+                    MoveToPosition(command.Position, ref remainingDeltaTime, node);
                     break;
                 case UseAbilityCommand command:
-                    UseAbility(command, ref remainingDeltaTime);
+                    UseAbility(command, ref remainingDeltaTime, node);
                     break;
             }
         }
@@ -188,9 +194,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
     {
         if (remainingDeltaTime == 0 || Stats[Stat.TurnSpeed] == 0) return;
         
-        float desiredDeltaAzimuth = azimuth - Azimuth;
-        if (desiredDeltaAzimuth > 180) desiredDeltaAzimuth -= 360;
-        if (desiredDeltaAzimuth < -180) desiredDeltaAzimuth += 360;
+        float desiredDeltaAzimuth = SoteoMath.ModularDelta(Azimuth, azimuth, 360);
         
         float timeToComplete = Mathf.Abs(desiredDeltaAzimuth) / Stats[Stat.TurnSpeed];
         if (timeToComplete <= remainingDeltaTime)
@@ -206,7 +210,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
         }
     }
     
-    private void MoveToPosition(Vector2 position, ref float remainingDeltaTime)
+    private void MoveToPosition(Vector2 position, ref float remainingDeltaTime, UnitNode node)
     {
         LookAtPosition(position, ref remainingDeltaTime);
         if (remainingDeltaTime == 0 || Stats[Stat.MoveSpeed] == 0) return;
@@ -221,25 +225,25 @@ public abstract class Unit : Entity<Unit.UnitNode>
         float timeToComplete = desiredMovementLength / Stats[Stat.MoveSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
-            MoveAndCollide(desiredMovement);
+            MoveAndCollide(desiredMovement, node);
             remainingDeltaTime -= timeToComplete;
             if (Commands.PeekOrDefault() is MoveCommand) Commands.Dequeue();
         }
         else
         {
-            MoveAndCollide(desiredMovement / desiredMovementLength * Stats[Stat.MoveSpeed] * remainingDeltaTime);
+            MoveAndCollide(desiredMovement / desiredMovementLength * Stats[Stat.MoveSpeed] * remainingDeltaTime, node);
             remainingDeltaTime = 0;
         }
     }
     
-    private KinematicCollision2D MoveAndCollide(Vector2 movement)
+    private KinematicCollision2D MoveAndCollide(Vector2 movement, UnitNode node)
     {
-        KinematicCollision2D collision = Node.MoveAndCollide(movement);
-        Position = Node.Position;
+        KinematicCollision2D collision = node.MoveAndCollide(movement);
+        Position = node.Position;
         return collision;
     }
 
-    private void UseAbility(UseAbilityCommand command, ref float remainingDeltaTime)
+    private void UseAbility(UseAbilityCommand command, ref float remainingDeltaTime, UnitNode node)
     {
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
         {
@@ -262,7 +266,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
         }
         
         AbilityValidationResult validationResult =
-            ValidateAbilityWithCorrection(state.Ability, context, command, ref remainingDeltaTime);
+            ValidateAbilityWithCorrection(state.Ability, context, command, ref remainingDeltaTime, node);
         if (validationResult != AbilityValidationResult.Ok || remainingDeltaTime == 0) return;
         
         if (command.Slot != CurrentAbilitySlot) CurrentAbilityRemainingUseTime = state.Ability.UseTime(context);
@@ -310,7 +314,8 @@ public abstract class Unit : Entity<Unit.UnitNode>
         Ability ability,
         AbilityContext context,
         UseAbilityCommand command,
-        ref float remainingDeltaTime
+        ref float remainingDeltaTime,
+        UnitNode node
     )
     {
         Vector2? targetPosition = context.TargetUnit?.Position ?? context.TargetPosition;
@@ -326,11 +331,10 @@ public abstract class Unit : Entity<Unit.UnitNode>
                 case AbilityValidationResult.Ok:
                     return abilityValidationResult;
                 case AbilityValidationResult.OutOfRange:
-                    MoveToPosition(targetPosition!.Value, ref remainingDeltaTime);
+                    MoveToPosition(targetPosition!.Value, ref remainingDeltaTime, node);
                     break;
                 case AbilityValidationResult.OutOfAngularRange:
-                    LookAtAzimuth(SoteoMath.DirectionToAzimuth(targetPosition!.Value - Position),
-                        ref remainingDeltaTime);
+                    LookAtPosition(targetPosition!.Value, ref remainingDeltaTime);
                     break;
                 default:
                     if (command.Repeat) remainingDeltaTime = 0;
@@ -357,7 +361,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
         Commands.Clear();
     }
     
-    public bool IsAlliedTo(Unit other) => other.Faction == Faction;
+    public bool IsAlliedTo(Unit other) => Faction != Faction.Neutral && other.Faction == Faction;
     
     public void SpendHealth(float amount, Ability ability)
     {
@@ -402,6 +406,4 @@ public abstract class Unit : Entity<Unit.UnitNode>
     {
         target.TakeDamage(Stats[Stat.AttackDamage], this, ability);
     }
-    
-    public static Unit? FromNode(Node node) => (node as UnitNode)?.Unit;
 }

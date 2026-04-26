@@ -22,7 +22,7 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
 
         public override void _PhysicsProcess(float delta)
         {
-            if (IsServer) _projectile._PhysicsProcessServer(delta);
+            if (IsServer) _projectile._PhysicsProcessServer(this, delta);
         }
     }
     
@@ -52,8 +52,8 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
         get;
         set
         {
-            if (IsRemoved) return;
             field = value;
+            if (IsRemoved) return;
             Node.Position = RoundVisualPositionToPixelPerfect(value, Node.Properties.HalfPixelXVisualOffset,
                 Node.Properties.HalfPixelYVisualOffset);
         }
@@ -77,7 +77,6 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
 
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {
-        if (IsRemoved) return;
         var s = (ProjectileSnapshot)snapshot;
         if (s.Position != null) Position = s.Position.Value;
         if (s.Azimuth != null) Azimuth = s.Azimuth.Value;
@@ -85,11 +84,7 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
         if (s.Speed != null) Speed = s.Speed.Value;
     }
     
-    [MemberNotNull(nameof(Node))]
-    public virtual void _PhysicsProcessServer(float delta)
-    {
-        Node.Required.Position = Position;
-    }
+    public virtual void _PhysicsProcessServer(ProjectileNode node, float delta) { }
 
     protected override void OnZoomChanged()
     {

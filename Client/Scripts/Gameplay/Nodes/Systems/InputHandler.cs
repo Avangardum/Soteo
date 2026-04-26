@@ -128,11 +128,11 @@ public sealed class InputHandler : Node2D
         return intersections
             .Cast<Dictionary>()
             .Select(it => (Area2D)it["collider"])
-            .Select(it => it.GetParent<Node2D>())
+            .Select(it => it.GetParent() as Unit.UnitNode)
+            .WhereNotNull()
             .OrderByDescending(it => it.ZIndex)
             .ThenByDescending(it => it.Position.y)
-            .Select(Unit.FromNode)
-            .WhereNotNull()
+            .Select(it => it.Unit)
             .ToImmutableList();
     }
 }

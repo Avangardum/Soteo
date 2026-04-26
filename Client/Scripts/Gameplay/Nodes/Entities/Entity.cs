@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 

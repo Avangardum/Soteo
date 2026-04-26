@@ -24,9 +24,9 @@ public abstract class UnitTargetedProjectile : Projectile
         Target = target;
     }
 
-    public override void _PhysicsProcessServer(float delta)
+    public override void _PhysicsProcessServer(ProjectileNode node, float delta)
     {
-        base._PhysicsProcessServer(delta);
+        base._PhysicsProcessServer(node, delta);
         
         if (_didHit)
         {
