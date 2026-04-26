@@ -241,7 +241,6 @@ public abstract class Unit : Entity<Unit.UnitNode>
         return collision;
     }
 
-    // todo shorten
     private void UseAbility(UseAbilityCommand command, ref float remainingDeltaTime, UnitNode node)
     {
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
@@ -255,12 +254,9 @@ public abstract class Unit : Entity<Unit.UnitNode>
         if (state.Cooldown > 0)
         {
             if (command.Repeat)
-            {
-                Vector2? targetPosition = context.TargetPosition ?? context.TargetUnit?.Position;
-                if (targetPosition != null) LookAtPosition(targetPosition.Value, ref remainingDeltaTime);
-                remainingDeltaTime = 0;
-            }
-            else Commands.Dequeue();
+                WaitForAbilityCooldown(context, ref remainingDeltaTime);
+            else
+                Commands.Dequeue();
             return;
         }
         
@@ -283,8 +279,16 @@ public abstract class Unit : Entity<Unit.UnitNode>
             state.Cooldown = state.Ability.Cooldown(context);
             CurrentAbilitySlot = null;
             CurrentAbilityRemainingUseTime = null;
-            if (!command.Repeat) Commands.Dequeue();
+            if (!command.Repeat)
+                Commands.Dequeue();
         }
+    }
+    
+    private void WaitForAbilityCooldown(AbilityContext context, ref float remainingDeltaTime)
+    {
+        Vector2? targetPosition = context.TargetPosition ?? context.TargetUnit?.Position;
+        if (targetPosition != null) LookAtPosition(targetPosition.Value, ref remainingDeltaTime);
+        remainingDeltaTime = 0;
     }
     
     public AbilityContext GetAbilityContext(UseAbilityCommand command)
