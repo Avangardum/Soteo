@@ -1,5 +1,4 @@
-using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Interfaces;
+using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
@@ -7,22 +6,14 @@ public abstract class UnitTargetedProjectile : Projectile
 {
     private bool _didHit;
     
-    protected Unit Target { get; private set; }
-
     protected UnitTargetedProjectile
     (
         Guid id,
-        Unit source,
-        Ability ability,
+        AbilityContext abilityContext,
         float speed,
-        Unit target,
         PackedScene scene,
-        ClientDependency<ICamera> camera,
-        IShard shard
-    ) : base(id, source, ability, speed, scene, camera, shard)
-    {
-        Target = target;
-    }
+        IServiceProvider serviceProvider
+    ) : base(id, abilityContext, speed, scene, serviceProvider) { }
 
     public override void _PhysicsProcessServer(ProjectileNode node, float delta)
     {
@@ -34,7 +25,7 @@ public abstract class UnitTargetedProjectile : Projectile
             return;
         }
         
-        Vector2 directionToTarget = Target.Position - Position;
+        Vector2 directionToTarget = AbilityContext.TargetUnit.Required.Position - Position;
         float movementLength = Speed * delta;
         if (movementLength * movementLength < directionToTarget.LengthSquared())
         {
@@ -42,15 +33,13 @@ public abstract class UnitTargetedProjectile : Projectile
         }
         else
         {
-            Hit();
+            _didHit = true;
+            AbilityContext.Ability.OnProjectileHit(AbilityContext);
             // Update position for the last time and defer removing the entity to the next frame so that clients receive
             // a snapshot where the projectile reaches the target, to prevent it from visually disappearing near the
             // target. Offset it 1 pixel up so that when coming from above it doesn't flicker for 1 frame in front of
             // the target.
-            Position = Target.Position + Vector2.Up;
-            _didHit = true;
+            Position = AbilityContext.TargetUnit.Position + Vector2.Up;
         }
     }
-    
-    protected abstract void Hit();
 }

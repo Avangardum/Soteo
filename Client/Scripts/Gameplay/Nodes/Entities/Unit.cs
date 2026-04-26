@@ -297,6 +297,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
             Ability = state.Ability,
             Level = state.Level,
             User = this,
+            UserStats = Stats.ToImmutableDictionary(),
             ServiceProvider = _serviceProvider,
             TargetPosition = command.TargetPosition,
             TargetUnit = command.TargetUnitId == null ? null :

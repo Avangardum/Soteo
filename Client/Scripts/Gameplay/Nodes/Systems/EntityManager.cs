@@ -57,20 +57,19 @@ public sealed class EntityManager : Node, IEntityManager
         return snapshot switch
         {
             UnitSnapshot s => Add(new PlayerCharacter(s, _serviceProvider)),
-            ProjectileSnapshot s => Add(new AttackProjectile(s, _camera, _shard))
+            ProjectileSnapshot s => Add(new AttackProjectile(s, _serviceProvider))
         };
     }
     
     public PlayerCharacter SpawnPlayerCharacter(Guid id) => Add(new PlayerCharacter(id, _serviceProvider));
 
-    public AttackProjectile SpawnAttackProjectile(Unit source, Ability ability, Unit target, float speed)
+    public AttackProjectile SpawnAttackProjectile(AbilityContext abilityContext, float speed)
     {
-        // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
-        // of the projectile over the source
-        Vector2 position = source.Position + Vector2.Up;
-        return Add(new AttackProjectile(Guid.NewGuid(), source, ability, speed, target, _camera, _shard)
+        return Add(new AttackProjectile(Guid.NewGuid(), abilityContext, speed, _serviceProvider)
         {
-            Position = position
+            // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
+            // of the projectile over the source
+            Position = abilityContext.User.Position + Vector2.Up
         });
     }
 

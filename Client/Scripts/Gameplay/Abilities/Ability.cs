@@ -72,6 +72,8 @@ public abstract class Ability
         context.User.SpendHealth(HealthCost(context), this);
         context.User.SpendMana(ManaCost(context), this);
     }
+
+    public virtual void OnProjectileHit(AbilityContext context) { }
     
     /// <summary>
     /// Checks whether an ability can be used and returns a reason if not.

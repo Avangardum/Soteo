@@ -176,7 +176,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
     {
         TEnum value = DeserializeEnumWithoutValidation<TEnum>(ref span);
         if (!Enum.IsDefined(typeof(TEnum), value) && !typeof(TEnum).HasAttribute<FlagsAttribute>())
-            throw new BadPacketException("Invalid enum value");
+            throw new BadPacketException($"Invalid {typeof(TEnum)} value {value}");
         return value;
     }
 

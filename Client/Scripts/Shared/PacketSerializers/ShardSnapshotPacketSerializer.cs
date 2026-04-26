@@ -9,6 +9,8 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapshotPacket>
 {
+    // todo too much boilerplate, refactor this
+    
     private enum EntityKind : byte
     {
         Unit = 0,
@@ -52,7 +54,9 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     
     private int ProjectileSize(ProjectileSnapshot projectile)
     {
-        return BaseEntitySize(projectile);
+        return BaseEntitySize(projectile) +
+            SizeOf(projectile.Speed) +
+            SizeOfAbilityContext(projectile.AbilityContext);
     }
 
     protected override void SerializeInternal(ShardSnapshotPacket packet, ref Span<byte> span)
@@ -96,6 +100,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         SerializeEnum(EntityKind.Projectile, ref span);
         SerializeBaseEntity(projectile, ref span);
+        SerializeFloat(projectile.Speed, ref span);
+        SerializeAbilityContext(projectile.AbilityContext, ref span);
     }
 
     protected override ShardSnapshotPacket DeserializeInternal(ref Span<byte> span)
@@ -134,7 +140,9 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return new ProjectileSnapshot(DeserializeGuid(ref span))
         {
             Position = DeserializeNullable(DeserializeVector2, ref span),
-            Azimuth = DeserializeNullable(DeserializeFloat, ref span)
+            Azimuth = DeserializeNullable(DeserializeFloat, ref span),
+            Speed = DeserializeFloat(ref span),
+            AbilityContext = DeserializeAbilityContext(ref span)
         };
     }
 
@@ -151,5 +159,45 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         int level = DeserializeInt(ref span);
         float cooldown = DeserializeFloat(ref span);
         return new AbilityState(ability, level) { Cooldown = cooldown };
+    }
+    
+    private int SizeOfAbilityContext(AbilityContext.Deflated context)
+    {
+        return
+            SizeOf(context.AbilityId) +
+            SizeOf(context.Level) +
+            SizeOf(context.UserId) +
+            SizeOf(context.UserStats, SizeOf) +
+            SizeOf(context.TargetPosition) +
+            SizeOf(context.TargetUnitId) +
+            SizeOf(context.TargetDirection) +
+            SizeOf(context.TargetShardId);
+    }
+    
+    private void SerializeAbilityContext(AbilityContext.Deflated context, ref Span<byte> span)
+    {
+        SerializeInt(context.AbilityId, ref span);
+        SerializeInt(context.Level, ref span);
+        SerializeGuid(context.UserId, ref span);
+        SerializeDictionary(context.UserStats, SerializeEnum, SerializeFloat, ref span);
+        SerializeNullable(context.TargetPosition, SerializeVector2, ref span);
+        SerializeNullable(context.TargetUnitId, SerializeGuid, ref span);
+        SerializeNullable(context.TargetDirection, SerializeVector2, ref span);
+        SerializeNullable(context.TargetShardId, SerializeGuid, ref span);
+    }
+    
+    private AbilityContext.Deflated DeserializeAbilityContext(ref Span<byte> span)
+    {
+        return new AbilityContext.Deflated
+        {
+            AbilityId = DeserializeInt(ref span),
+            Level = DeserializeInt(ref span),
+            UserId = DeserializeGuid(ref span),
+            UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, ref span),
+            TargetPosition = DeserializeNullable(DeserializeVector2, ref span),
+            TargetUnitId = DeserializeNullable(DeserializeGuid, ref span),
+            TargetDirection = DeserializeNullable(DeserializeVector2, ref span),
+            TargetShardId = DeserializeNullable(DeserializeGuid, ref span)
+        };
     }
 }

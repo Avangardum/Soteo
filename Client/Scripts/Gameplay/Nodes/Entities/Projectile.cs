@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Soteo.Gameplay.Abilities;
+using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Extensions;
 
@@ -26,21 +26,22 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
         }
     }
     
+    private readonly IServiceProvider _serviceProvider;
+    
     protected Projectile
     (
         Guid id,
-        Unit source,
-        Ability ability,
+        AbilityContext abilityContext,
         float speed,
         PackedScene scene,
-        ClientDependency<ICamera> camera,
-        IShard shard
-    ) : base(id, camera)
+        IServiceProvider serviceProvider
+    ) : base(id, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
     {
-        Source = source;
-        Ability = ability;
+        AbilityContext = abilityContext;
         Speed = speed;
+        _serviceProvider = serviceProvider;
         
+        var shard = serviceProvider.GetRequiredService<IShard>();
         Node = new ProjectileNode(this, scene, shard) { Name = $"{GetType().Name} {id}" };
     }
 
@@ -59,8 +60,7 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
         }
     }
     
-    protected Unit Source { get; private set; }
-    protected Ability Ability { get; private set; }
+    protected AbilityContext AbilityContext { get; private set; }
     protected float Speed { get; private set; }
     
     public override EntitySnapshot CreateSnapshot()
@@ -69,10 +69,9 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
         {
             Position = Position,
             Azimuth = Azimuth,
-            Ability = Ability,
+            AbilityContext = AbilityContext.Deflate(),
             Speed = Speed
         };
-        // todo source and target
     }
 
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
@@ -80,8 +79,8 @@ public abstract class Projectile : Entity<Projectile.ProjectileNode>
         var s = (ProjectileSnapshot)snapshot;
         if (s.Position != null) Position = s.Position.Value;
         if (s.Azimuth != null) Azimuth = s.Azimuth.Value;
-        if (s.Ability != null) Ability = s.Ability;
-        if (s.Speed != null) Speed = s.Speed.Value;
+        AbilityContext = s.AbilityContext.Inflate(_serviceProvider);
+        Speed = s.Speed;
     }
     
     public virtual void _PhysicsProcessServer(ProjectileNode node, float delta) { }
