@@ -8,7 +8,7 @@ public abstract class UnitTargetedProjectile : Projectile
 {
     private bool _didHit;
     
-    protected Unit? Target { get => field.AsValid(); set; }
+    protected Unit Target { get; set; }
 
     protected UnitTargetedProjectile
     (

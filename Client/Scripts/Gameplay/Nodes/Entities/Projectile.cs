@@ -49,7 +49,7 @@ public abstract class Projectile : IEntity
     [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
     public Vector2 Position { get; set; }
     public float Azimuth { get; set; }
-    protected Unit? Source { get => field.AsValid(); set; }
+    protected Unit Source { get; set; }
     protected Ability Ability { get; private set; }
     protected float Speed { get; set; }
     protected ProjectileNode? Node => field.AsValid();

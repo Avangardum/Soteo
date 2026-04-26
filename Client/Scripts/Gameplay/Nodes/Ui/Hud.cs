@@ -64,10 +64,7 @@ public sealed class Hud : Control, IHud
 
     public override void _Process(float delta)
     {
-        if (SelectedUnit == null || !IsInstanceValid(SelectedUnit))
-        {
-            SelectedUnit = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepository.UserId, out _);
-        }
+        SelectedUnit ??= _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepository.UserId, out _);
         if (SelectedUnit == null)
         {
             Visible = false;

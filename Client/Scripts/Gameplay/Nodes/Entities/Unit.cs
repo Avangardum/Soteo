@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Commands;
@@ -11,11 +12,22 @@ using static Soteo.Gameplay.Nodes.Entities.Entity;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
-public abstract class Unit : KinematicBody2D, IEntity
+public abstract class Unit : IEntity
 {
-    private Node2D _visuals = null!;
-    private Line2D _azimuthLine = null!;
-    private EntityProperties _properties = null!;
+    protected sealed class UnitNode(Unit unit) : KinematicBody2D
+    {
+        public Unit Unit => unit;
+        
+        public override void _PhysicsProcess(float delta)
+        {
+            if (IsServer) unit._PhysicsProcessServer(delta);
+            else unit._PhysicsProcessClient(delta);
+        }
+    }
+    
+    private readonly Node2D _visuals;
+    private readonly Line2D _azimuthLine;
+    private readonly EntityProperties _properties;
     
     private readonly ClientDependency<ICamera> _camera;
     private readonly IServiceProvider _serviceProvider;
@@ -30,8 +42,17 @@ public abstract class Unit : KinematicBody2D, IEntity
         _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
         
         _camera.Value?.ZoomChanged += OnZoomChanged;
-        scene.InstanceAndReparentTo(this);
-        serviceProvider.GetRequiredService<IShard>().EntityRoot.AddChild(this);
+        Node = new UnitNode(this);
+        scene.InstanceAndReparentTo(Node);
+        serviceProvider.GetRequiredService<IShard>().EntityRoot.AddChild(Node);
+        
+        _visuals = Node.GetNode<Node2D>("Visuals");
+        _azimuthLine = Node.GetNode<Line2D>("Visuals/AzimuthLine");
+        _properties = Node.GetNode<EntityProperties>("Properties");
+        
+        foreach (Stat stat in Enum.GetValues<Stat>()) StatsInternal[stat] = DefaultStats[stat];
+        
+        Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
     
     public event Action Removed = delegate {};
@@ -62,25 +83,20 @@ public abstract class Unit : KinematicBody2D, IEntity
 
     public AbilitySlot? CurrentAbilitySlot { get; private set; }
     public float CurrentAbilityRemainingUseTime { get; private set; } = -1;
-    
+    protected UnitNode? Node => field.AsValid();
+    [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
     public Guid Id { get; }
-
     public Faction Faction { get; set; }
-    
-    /// <summary>
-    /// Visual position of the unit, separate from its physical position. Unlike physical position, this is safe to
-    /// set outside _PhysicsProcess, when updating physical position would introduce physics bugs. Also, it ensures
-    /// pixel perfect rendering by rounding the value to avoid rendering anything between screen pixels.
-    /// </summary>
-    public Vector2 VisualPosition
+
+    public Vector2 Position
     {
-        get => Position + _visuals.Position;
-        private set
+        get;
+        set
         {
-            if (IsServer) throw new InvalidOperationException("Server should set unit position directly");
-            Vector2 roundedValue = RoundVisualPositionToPixelPerfect(
-                value, _camera.Value, _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset);
-            _visuals.Position = roundedValue - Position;
+            field = value;
+            if (IsServer) Node.Position = Position;
+            else _visuals.Position = RoundVisualPositionToPixelPerfect(Position, _camera.Value,
+                _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset) - Node.Position;
         }
     }
     
@@ -112,12 +128,7 @@ public abstract class Unit : KinematicBody2D, IEntity
     {
         var s = (UnitSnapshot)snapshot;
         
-        if (s.Position != null)
-        {
-            if (IsServer) Position = s.Position.Value;
-            else VisualPosition = s.Position.Value;
-        }
-
+        if (s.Position != null) Position = s.Position.Value;
         if (s.Azimuth != null) Azimuth = s.Azimuth.Value;
         foreach ((Stat stat, float value) in s.Stats) StatsInternal[stat] = value;
         foreach ((AbilitySlot slot, IReadOnlyAbilityState state) in s.AbilityStates)
@@ -127,49 +138,26 @@ public abstract class Unit : KinematicBody2D, IEntity
         if (s.CurrentAbilityRemainingUseTime != null)
             CurrentAbilityRemainingUseTime = s.CurrentAbilityRemainingUseTime.Value;
     }
-    
-    private void MatchPhysicsPositionToVisualPosition()
-    {
-        Position += _visuals.Position;
-        _visuals.Position = Vector2.Zero;
-    }
-    
-    public override void _Ready()
-    {
-        _visuals = GetNode<Node2D>("Visuals");
-        _azimuthLine = GetNode<Line2D>("Visuals/AzimuthLine");
-        _properties = GetNode<EntityProperties>("Properties");
-        
-        foreach (Stat stat in Enum.GetValues<Stat>()) StatsInternal[stat] = DefaultStats[stat];
-        
-        Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
-    }
 
-    public override void _ExitTree()
-    {
-        _camera.Value?.ZoomChanged -= OnZoomChanged;
-    }
-    
     private void OnZoomChanged()
     {
-        // Recalculate VisualPosition because it depends on zoom
-        VisualPosition = VisualPosition;
+        // Trigger Position setter to recalculate position of visuals
+        Position = Position;
     }
 
-    public override void _PhysicsProcess(float deltaTime)
+    public virtual void _PhysicsProcessServer(float deltaTime)
     {
-        if (IsServer)
-        {
-            foreach (AbilityState abilityState in AbilityStatesInternal.Values)
-                abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - deltaTime, 0);
-            ExecuteCommands(deltaTime);
-        }
-        else
-        {
-            MatchPhysicsPositionToVisualPosition();
-        }
+        foreach (AbilityState abilityState in AbilityStatesInternal.Values)
+            abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - deltaTime, 0);
+        ExecuteCommands(deltaTime);
     }
-    
+
+    public virtual void _PhysicsProcessClient(float deltaTime)
+    {
+        Node.Position = Position;
+        _visuals.Position = Vector2.Zero;
+    }
+
     private void ExecuteCommands(float deltaTime)
     {
         float remainingDeltaTime = deltaTime;
@@ -251,6 +239,13 @@ public abstract class Unit : KinematicBody2D, IEntity
         }
     }
     
+    private KinematicCollision2D MoveAndCollide(Vector2 movement)
+    {
+        KinematicCollision2D collision = Node.MoveAndCollide(movement);
+        Position = Node.Position;
+        return collision;
+    }
+
     private void UseAbility(UseAbilityCommand command, ref float remainingDeltaTime)
     {
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
@@ -417,13 +412,12 @@ public abstract class Unit : KinematicBody2D, IEntity
     
     public void Remove()
     {
-        GetParent().RemoveChild(this);
+        if (IsRemoved) return;
+        IsRemoved = true;
+        _camera.Value?.ZoomChanged -= OnZoomChanged;
+        Node.QueueFree();
         Removed();
     }
     
-    [Obsolete(FreeErrorMessage, true)]
-    public new void Free() => throw new InvalidOperationException(FreeErrorMessage);
-    
-    [Obsolete(FreeErrorMessage, true)]
-    public new void QueueFree() => throw new InvalidOperationException(FreeErrorMessage);
+    public static Unit? FromNode(Node node) => (node as UnitNode)?.Unit;
 }
