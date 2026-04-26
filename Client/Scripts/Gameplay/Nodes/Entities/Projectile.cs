@@ -2,13 +2,12 @@ using System.Diagnostics.CodeAnalysis;
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Extensions;
-using static Soteo.Gameplay.Nodes.Entities.Entity;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
-public abstract class Projectile : IEntity
+public abstract class Projectile : Entity<Projectile.ProjectileNode>
 {
-    protected sealed class ProjectileNode(Projectile projectile) : Area2D
+    public sealed class ProjectileNode(Projectile projectile) : Area2D
     {
         public override void _PhysicsProcess(float delta)
         {
@@ -29,9 +28,8 @@ public abstract class Projectile : IEntity
         PackedScene scene,
         ClientDependency<ICamera> camera,
         IShard shard
-    )
+    ) : base(id, camera)
     {
-        Id = id;
         Source = source;
         Ability = ability;
         Speed = speed;
@@ -42,19 +40,25 @@ public abstract class Projectile : IEntity
         _properties = Node.GetNode<EntityProperties>("Properties");
         shard.EntityRoot.AddChild(Node);
     }
+
+    protected override ProjectileNode Node { get; }
+
+    public override Vector2 Position
+    {
+        get;
+        set
+        {
+            field = value;
+            Node.Position = RoundVisualPositionToPixelPerfect(value, _camera.Value,
+                _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset);
+        }
+    }
     
-    public event Action Removed = delegate {};
-    
-    public Guid Id { get; }
-    [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
-    public Vector2 Position { get; set; }
-    public float Azimuth { get; set; }
     protected Unit Source { get; set; }
     protected Ability Ability { get; private set; }
     protected float Speed { get; set; }
-    protected ProjectileNode? Node => field.AsValid();
     
-    public EntitySnapshot CreateSnapshot()
+    public override EntitySnapshot CreateSnapshot()
     {
         return new ProjectileSnapshot(Id)
         {
@@ -66,32 +70,24 @@ public abstract class Projectile : IEntity
         // todo source and target
     }
 
-    public void ReplicateSnapshot(EntitySnapshot snapshot)
+    public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {
         if (IsRemoved) return;
         var s = (ProjectileSnapshot)snapshot;
-        if (s.Position != null)
-        {
-            Position = s.Position.Value;
-            Node.Position = RoundVisualPositionToPixelPerfect(s.Position.Value, _camera.Value,
-                _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset);
-        }
+        if (s.Position != null) Position = s.Position.Value;
         if (s.Azimuth != null) Azimuth = s.Azimuth.Value;
         if (s.Ability != null) Ability = s.Ability;
         if (s.Speed != null) Speed = s.Speed.Value;
-    }
-    
-    public void Remove()
-    {
-        if (IsRemoved) return;
-        IsRemoved = true;
-        Node.QueueFree();
-        Removed();
     }
     
     [MemberNotNull(nameof(Node))]
     public virtual void _PhysicsProcessServer(float delta)
     {
         Node.Required.Position = Position;
+    }
+
+    protected override void OnZoomChanged()
+    {
+        
     }
 }

@@ -8,13 +8,12 @@ using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
-using static Soteo.Gameplay.Nodes.Entities.Entity;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
-public abstract class Unit : IEntity
+public abstract class Unit : Entity<Unit.UnitNode>
 {
-    protected sealed class UnitNode(Unit unit) : KinematicBody2D
+    public sealed class UnitNode(Unit unit) : KinematicBody2D
     {
         public Unit Unit => unit;
         
@@ -29,20 +28,17 @@ public abstract class Unit : IEntity
     private readonly Line2D _azimuthLine;
     private readonly EntityProperties _properties;
     
-    private readonly ClientDependency<ICamera> _camera;
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
     
-    protected Unit(Guid id, PackedScene scene, IServiceProvider serviceProvider)
+    protected Unit(Guid id, PackedScene scene, IServiceProvider serviceProvider) :
+        base(id, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
     {
-        Id = id;
         _serviceProvider = serviceProvider;
         
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
-        _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
         
-        _camera.Value?.ZoomChanged += OnZoomChanged;
-        Node = new UnitNode(this);
+        Node = new UnitNode(this) { Name = $"{GetType().Name} {id}"};
         scene.InstanceAndReparentTo(Node);
         serviceProvider.GetRequiredService<IShard>().EntityRoot.AddChild(Node);
         
@@ -54,8 +50,6 @@ public abstract class Unit : IEntity
         
         Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
-    
-    public event Action Removed = delegate {};
     
     public static readonly IReadOnlyDictionary<Stat, float> DefaultStats = new Dictionary<Stat, float>
     {
@@ -83,34 +77,32 @@ public abstract class Unit : IEntity
 
     public AbilitySlot? CurrentAbilitySlot { get; private set; }
     public float CurrentAbilityRemainingUseTime { get; private set; } = -1;
-    protected UnitNode? Node => field.AsValid();
-    [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
-    public Guid Id { get; }
+    protected override UnitNode? Node => field.AsValid();
     public Faction Faction { get; set; }
 
-    public Vector2 Position
+    public override Vector2 Position
     {
         get;
         set
         {
             field = value;
             if (IsServer) Node.Position = Position;
-            else _visuals.Position = RoundVisualPositionToPixelPerfect(Position, _camera.Value,
+            else _visuals.Position = RoundVisualPositionToPixelPerfect(Position, Camera.Value,
                 _properties.HalfPixelXVisualOffset, _properties.HalfPixelYVisualOffset) - Node.Position;
         }
     }
     
-    public float Azimuth
+    public override float Azimuth
     {
-        get;
+        get => base.Azimuth;
         set
         {
-            field = Mathf.PosMod(value, 360);
-            _azimuthLine.RotationDegrees = field;
+            base.Azimuth = value;
+            _azimuthLine.RotationDegrees = value;
         }
     }
     
-    public EntitySnapshot CreateSnapshot()
+    public override EntitySnapshot CreateSnapshot()
     {
         return new UnitSnapshot(Id)
         {
@@ -124,7 +116,7 @@ public abstract class Unit : IEntity
         };
     }
 
-    public void ReplicateSnapshot(EntitySnapshot snapshot)
+    public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {
         var s = (UnitSnapshot)snapshot;
         
@@ -139,7 +131,7 @@ public abstract class Unit : IEntity
             CurrentAbilityRemainingUseTime = s.CurrentAbilityRemainingUseTime.Value;
     }
 
-    private void OnZoomChanged()
+    protected override void OnZoomChanged()
     {
         // Trigger Position setter to recalculate position of visuals
         Position = Position;
@@ -408,15 +400,6 @@ public abstract class Unit : IEntity
     public void DealAttackDamageTo(Unit target, Ability ability)
     {
         target.TakeDamage(Stats[Stat.AttackDamage], this, ability);
-    }
-    
-    public void Remove()
-    {
-        if (IsRemoved) return;
-        IsRemoved = true;
-        _camera.Value?.ZoomChanged -= OnZoomChanged;
-        Node.QueueFree();
-        Removed();
     }
     
     public static Unit? FromNode(Node node) => (node as UnitNode)?.Unit;

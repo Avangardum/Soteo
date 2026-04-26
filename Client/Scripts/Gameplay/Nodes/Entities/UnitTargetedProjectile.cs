@@ -1,6 +1,5 @@
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 

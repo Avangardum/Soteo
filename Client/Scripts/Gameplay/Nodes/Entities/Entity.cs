@@ -1,12 +1,51 @@
+using System.Diagnostics.CodeAnalysis;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Nodes.Entities;
 
-public static class Entity
+public abstract class Entity<TNode> : IEntity where TNode : Node2D
 {
-    public const string FreeErrorMessage =
-        "Calling Free or QueueFree on entities is allowed only from EntityManager. Call Remove instead.";
+    protected Entity(Guid id, ClientDependency<ICamera> camera)
+    {
+        Id = id;
+        Camera = camera;
+        Camera.Value?.ZoomChanged += OnZoomChanged;
+    }
+
+    public event Action Removed = delegate {};
+
+    protected ClientDependency<ICamera> Camera { get; }
+    
+    [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
+    
+    protected abstract TNode? Node { get; }
+
+    public Guid Id { get; }
+
+    public abstract Vector2 Position { get; set; }
+
+    public virtual float Azimuth
+    {
+        get;
+        set => field = Mathf.PosMod(value, 360);
+    }
+
+    public abstract EntitySnapshot CreateSnapshot();
+
+    public abstract void ReplicateSnapshot(EntitySnapshot snapshot);
+
+    public void Remove()
+    {
+        if (IsRemoved) return;
+        IsRemoved = true;
+        Camera.Value?.ZoomChanged -= OnZoomChanged;
+        Node.QueueFree();
+        Removed();
+    }
+    
+    protected abstract void OnZoomChanged();
     
     /// <summary>
     /// Round a visual position value to a value that will allow pixel perfect rendering without artifacts due to
@@ -20,7 +59,7 @@ public static class Entity
     /// <param name="halfPixelYOffset">
     /// Whether a half screen pixel y offset should be applied. Use when the sprite's y position ends in .5
     /// </param>
-    public static Vector2 RoundVisualPositionToPixelPerfect
+    public Vector2 RoundVisualPositionToPixelPerfect
     (
         Vector2 value,
         ICamera? camera,
