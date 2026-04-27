@@ -1,6 +1,6 @@
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class MeleeAttack : Attack<MeleeAttack>
+public sealed class MeleeAttack : Attack
 {
     public override void TakeEffect(AbilityContext context)
     {

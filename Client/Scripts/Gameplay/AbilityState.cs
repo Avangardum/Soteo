@@ -12,6 +12,6 @@ public record AbilityState
     /// </summary>
     public float MaxCooldown { get; init; }
     
-    public static AbilityState New<T>(int level) where T : Ability<T>, new() =>
-        new AbilityState { Ability = Ability<T>.Instance, Level = level };
+    public static AbilityState New<T>(int level) where T : Ability =>
+        new AbilityState { Ability = Ability.Instance<T>(), Level = level };
 }

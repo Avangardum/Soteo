@@ -4,7 +4,7 @@ using Soteo.Shared;
 
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class ProjectileBurst : Ability<ProjectileBurst> // todo remove base generic class
+public sealed class ProjectileBurst : Ability
 {
     public override Scalable<float> StaticRange => 1000;
     public override Scalable<float> StaticCooldown => 5;

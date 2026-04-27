@@ -9,23 +9,21 @@ namespace Soteo.Gameplay.Abilities;
 
 public abstract class Ability
 {
-    public static ImmutableList<Ability> All
+    private static readonly ImmutableDictionary<Type, Ability> InstancesByType;
+
+    public static ImmutableList<Ability> All { get; }
+
+    public static T Instance<T>() where T : Ability => (T)InstancesByType[typeof(T)];
+
+    static Ability()
     {
-        get
-        {
-            field ??= Assembly.GetExecutingAssembly().DefinedTypes
-                .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(Ability)))
-                .OrderBy(it => it.FullName)
-                .Select(it =>
-                {
-                    if (!it.BaseTypes.Any(b => b.IsGenericType && b.GetGenericTypeDefinition() == typeof(Ability<>)))
-                        throw new InvalidOperationException($"{it.Name} should inherit Ability<{it.Name}>");
-                    Type genericAbilityType = typeof(Ability<>).MakeGenericType(it);
-                    return (Ability)genericAbilityType.GetProperty(nameof(Ability<>.Instance))!.GetValue(null);
-                })
-                .ToImmutableList();
-            return field;
-        }
+        All = Assembly.GetExecutingAssembly().DefinedTypes
+            .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(Ability)))
+            .OrderBy(it => it.FullName)
+            .Select(it => (Ability)Activator.CreateInstance(it))
+            .ToImmutableList();
+        
+        InstancesByType = All.ToImmutableDictionary(it => it.GetType(), it => it);
     }
     
     public int Id => All.IndexOf(this);
@@ -161,9 +159,4 @@ public abstract class Ability
         
         return AbilityValidationResult.Ok;
     }
-}
-
-public abstract class Ability<T> : Ability where T : Ability<T>, new()
-{
-    public static T Instance { get; } = new();
 }

@@ -3,7 +3,7 @@ using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Abilities;
 
-public abstract class Attack<T> : Ability<T> where T : Ability<T>, new()
+public abstract class Attack : Ability
 {
     public override CanTarget Targeting => CanTarget.Enemy | CanTarget.Character | CanTarget.Building;
     public override Scalable<float> StaticRange => 0;

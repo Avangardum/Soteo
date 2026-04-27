@@ -2,7 +2,7 @@ using Soteo.Gameplay.Enums;
 
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class HealAbility : Ability<HealAbility>
+public sealed class HealAbility : Ability
 {
     public override int MaxLevel => 4;
     public override Scalable<float> StaticManaCost => [100, 120, 160, 180];

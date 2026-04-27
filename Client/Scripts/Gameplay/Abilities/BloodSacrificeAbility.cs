@@ -1,6 +1,6 @@
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class BloodSacrificeAbility : Ability<BloodSacrificeAbility>
+public sealed class BloodSacrificeAbility : Ability
 {
     public override Scalable<float> StaticHealthCost => 100;
     public override Scalable<float> StaticUseTime => 0.5f;

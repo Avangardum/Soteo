@@ -5,7 +5,7 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class RecallAbility : Ability<RecallAbility>
+public sealed class RecallAbility : Ability
 {
     public override bool LoopAnimation => true;
     public override Scalable<float> StaticUseTime => 10;
