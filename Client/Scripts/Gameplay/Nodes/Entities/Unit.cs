@@ -56,9 +56,7 @@ public abstract class Unit : Entity<UnitNode>
     public ICovariantReadOnlyDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates =>
         AbilityStatesInternal.AsCovariant();
 
-    public AbilitySlot? CurrentAbilitySlot { get; private set; }
-    public float? CurrentAbilityRemainingUseTime { get; private set; }
-    public float? CurrentAbilityCompletedUseTime { get; private set; }
+    public AbilityUseProgress? AbilityUseProgress { get; private set; }
     [MemberNotNullWhen(false, nameof(Node))] public override bool IsRemoved { get; protected set; }
     protected override UnitNode? Node => field.AsValid();
     public Faction Faction { get; set; }
@@ -98,9 +96,7 @@ public abstract class Unit : Entity<UnitNode>
             Stats = Stats.ToImmutableDictionary(),
             AbilityStates = AbilityStatesInternal
                 .ToImmutableDictionary(it => it.Key, IReadOnlyAbilityState (it) => it.Value with {}),
-            CurrentAbilitySlot = CurrentAbilitySlot,
-            CurrentAbilityRemainingUseTime = CurrentAbilityRemainingUseTime,
-            CurrentAbilityCompletedUseTime = CurrentAbilityCompletedUseTime
+            AbilityUseProgress = AbilityUseProgress
         };
     }
 
@@ -113,9 +109,7 @@ public abstract class Unit : Entity<UnitNode>
         _isMoving = s.IsMoving;
         StatsInternal = s.Stats.ToDictionary(it => it.Key, it => it.Value);
         AbilityStatesInternal = s.AbilityStates.ToDictionary(it => it.Key, it => new AbilityState(it.Value));
-        CurrentAbilitySlot = s.CurrentAbilitySlot;
-        CurrentAbilityRemainingUseTime = s.CurrentAbilityRemainingUseTime;
-        CurrentAbilityCompletedUseTime = s.CurrentAbilityCompletedUseTime;
+        AbilityUseProgress = s.AbilityUseProgress;
         
         UpdateAnimation();
     }
@@ -234,9 +228,7 @@ public abstract class Unit : Entity<UnitNode>
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
         {
             Commands.Dequeue();
-            CurrentAbilitySlot = null;
-            CurrentAbilityCompletedUseTime = null;
-            CurrentAbilityRemainingUseTime = null;
+            AbilityUseProgress = null;
             return;
         }
         
@@ -248,9 +240,7 @@ public abstract class Unit : Entity<UnitNode>
                 WaitForAbilityCooldown(context, ref remainingDeltaTime);
             else
                 Commands.Dequeue();
-            CurrentAbilitySlot = null;
-            CurrentAbilityCompletedUseTime = null;
-            CurrentAbilityRemainingUseTime = null;
+            AbilityUseProgress = null;
             return;
         }
         
@@ -258,33 +248,30 @@ public abstract class Unit : Entity<UnitNode>
             ValidateAbilityWithCorrection(state.Ability, context, command, ref remainingDeltaTime, node);
         if (validationResult != AbilityValidationResult.Ok || remainingDeltaTime == 0)
         {
-            CurrentAbilitySlot = null;
-            CurrentAbilityCompletedUseTime = null;
-            CurrentAbilityRemainingUseTime = null;
+            AbilityUseProgress = null;
             return;
         }
 
-        if (command.Slot != CurrentAbilitySlot)
+        if (AbilityUseProgress?.Slot != command.Slot)
         {
-            CurrentAbilityRemainingUseTime = state.Ability.UseTime(context);
-            CurrentAbilityCompletedUseTime = 0;
+            AbilityUseProgress = new AbilityUseProgress
+            {
+                Slot = command.Slot,
+                RemainingTime = state.Ability.UseTime(context)
+            };
         }
-        CurrentAbilitySlot = command.Slot;
         
-        if (remainingDeltaTime < CurrentAbilityRemainingUseTime!.Value)
+        if (remainingDeltaTime < AbilityUseProgress.RemainingTime)
         {
-            CurrentAbilityRemainingUseTime -= remainingDeltaTime;
-            CurrentAbilityCompletedUseTime += remainingDeltaTime;
+            AbilityUseProgress = AbilityUseProgress.AddTime(remainingDeltaTime);
             remainingDeltaTime = 0;
         }
         else
         {
-            remainingDeltaTime -= CurrentAbilityRemainingUseTime.Value;
+            remainingDeltaTime -= AbilityUseProgress.RemainingTime;
             state.Ability.TakeEffect(context);
             state.Cooldown = state.Ability.Cooldown(context);
-            CurrentAbilitySlot = null;
-            CurrentAbilityRemainingUseTime = null;
-            CurrentAbilityCompletedUseTime = null;
+            AbilityUseProgress = null;
             if (!command.Repeat)
                 Commands.Dequeue();
         }
@@ -360,9 +347,9 @@ public abstract class Unit : Entity<UnitNode>
         if (IsRemoved) return;
         Node.Sprite.FlipH = Azimuth >= 180;
         
-        if (CurrentAbilitySlot != null)
+        if (AbilityUseProgress != null)
         {
-            var ability = AbilityStates[CurrentAbilitySlot.Value].Ability;
+            var ability = AbilityStates[AbilityUseProgress.Slot].Ability;
             Node.Sprite.Animation = ability.Animation;
             if (ability.LoopAnimation)
             {
@@ -371,9 +358,8 @@ public abstract class Unit : Entity<UnitNode>
             }
             else
             {
-                float useTime = CurrentAbilityCompletedUseTime!.Value + CurrentAbilityRemainingUseTime!.Value;
-                float progress = CurrentAbilityCompletedUseTime.Value / useTime;
                 int frameCount = Node.Sprite.Frames.GetFrameCount(ability.Animation);
+                float progress = AbilityUseProgress.NormalizedProgress;
                 Node.Sprite.Frame = Mathf.Min(Mathf.FloorToInt(frameCount * progress), frameCount - 1);
                 Node.Sprite.SpeedScale = 0;
             }
@@ -395,11 +381,8 @@ public abstract class Unit : Entity<UnitNode>
     {
         Commands.Clear();
         Commands.Enqueue(command);
-        if (command is not UseAbilityCommand useAbilityCommand || useAbilityCommand.Slot != CurrentAbilitySlot)
-        {
-            CurrentAbilitySlot = null;
-            CurrentAbilityRemainingUseTime = -1;
-        }
+        if (command is not UseAbilityCommand useAbilityCommand || useAbilityCommand.Slot != AbilityUseProgress?.Slot)
+            AbilityUseProgress = null;
     }
      
     public void CancelCommands()

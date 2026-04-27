@@ -108,12 +108,13 @@ public sealed class Hud : Control, IHud
             IReadOnlyAbilityState state = SelectedUnit.AbilityStates[slot];
             AbilityContext context = SelectedUnit.GetAbilityContext(new UseAbilityCommand(slot));
             
+            // todo use frozen max cooldown value
             button.CooldownIndicator.Value = state.Cooldown;
             button.CooldownIndicator.MaxValue = state.Ability.Cooldown(context);
 
-            button.UseProgressIndicator.Value = SelectedUnit.CurrentAbilitySlot != slot ? 0 :
-                state.Ability.UseTime(context) - SelectedUnit.CurrentAbilityRemainingUseTime!.Value;
-            button.UseProgressIndicator.MaxValue = state.Ability.UseTime(context);
+            button.UseProgressIndicator.Value = SelectedUnit.AbilityUseProgress?.Slot != slot ? 0 :
+                SelectedUnit.AbilityUseProgress.NormalizedProgress;
+            button.UseProgressIndicator.MaxValue = 1;
             
             button.HealthCostLabel.Text = Mathf.CeilToInt(state.Ability.HealthCost(context)).ToString();
             button.HealthCostLabel.Visible = state.Ability.HealthCost(context) > 0;

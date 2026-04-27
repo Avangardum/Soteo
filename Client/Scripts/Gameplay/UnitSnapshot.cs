@@ -10,9 +10,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required bool IsMoving { get; init; }
     public required ImmutableDictionary<Stat, float> Stats { get; init; }
     public required ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates { get; init; }
-    public required AbilitySlot? CurrentAbilitySlot { get; init; }
-    public required float? CurrentAbilityRemainingUseTime { get; init; }
-    public required float? CurrentAbilityCompletedUseTime { get; init; }
+    public required AbilityUseProgress? AbilityUseProgress { get; init; }
     
     public override UnitSnapshot Interpolate(UnitSnapshot to, float weight)
     {
@@ -20,12 +18,12 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
         return base.Interpolate(to, weight) with
         {
             AbilityStates = InterpolateAbilityStates(from.AbilityStates, to.AbilityStates, weight),
-            CurrentAbilityRemainingUseTime = InterpolateNullable(from.CurrentAbilityRemainingUseTime,
-                to.CurrentAbilityRemainingUseTime, (f, t) => LerpDecrease(f, t, weight))
+            AbilityUseProgress = InterpolateNullable(from.AbilityUseProgress, to.AbilityUseProgress, weight,
+                InterpolateAbilityUseProgress)
         };
     }
     
-    private static ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> InterpolateAbilityStates
+    private ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> InterpolateAbilityStates
     (
         ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> from,
         ImmutableDictionary<AbilitySlot, IReadOnlyAbilityState> to,
@@ -38,5 +36,19 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
             if (!from.TryGetValue(pair.Key, out IReadOnlyAbilityState? f)) return t;
             return new AbilityState(t) { Cooldown = LerpDecrease(f.Cooldown, t.Cooldown, weight) };
         });
+    }
+    
+    private static AbilityUseProgress InterpolateAbilityUseProgress
+    (
+        AbilityUseProgress from,
+        AbilityUseProgress to,
+        float weight
+    )
+    {
+        return to with
+        {
+            ElapsedTime = LerpIncrease(from.ElapsedTime, to.ElapsedTime, weight),
+            RemainingTime = LerpDecrease(from.RemainingTime, to.RemainingTime, weight)
+        };
     }
 }

@@ -18,6 +18,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     }
     
     private const int SizeOfAbilityState = sizeof(int) + sizeof(int) + sizeof(float);
+    private const int SizeOfAbilityUseProgress = sizeof(AbilitySlot) + sizeof(float) + sizeof(float);
 
     protected override int PacketSize(ShardSnapshotPacket packet)
     {
@@ -49,9 +50,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             SizeOf(unit.IsMoving) +
             SizeOf(unit.Stats) +
             SizeOf(unit.AbilityStates, SizeOfAbilityState) +
-            SizeOf(unit.CurrentAbilitySlot) +
-            SizeOf(unit.CurrentAbilityRemainingUseTime) +
-            SizeOf(unit.CurrentAbilityCompletedUseTime);
+            SizeOfNullableClass(unit.AbilityUseProgress, _ => SizeOfAbilityUseProgress);
     }
     
     private int ProjectileSize(ProjectileSnapshot projectile)
@@ -95,9 +94,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeBool(unit.IsMoving, ref span);
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeFloat, ref span);
         SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilityState, ref span);
-        SerializeNullable(unit.CurrentAbilitySlot, SerializeEnum, ref span);
-        SerializeNullable(unit.CurrentAbilityRemainingUseTime, SerializeFloat, ref span);
-        SerializeNullable(unit.CurrentAbilityCompletedUseTime, SerializeFloat, ref span);
+        SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, ref span);
     }
     
     private void SerializeProjectile(ProjectileSnapshot projectile, ref Span<byte> span)
@@ -136,9 +133,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             IsMoving = DeserializeBool(ref span),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, ref span),
             AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, ref span),
-            CurrentAbilitySlot = DeserializeNullable(DeserializeEnum<AbilitySlot>, ref span),
-            CurrentAbilityRemainingUseTime = DeserializeNullable(DeserializeFloat, ref span),
-            CurrentAbilityCompletedUseTime = DeserializeNullable(DeserializeFloat, ref span)
+            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, ref span)
         };
     }
     
@@ -176,10 +171,10 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             SizeOf(context.Level) +
             SizeOf(context.UserId) +
             SizeOf(context.UserStats, SizeOf) +
-            SizeOf(context.TargetPosition) +
-            SizeOf(context.TargetUnitId) +
-            SizeOf(context.TargetDirection) +
-            SizeOf(context.TargetShardId);
+            SizeOfNullableStruct(context.TargetPosition) +
+            SizeOfNullableStruct(context.TargetUnitId) +
+            SizeOfNullableStruct(context.TargetDirection) +
+            SizeOfNullableStruct(context.TargetShardId);
     }
     
     private void SerializeAbilityContext(AbilityContext.Deflated context, ref Span<byte> span)
@@ -188,10 +183,10 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeInt(context.Level, ref span);
         SerializeGuid(context.UserId, ref span);
         SerializeDictionary(context.UserStats, SerializeEnum, SerializeFloat, ref span);
-        SerializeNullable(context.TargetPosition, SerializeVector2, ref span);
-        SerializeNullable(context.TargetUnitId, SerializeGuid, ref span);
-        SerializeNullable(context.TargetDirection, SerializeVector2, ref span);
-        SerializeNullable(context.TargetShardId, SerializeGuid, ref span);
+        SerializeNullableStruct(context.TargetPosition, SerializeVector2, ref span);
+        SerializeNullableStruct(context.TargetUnitId, SerializeGuid, ref span);
+        SerializeNullableStruct(context.TargetDirection, SerializeVector2, ref span);
+        SerializeNullableStruct(context.TargetShardId, SerializeGuid, ref span);
     }
     
     private AbilityContext.Deflated DeserializeAbilityContext(ref Span<byte> span)
@@ -202,10 +197,27 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Level = DeserializeInt(ref span),
             UserId = DeserializeGuid(ref span),
             UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, ref span),
-            TargetPosition = DeserializeNullable(DeserializeVector2, ref span),
-            TargetUnitId = DeserializeNullable(DeserializeGuid, ref span),
-            TargetDirection = DeserializeNullable(DeserializeVector2, ref span),
-            TargetShardId = DeserializeNullable(DeserializeGuid, ref span)
+            TargetPosition = DeserializeNullableStruct(DeserializeVector2, ref span),
+            TargetUnitId = DeserializeNullableStruct(DeserializeGuid, ref span),
+            TargetDirection = DeserializeNullableStruct(DeserializeVector2, ref span),
+            TargetShardId = DeserializeNullableStruct(DeserializeGuid, ref span)
+        };
+    }
+    
+    private void SerializeAbilityUseProgress(AbilityUseProgress value, ref Span<byte> span)
+    {
+        SerializeEnum(value.Slot, ref span);
+        SerializeFloat(value.ElapsedTime, ref span);
+        SerializeFloat(value.RemainingTime, ref span);
+    }
+    
+    private AbilityUseProgress DeserializeAbilityUseProgress(ref Span<byte> span)
+    {
+        return new AbilityUseProgress
+        {
+            Slot = DeserializeEnum<AbilitySlot>(ref span),
+            ElapsedTime = DeserializeFloat(ref span),
+            RemainingTime = DeserializeFloat(ref span)
         };
     }
 }

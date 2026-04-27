@@ -66,10 +66,24 @@ public static class SoteoMath
         return interpolate(from.Value, to.Value);
     }
     
+    public static T? InterpolateNullable<T>(T? from, T? to, float weight, Func<T, T, float, T> interpolate)
+        where T : struct
+    {
+        if (from == null || to == null) return to;
+        return interpolate(from.Value, to.Value, weight);
+    }
+
     public static T? InterpolateNullable<T>(T? from, T? to, Func<T, T, T> interpolate) where T : class
     {
         if (from == null || to == null) return to;
         return interpolate(from, to);
+    }
+    
+    public static T? InterpolateNullable<T>(T? from, T? to, float weight, Func<T, T, float, T> interpolate)
+        where T : class
+    {
+        if (from == null || to == null) return to;
+        return interpolate(from, to, weight);
     }
     
     public static float LerpDecrease(float from, float to, float weight) => from > to ? Lerp(from, to, weight) : to;

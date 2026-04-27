@@ -225,13 +225,29 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         return Encoding.UTF8.GetString(slice.ToArray());
     }
     
-    protected void SerializeNullable<T>(T? nullable, Serializer<T> serializer, ref Span<byte> span) where T : struct
+    protected void SerializeNullableStruct<T>(T? nullable, Serializer<T> serializer, ref Span<byte> span)
+        where T : struct
     {
         SerializeBool(nullable.HasValue, ref span);
         if (nullable.HasValue) serializer(nullable.Value, ref span);
     }
     
-    protected T? DeserializeNullable<T>(Deserializer<T> deserializer, ref Span<byte> span) where T : struct
+    protected T? DeserializeNullableStruct<T>(Deserializer<T> deserializer, ref Span<byte> span)
+        where T : struct
+    {
+        bool hasValue = DeserializeBool(ref span);
+        return hasValue ? deserializer(ref span) : null;
+    }
+    
+    protected void SerializeNullableClass<T>(T? nullable, Serializer<T> serializer, ref Span<byte> span)
+        where T : class
+    {
+        SerializeBool(nullable != null, ref span);
+        if (nullable != null) serializer(nullable, ref span);
+    }
+    
+    protected T? DeserializeNullableClass<T>(Deserializer<T> deserializer, ref Span<byte> span)
+        where T : class
     {
         bool hasValue = DeserializeBool(ref span);
         return hasValue ? deserializer(ref span) : null;
@@ -264,10 +280,14 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
 
     protected int SizeOf(string s) => sizeof(int) + Encoding.UTF8.GetByteCount(s);
     
-    /// <summary>
-    /// Size of a nullable value when serialized as a pair of HasValue and Value.
-    /// </summary>
-    protected int SizeOf<T>(T? nullable) where T : unmanaged => nullable == null ? 1 : 1 + SizeOf<T>();
+    protected int SizeOfNullableStruct<T>(T? nullable) where T : unmanaged =>
+        nullable == null ? 1 : 1 + SizeOf<T>();
+    
+    protected int SizeOfNullableStruct<T>(T? nullable, Func<T, int> sizeOfValue) where T : struct =>
+        nullable == null ? 1 : 1 + sizeOfValue(nullable.Value);
+    
+    protected int SizeOfNullableClass<T>(T? nullable, Func<T, int> sizeOfValue) where T : class =>
+        nullable == null ? 1 : 1 + sizeOfValue(nullable);
     
     protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, int sizeOfValue)
         where TKey : unmanaged
