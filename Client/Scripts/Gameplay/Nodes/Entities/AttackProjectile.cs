@@ -1,6 +1,6 @@
 namespace Soteo.Gameplay.Nodes.Entities;
 
-public sealed class AttackProjectile : UnitTargetedProjectile
+public sealed class AttackProjectile : TargetedProjectile
 {
     private static readonly PackedScene Scene =
         ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Projectiles/AttackProjectile.tscn"); 
