@@ -1,3 +1,5 @@
+using Soteo.Gameplay.Dto;
+
 namespace Soteo.Gameplay.Abilities;
 
 public sealed class MeleeAttack : Attack

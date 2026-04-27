@@ -1,3 +1,6 @@
+using Soteo.Gameplay.Dto;
+using Soteo.Gameplay.Util;
+
 namespace Soteo.Gameplay.Abilities;
 
 public sealed class BloodSacrificeAbility : Ability

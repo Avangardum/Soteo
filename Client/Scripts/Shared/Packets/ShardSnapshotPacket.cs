@@ -1,4 +1,5 @@
 using Soteo.Gameplay;
+using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Enums;
 

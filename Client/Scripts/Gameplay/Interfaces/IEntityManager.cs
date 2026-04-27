@@ -1,5 +1,7 @@
 using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Nodes.Entities;
+using Soteo.Gameplay.Dto;
+using Soteo.Gameplay.Dto.Snapshots;
+using Soteo.Gameplay.Entities;
 
 namespace Soteo.Gameplay.Interfaces;
 

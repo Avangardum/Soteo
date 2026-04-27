@@ -1,4 +1,4 @@
-using Soteo.Gameplay.Nodes;
+using Soteo.Gameplay;
 
 namespace Soteo.Shared;
 

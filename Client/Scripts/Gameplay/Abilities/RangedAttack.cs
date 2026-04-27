@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
