@@ -64,4 +64,10 @@ public static class DictionaryExtensions
             return value;
         }
     }
+    
+    extension<TKey, TValue> (IEnumerable<KeyValuePair<TKey, TValue>> self)
+    {
+        public Dictionary<TKey, TValue> ToDictionary() =>
+            self.ToDictionary(it => it.Key, it => it.Value);
+    }
 }

@@ -85,7 +85,7 @@ public sealed class InputHandler : Node2D
     private void HandleUseAbility(AbilitySlot slot)
     {
         Unit? user = _entityLocator.FindEntity<Unit>(_currentUserIdRepo.UserId, out _);
-        if (user == null || !user.AbilityStates.TryGetValue(slot, out IReadOnlyAbilityState? state)) return;
+        if (user == null || !user.AbilityStates.TryGetValue(slot, out AbilityState? state)) return;
 
         IReadOnlyList<Unit> candidateTargetUnits =
             Input.IsActionPressed("alt") ? [user] : GetUnitsUnderMouse();

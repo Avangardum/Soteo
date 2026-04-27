@@ -1,24 +1,17 @@
 using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Interfaces;
 
 namespace Soteo.Gameplay;
 
-public record AbilityState : IReadOnlyAbilityState
+public record AbilityState
 {
-    public AbilityState(Ability ability, int level)
-    {
-        Ability = ability;
-        Level = level;
-    }
+    public required Ability Ability { get; init; }
+    public required int Level { get; init; }
+    public float Cooldown { get; init; }
+    /// <summary>
+    /// Cooldown of the ability at the last moment it was used
+    /// </summary>
+    public float MaxCooldown { get; init; }
     
-    public AbilityState(IReadOnlyAbilityState other) : this(other.Ability, other.Level)
-    {
-        Cooldown = other.Cooldown;
-    }
-    
-    public Ability Ability { get; }
-    public int Level { get; set; }
-    public float Cooldown { get; set; }
-
-    public static AbilityState New<T>(int level) where T : Ability<T>, new() => new(Ability<T>.Instance, level);
+    public static AbilityState New<T>(int level) where T : Ability<T>, new() =>
+        new AbilityState { Ability = Ability<T>.Instance, Level = level };
 }

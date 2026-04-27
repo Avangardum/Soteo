@@ -53,8 +53,7 @@ public abstract class Unit : Entity<UnitNode>
     public IReadOnlyDictionary<Stat, float> Stats => StatsInternal;
     
     protected Dictionary<AbilitySlot, AbilityState> AbilityStatesInternal { get; set; } = [];
-    public ICovariantReadOnlyDictionary<AbilitySlot, IReadOnlyAbilityState> AbilityStates =>
-        AbilityStatesInternal.AsCovariant();
+    public IReadOnlyDictionary<AbilitySlot, AbilityState> AbilityStates => AbilityStatesInternal;
 
     public AbilityUseProgress? AbilityUseProgress { get; private set; }
     [MemberNotNullWhen(false, nameof(Node))] public override bool IsRemoved { get; protected set; }
@@ -94,8 +93,7 @@ public abstract class Unit : Entity<UnitNode>
             Azimuth = Azimuth,
             IsMoving = _isMoving,
             Stats = Stats.ToImmutableDictionary(),
-            AbilityStates = AbilityStatesInternal
-                .ToImmutableDictionary(it => it.Key, IReadOnlyAbilityState (it) => it.Value with {}),
+            AbilityStates = AbilityStatesInternal.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress
         };
     }
@@ -107,8 +105,8 @@ public abstract class Unit : Entity<UnitNode>
         Position = s.Position;
         Azimuth = s.Azimuth;
         _isMoving = s.IsMoving;
-        StatsInternal = s.Stats.ToDictionary(it => it.Key, it => it.Value);
-        AbilityStatesInternal = s.AbilityStates.ToDictionary(it => it.Key, it => new AbilityState(it.Value));
+        StatsInternal = s.Stats.ToDictionary();
+        AbilityStatesInternal = s.AbilityStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
         
         UpdateAnimation();
@@ -123,9 +121,19 @@ public abstract class Unit : Entity<UnitNode>
     public virtual void _PhysicsProcessServer(UnitNode node, float delta)
     {
         _isMoving = false;
-        foreach (AbilityState abilityState in AbilityStatesInternal.Values)
-            abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - delta, 0);
+        DecreaseCooldowns(delta);
         ExecuteCommands(node, delta);
+    }
+    
+    private void DecreaseCooldowns(float delta)
+    {
+        foreach (AbilitySlot slot in AbilityStatesInternal.Keys.ToList())
+        {
+            AbilityStatesInternal[slot] = AbilityStatesInternal[slot] with
+            {
+                Cooldown = Mathf.Max(AbilityStatesInternal[slot].Cooldown - delta, 0)
+            };
+        }
     }
 
     public virtual void _PhysicsProcessClient(UnitNode node, float delta)
@@ -269,12 +277,22 @@ public abstract class Unit : Entity<UnitNode>
         else
         {
             remainingDeltaTime -= AbilityUseProgress.RemainingTime;
-            state.Ability.TakeEffect(context);
-            state.Cooldown = state.Ability.Cooldown(context);
-            AbilityUseProgress = null;
-            if (!command.Repeat)
-                Commands.Dequeue();
+            TriggerAbilityEffect(context, command);
         }
+    }
+    
+    private void TriggerAbilityEffect(AbilityContext context, UseAbilityCommand command)
+    {
+        context.Ability.TakeEffect(context);
+        float cooldown = context.Ability.Cooldown(context);
+        AbilityStatesInternal[command.Slot] = AbilityStatesInternal[command.Slot] with
+        {
+            Cooldown = cooldown,
+            MaxCooldown = cooldown
+        };
+        AbilityUseProgress = null;
+        if (!command.Repeat)
+            Commands.Dequeue();
     }
     
     private void WaitForAbilityCooldown(AbilityContext context, ref float remainingDeltaTime)
@@ -286,7 +304,7 @@ public abstract class Unit : Entity<UnitNode>
     
     public AbilityContext GetAbilityContext(UseAbilityCommand command)
     {
-        if (!AbilityStates.TryGetValue(command.Slot, out IReadOnlyAbilityState? state))
+        if (!AbilityStates.TryGetValue(command.Slot, out AbilityState? state))
             throw new ArgumentException($"Unit {Id} doesn't have an ability in slot {command.Slot}");
         return new AbilityContext
         {

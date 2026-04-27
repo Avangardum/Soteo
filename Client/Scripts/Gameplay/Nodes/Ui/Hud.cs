@@ -105,12 +105,11 @@ public sealed class Hud : Control, IHud
             }
             
             button.Visible = true;
-            IReadOnlyAbilityState state = SelectedUnit.AbilityStates[slot];
+            AbilityState state = SelectedUnit.AbilityStates[slot];
             AbilityContext context = SelectedUnit.GetAbilityContext(new UseAbilityCommand(slot));
             
-            // todo use frozen max cooldown value
             button.CooldownIndicator.Value = state.Cooldown;
-            button.CooldownIndicator.MaxValue = state.Ability.Cooldown(context);
+            button.CooldownIndicator.MaxValue = state.MaxCooldown == 0 ? 1 : state.MaxCooldown;
 
             button.UseProgressIndicator.Value = SelectedUnit.AbilityUseProgress?.Slot != slot ? 0 :
                 SelectedUnit.AbilityUseProgress.NormalizedProgress;

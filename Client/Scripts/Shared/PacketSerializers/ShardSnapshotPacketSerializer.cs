@@ -17,7 +17,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         Projectile = 1
     }
     
-    private const int SizeOfAbilityState = sizeof(int) + sizeof(int) + sizeof(float);
+    private const int SizeOfAbilityState = sizeof(int) + sizeof(int) + sizeof(float) + sizeof(float);
     private const int SizeOfAbilityUseProgress = sizeof(AbilitySlot) + sizeof(float) + sizeof(float);
 
     protected override int PacketSize(ShardSnapshotPacket packet)
@@ -149,19 +149,23 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         };
     }
 
-    private void SerializeAbilityState(IReadOnlyAbilityState value, ref Span<byte> span)
+    private void SerializeAbilityState(AbilityState value, ref Span<byte> span)
     {
         SerializeInt(value.Ability.Id, ref span);
         SerializeInt(value.Level, ref span);
         SerializeFloat(value.Cooldown, ref span);
+        SerializeFloat(value.MaxCooldown, ref span);
     }
     
-    private IReadOnlyAbilityState DeserializeAbilityState(ref Span<byte> span)
+    private AbilityState DeserializeAbilityState(ref Span<byte> span)
     {
-        Ability ability = Ability.All[DeserializeInt(ref span)];
-        int level = DeserializeInt(ref span);
-        float cooldown = DeserializeFloat(ref span);
-        return new AbilityState(ability, level) { Cooldown = cooldown };
+        return new AbilityState
+        {
+            Ability = Ability.All[DeserializeInt(ref span)],
+            Level = DeserializeInt(ref span),
+            Cooldown = DeserializeFloat(ref span),
+            MaxCooldown = DeserializeFloat(ref span)
+        };
     }
     
     private int SizeOfAbilityContext(AbilityContext.Deflated context)
