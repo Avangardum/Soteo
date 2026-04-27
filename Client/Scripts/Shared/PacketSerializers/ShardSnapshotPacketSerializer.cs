@@ -46,10 +46,12 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         return
             BaseEntitySize(unit) +
+            SizeOf(unit.IsMoving) +
             SizeOf(unit.Stats) +
             SizeOf(unit.AbilityStates, SizeOfAbilityState) +
             SizeOf(unit.CurrentAbilitySlot) +
-            SizeOf(unit.CurrentAbilityRemainingUseTime);
+            SizeOf(unit.CurrentAbilityRemainingUseTime) +
+            SizeOf(unit.CurrentAbilityCompletedUseTime);
     }
     
     private int ProjectileSize(ProjectileSnapshot projectile)
@@ -90,10 +92,12 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         SerializeEnum(EntityKind.Unit, ref span);
         SerializeBaseEntity(unit, ref span);
+        SerializeBool(unit.IsMoving, ref span);
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeFloat, ref span);
         SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilityState, ref span);
         SerializeNullable(unit.CurrentAbilitySlot, SerializeEnum, ref span);
         SerializeNullable(unit.CurrentAbilityRemainingUseTime, SerializeFloat, ref span);
+        SerializeNullable(unit.CurrentAbilityCompletedUseTime, SerializeFloat, ref span);
     }
     
     private void SerializeProjectile(ProjectileSnapshot projectile, ref Span<byte> span)
@@ -129,10 +133,12 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Id = DeserializeGuid(ref span),
             Position = DeserializeVector2(ref span),
             Azimuth = DeserializeFloat(ref span),
+            IsMoving = DeserializeBool(ref span),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, ref span),
             AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, ref span),
             CurrentAbilitySlot = DeserializeNullable(DeserializeEnum<AbilitySlot>, ref span),
-            CurrentAbilityRemainingUseTime = DeserializeNullable(DeserializeFloat, ref span)
+            CurrentAbilityRemainingUseTime = DeserializeNullable(DeserializeFloat, ref span),
+            CurrentAbilityCompletedUseTime = DeserializeNullable(DeserializeFloat, ref span)
         };
     }
     

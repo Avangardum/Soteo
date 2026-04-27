@@ -264,7 +264,7 @@ HalfPixelXVisualOffset = true
 [node name="AnimatedSprite" type="AnimatedSprite" parent="Visuals"]
 position = Vector2( 0.5, -5 )
 frames = SubResource( 7 )
-animation = "Idle Down"
+animation = "Idle Right"
 playing = true
 
 [node name="AzimuthLine" type="Line2D" parent="Visuals"]

@@ -22,12 +22,14 @@ public abstract class Unit : Entity<Unit.UnitNode>
             
             Unit = unit;
             Visuals = GetNode<Node2D>("Visuals");
+            Sprite = GetNode<AnimatedSprite>("Visuals/AnimatedSprite");
             AzimuthLine = GetNode<Line2D>("Visuals/AzimuthLine");
             Properties = GetNode<EntityProperties>("Properties");
         }
         
         public Unit Unit { get; }
         public Node2D Visuals { get; }
+        public AnimatedSprite Sprite { get; }
         public Line2D AzimuthLine { get; }
         public EntityProperties Properties { get; }
         
@@ -40,6 +42,8 @@ public abstract class Unit : Entity<Unit.UnitNode>
     
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
+    
+    private bool _isMoving;
     
     protected Unit(Guid id, PackedScene scene, IServiceProvider serviceProvider) :
         base(id, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
@@ -81,6 +85,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
 
     public AbilitySlot? CurrentAbilitySlot { get; private set; }
     public float? CurrentAbilityRemainingUseTime { get; private set; }
+    public float? CurrentAbilityCompletedUseTime { get; private set; }
     [MemberNotNullWhen(false, nameof(Node))] public override bool IsRemoved { get; protected set; }
     protected override UnitNode? Node => field.AsValid();
     public Faction Faction { get; set; }
@@ -116,11 +121,13 @@ public abstract class Unit : Entity<Unit.UnitNode>
             Id = Id,
             Position = Position,
             Azimuth = Azimuth,
+            IsMoving = _isMoving,
             Stats = Stats.ToImmutableDictionary(),
             AbilityStates = AbilityStatesInternal
                 .ToImmutableDictionary(it => it.Key, IReadOnlyAbilityState (it) => it.Value with {}),
             CurrentAbilitySlot = CurrentAbilitySlot,
-            CurrentAbilityRemainingUseTime = CurrentAbilityRemainingUseTime
+            CurrentAbilityRemainingUseTime = CurrentAbilityRemainingUseTime,
+            CurrentAbilityCompletedUseTime = CurrentAbilityCompletedUseTime
         };
     }
 
@@ -130,10 +137,14 @@ public abstract class Unit : Entity<Unit.UnitNode>
         
         Position = s.Position;
         Azimuth = s.Azimuth;
+        _isMoving = s.IsMoving;
         StatsInternal = s.Stats.ToDictionary(it => it.Key, it => it.Value);
         AbilityStatesInternal = s.AbilityStates.ToDictionary(it => it.Key, it => new AbilityState(it.Value));
         CurrentAbilitySlot = s.CurrentAbilitySlot;
         CurrentAbilityRemainingUseTime = s.CurrentAbilityRemainingUseTime;
+        CurrentAbilityCompletedUseTime = s.CurrentAbilityCompletedUseTime;
+        
+        UpdateAnimation();
     }
 
     protected override void OnZoomChanged()
@@ -144,6 +155,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
 
     public virtual void _PhysicsProcessServer(UnitNode node, float delta)
     {
+        _isMoving = false;
         foreach (AbilityState abilityState in AbilityStatesInternal.Values)
             abilityState.Cooldown = Mathf.Max(abilityState.Cooldown - delta, 0);
         ExecuteCommands(node, delta);
@@ -220,6 +232,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
             if (Commands.PeekOrDefault() is MoveCommand) Commands.Dequeue();
             return;
         }
+        Vector2 normalizedDesiredMovement = desiredMovement / desiredMovementLength;
         float timeToComplete = desiredMovementLength / Stats[Stat.MoveSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
@@ -229,9 +242,11 @@ public abstract class Unit : Entity<Unit.UnitNode>
         }
         else
         {
-            MoveAndCollide(desiredMovement / desiredMovementLength * Stats[Stat.MoveSpeed] * remainingDeltaTime, node);
+            Vector2 movement = normalizedDesiredMovement * Stats[Stat.MoveSpeed] * remainingDeltaTime;
+            MoveAndCollide(movement, node);
             remainingDeltaTime = 0;
         }
+        _isMoving = true;
     }
     
     private KinematicCollision2D MoveAndCollide(Vector2 movement, UnitNode node)
@@ -246,6 +261,9 @@ public abstract class Unit : Entity<Unit.UnitNode>
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
         {
             Commands.Dequeue();
+            CurrentAbilitySlot = null;
+            CurrentAbilityCompletedUseTime = null;
+            CurrentAbilityRemainingUseTime = null;
             return;
         }
         
@@ -257,19 +275,33 @@ public abstract class Unit : Entity<Unit.UnitNode>
                 WaitForAbilityCooldown(context, ref remainingDeltaTime);
             else
                 Commands.Dequeue();
+            CurrentAbilitySlot = null;
+            CurrentAbilityCompletedUseTime = null;
+            CurrentAbilityRemainingUseTime = null;
             return;
         }
         
         AbilityValidationResult validationResult =
             ValidateAbilityWithCorrection(state.Ability, context, command, ref remainingDeltaTime, node);
-        if (validationResult != AbilityValidationResult.Ok || remainingDeltaTime == 0) return;
-        
-        if (command.Slot != CurrentAbilitySlot) CurrentAbilityRemainingUseTime = state.Ability.UseTime(context);
+        if (validationResult != AbilityValidationResult.Ok || remainingDeltaTime == 0)
+        {
+            CurrentAbilitySlot = null;
+            CurrentAbilityCompletedUseTime = null;
+            CurrentAbilityRemainingUseTime = null;
+            return;
+        }
+
+        if (command.Slot != CurrentAbilitySlot)
+        {
+            CurrentAbilityRemainingUseTime = state.Ability.UseTime(context);
+            CurrentAbilityCompletedUseTime = 0;
+        }
         CurrentAbilitySlot = command.Slot;
         
         if (remainingDeltaTime < CurrentAbilityRemainingUseTime!.Value)
         {
             CurrentAbilityRemainingUseTime -= remainingDeltaTime;
+            CurrentAbilityCompletedUseTime += remainingDeltaTime;
             remainingDeltaTime = 0;
         }
         else
@@ -279,6 +311,7 @@ public abstract class Unit : Entity<Unit.UnitNode>
             state.Cooldown = state.Ability.Cooldown(context);
             CurrentAbilitySlot = null;
             CurrentAbilityRemainingUseTime = null;
+            CurrentAbilityCompletedUseTime = null;
             if (!command.Repeat)
                 Commands.Dequeue();
         }
@@ -347,6 +380,42 @@ public abstract class Unit : Entity<Unit.UnitNode>
             }
         } while (remainingDeltaTime > 0 && iterations < maxIterations);
         return abilityValidationResult;
+    }
+    
+    private void UpdateAnimation()
+    {
+        if (IsRemoved) return;
+        Node.Sprite.FlipH = Azimuth >= 180;
+        
+        if (CurrentAbilitySlot != null)
+        {
+            var ability = AbilityStates[CurrentAbilitySlot.Value].Ability;
+            Node.Sprite.Animation = ability.Animation;
+            if (ability.LoopAnimation)
+            {
+                Node.Sprite.Animation = ability.Animation;
+                Node.Sprite.SpeedScale = 1;
+            }
+            else
+            {
+                float useTime = CurrentAbilityCompletedUseTime!.Value + CurrentAbilityRemainingUseTime!.Value;
+                float progress = CurrentAbilityCompletedUseTime.Value / useTime;
+                int frameCount = Node.Sprite.Frames.GetFrameCount(ability.Animation);
+                Node.Sprite.Frame = Mathf.Min(Mathf.FloorToInt(frameCount * progress), frameCount - 1);
+                Node.Sprite.SpeedScale = 0;
+            }
+        }
+        else if (_isMoving)
+        {
+            Node.Sprite.Animation = "Walk Right";
+            const float referenceMoveSpeed = 35;
+            Node.Sprite.SpeedScale = Stats[Stat.MoveSpeed] / referenceMoveSpeed;
+        }
+        else
+        {
+            Node.Sprite.Animation = "Idle Right";
+            Node.Sprite.SpeedScale = 1;
+        }
     }
 
     public void SetCommand(ICommand command)

@@ -32,6 +32,8 @@ public abstract class Ability
     
     public virtual int MaxLevel => 1;
     public virtual CanTarget Targeting => CanTarget.Nothing;
+    public virtual string Animation => "Attack Right";
+    public virtual bool LoopAnimation => false;
     
     // Static values define what is shown in ability description. They are constant and independent of context.
     public virtual Scalable<float> StaticHealthCost => 0;

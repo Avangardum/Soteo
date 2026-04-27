@@ -7,6 +7,7 @@ namespace Soteo.Gameplay.Abilities;
 
 public sealed class RecallAbility : Ability<RecallAbility>
 {
+    public override bool LoopAnimation => true;
     public override Scalable<float> StaticUseTime => 10;
     
     public override void TakeEffect(AbilityContext context)

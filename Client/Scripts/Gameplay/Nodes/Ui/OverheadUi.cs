@@ -74,7 +74,7 @@ public sealed class OverheadUi : Control
                 case Variant.PlayerCharacter:
                     _playerCharacterPanel.Visible = true;
                     _tinyHealthPanel.Visible = false;
-                    _offset = new Vector2(0, -18);
+                    _offset = new Vector2(0, -19);
                     break;
                 case Variant.TinyHealth:
                     _playerCharacterPanel.Visible = false;
