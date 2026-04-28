@@ -12,37 +12,34 @@ namespace Soteo.Shared.PacketSerializers;
 public abstract class PacketSerializer<TPacket> : IPacketSerializer
     where TPacket : Packet, new()
 {
-    protected delegate TElement Deserializer<out TElement>(ref Span<byte> span);
+    protected delegate TElement Deserializer<out TElement>(Stream stream);
     
-    protected delegate void Serializer<in TElement>(TElement value, ref Span<byte> span);
-    
-    protected virtual int PacketSize(TPacket packet) => sizeof(PacketType);
+    protected delegate void Serializer<in TElement>(TElement value, Stream stream);
     
     byte[] IPacketSerializer.Serialize(Packet packet) => Serialize((TPacket)packet);
     
     public byte[] Serialize(TPacket packet)
     {
-        var bytes = new byte[PacketSize(packet)];
-        var span = new Span<byte>(bytes);
-        SerializeInternal(packet, ref span);
-        return bytes;
+        var stream = new MemoryStream();
+        SerializeInternal(packet, stream);
+        return stream.ToArray();
     }
     
-    protected virtual void SerializeInternal(TPacket packet, ref Span<byte> span)
+    protected virtual void SerializeInternal(TPacket packet, Stream stream)
     {
-        SerializeEnum(packet.Type, ref span);
+        SerializeEnum(packet.Type, stream);
     }
     
-    Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
+    Packet IPacketSerializer.Deserialize(byte[] bytes) => Deserialize(bytes);
     
-    public TPacket Deserialize(Span<byte> bytes)
+    public TPacket Deserialize(byte[] bytes)
     {
         try
         {
-            Span<byte> remainingBytes = bytes;
-            TPacket packet = DeserializeInternal(ref remainingBytes);
-            if (!remainingBytes.IsEmpty) throw new BadPacketException(
-                $"Packet deserialized as {packet}, but contains {remainingBytes.Length} extra bytes");
+            var stream = new MemoryStream(bytes);
+            TPacket packet = DeserializeInternal(stream);
+            if (stream.Position != bytes.Length) throw new BadPacketException(
+                $"Packet deserialized as {packet}, but contains {bytes.Length - stream.Position} extra bytes");
             return packet;
         }
         catch (BadPacketException e)
@@ -51,35 +48,25 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         }
     }
     
-    protected virtual TPacket DeserializeInternal(ref Span<byte> span)
+    protected virtual TPacket DeserializeInternal(Stream stream)
     {
         var packet = new TPacket();
-        var type = DeserializeEnum<PacketType>(ref span);
-        if (type != packet.Type) throw new InvalidOperationException("Wrong serializer");
+        var type = DeserializeEnum<PacketType>(stream);
+        if (type != packet.Type)
+            throw new InvalidOperationException("Wrong serializer");
         return packet;
     }
     
-    protected Span<byte> SliceOff(int count, ref Span<byte> span)
-    {
-        if (count > span.Length) throw new BadPacketException("Packet is missing bytes");
-        Span<byte> result = span[..count];
-        span = span[count..];
-        return result;
-    }
+    protected void SerializeByte(byte value, Stream stream) => stream.WriteByte(value);
 
-    protected void SerializeByte(byte value, ref Span<byte> span)
-    {
-        Span<byte> slice = SliceOff(1, ref span);
-        slice[0] = value;
-    }
+    protected byte DeserializeByte(Stream stream) => stream.ReadExactlyByte();
 
-    protected byte DeserializeByte(ref Span<byte> span) => SliceOff(1, ref span)[0];
+    protected void SerializeBool(bool value, Stream stream) =>
+        SerializeByte(value ? (byte)1 : (byte)0, stream);
     
-    protected void SerializeBool(bool value, ref Span<byte> span) => SerializeByte(value ? (byte)1 : (byte)0, ref span);
-    
-    protected bool DeserializeBool(ref Span<byte> span)
+    protected bool DeserializeBool(Stream stream)
     {
-        return DeserializeByte(ref span) switch
+        return DeserializeByte(stream) switch
         {
             0 => false,
             1 => true,
@@ -87,253 +74,219 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         };
     }
 
-    protected void SerializeInt(int value, ref Span<byte> span)
+    protected void SerializeInt(int value, Stream stream)
     {
-        Span<byte> slice = SliceOff(sizeof(int), ref span);
-        BinaryPrimitives.WriteInt32BigEndian(slice, value);
+        Span<byte> buffer = stackalloc byte[sizeof(int)];
+        BinaryPrimitives.WriteInt32BigEndian(buffer, value);
+        stream.Write(buffer);
     }
 
-    protected int DeserializeInt(ref Span<byte> span)
+    protected int DeserializeInt(Stream stream)
     {
-        Span<byte> slice = SliceOff(sizeof(int), ref span);
-        return BinaryPrimitives.ReadInt32BigEndian(slice);
+        Span<byte> buffer = stackalloc byte[sizeof(int)];
+        stream.ReadExactly(buffer);
+        return BinaryPrimitives.ReadInt32BigEndian(buffer);
     }
     
-    protected void SerializeLong(long value, ref Span<byte> span)
+    protected void SerializeLong(long value, Stream stream)
     {
-        Span<byte> slice = SliceOff(sizeof(long), ref span);
-        BinaryPrimitives.WriteInt64BigEndian(slice, value);
+        Span<byte> buffer = stackalloc byte[sizeof(long)];
+        BinaryPrimitives.WriteInt64BigEndian(buffer, value);
+        stream.Write(buffer);
     }
 
-    protected long DeserializeLong(ref Span<byte> span)
+    protected long DeserializeLong(Stream stream)
     {
-        Span<byte> slice = SliceOff(sizeof(long), ref span);
-        return BinaryPrimitives.ReadInt64BigEndian(slice);
+        Span<byte> buffer = stackalloc byte[sizeof(long)];
+        stream.ReadExactly(buffer);
+        return BinaryPrimitives.ReadInt64BigEndian(buffer);
     }
 
-    protected void SerializeUShort(ushort value, ref Span<byte> span)
+    protected void SerializeUShort(ushort value, Stream stream)
     {
-        Span<byte> slice = SliceOff(sizeof(ushort), ref span);
-        BinaryPrimitives.WriteUInt16BigEndian(slice, value);
+        Span<byte> buffer = stackalloc byte[sizeof(ushort)];
+        BinaryPrimitives.WriteUInt16BigEndian(buffer, value);
+        stream.Write(buffer);
     }
 
-    protected ushort DeserializeUShort(ref Span<byte> span)
+    protected ushort DeserializeUShort(Stream stream)
     {
-        Span<byte> slice = SliceOff(sizeof(ushort), ref span);
-        return BinaryPrimitives.ReadUInt16BigEndian(slice);
+        Span<byte> buffer = stackalloc byte[sizeof(ushort)];
+        stream.ReadExactly(buffer);
+        return BinaryPrimitives.ReadUInt16BigEndian(buffer);
     }
 
-    protected void SerializeFloat(float value, ref Span<byte> span)
+    protected void SerializeFloat(float value, Stream stream)
     {
-        Span<byte> slice = SliceOff(sizeof(float), ref span);
-        var bytes = BitConverter.GetBytes(value);
-        bytes.CopyTo(slice);
-        if (BitConverter.IsLittleEndian) slice.Reverse();
+        byte[] buffer = BitConverter.GetBytes(value);
+        if (BitConverter.IsLittleEndian) buffer.Reverse();
+        stream.Write(buffer);
     }
 
-    protected float DeserializeFloat(ref Span<byte> span)
+    protected float DeserializeFloat(Stream stream)
     {
-        Span<byte> slice = SliceOff(sizeof(float), ref span);
-        if (BitConverter.IsLittleEndian) slice.Reverse();
-        return BitConverter.ToSingle(slice.ToArray(), 0);
+        byte[] buffer = new byte[sizeof(float)];
+        stream.ReadExactly(buffer);
+        if (BitConverter.IsLittleEndian) buffer.Reverse();
+        return BitConverter.ToSingle(buffer, 0);
     }
 
-    protected void SerializeVector2(Vector2 value, ref Span<byte> span)
+    protected void SerializeVector2(Vector2 value, Stream stream)
     {
-        SerializeFloat(value.x, ref span);
-        SerializeFloat(value.y, ref span);
+        SerializeFloat(value.x, stream);
+        SerializeFloat(value.y, stream);
     }
 
-    protected Vector2 DeserializeVector2(ref Span<byte> span)
+    protected Vector2 DeserializeVector2(Stream stream)
     {
-        float x = DeserializeFloat(ref span);
-        float y = DeserializeFloat(ref span);
+        float x = DeserializeFloat(stream);
+        float y = DeserializeFloat(stream);
         return new(x, y);
     }
 
-    protected void SerializeGuid(Guid value, ref Span<byte> span)
+    protected void SerializeGuid(Guid value, Stream stream)
     {
-        var slice = SliceOff(Const.BytesInGuid, ref span);
-        value.ToByteArray().CopyTo(slice);
+        stream.Write(value.ToByteArray());
     }
 
-    protected Guid DeserializeGuid(ref Span<byte> span)
+    protected Guid DeserializeGuid(Stream stream)
     {
-        Span<byte> slice = SliceOff(Const.BytesInGuid, ref span);
-        return new Guid(slice.ToArray());
+        byte[] buffer = new byte[Const.BytesInGuid];
+        stream.ReadExactly(buffer);
+        return new Guid(buffer);
     }
 
-    protected void SerializeEnum<TEnum>(TEnum value, ref Span<byte> span) where TEnum : Enum
+    protected void SerializeEnum<TEnum>(TEnum value, Stream stream) where TEnum : Enum
     {
         Type underlyingType = Enum.GetUnderlyingType(typeof(TEnum));
-        if (underlyingType == typeof(byte)) SerializeByte((byte)(object)value, ref span);
-        else if (underlyingType == typeof(ushort)) SerializeUShort((ushort)(object)value, ref span);
-        else if (underlyingType == typeof(int)) SerializeInt((int)(object)value, ref span);
-        else throw new NotSupportedException();
+        if (underlyingType == typeof(byte))
+            SerializeByte((byte)(object)value, stream);
+        else if (underlyingType == typeof(ushort))
+            SerializeUShort((ushort)(object)value, stream);
+        else if (underlyingType == typeof(int))
+            SerializeInt((int)(object)value, stream);
+        else
+            throw new NotSupportedException();
     }
 
-    protected TEnum DeserializeEnum<TEnum>(ref Span<byte> span) where TEnum : Enum
+    protected TEnum DeserializeEnum<TEnum>(Stream stream) where TEnum : Enum
     {
-        TEnum value = DeserializeEnumWithoutValidation<TEnum>(ref span);
+        TEnum value = DeserializeEnumWithoutValidation<TEnum>(stream);
         if (!Enum.IsDefined(typeof(TEnum), value) && !typeof(TEnum).HasAttribute<FlagsAttribute>())
             throw new BadPacketException($"Invalid {typeof(TEnum)} value {value}");
         return value;
     }
 
-    protected TEnum DeserializeEnumWithoutValidation<TEnum>(ref Span<byte> span) where TEnum : Enum
+    protected TEnum DeserializeEnumWithoutValidation<TEnum>(Stream stream) where TEnum : Enum
     {
         Type underlyingType = Enum.GetUnderlyingType(typeof(TEnum));
-        if (underlyingType == typeof(byte)) return (TEnum)(object)DeserializeByte(ref span);
-        if (underlyingType == typeof(ushort)) return (TEnum)(object)DeserializeUShort(ref span);
-        if (underlyingType == typeof(int)) return (TEnum)(object)DeserializeInt(ref span);
+        if (underlyingType == typeof(byte))
+            return (TEnum)(object)DeserializeByte(stream);
+        if (underlyingType == typeof(ushort))
+            return (TEnum)(object)DeserializeUShort(stream);
+        if (underlyingType == typeof(int))
+            return (TEnum)(object)DeserializeInt(stream);
         throw new NotSupportedException();
     }
 
     protected void SerializeList<TElement>
     (
-        IReadOnlyList<TElement> value,
+        IReadOnlyCollection<TElement> value,
         Serializer<TElement> serializeElement,
-        ref Span<byte> span
+        Stream stream
     )
     {
-        SerializeInt(value.Count, ref span);
-        foreach (var element in value) serializeElement(element, ref span);
+        SerializeInt(value.Count, stream);
+        foreach (var element in value)
+            serializeElement(element, stream);
     }
 
-    protected TElement[] DeserializeList<TElement>(Deserializer<TElement> deserializeElement, ref Span<byte> span)
+    protected TElement[] DeserializeList<TElement>
+    (
+        Deserializer<TElement> deserializeElement, Stream stream
+    )
     {
-        int length = DeserializeInt(ref span);
-        if (length < 0 || length > span.Length) throw new BadPacketException("Invalid array length");
+        int length = DeserializeInt(stream);
+        if (length < 0 || length > stream.Length - stream.Position)
+            throw new BadPacketException("Invalid array length");
         var result = new TElement[length];
-        for (int i = 0; i < length; i++) result[i] = deserializeElement(ref span);
+        for (int i = 0; i < length; i++)
+            result[i] = deserializeElement(stream);
         return result;
     }
 
-    protected void SerializeString(string value, ref Span<byte> span)
+    protected void SerializeString(string value, Stream stream)
     {
-        int byteCount = Encoding.UTF8.GetByteCount(value);
-        SerializeInt(byteCount, ref span);
-        Span<byte> slice = SliceOff(byteCount, ref span);
-        Encoding.UTF8.GetBytes(value).CopyTo(slice);
+        SerializeInt(Encoding.UTF8.GetByteCount(value), stream);
+        stream.Write(Encoding.UTF8.GetBytes(value));
     }
 
-    protected string DeserializeString(ref Span<byte> span)
+    protected string DeserializeString(Stream stream)
     {
-        int byteCount = DeserializeInt(ref span);
-        if (byteCount < 0 || byteCount > span.Length) throw new BadPacketException("Invalid string length");
-        Span<byte> slice = SliceOff(byteCount, ref span);
-        return Encoding.UTF8.GetString(slice.ToArray());
+        int byteCount = DeserializeInt(stream);
+        if (byteCount < 0 || byteCount > stream.Length - stream.Position)
+            throw new BadPacketException("Invalid string length");
+        byte[] buffer = new byte[byteCount];
+        stream.ReadExactly(buffer);
+        return Encoding.UTF8.GetString(buffer);
     }
     
-    protected void SerializeNullableStruct<T>(T? nullable, Serializer<T> serializer, ref Span<byte> span)
+    protected void SerializeNullableStruct<T>(T? nullable, Serializer<T> serializer, Stream stream)
         where T : struct
     {
-        SerializeBool(nullable.HasValue, ref span);
-        if (nullable.HasValue) serializer(nullable.Value, ref span);
+        SerializeBool(nullable != null, stream);
+        if (nullable != null)
+            serializer(nullable.Value, stream);
     }
     
-    protected T? DeserializeNullableStruct<T>(Deserializer<T> deserializer, ref Span<byte> span)
+    protected T? DeserializeNullableStruct<T>(Deserializer<T> deserializer, Stream stream)
         where T : struct
     {
-        bool hasValue = DeserializeBool(ref span);
-        return hasValue ? deserializer(ref span) : null;
+        bool hasValue = DeserializeBool(stream);
+        return hasValue ? deserializer(stream) : null;
     }
     
-    protected void SerializeNullableClass<T>(T? nullable, Serializer<T> serializer, ref Span<byte> span)
+    protected void SerializeNullableClass<T>(T? nullable, Serializer<T> serializer, Stream stream)
         where T : class
     {
-        SerializeBool(nullable != null, ref span);
-        if (nullable != null) serializer(nullable, ref span);
+        SerializeBool(nullable != null, stream);
+        if (nullable != null)
+            serializer(nullable, stream);
     }
     
-    protected T? DeserializeNullableClass<T>(Deserializer<T> deserializer, ref Span<byte> span)
+    protected T? DeserializeNullableClass<T>(Deserializer<T> deserializer, Stream stream)
         where T : class
     {
-        bool hasValue = DeserializeBool(ref span);
-        return hasValue ? deserializer(ref span) : null;
+        bool hasValue = DeserializeBool(stream);
+        return hasValue ? deserializer(stream) : null;
     }
 
-    protected int SizeOf<TValue>(TValue value = default) where TValue : unmanaged
-    {
-        return value switch
-        {
-            byte or sbyte or bool => 1,
-            short or ushort or char => 2,
-            int or uint or float => 4,
-            long or ulong or double or Vector2 => 8,
-            Guid or decimal => 16,
-            Enum e => e.GetTypeCode() switch
-            {
-                TypeCode.Byte or TypeCode.SByte => 1,
-                TypeCode.Int16 or TypeCode.UInt16 => 2,
-                TypeCode.Int32 or TypeCode.UInt32 => 4,
-                TypeCode.Int64 or TypeCode.UInt64 => 8
-            }
-        };
-    }
-    
-    protected int SizeOf<TElement>(IReadOnlyList<TElement> value) where TElement : unmanaged =>
-        sizeof(int) + value.Count * SizeOf<TElement>();
-    
-    protected int SizeOf<TElement>(IReadOnlyList<TElement> value, Func<TElement, int> sizeOfElement) =>
-        sizeof(int) + value.Sum(sizeOfElement);
-
-    protected int SizeOf(string s) => sizeof(int) + Encoding.UTF8.GetByteCount(s);
-    
-    protected int SizeOfNullableStruct<T>(T? nullable) where T : unmanaged =>
-        nullable == null ? 1 : 1 + SizeOf<T>();
-    
-    protected int SizeOfNullableStruct<T>(T? nullable, Func<T, int> sizeOfValue) where T : struct =>
-        nullable == null ? 1 : 1 + sizeOfValue(nullable.Value);
-    
-    protected int SizeOfNullableClass<T>(T? nullable, Func<T, int> sizeOfValue) where T : class =>
-        nullable == null ? 1 : 1 + sizeOfValue(nullable);
-    
-    protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, int sizeOfValue)
-        where TKey : unmanaged
-    {
-        return SizeOf(dictionary, _ => sizeOfValue);
-    }
-    
-    protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary, Func<TValue, int> sizeOfValue)
-        where TKey : unmanaged
-    {
-        return sizeof(int) + dictionary.Count * SizeOf<TKey>() + dictionary.Values.Sum(sizeOfValue);
-    }
-    
-    protected int SizeOf<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary)
-        where TKey : unmanaged
-        where TValue : unmanaged
-    {
-        return sizeof(int) + dictionary.Count * (SizeOf<TKey>() + SizeOf<TValue>());
-    }
-    
     protected void SerializeDictionary<TKey, TValue>
     (
         IReadOnlyDictionary<TKey, TValue> dictionary,
         Serializer<TKey> serializeKey,
         Serializer<TValue> serializeValue,
-        ref Span<byte> span
+        Stream stream
     )
     {
-        SerializeInt(dictionary.Count, ref span);
-        foreach ((TKey key, TValue value) in dictionary)
+        SerializeList(dictionary, (pair, _) =>
         {
-            serializeKey(key, ref span);
-            serializeValue(value, ref span);
-        }
+            serializeKey(pair.Key, stream);
+            serializeValue(pair.Value, stream);
+        }, stream);
     }
 
     protected ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue> 
     (
         Deserializer<TKey> deserializeKey,
         Deserializer<TValue> deserializeValue,
-        ref Span<byte> span
+        Stream stream
     ) where TKey : notnull
     {
-        var pairs = new KeyValuePair<TKey, TValue>[DeserializeInt(ref span)];
-        for (int i = 0; i < pairs.Length; i++)
-            pairs[i] = new KeyValuePair<TKey, TValue>(deserializeKey(ref span), deserializeValue(ref span));
-        return pairs.ToImmutableDictionary();
+        return DeserializeList
+        (
+            _ => new KeyValuePair<TKey, TValue>(deserializeKey(stream), deserializeValue(stream)),
+            stream
+        ).ToImmutableDictionary();
     }
 }
