@@ -4,21 +4,16 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class CharacterRecalledPacketSerializer : PacketSerializer<CharacterRecalledPacket>
 {
-    protected override int PacketSize(CharacterRecalledPacket packet)
+    protected override void SerializeInternal(CharacterRecalledPacket packet, Stream stream)
     {
-        return base.PacketSize(packet) + SizeOf(packet.CharacterId);
+        base.SerializeInternal(packet, stream);
+        SerializeGuid(packet.CharacterId, stream);
     }
 
-    protected override void SerializeInternal(CharacterRecalledPacket packet, ref Span<byte> span)
+    protected override CharacterRecalledPacket DeserializeInternal(Stream stream)
     {
-        base.SerializeInternal(packet, ref span);
-        SerializeGuid(packet.CharacterId, ref span);
-    }
-
-    protected override CharacterRecalledPacket DeserializeInternal(ref Span<byte> span)
-    {
-        var packet = base.DeserializeInternal(ref span);
-        packet.CharacterId = DeserializeGuid(ref span);
+        var packet = base.DeserializeInternal(stream);
+        packet.CharacterId = DeserializeGuid(stream);
         return packet;
     }
 }

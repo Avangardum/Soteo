@@ -11,219 +11,161 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapshotPacket>
 {
-    // todo too much boilerplate, refactor this
-    
     private enum EntityKind : byte
     {
         Unit = 0,
         Projectile = 1
     }
     
-    private const int SizeOfAbilityState = sizeof(int) + sizeof(int) + sizeof(float) + sizeof(float);
-    private const int SizeOfAbilityUseProgress = sizeof(AbilitySlot) + sizeof(float) + sizeof(float);
-
-    protected override int PacketSize(ShardSnapshotPacket packet)
+    protected override void SerializeInternal(ShardSnapshotPacket packet, Stream stream)
     {
-        return base.PacketSize(packet) + SizeOf(packet.Tick) + SizeOf(packet.Snapshot.Entities, EntitySize);
+        base.SerializeInternal(packet, stream);
+        SerializeLong(packet.Tick, stream);
+        SerializeList(packet.Snapshot.Entities, SerializeEntity, stream);
     }
     
-    private int EntitySize(EntitySnapshot entity)
-    {
-        return entity switch
-        {
-            UnitSnapshot unit => UnitSize(unit),
-            ProjectileSnapshot projectile => ProjectileSize(projectile)
-        };
-    }
-    
-    private int BaseEntitySize(EntitySnapshot entity)
-    {
-        return
-            sizeof(EntityKind) +
-            SizeOf(entity.Id) +
-            SizeOf(entity.Position) +
-            SizeOf(entity.Azimuth);
-    }
-    
-    private int UnitSize(UnitSnapshot unit)
-    {
-        return
-            BaseEntitySize(unit) +
-            SizeOf(unit.IsMoving) +
-            SizeOf(unit.Stats) +
-            SizeOf(unit.AbilityStates, SizeOfAbilityState) +
-            SizeOfNullableClass(unit.AbilityUseProgress, _ => SizeOfAbilityUseProgress);
-    }
-    
-    private int ProjectileSize(ProjectileSnapshot projectile)
-    {
-        return BaseEntitySize(projectile) +
-            SizeOf(projectile.Speed) +
-            SizeOfAbilityContext(projectile.AbilityContext);
-    }
-
-    protected override void SerializeInternal(ShardSnapshotPacket packet, ref Span<byte> span)
-    {
-        base.SerializeInternal(packet, ref span);
-        SerializeLong(packet.Tick, ref span);
-        SerializeList(packet.Snapshot.Entities, SerializeEntity, ref span);
-    }
-    
-    private void SerializeEntity(EntitySnapshot entity, ref Span<byte> span)
+    private void SerializeEntity(EntitySnapshot entity, Stream stream)
     {
         switch (entity)
         {
             case UnitSnapshot unit:
-                SerializeUnit(unit, ref span);
+                SerializeUnit(unit, stream);
                 break;
             case ProjectileSnapshot projectile:
-                SerializeProjectile(projectile, ref span);
+                SerializeProjectile(projectile, stream);
                 break;
         }
     }
     
-    private void SerializeBaseEntity(EntitySnapshot unit, ref Span<byte> span)
+    private void SerializeBaseEntity(EntitySnapshot unit, Stream stream)
     {
-        SerializeGuid(unit.Id, ref span);
-        SerializeVector2(unit.Position, ref span);
-        SerializeFloat(unit.Azimuth, ref span);
+        SerializeGuid(unit.Id, stream);
+        SerializeVector2(unit.Position, stream);
+        SerializeFloat(unit.Azimuth, stream);
     }
     
-    private void SerializeUnit(UnitSnapshot unit, ref Span<byte> span)
+    private void SerializeUnit(UnitSnapshot unit, Stream stream)
     {
-        SerializeEnum(EntityKind.Unit, ref span);
-        SerializeBaseEntity(unit, ref span);
-        SerializeBool(unit.IsMoving, ref span);
-        SerializeDictionary(unit.Stats, SerializeEnum, SerializeFloat, ref span);
-        SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilityState, ref span);
-        SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, ref span);
+        SerializeEnum(EntityKind.Unit, stream);
+        SerializeBaseEntity(unit, stream);
+        SerializeBool(unit.IsMoving, stream);
+        SerializeDictionary(unit.Stats, SerializeEnum, SerializeFloat, stream);
+        SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilityState, stream);
+        SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
     }
     
-    private void SerializeProjectile(ProjectileSnapshot projectile, ref Span<byte> span)
+    private void SerializeProjectile(ProjectileSnapshot projectile, Stream stream)
     {
-        SerializeEnum(EntityKind.Projectile, ref span);
-        SerializeBaseEntity(projectile, ref span);
-        SerializeFloat(projectile.Speed, ref span);
-        SerializeAbilityContext(projectile.AbilityContext, ref span);
+        SerializeEnum(EntityKind.Projectile, stream);
+        SerializeBaseEntity(projectile, stream);
+        SerializeFloat(projectile.Speed, stream);
+        SerializeAbilityContext(projectile.AbilityContext, stream);
     }
 
-    protected override ShardSnapshotPacket DeserializeInternal(ref Span<byte> span)
+    protected override ShardSnapshotPacket DeserializeInternal(Stream stream)
     {
-        var message = base.DeserializeInternal(ref span);
-        message.Tick = DeserializeLong(ref span);
-        var entities = DeserializeList(DeserializeEntity, ref span).ToImmutableList();
+        var message = base.DeserializeInternal(stream);
+        message.Tick = DeserializeLong(stream);
+        var entities = DeserializeList(DeserializeEntity, stream).ToImmutableList();
         message.Snapshot = new ShardSnapshot { Entities = entities };
         return message;
     }
     
-    private EntitySnapshot DeserializeEntity(ref Span<byte> span)
+    private EntitySnapshot DeserializeEntity(Stream stream)
     {
-        return DeserializeEnum<EntityKind>(ref span) switch
+        return DeserializeEnum<EntityKind>(stream) switch
         {
-            EntityKind.Unit => DeserializeUnit(ref span),
-            EntityKind.Projectile => DeserializeProjectile(ref span)
+            EntityKind.Unit => DeserializeUnit(stream),
+            EntityKind.Projectile => DeserializeProjectile(stream)
         };
     }
     
-    private UnitSnapshot DeserializeUnit(ref Span<byte> span)
+    private UnitSnapshot DeserializeUnit(Stream stream)
     {
         return new UnitSnapshot
         {
-            Id = DeserializeGuid(ref span),
-            Position = DeserializeVector2(ref span),
-            Azimuth = DeserializeFloat(ref span),
-            IsMoving = DeserializeBool(ref span),
-            Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, ref span),
-            AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, ref span),
-            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, ref span)
+            Id = DeserializeGuid(stream),
+            Position = DeserializeVector2(stream),
+            Azimuth = DeserializeFloat(stream),
+            IsMoving = DeserializeBool(stream),
+            Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, stream),
+            AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, stream),
+            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream)
         };
     }
     
-    private ProjectileSnapshot DeserializeProjectile(ref Span<byte> span)
+    private ProjectileSnapshot DeserializeProjectile(Stream stream)
     {
         return new ProjectileSnapshot
         {
-            Id = DeserializeGuid(ref span),
-            Position = DeserializeVector2(ref span),
-            Azimuth = DeserializeFloat(ref span),
-            Speed = DeserializeFloat(ref span),
-            AbilityContext = DeserializeAbilityContext(ref span)
+            Id = DeserializeGuid(stream),
+            Position = DeserializeVector2(stream),
+            Azimuth = DeserializeFloat(stream),
+            Speed = DeserializeFloat(stream),
+            AbilityContext = DeserializeAbilityContext(stream)
         };
     }
 
-    private void SerializeAbilityState(AbilityState value, ref Span<byte> span)
+    private void SerializeAbilityState(AbilityState value, Stream stream)
     {
-        SerializeInt(value.Ability.Id, ref span);
-        SerializeInt(value.Level, ref span);
-        SerializeFloat(value.Cooldown, ref span);
-        SerializeFloat(value.MaxCooldown, ref span);
+        SerializeInt(value.Ability.Id, stream);
+        SerializeInt(value.Level, stream);
+        SerializeFloat(value.Cooldown, stream);
+        SerializeFloat(value.MaxCooldown, stream);
     }
     
-    private AbilityState DeserializeAbilityState(ref Span<byte> span)
+    private AbilityState DeserializeAbilityState(Stream stream)
     {
         return new AbilityState
         {
-            Ability = Ability.All[DeserializeInt(ref span)],
-            Level = DeserializeInt(ref span),
-            Cooldown = DeserializeFloat(ref span),
-            MaxCooldown = DeserializeFloat(ref span)
+            Ability = Ability.All[DeserializeInt(stream)],
+            Level = DeserializeInt(stream),
+            Cooldown = DeserializeFloat(stream),
+            MaxCooldown = DeserializeFloat(stream)
         };
     }
     
-    private int SizeOfAbilityContext(AbilityContext.Deflated context)
+    private void SerializeAbilityContext(AbilityContext.Deflated context, Stream stream)
     {
-        return
-            SizeOf(context.AbilityId) +
-            SizeOf(context.Level) +
-            SizeOf(context.UserId) +
-            SizeOf(context.UserStats, SizeOf) +
-            SizeOfNullableStruct(context.TargetPosition) +
-            SizeOfNullableStruct(context.TargetUnitId) +
-            SizeOfNullableStruct(context.TargetDirection) +
-            SizeOfNullableStruct(context.TargetShardId);
+        SerializeInt(context.AbilityId, stream);
+        SerializeInt(context.Level, stream);
+        SerializeGuid(context.UserId, stream);
+        SerializeDictionary(context.UserStats, SerializeEnum, SerializeFloat, stream);
+        SerializeNullableStruct(context.TargetPosition, SerializeVector2, stream);
+        SerializeNullableStruct(context.TargetUnitId, SerializeGuid, stream);
+        SerializeNullableStruct(context.TargetDirection, SerializeVector2, stream);
+        SerializeNullableStruct(context.TargetShardId, SerializeGuid, stream);
     }
     
-    private void SerializeAbilityContext(AbilityContext.Deflated context, ref Span<byte> span)
-    {
-        SerializeInt(context.AbilityId, ref span);
-        SerializeInt(context.Level, ref span);
-        SerializeGuid(context.UserId, ref span);
-        SerializeDictionary(context.UserStats, SerializeEnum, SerializeFloat, ref span);
-        SerializeNullableStruct(context.TargetPosition, SerializeVector2, ref span);
-        SerializeNullableStruct(context.TargetUnitId, SerializeGuid, ref span);
-        SerializeNullableStruct(context.TargetDirection, SerializeVector2, ref span);
-        SerializeNullableStruct(context.TargetShardId, SerializeGuid, ref span);
-    }
-    
-    private AbilityContext.Deflated DeserializeAbilityContext(ref Span<byte> span)
+    private AbilityContext.Deflated DeserializeAbilityContext(Stream stream)
     {
         return new AbilityContext.Deflated
         {
-            AbilityId = DeserializeInt(ref span),
-            Level = DeserializeInt(ref span),
-            UserId = DeserializeGuid(ref span),
-            UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, ref span),
-            TargetPosition = DeserializeNullableStruct(DeserializeVector2, ref span),
-            TargetUnitId = DeserializeNullableStruct(DeserializeGuid, ref span),
-            TargetDirection = DeserializeNullableStruct(DeserializeVector2, ref span),
-            TargetShardId = DeserializeNullableStruct(DeserializeGuid, ref span)
+            AbilityId = DeserializeInt(stream),
+            Level = DeserializeInt(stream),
+            UserId = DeserializeGuid(stream),
+            UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, stream),
+            TargetPosition = DeserializeNullableStruct(DeserializeVector2, stream),
+            TargetUnitId = DeserializeNullableStruct(DeserializeGuid, stream),
+            TargetDirection = DeserializeNullableStruct(DeserializeVector2, stream),
+            TargetShardId = DeserializeNullableStruct(DeserializeGuid, stream)
         };
     }
     
-    private void SerializeAbilityUseProgress(AbilityUseProgress value, ref Span<byte> span)
+    private void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream)
     {
-        SerializeEnum(value.Slot, ref span);
-        SerializeFloat(value.ElapsedTime, ref span);
-        SerializeFloat(value.RemainingTime, ref span);
+        SerializeEnum(value.Slot, stream);
+        SerializeFloat(value.ElapsedTime, stream);
+        SerializeFloat(value.RemainingTime, stream);
     }
     
-    private AbilityUseProgress DeserializeAbilityUseProgress(ref Span<byte> span)
+    private AbilityUseProgress DeserializeAbilityUseProgress(Stream stream)
     {
         return new AbilityUseProgress
         {
-            Slot = DeserializeEnum<AbilitySlot>(ref span),
-            ElapsedTime = DeserializeFloat(ref span),
-            RemainingTime = DeserializeFloat(ref span)
+            Slot = DeserializeEnum<AbilitySlot>(stream),
+            ElapsedTime = DeserializeFloat(stream),
+            RemainingTime = DeserializeFloat(stream)
         };
     }
 }

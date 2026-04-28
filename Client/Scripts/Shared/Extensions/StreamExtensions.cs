@@ -7,13 +7,14 @@ public static class StreamExtensions
         public int Read(Span<byte> buffer)
         {
             int bytesRead = 0;
-            while (true)
+            while (bytesRead < buffer.Length)
             {
                 int value = self.ReadByte();
                 if (value == -1) return bytesRead;
                 buffer[bytesRead] = (byte)value;
                 bytesRead++;
             }
+            return bytesRead;
         }
         
         public void ReadExactly(Span<byte> buffer)

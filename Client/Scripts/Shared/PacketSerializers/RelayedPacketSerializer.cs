@@ -5,18 +5,16 @@ namespace Soteo.Shared.PacketSerializers;
 public abstract class RelayedPacketSerializer<TPacket> : PacketSerializer<TPacket>
     where TPacket : RelayedPacket, new()
 {
-    protected override int PacketSize(TPacket packet) => base.PacketSize(packet) + Const.BytesInGuid;
-
-    protected override void SerializeInternal(TPacket packet, ref Span<byte> span)
+    protected override void SerializeInternal(TPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, ref span);
-        SerializeGuid(packet.PeerId, ref span);
+        base.SerializeInternal(packet, stream);
+        SerializeGuid(packet.PeerId, stream);
     }
 
-    protected override TPacket DeserializeInternal(ref Span<byte> span)
+    protected override TPacket DeserializeInternal(Stream stream)
     {
-        TPacket packet = base.DeserializeInternal(ref span);
-        packet.PeerId = DeserializeGuid(ref span);
+        TPacket packet = base.DeserializeInternal(stream);
+        packet.PeerId = DeserializeGuid(stream);
         return packet;
     }
 }

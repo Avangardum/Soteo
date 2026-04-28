@@ -4,21 +4,18 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class MasterServerHandshakePacketSerializer : PacketSerializer<MasterServerHandshakePacket>
 {
-    protected override int PacketSize(MasterServerHandshakePacket packet) =>
-        base.PacketSize(packet) + SizeOf(packet.Token) + SizeOf(packet.Version);
-
-    protected override void SerializeInternal(MasterServerHandshakePacket packet, ref Span<byte> span)
+    protected override void SerializeInternal(MasterServerHandshakePacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, ref span);
-        SerializeString(packet.Token, ref span);
-        SerializeString(packet.Version, ref span);
+        base.SerializeInternal(packet, stream);
+        SerializeString(packet.Token, stream);
+        SerializeString(packet.Version, stream);
     }
 
-    protected override MasterServerHandshakePacket DeserializeInternal(ref Span<byte> span)
+    protected override MasterServerHandshakePacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(ref span);
-        packet.Token = DeserializeString(ref span);
-        packet.Version = DeserializeString(ref span);
+        var packet = base.DeserializeInternal(stream);
+        packet.Token = DeserializeString(stream);
+        packet.Version = DeserializeString(stream);
         return packet;
     }
 }

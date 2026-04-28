@@ -4,19 +4,16 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class BadInputPacketSerializer : PacketSerializer<BadInputPacket>
 {
-    protected override int PacketSize(BadInputPacket packet) =>
-        base.PacketSize(packet) + SizeOf(packet.Reason);
-
-    protected override void SerializeInternal(BadInputPacket packet, ref Span<byte> span)
+    protected override void SerializeInternal(BadInputPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, ref span);
-        SerializeString(packet.Reason, ref span);
+        base.SerializeInternal(packet, stream);
+        SerializeString(packet.Reason, stream);
     }
 
-    protected override BadInputPacket DeserializeInternal(ref Span<byte> span)
+    protected override BadInputPacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(ref span);
-        packet.Reason = DeserializeString(ref span);
+        var packet = base.DeserializeInternal(stream);
+        packet.Reason = DeserializeString(stream);
         return packet;
     }
 }

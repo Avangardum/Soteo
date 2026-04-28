@@ -30,13 +30,13 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         SerializeEnum(packet.Type, stream);
     }
     
-    Packet IPacketSerializer.Deserialize(byte[] bytes) => Deserialize(bytes);
+    Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
     
-    public TPacket Deserialize(byte[] bytes)
+    public TPacket Deserialize(Span<byte> bytes)
     {
         try
         {
-            var stream = new MemoryStream(bytes);
+            var stream = new MemoryStream(bytes.ToArray());
             TPacket packet = DeserializeInternal(stream);
             if (stream.Position != bytes.Length) throw new BadPacketException(
                 $"Packet deserialized as {packet}, but contains {bytes.Length - stream.Position} extra bytes");

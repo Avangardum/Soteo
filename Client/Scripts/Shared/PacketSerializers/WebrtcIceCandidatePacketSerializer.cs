@@ -4,25 +4,20 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class WebrtcIceCandidatePacketSerializer : RelayedPacketSerializer<WebrtcIceCandidatePacket>
 {
-    protected override int PacketSize(WebrtcIceCandidatePacket packet)
+    protected override void SerializeInternal(WebrtcIceCandidatePacket packet, Stream stream)
     {
-        return base.PacketSize(packet) + SizeOf(packet.Media) + SizeOf(packet.Index) + SizeOf(packet.Name);
+        base.SerializeInternal(packet, stream);
+        SerializeString(packet.Media, stream);
+        SerializeInt(packet.Index, stream);
+        SerializeString(packet.Name, stream);
     }
 
-    protected override void SerializeInternal(WebrtcIceCandidatePacket packet, ref Span<byte> span)
+    protected override WebrtcIceCandidatePacket DeserializeInternal(Stream stream)
     {
-        base.SerializeInternal(packet, ref span);
-        SerializeString(packet.Media, ref span);
-        SerializeInt(packet.Index, ref span);
-        SerializeString(packet.Name, ref span);
-    }
-
-    protected override WebrtcIceCandidatePacket DeserializeInternal(ref Span<byte> span)
-    {
-        var packet = base.DeserializeInternal(ref span);
-        packet.Media = DeserializeString(ref span);
-        packet.Index = DeserializeInt(ref span);
-        packet.Name = DeserializeString(ref span);
+        var packet = base.DeserializeInternal(stream);
+        packet.Media = DeserializeString(stream);
+        packet.Index = DeserializeInt(stream);
+        packet.Name = DeserializeString(stream);
         return packet;
     }
 }

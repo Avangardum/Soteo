@@ -4,18 +4,16 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class MovePacketSerializer : PacketSerializer<MovePacket>
 {
-    protected override int PacketSize(MovePacket packet) => base.PacketSize(packet) + SizeOf(packet.Position);
-
-    protected override void SerializeInternal(MovePacket packet, ref Span<byte> span)
+    protected override void SerializeInternal(MovePacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, ref span);
-        SerializeVector2(packet.Position, ref span);
+        base.SerializeInternal(packet, stream);
+        SerializeVector2(packet.Position, stream);
     }
 
-    protected override MovePacket DeserializeInternal(ref Span<byte> span)
+    protected override MovePacket DeserializeInternal(Stream stream)
     {
-        var message = base.DeserializeInternal(ref span);
-        message.Position = DeserializeVector2(ref span);
+        var message = base.DeserializeInternal(stream);
+        message.Position = DeserializeVector2(stream);
         return message;
     }
 }

@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
-[ext_resource path="res://Scripts/Gameplay/Nodes/Main.cs" type="Script" id=2]
-[ext_resource path="res://Scripts/Gameplay/Nodes/SoteoCamera.cs" type="Script" id=3]
+[ext_resource path="res://Scripts/Gameplay/Main.cs" type="Script" id=2]
+[ext_resource path="res://Scripts/Gameplay/SoteoCamera.cs" type="Script" id=3]
 [ext_resource path="res://Textures/Stars.png" type="Texture" id=7]
 
 [node name="Main" type="Node2D"]

@@ -4,21 +4,16 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class SpawnCharacterPacketSerializer : RelayedPacketSerializer<SpawnCharacterPacket>
 {
-    protected override int PacketSize(SpawnCharacterPacket packet)
+    protected override void SerializeInternal(SpawnCharacterPacket packet, Stream stream)
     {
-        return base.PacketSize(packet) + SizeOf(packet.SpawnPointId);
+        base.SerializeInternal(packet, stream);
+        SerializeGuid(packet.SpawnPointId, stream);
     }
 
-    protected override void SerializeInternal(SpawnCharacterPacket packet, ref Span<byte> span)
+    protected override SpawnCharacterPacket DeserializeInternal(Stream stream)
     {
-        base.SerializeInternal(packet, ref span);
-        SerializeGuid(packet.SpawnPointId, ref span);
-    }
-
-    protected override SpawnCharacterPacket DeserializeInternal(ref Span<byte> span)
-    {
-        var packet = base.DeserializeInternal(ref span);
-        packet.SpawnPointId = DeserializeGuid(ref span);
+        var packet = base.DeserializeInternal(stream);
+        packet.SpawnPointId = DeserializeGuid(stream);
         return packet;
     }
 }

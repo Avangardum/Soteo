@@ -4,19 +4,16 @@ namespace Soteo.Shared.PacketSerializers;
 
 public sealed class WebrtcSdpPacketSerializer : RelayedPacketSerializer<WebrtcSdpPacket>
 {
-    protected override int PacketSize(WebrtcSdpPacket packet) =>
-        base.PacketSize(packet) + SizeOf(packet.Sdp);
-
-    protected override void SerializeInternal(WebrtcSdpPacket packet, ref Span<byte> span)
+    protected override void SerializeInternal(WebrtcSdpPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, ref span);
-        SerializeString(packet.Sdp, ref span);
+        base.SerializeInternal(packet, stream);
+        SerializeString(packet.Sdp, stream);
     }
 
-    protected override WebrtcSdpPacket DeserializeInternal(ref Span<byte> span)
+    protected override WebrtcSdpPacket DeserializeInternal(Stream stream)
     {
-        WebrtcSdpPacket packet = base.DeserializeInternal(ref span);
-        packet.Sdp = DeserializeString(ref span);
+        WebrtcSdpPacket packet = base.DeserializeInternal(stream);
+        packet.Sdp = DeserializeString(stream);
         return packet;
     }
 }
