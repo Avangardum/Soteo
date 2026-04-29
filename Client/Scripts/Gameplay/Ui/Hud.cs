@@ -77,19 +77,21 @@ public sealed class Hud : Control, IHud
     
     private void ProcessBars()
     {
-        _healthBar.TintProgress = SelectedUnit!.Faction switch
+        _healthBar.TintProgress = SelectedUnit.Required.Faction switch
         {
-            Faction.Neutral => _palette.Neutral,
             Faction.Empire => _palette.Empire,
-            Faction.Syndicate => _palette.Syndicate
+            Faction.Syndicate => _palette.Syndicate,
+            _ => _palette.Neutral
         };
         
-        _healthBar.Value = SelectedUnit!.Stats[Stat.CurrentHealth];
+        _healthBar.Value = SelectedUnit.Stats[Stat.CurrentHealth];
         _healthBar.MaxValue = SelectedUnit.Stats[Stat.MaxHealth];
-        _healthLabel.Text = $"{SelectedUnit.Stats[Stat.CurrentHealth]} / {SelectedUnit.Stats[Stat.MaxHealth]}";
+        _healthLabel.Text = $"{Mathf.CeilToInt(SelectedUnit.Stats[Stat.CurrentHealth])} / " +
+            $"{Mathf.CeilToInt(SelectedUnit.Stats[Stat.MaxHealth])}";
         _manaBar.Value = SelectedUnit.Stats[Stat.CurrentMana];
         _manaBar.MaxValue = SelectedUnit.Stats[Stat.MaxMana];
-        _manaLabel.Text = $"{SelectedUnit.Stats[Stat.CurrentMana]} / {SelectedUnit.Stats[Stat.MaxMana]}";
+        _manaLabel.Text = $"{Mathf.CeilToInt(SelectedUnit.Stats[Stat.CurrentMana])} / " +
+        $"  {Mathf.CeilToInt(SelectedUnit.Stats[Stat.MaxMana])}";
     }
     
     private void ProcessAbilities()

@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
-using System.Reflection;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Enums;
+using Soteo.Gameplay.Statuses;
 using Soteo.Gameplay.Util;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
@@ -19,19 +19,15 @@ public abstract class Ability
 
     static Ability()
     {
-        All = Assembly.GetExecutingAssembly().DefinedTypes
-            .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(Ability)))
-            .OrderBy(it => it.FullName)
-            .Select(it => (Ability)Activator.CreateInstance(it))
-            .ToImmutableList();
-        
+        All = TypeLocator.InstanceAllSubclasses<Ability>();
         InstancesByType = All.ToImmutableDictionary(it => it.GetType(), it => it);
     }
     
     public int Id => All.IndexOf(this);
     
     public virtual int MaxLevel => 1;
-    public virtual CanTarget Targeting => CanTarget.Nothing;
+    public virtual Status? PassiveStatus => null;
+    public virtual CanTarget Targeting => CanTarget.Passive;
     public virtual string Animation => "Attack Right";
     public virtual bool LoopAnimation => false;
     

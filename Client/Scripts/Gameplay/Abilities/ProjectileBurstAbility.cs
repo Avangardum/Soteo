@@ -1,13 +1,15 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Dto;
+using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
 using Soteo.Shared;
 
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class ProjectileBurst : Ability
+public sealed class ProjectileBurstAbility : Ability
 {
+    public override CanTarget Targeting => CanTarget.Nothing;
     public override Scalable<float> StaticRange => 1000;
     public override Scalable<float> StaticCooldown => 5;
 

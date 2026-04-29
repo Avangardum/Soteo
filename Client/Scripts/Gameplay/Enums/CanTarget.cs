@@ -3,7 +3,7 @@ namespace Soteo.Gameplay.Enums;
 [Flags]
 public enum CanTarget
 {
-    Invalid = 0,
+    Passive = 0,
     
     // Unprefixed values specify whether that kind of target is allowed
     Nothing = 1 << 0,

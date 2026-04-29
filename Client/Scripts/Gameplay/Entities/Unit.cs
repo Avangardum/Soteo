@@ -40,6 +40,8 @@ public abstract class Unit : Entity<UnitNode>
     {
         [Stat.MaxHealth] = 1000,
         [Stat.CurrentHealth] = 1000,
+        [Stat.HealthRegen] = 2,
+        [Stat.ManaRegen] = 2,
         [Stat.MaxMana] = 1000,
         [Stat.CurrentMana] = 1000,
         [Stat.MoveSpeed] = 50,
@@ -59,10 +61,12 @@ public abstract class Unit : Entity<UnitNode>
     protected Dictionary<AbilitySlot, AbilityState> AbilityStatesInternal { get; set; } = [];
     public IReadOnlyDictionary<AbilitySlot, AbilityState> AbilityStates => AbilityStatesInternal;
 
+    [MemberNotNullWhen(false, nameof(Node))]
+    public override bool IsRemoved { get; protected set; }
+    
     public AbilityUseProgress? AbilityUseProgress { get; private set; }
-    [MemberNotNullWhen(false, nameof(Node))] public override bool IsRemoved { get; protected set; }
     protected override UnitNode? Node => field.AsValid();
-    public Faction Faction { get; set; }
+    public Faction Faction { get; }
 
     public override Vector2 Position
     {
@@ -126,6 +130,7 @@ public abstract class Unit : Entity<UnitNode>
     {
         _isMoving = false;
         DecreaseCooldowns(delta);
+        ApplyRegen(delta);
         ExecuteCommands(node, delta);
     }
     
@@ -138,6 +143,12 @@ public abstract class Unit : Entity<UnitNode>
                 Cooldown = Mathf.Max(AbilityStatesInternal[slot].Cooldown - delta, 0)
             };
         }
+    }
+    
+    private void ApplyRegen(float delta)
+    {
+        ChangeStat(Stat.CurrentHealth, Stats[Stat.HealthRegen] * delta);
+        ChangeStat(Stat.CurrentMana, Stats[Stat.ManaRegen] * delta);
     }
 
     public virtual void _PhysicsProcessClient(UnitNode node, float delta)

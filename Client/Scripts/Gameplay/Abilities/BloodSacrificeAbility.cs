@@ -1,10 +1,12 @@
 using Soteo.Gameplay.Dto;
+using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Util;
 
 namespace Soteo.Gameplay.Abilities;
 
 public sealed class BloodSacrificeAbility : Ability
 {
+    public override CanTarget Targeting => CanTarget.Nothing;
     public override Scalable<float> StaticHealthCost => 100;
     public override Scalable<float> StaticUseTime => 0.5f;
     private Scalable<float> ManaRestored => 200;

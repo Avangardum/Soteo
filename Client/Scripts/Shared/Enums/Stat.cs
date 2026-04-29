@@ -4,8 +4,10 @@ public enum Stat : byte
 {
     MaxHealth,
     CurrentHealth,
+    HealthRegen,
     MaxMana,
     CurrentMana,
+    ManaRegen,
     /// <summary>
     /// Move speed in pixels per second
     /// </summary>

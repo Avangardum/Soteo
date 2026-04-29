@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.PacketHandlers;
 using Soteo.Shared.Enums;
@@ -15,5 +16,14 @@ public static class TypeLocator
             .Where(it =>
                 !it.IsAbstract && it != typeof(RoutingPacketHandler) && it.IsAssignableTo(typeof(IPacketHandler)))
             .ToDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
+    }
+    
+    public static ImmutableList<T> InstanceAllSubclasses<T>()
+    {
+        return typeof(T).Assembly.DefinedTypes
+            .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(T)))
+            .OrderBy(it => it.FullName)
+            .Select(it => (T)Activator.CreateInstance(it))
+            .ToImmutableList();
     }
 }
