@@ -13,12 +13,12 @@ public sealed class PlayerCharacter : Unit
     {
         DisplayName = id.ToString()[^12..];
         
-        AbilityStatesInternal[AbilitySlot.Class0] = AbilityState.New<BloodSacrificeAbility>(1);
-        AbilityStatesInternal[AbilitySlot.Class1] = AbilityState.New<HealAbility>(1);
-        AbilityStatesInternal[AbilitySlot.Class2] = AbilityState.New<ProjectileBurstAbility>(1);
-        AbilityStatesInternal[AbilitySlot.Class3] = AbilityState.New<VampireAbility>(1);
-        AbilityStatesInternal[AbilitySlot.Recall] = AbilityState.New<RecallAbility>(1);
-        AbilityStatesInternal[AbilitySlot.Attack] = AbilityState.New<RangedAttack>(1);
+        SetAbility<BloodSacrificeAbility>(AbilitySlot.Class0, 1);
+        SetAbility<HealAbility>(AbilitySlot.Class1, 1);
+        SetAbility<ProjectileBurstAbility>(AbilitySlot.Class2, 1);
+        SetAbility<VampireAbility>(AbilitySlot.Class3, 1);
+        SetAbility<RecallAbility>(AbilitySlot.Recall, 1);
+        SetAbility<RangedAttackAbility>(AbilitySlot.Attack, 1);
     }
     
     public PlayerCharacter(UnitSnapshot snapshot, IServiceProvider serviceProvider) :

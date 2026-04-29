@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Entities;
+using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Util;
 
 namespace Soteo.Gameplay.Statuses;
@@ -18,6 +19,8 @@ public abstract class Status
         All = TypeLocator.InstanceAllSubclasses<Status>();
         InstancesByType = All.ToImmutableDictionary(it => it.GetType(), it => it);
     }
+    
+    public abstract DuplicateStatusResolution DuplicateResolution { get; }
     
     public virtual IReadOnlyList<StatModifier> StatModifiers(StatusContext context) => [];
     

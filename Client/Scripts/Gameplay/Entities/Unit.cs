@@ -8,6 +8,7 @@ using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Statuses;
 using Soteo.Gameplay.Util;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
@@ -31,7 +32,8 @@ public abstract class Unit : Entity<UnitNode>
         Node = new UnitNode(this, scene, serviceProvider.GetRequiredService<IShard>());
         Node.Name = $"{GetType().Name} {id}";
         
-        foreach (Stat stat in Enum.GetValues<Stat>()) StatsInternal[stat] = DefaultStats[stat];
+        foreach (Stat stat in Stat.All)
+            StatsInternal[stat] = DefaultStats[stat];
         
         Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
@@ -60,6 +62,9 @@ public abstract class Unit : Entity<UnitNode>
     
     protected Dictionary<AbilitySlot, AbilityState> AbilityStatesInternal { get; set; } = [];
     public IReadOnlyDictionary<AbilitySlot, AbilityState> AbilityStates => AbilityStatesInternal;
+    
+    protected Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
+    public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
 
     [MemberNotNullWhen(false, nameof(Node))]
     public override bool IsRemoved { get; protected set; }
@@ -131,6 +136,8 @@ public abstract class Unit : Entity<UnitNode>
         _isMoving = false;
         DecreaseCooldowns(delta);
         ApplyRegen(delta);
+        ProcessStatuses(delta);
+        UpdateStats();
         ExecuteCommands(node, delta);
     }
     
@@ -149,6 +156,122 @@ public abstract class Unit : Entity<UnitNode>
     {
         ChangeStat(Stat.CurrentHealth, Stats[Stat.HealthRegen] * delta);
         ChangeStat(Stat.CurrentMana, Stats[Stat.ManaRegen] * delta);
+    }
+    
+    private void ProcessStatuses(float delta)
+    {
+        List<StatusContext> contexts = Statuses.Values.ToList();
+        for (int i = 0; i < contexts.Count; i++)
+        {
+            StatusContext context = contexts[i];
+            float oldElapsedTime = context.ElapsedTime;
+            float limitedDelta = Mathf.Min(delta, context.RemainingTime);
+            context = context with
+            {
+                ElapsedTime = context.ElapsedTime + limitedDelta,
+                RemainingTime = context.RemainingTime - limitedDelta
+            };
+            CallStatusTicksSinceOldElapsedTime(context, oldElapsedTime);
+            if (context.RemainingTime > 0)
+                StatusesInternal[context.Id] = context;
+            else
+                RemoveStatus(context.Id);
+        }
+    }
+    
+    /// <summary>
+    /// Call all status ticks scheduled in the interval (oldElapsedTime, context.ElapsedTime]<br />
+    /// Example: f({ TickInterval = 0.5, ElapsedTime = 2 }, 1) calls Tick 2 times (for 1.5 and 2)
+    /// </summary>
+    private void CallStatusTicksSinceOldElapsedTime(StatusContext context, float oldElapsedTime)
+    {
+        if (context.TickInterval <= 0) return;
+        float oldElapsedTimeInStatusTicks = oldElapsedTime / context.TickInterval;
+        float newElapsedTimeInStatusTicks = context.ElapsedTime / context.TickInterval;
+        int firstTickIndex = oldElapsedTimeInStatusTicks % 1 == 0 ?
+            (int)oldElapsedTimeInStatusTicks + 1 :
+            Mathf.CeilToInt(oldElapsedTimeInStatusTicks);
+        int lastTickIndex = Mathf.FloorToInt(newElapsedTimeInStatusTicks);
+        for (int tick = firstTickIndex; tick <= lastTickIndex; tick++)
+            context.Status.Tick(context);
+    }
+    
+    private void UpdateStats()
+    {
+        Dictionary<Stat, Dictionary<StatModifierKind, List<StatModifier>>> modifiers = [];
+        
+        foreach (Stat stat in Stat.AllNonVolatile)
+        {
+            if (!modifiers.ContainsKey(stat))
+                modifiers[stat] = [];
+            foreach (StatModifierKind kind in Enum.GetValues<StatModifierKind>())
+                modifiers[stat][kind] = [];
+        }
+        
+        foreach (StatModifier modifier in Statuses.Values.SelectMany(it => it.Status.StatModifiers(it)))
+            modifiers[modifier.Stat][modifier.Kind].Add(modifier);
+        
+        foreach (Stat stat in Stat.AllNonVolatile)
+            StatsInternal[stat] = CalculateStatValue(stat, modifiers[stat]);
+        
+        // todo update volatile stats
+    }
+
+    private float CalculateStatValue
+    (
+        Stat stat,
+        Dictionary<StatModifierKind, List<StatModifier>> modifiers
+    )
+    {
+        StatModifier? setModifier = modifiers[StatModifierKind.Set]
+            .OrderByDescending(it => it.Priority)
+            .ThenByDescending(it => it)
+            .FirstOrDefault();
+        if (setModifier != null) return setModifier.Value;
+
+        List<StatModifier> floorModifiers = modifiers[StatModifierKind.Floor];
+        List<StatModifier> ceilingModifiers = modifiers[StatModifierKind.Ceiling];
+        float maxFloor = floorModifiers
+            .Select(it => it.Value)
+            .OrderDescending()
+            .FirstOrDefault(float.NegativeInfinity);
+        float minCeiling = ceilingModifiers
+            .Select(it => it.Value)
+            .Order()
+            .FirstOrDefault(float.PositiveInfinity);
+        if (maxFloor > minCeiling)
+            return ResolveNonOverlappingStatLimits(floorModifiers, ceilingModifiers);
+            
+        float addTotal = modifiers[StatModifierKind.Add].Sum(it => it.Value);
+        float multiplyTotal = modifiers[StatModifierKind.Multiply].Product(it => it.Value);
+        return Mathf.Clamp((DefaultStats[stat] + addTotal) * multiplyTotal, maxFloor, minCeiling);
+    }
+    
+    private float ResolveNonOverlappingStatLimits
+    (
+        IReadOnlyList<StatModifier> floorModifiers,
+        IReadOnlyList<StatModifier> ceilingModifiers
+    )
+    {
+        var floorStack = new Stack<StatModifier>(floorModifiers.OrderBy(it => it.Value));
+        var ceilingStack = new Stack<StatModifier>(ceilingModifiers.OrderByDescending(it => it.Value));
+        
+        StatModifier floor = floorStack.Pop();
+        StatModifier ceiling = ceilingStack.Pop();
+
+        while (true)
+        {
+            if (ceiling.Priority > floor.Priority)
+            {
+                if (floorStack.Count == 0) return ceiling.Value;
+                floor = floorStack.Pop();
+            }
+            else
+            {
+                if (ceilingStack.Count == 0) return floor.Value;
+                ceiling = ceilingStack.Pop();
+            }
+        }
     }
 
     public virtual void _PhysicsProcessClient(UnitNode node, float delta)
@@ -454,6 +577,8 @@ public abstract class Unit : Entity<UnitNode>
 
     protected void SetStat(Stat stat, float value)
     {
+        if (!stat.IsVolatile)
+            throw new ArgumentException($"{nameof(SetStat)} can only be used with volatile stats");
         float min = 0;
         float max = stat switch
         {
@@ -467,5 +592,95 @@ public abstract class Unit : Entity<UnitNode>
     public void DealAttackDamageTo(Unit target, Ability ability)
     {
         target.TakeDamage(Stats[Stat.AttackDamage], this, ability);
+        foreach (StatusContext statusContext in Statuses.Values)
+            statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
+    }
+    
+    protected void SetAbility<T>(AbilitySlot slot, int level) where T : Ability =>
+        SetAbility(Ability.Instance<T>(), slot, level);
+    
+    protected void SetAbility(Ability ability, AbilitySlot slot, int level)
+    {
+        if (AbilityStates.ContainsKey(slot))
+            throw new InvalidOperationException($"Slot {slot} already has an ability");
+        
+        AbilityStatesInternal[slot] = new AbilityState { Ability = ability, Level = level };
+        if (ability.PassiveStatus != null)
+        {
+            AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand(slot));
+            AddStatus(ability.PassiveStatus, float.PositiveInfinity, abilityContext, this, ability.PassiveTickInterval);
+        }
+    }
+    
+    public void AddStatus(Status status, float time, AbilityContext? abilityContext, Unit? source, float tickInterval)
+    {
+        StatusContext context = new StatusContext
+        {
+            Id = Guid.NewGuid(),
+            Status = status,
+            AbilityContext = abilityContext,
+            Unit = this,
+            Source = source,
+            ElapsedTime = 0,
+            RemainingTime = time,
+            TickInterval = tickInterval,
+            ServiceProvider = _serviceProvider
+        };
+        
+        List<StatusContext> duplicates = Statuses.Values.Where(it => it.Status == status).ToList();
+        if (duplicates.Count == 0)
+        {
+            AddStatusWithoutDuplicateResolution(context);
+            return;
+        }
+        
+        switch (status.DuplicateResolution)
+        {
+            case DuplicateStatusResolution.Stack:
+                AddStatusWithoutDuplicateResolution(context);
+                break;
+            case DuplicateStatusResolution.Refresh:
+                RefreshDuplicateStatuses(context, duplicates.Single());
+                break;
+            case DuplicateStatusResolution.StackAndRefresh:
+                AddStatusWithoutDuplicateResolution(context);
+                RefreshDuplicateStatuses(context, duplicates);
+                break;
+            case DuplicateStatusResolution.Replace:
+                RemoveStatus(duplicates.Single().Id);
+                AddStatusWithoutDuplicateResolution(context);
+                break;
+            case DuplicateStatusResolution.Discard:
+                break;
+            case DuplicateStatusResolution.Throw:
+                throw new InvalidOperationException($"{status} does not allow duplicates");
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+    
+    private void AddStatusWithoutDuplicateResolution(StatusContext context)
+    {
+        StatusesInternal[context.Id] = context;
+        if (context.TickInterval > 0)
+            context.Status.Tick(context);
+    }
+    
+    private void RefreshDuplicateStatuses(StatusContext reference, params IReadOnlyList<StatusContext> targets)
+    {
+        foreach (StatusContext target in targets)
+        {
+            StatusesInternal[target.Id] = target with
+            {
+                Source = reference.Source,
+                AbilityContext = reference.AbilityContext,
+                RemainingTime = Mathf.Max(target.RemainingTime, reference.RemainingTime)
+            };
+        }
+    }
+    
+    public void RemoveStatus(Guid id)
+    {
+        StatusesInternal.Remove(id);
     }
 }

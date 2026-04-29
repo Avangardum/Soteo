@@ -6,7 +6,7 @@ using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Abilities;
 
-public sealed class RangedAttack : Attack
+public sealed class RangedAttackAbility : AttackAbility
 {
     public override void TakeEffect(AbilityContext context)
     {

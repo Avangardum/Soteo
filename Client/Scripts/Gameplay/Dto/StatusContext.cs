@@ -9,16 +9,17 @@ namespace Soteo.Gameplay.Dto;
 public sealed record StatusContext : IServiceProvider
 {
     public required Guid Id { get; init; }
-    public required Status Effect { get; init; }
+    public required Status Status { get; init; }
     public required AbilityContext? AbilityContext { get; init; }
     public required Unit Unit { get; init; }
     public required Unit? Source { get; init; }
+    // todo replace with a tick scheduling value that wraps around to prevent floating point precision issues and a display value
     public required float ElapsedTime { get; init; }
     public required float RemainingTime { get; init; }
     public required float TickInterval { get; init; }
-    public required IServiceProvider Services { get; init; }
+    public required IServiceProvider ServiceProvider { get; init; }
     
-    public object? GetService(Type type) => Services.GetService(type);
+    public object? GetService(Type type) => ServiceProvider.GetService(type);
     
     [MemberNotNull(nameof(AbilityContext))]
     public T AbilityAs<T>() where T : Ability => (T)AbilityContext.Required.Ability;

@@ -27,8 +27,11 @@ public static class DictionaryExtensions
     
     extension<TKey, TValue> (IReadOnlyDictionary<TKey, TValue> self)
     {
-        public TValue? GetOrDefault(TKey key, TValue? defaultValue = default) =>
+        public TValue GetOrDefault(TKey key, TValue defaultValue) =>
             self.TryGetValue(key, out TValue? value) ? value : defaultValue;
+        
+        public TValue? GetOrDefault(TKey key) =>
+            self.TryGetValue(key, out TValue? value) ? value : default;
         
         public ICovariantReadOnlyDictionary<TKey, TValue> AsCovariant() =>
             new CovariantReadOnlyDictionaryWrapper<TKey, TValue>(self);

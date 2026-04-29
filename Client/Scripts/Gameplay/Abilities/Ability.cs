@@ -27,6 +27,7 @@ public abstract class Ability
     
     public virtual int MaxLevel => 1;
     public virtual Status? PassiveStatus => null;
+    public virtual float PassiveTickInterval => 0;
     public virtual CanTarget Targeting => CanTarget.Passive;
     public virtual string Animation => "Attack Right";
     public virtual bool LoopAnimation => false;
