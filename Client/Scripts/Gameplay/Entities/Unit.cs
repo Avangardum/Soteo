@@ -109,6 +109,7 @@ public abstract class Unit : Entity<UnitNode>
             AbilityStates = AbilityStatesInternal.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress
         };
+        // todo statuses
     }
 
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
@@ -164,14 +165,14 @@ public abstract class Unit : Entity<UnitNode>
         for (int i = 0; i < contexts.Count; i++)
         {
             StatusContext context = contexts[i];
-            float oldElapsedTime = context.ElapsedTime;
             float limitedDelta = Mathf.Min(delta, context.RemainingTime);
+            float newTickCountdown = ProcessStatusTickCountdown(context, limitedDelta);
             context = context with
             {
-                ElapsedTime = context.ElapsedTime + limitedDelta,
+                TickCountdown = newTickCountdown,
+                DisplayElapsedTime = context.DisplayElapsedTime + limitedDelta,
                 RemainingTime = context.RemainingTime - limitedDelta
             };
-            CallStatusTicksSinceOldElapsedTime(context, oldElapsedTime);
             if (context.RemainingTime > 0)
                 StatusesInternal[context.Id] = context;
             else
@@ -179,21 +180,16 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    /// <summary>
-    /// Call all status ticks scheduled in the interval (oldElapsedTime, context.ElapsedTime]<br />
-    /// Example: f({ TickInterval = 0.5, ElapsedTime = 2 }, 1) calls Tick 2 times (for 1.5 and 2)
-    /// </summary>
-    private void CallStatusTicksSinceOldElapsedTime(StatusContext context, float oldElapsedTime)
+    private float ProcessStatusTickCountdown(StatusContext context, float delta)
     {
-        if (context.TickInterval <= 0) return;
-        float oldElapsedTimeInStatusTicks = oldElapsedTime / context.TickInterval;
-        float newElapsedTimeInStatusTicks = context.ElapsedTime / context.TickInterval;
-        int firstTickIndex = oldElapsedTimeInStatusTicks % 1 == 0 ?
-            (int)oldElapsedTimeInStatusTicks + 1 :
-            Mathf.CeilToInt(oldElapsedTimeInStatusTicks);
-        int lastTickIndex = Mathf.FloorToInt(newElapsedTimeInStatusTicks);
-        for (int tick = firstTickIndex; tick <= lastTickIndex; tick++)
+        if (context.TickInterval == 0) return 0;
+        float countdown = context.TickCountdown - delta;
+        while (countdown <= 0)
+        {
             context.Status.Tick(context);
+            countdown += context.TickInterval;
+        }
+        return countdown;
     }
     
     private void UpdateStats()
@@ -211,10 +207,14 @@ public abstract class Unit : Entity<UnitNode>
         foreach (StatModifier modifier in Statuses.Values.SelectMany(it => it.Status.StatModifiers(it)))
             modifiers[modifier.Stat][modifier.Kind].Add(modifier);
         
+        float oldMaxHealth = Stats[Stat.MaxHealth];
+        float oldMaxMana = Stats[Stat.MaxMana];
+        
         foreach (Stat stat in Stat.AllNonVolatile)
             StatsInternal[stat] = CalculateStatValue(stat, modifiers[stat]);
         
-        // todo update volatile stats
+        UpdateResourceStat(Stat.CurrentHealth, Stat.MaxHealth, oldMaxHealth);
+        UpdateResourceStat(Stat.CurrentMana, Stat.MaxMana, oldMaxMana);
     }
 
     private float CalculateStatValue
@@ -272,6 +272,12 @@ public abstract class Unit : Entity<UnitNode>
                 ceiling = ceilingStack.Pop();
             }
         }
+    }
+    
+    private void UpdateResourceStat(Stat stat, Stat maxStat, float oldMax)
+    {
+        float normalized = Stats[stat] / oldMax;
+        StatsInternal[stat] = Stats[maxStat] * normalized;
     }
 
     public virtual void _PhysicsProcessClient(UnitNode node, float delta)
@@ -614,6 +620,9 @@ public abstract class Unit : Entity<UnitNode>
     
     public void AddStatus(Status status, float time, AbilityContext? abilityContext, Unit? source, float tickInterval)
     {
+        if (time < 0) throw new ArgumentException();
+        if (tickInterval < 0) throw new ArgumentException();
+        
         StatusContext context = new StatusContext
         {
             Id = Guid.NewGuid(),
@@ -621,7 +630,8 @@ public abstract class Unit : Entity<UnitNode>
             AbilityContext = abilityContext,
             Unit = this,
             Source = source,
-            ElapsedTime = 0,
+            TickCountdown = tickInterval,
+            DisplayElapsedTime = 0,
             RemainingTime = time,
             TickInterval = tickInterval,
             ServiceProvider = _serviceProvider
@@ -662,7 +672,7 @@ public abstract class Unit : Entity<UnitNode>
     private void AddStatusWithoutDuplicateResolution(StatusContext context)
     {
         StatusesInternal[context.Id] = context;
-        if (context.TickInterval > 0)
+        if (context.TickInterval == 0)
             context.Status.Tick(context);
     }
     
@@ -674,6 +684,7 @@ public abstract class Unit : Entity<UnitNode>
             {
                 Source = reference.Source,
                 AbilityContext = reference.AbilityContext,
+                DisplayElapsedTime = 0,
                 RemainingTime = Mathf.Max(target.RemainingTime, reference.RemainingTime)
             };
         }

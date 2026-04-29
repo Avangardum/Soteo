@@ -13,8 +13,8 @@ public sealed record StatusContext : IServiceProvider
     public required AbilityContext? AbilityContext { get; init; }
     public required Unit Unit { get; init; }
     public required Unit? Source { get; init; }
-    // todo replace with a tick scheduling value that wraps around to prevent floating point precision issues and a display value
-    public required float ElapsedTime { get; init; }
+    public required float TickCountdown { get; init; }
+    public required float DisplayElapsedTime { get; init; }
     public required float RemainingTime { get; init; }
     public required float TickInterval { get; init; }
     public required IServiceProvider ServiceProvider { get; init; }
