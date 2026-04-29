@@ -23,4 +23,20 @@ public sealed record StatusContext : IServiceProvider
     
     [MemberNotNull(nameof(AbilityContext))]
     public T AbilityAs<T>() where T : Ability => (T)AbilityContext.Required.Ability;
+    
+    public DeflatedStatusContext Deflate()
+    {
+        return new DeflatedStatusContext
+        {
+            Id = Id,
+            StatusId = Status.Id,
+            AbilityContext = AbilityContext?.Deflate(),
+            UnitId = Unit.Id,
+            SourceId = Source?.Id,
+            TickCountdown = TickCountdown,
+            DisplayElapsedTime = DisplayElapsedTime,
+            RemainingTime = RemainingTime,
+            TickInterval = TickInterval
+        };
+    }
 }

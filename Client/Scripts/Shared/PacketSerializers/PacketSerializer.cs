@@ -289,4 +289,32 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
             stream
         ).ToImmutableDictionary();
     }
+    
+    /// <summary>
+    /// Serialize a dictionary where keys are derived from values
+    /// </summary>
+    protected void SerializeIndexedDictionary<TKey, TValue>
+    (
+        IReadOnlyDictionary<TKey, TValue> dictionary,
+        Serializer<TValue> serializeValue,
+        Stream stream
+    )
+    {
+        SerializeList(dictionary.Values.ToList(), serializeValue, stream);
+    }
+    
+    /// <summary>
+    /// Deserialize a dictionary where keys are derived from values
+    /// </summary>
+    protected ImmutableDictionary<TKey, TValue> DeserializeIndexedDictionary<TKey, TValue>
+    (
+        Deserializer<TValue> deserializeValue,
+        Func<TValue, TKey> keySelector,
+        Stream stream
+    ) where TKey: notnull
+    {
+        return DeserializeList(deserializeValue, stream).ToImmutableDictionary(keySelector, it => it);
+    }
+    
+    // todo refactor parameter order
 }

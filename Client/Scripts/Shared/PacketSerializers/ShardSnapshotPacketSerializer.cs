@@ -52,6 +52,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeFloat, stream);
         SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilityState, stream);
         SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
+        SerializeIndexedDictionary(unit.Statuses, SerializeStatusContext, stream);
     }
     
     private void SerializeProjectile(ProjectileSnapshot projectile, Stream stream)
@@ -90,7 +91,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, stream),
             AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, stream),
-            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream)
+            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
+            Statuses = DeserializeIndexedDictionary(DeserializeStatusContext, it => it.Id, stream)
         };
     }
     
@@ -125,7 +127,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         };
     }
     
-    private void SerializeAbilityContext(AbilityContext.Deflated context, Stream stream)
+    private void SerializeAbilityContext(DeflatedAbilityContext context, Stream stream)
     {
         SerializeInt(context.AbilityId, stream);
         SerializeInt(context.Level, stream);
@@ -137,9 +139,9 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeNullableStruct(context.TargetShardId, SerializeGuid, stream);
     }
     
-    private AbilityContext.Deflated DeserializeAbilityContext(Stream stream)
+    private DeflatedAbilityContext DeserializeAbilityContext(Stream stream)
     {
-        return new AbilityContext.Deflated
+        return new DeflatedAbilityContext
         {
             AbilityId = DeserializeInt(stream),
             Level = DeserializeInt(stream),
@@ -166,6 +168,35 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Slot = DeserializeEnum<AbilitySlot>(stream),
             ElapsedTime = DeserializeFloat(stream),
             RemainingTime = DeserializeFloat(stream)
+        };
+    }
+    
+    private void SerializeStatusContext(DeflatedStatusContext value, Stream stream)
+    {
+        SerializeGuid(value.Id, stream);
+        SerializeInt(value.StatusId, stream);
+        SerializeNullableClass(value.AbilityContext, SerializeAbilityContext, stream);
+        SerializeGuid(value.UnitId, stream);
+        SerializeNullableStruct(value.SourceId, SerializeGuid, stream);
+        SerializeFloat(value.TickCountdown, stream);
+        SerializeFloat(value.DisplayElapsedTime, stream);
+        SerializeFloat(value.RemainingTime, stream);
+        SerializeFloat(value.TickInterval, stream);
+    }
+    
+    private DeflatedStatusContext DeserializeStatusContext(Stream stream)
+    {
+        return new DeflatedStatusContext
+        {
+            Id = DeserializeGuid(stream),
+            StatusId = DeserializeInt(stream),
+            AbilityContext = DeserializeNullableClass(DeserializeAbilityContext, stream),
+            UnitId = DeserializeGuid(stream),
+            SourceId = DeserializeNullableStruct(DeserializeGuid, stream),
+            TickCountdown = DeserializeFloat(stream),
+            DisplayElapsedTime = DeserializeFloat(stream),
+            RemainingTime = DeserializeFloat(stream),
+            TickInterval = DeserializeFloat(stream)
         };
     }
 }

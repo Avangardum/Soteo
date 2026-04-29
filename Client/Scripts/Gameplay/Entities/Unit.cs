@@ -107,9 +107,9 @@ public abstract class Unit : Entity<UnitNode>
             IsMoving = _isMoving,
             Stats = Stats.ToImmutableDictionary(),
             AbilityStates = AbilityStatesInternal.ToImmutableDictionary(),
-            AbilityUseProgress = AbilityUseProgress
+            AbilityUseProgress = AbilityUseProgress,
+            Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.Deflate())
         };
-        // todo statuses
     }
 
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
@@ -122,6 +122,7 @@ public abstract class Unit : Entity<UnitNode>
         StatsInternal = s.Stats.ToDictionary();
         AbilityStatesInternal = s.AbilityStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
+        StatusesInternal = s.Statuses.ToDictionary(it => it.Key, it => it.Value.Inflate(_serviceProvider));
         
         UpdateAnimation();
     }

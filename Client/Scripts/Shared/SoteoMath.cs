@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using static System.Math;
 using static Godot.Mathf;
 
@@ -84,6 +85,22 @@ public static class SoteoMath
     {
         if (from == null || to == null) return to;
         return interpolate(from, to, weight);
+    }
+    
+    public static IReadOnlyDictionary<TKey, TValue> InterpolateDictionary<TKey, TValue>
+    (
+        IReadOnlyDictionary<TKey, TValue> from,
+        IReadOnlyDictionary<TKey, TValue> to,
+        float weight,
+        Func<TValue, TValue, float, TValue> interpolateValue
+    ) where TKey : notnull
+    {
+        return to.ToImmutableDictionary(it => it.Key, it =>
+        {
+            TValue t = it.Value;
+            if (!from.TryGetValue(it.Key, out TValue? f)) return t;
+            return interpolateValue(f, t, weight);
+        });
     }
     
     public static float LerpDecrease(float from, float to, float weight) => from > to ? Lerp(from, to, weight) : to;

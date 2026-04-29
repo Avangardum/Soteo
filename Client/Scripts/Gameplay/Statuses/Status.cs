@@ -20,6 +20,8 @@ public abstract class Status
         InstancesByType = All.ToImmutableDictionary(it => it.GetType(), it => it);
     }
     
+    public int Id => All.IndexOf(this);
+    
     public abstract DuplicateStatusResolution DuplicateResolution { get; }
     
     public virtual IReadOnlyList<StatModifier> StatModifiers(StatusContext context) => [];
