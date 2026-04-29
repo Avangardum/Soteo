@@ -135,10 +135,10 @@ public abstract class Unit : Entity<UnitNode>
     public virtual void _PhysicsProcessServer(UnitNode node, float delta)
     {
         _isMoving = false;
+        UpdateStats();
         DecreaseCooldowns(delta);
         ApplyRegen(delta);
         ProcessStatuses(delta);
-        UpdateStats();
         ExecuteCommands(node, delta);
     }
     
@@ -225,7 +225,7 @@ public abstract class Unit : Entity<UnitNode>
     {
         StatModifier? setModifier = modifiers[StatModifierKind.Set]
             .OrderByDescending(it => it.Priority)
-            .ThenByDescending(it => it)
+            .ThenByDescending(it => it.Value)
             .FirstOrDefault();
         if (setModifier != null) return setModifier.Value;
 
