@@ -81,9 +81,15 @@ public abstract class Unit : Entity<UnitNode>
             field = value;
             if (IsRemoved) return;
             if (IsServer) Node.Position = Position;
-            else Node.Visuals.Position = RoundVisualPositionToPixelPerfect(Position,
-                Node.Properties.HalfPixelXVisualOffset, Node.Properties.HalfPixelYVisualOffset) - Node.Position;
+            else UpdateVisualsPosition();
         }
+    }
+    
+    private void UpdateVisualsPosition()
+    {
+        if (IsRemoved || IsServer) return;
+        Node.Visuals.Position = RoundVisualPositionToPixelPerfect(Position,
+            Node.Properties.HalfPixelXVisualOffset, Node.Properties.HalfPixelYVisualOffset) - Node.Position;
     }
     
     public override float Azimuth
@@ -129,8 +135,7 @@ public abstract class Unit : Entity<UnitNode>
 
     protected override void OnZoomChanged()
     {
-        // Trigger Position setter to recalculate position of visuals
-        Position = Position;
+        UpdateVisualsPosition();
     }
 
     public virtual void _PhysicsProcessServer(UnitNode node, float delta)
@@ -284,7 +289,7 @@ public abstract class Unit : Entity<UnitNode>
     public virtual void _PhysicsProcessClient(UnitNode node, float delta)
     {
         node.Position = Position;
-        node.Visuals.Position = Vector2.Zero;
+        UpdateVisualsPosition();
     }
 
     private void ExecuteCommands(UnitNode node, float deltaTime)

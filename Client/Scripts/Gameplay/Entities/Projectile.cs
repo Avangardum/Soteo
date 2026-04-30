@@ -40,8 +40,19 @@ public abstract class Projectile : Entity<ProjectileNode>
         {
             field = value;
             if (IsRemoved) return;
-            Node.Position = RoundVisualPositionToPixelPerfect(value, Node.Properties.HalfPixelXVisualOffset,
-                Node.Properties.HalfPixelYVisualOffset);
+            if (IsServer)
+            {
+                Node.Position = value;
+            }
+            else
+            {
+                Node.Position = RoundVisualPositionToPixelPerfect
+                (
+                    value,
+                    Node.Properties.HalfPixelXVisualOffset,
+                    Node.Properties.HalfPixelYVisualOffset
+                );
+            }
         }
     }
     

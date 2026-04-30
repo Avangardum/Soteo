@@ -2,7 +2,8 @@
 
 ## To-do
 
-- [ ] Rework azimuth indicator
+- [x] Rework azimuth indicator
+- [x] Fix pixel perfect rendering
 - [ ] Show statuses in HUD
 - [ ] Status / abililty icons
 - [ ] Death
