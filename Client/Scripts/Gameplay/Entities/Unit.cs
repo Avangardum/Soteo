@@ -560,27 +560,33 @@ public abstract class Unit : Entity<UnitNode>
     
     public bool IsAlliedTo(Unit other) => Faction != Faction.Neutral && other.Faction == Faction;
     
-    public void SpendHealth(float amount, Ability ability)
+    public void SpendHealth(float amount, Ability? ability)
     {
         ChangeStat(Stat.CurrentHealth, -amount);
     }
     
-    public void SpendMana(float amount, Ability ability)
+    public void SpendMana(float amount, Ability? ability)
     {
         ChangeStat(Stat.CurrentMana, -amount);
     }
     
-    public void TakeDamage(float amount, Unit source, Ability ability)
+    public void TakeDamage(float amount, Unit? source, Ability? ability)
     {
         ChangeStat(Stat.CurrentHealth, -amount);
     }
     
-    public void RestoreHealth(float amount, Unit source, Ability ability)
+    public void TakeDamage(float amount, StatusContext context) =>
+        TakeDamage(amount, context.Source, context.AbilityContext?.Ability);
+    
+    public void TakeDamage(float amount, AbilityContext context) =>
+        TakeDamage(amount, context.User, context.Ability);
+    
+    public void RestoreHealth(float amount, Unit? source, Ability? ability)
     {
         ChangeStat(Stat.CurrentHealth, amount);
     }
     
-    public void RestoreMana(float amount, Unit source, Ability ability)
+    public void RestoreMana(float amount, Unit? source, Ability? ability)
     {
         ChangeStat(Stat.CurrentMana, amount);
     }
@@ -620,11 +626,11 @@ public abstract class Unit : Entity<UnitNode>
         if (ability.PassiveStatus != null)
         {
             AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand(slot));
-            AddStatus(ability.PassiveStatus, float.PositiveInfinity, abilityContext, this, ability.PassiveTickInterval);
+            AddStatus(ability.PassiveStatus, float.PositiveInfinity, ability.PassiveTickInterval, abilityContext, this);
         }
     }
     
-    public void AddStatus(Status status, float time, AbilityContext? abilityContext, Unit? source, float tickInterval)
+    public void AddStatus(Status status, float time, float tickInterval, AbilityContext? abilityContext, Unit? source)
     {
         if (time < 0) throw new ArgumentException();
         if (tickInterval < 0) throw new ArgumentException();
@@ -675,6 +681,23 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
+    public void AddStatus(Status status, float time, float tickInterval, StatusContext sourceStatusContext)
+    {
+        AddStatus(status, time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
+    }
+    
+    public void AddStatus<T>(float time, float tickInterval, AbilityContext? abilityContext, Unit? source)
+        where T : Status
+    {
+        AddStatus(Status.Instance<T>(), time, tickInterval, abilityContext, source);
+    }
+    
+    public void AddStatus<T>(float time, float tickInterval, StatusContext sourceStatusContext)
+        where T : Status
+    {
+        AddStatus<T>(time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
+    }
+
     private void AddStatusWithoutDuplicateResolution(StatusContext context)
     {
         StatusesInternal[context.Id] = context;
