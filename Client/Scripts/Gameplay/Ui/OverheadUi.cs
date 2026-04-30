@@ -35,6 +35,7 @@ public sealed class OverheadUi : Control
     {
         Name = $"{nameof(OverheadUi)} {unit.Id}";
         ProcessPriority = (int)ProcessPriorityEnum.OverheadUi;
+        MouseFilter = MouseFilterEnum.Ignore;
         
         _unit = unit;
         _camera = camera;

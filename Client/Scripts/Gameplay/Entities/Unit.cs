@@ -33,27 +33,28 @@ public abstract class Unit : Entity<UnitNode>
         Node.Name = $"{GetType().Name} {id}";
         
         foreach (Stat stat in Stat.All)
-            StatsInternal[stat] = DefaultStats[stat];
+            StatsInternal[stat] = StatConst[stat].Defalut;
         
         Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
     
-    public static readonly IReadOnlyDictionary<Stat, float> DefaultStats = new Dictionary<Stat, float>
-    {
-        [Stat.MaxHealth] = 1000,
-        [Stat.CurrentHealth] = 1000,
-        [Stat.HealthRegen] = 2,
-        [Stat.ManaRegen] = 2,
-        [Stat.MaxMana] = 1000,
-        [Stat.CurrentMana] = 1000,
-        [Stat.MoveSpeed] = 50,
-        [Stat.TurnSpeed] = 360,
-        [Stat.AttackDamage] = 50,
-        [Stat.AttackSpeed] = 1000,
-        [Stat.AttackUseTimeFraction] = 0.5f,
-        [Stat.AttackRange] = 100,
-        [Stat.AttackProjectileSpeed] = 500
-    }.ToImmutableDictionary(); 
+    public static readonly IReadOnlyDictionary<Stat, (float Min, float Defalut, float Max)> StatConst =
+        new Dictionary<Stat, (float, float, float)>
+        {
+            [Stat.MaxHealth] = (0, 1000, 10_000),
+            [Stat.CurrentHealth] = (0, 1000, 10_000),
+            [Stat.HealthRegen] = (float.NegativeInfinity, 2, float.PositiveInfinity),
+            [Stat.ManaRegen] = (float.NegativeInfinity, 2, float.PositiveInfinity),
+            [Stat.MaxMana] = (0, 1000, 10_000),
+            [Stat.CurrentMana] = (0, 1000, 10_000),
+            [Stat.MoveSpeed] = (5, 50, 500),
+            [Stat.TurnSpeed] = (36, 360, 3600),
+            [Stat.AttackDamage] = (0, 50, float.PositiveInfinity),
+            [Stat.AttackSpeed] = (100, 1000, 10_000),
+            [Stat.AttackUseTimeFraction] = (0, 0.5f, 1),
+            [Stat.AttackRange] = (10, 100, float.PositiveInfinity),
+            [Stat.AttackProjectileSpeed] = (50, 500, 5000)
+        }.ToImmutableDictionary();
     
     private Queue<ICommand> Commands { get; } = [];
     
@@ -240,17 +241,17 @@ public abstract class Unit : Entity<UnitNode>
         float maxFloor = floorModifiers
             .Select(it => it.Value)
             .OrderDescending()
-            .FirstOrDefault(float.NegativeInfinity);
+            .FirstOrDefault(StatConst[stat].Min);
         float minCeiling = ceilingModifiers
             .Select(it => it.Value)
             .Order()
-            .FirstOrDefault(float.PositiveInfinity);
+            .FirstOrDefault(StatConst[stat].Max);
         if (maxFloor > minCeiling)
             return ResolveNonOverlappingStatLimits(floorModifiers, ceilingModifiers);
             
         float addTotal = modifiers[StatModifierKind.Add].Sum(it => it.Value);
         float multiplyTotal = modifiers[StatModifierKind.Multiply].Product(it => it.Value);
-        return Mathf.Clamp((DefaultStats[stat] + addTotal) * multiplyTotal, maxFloor, minCeiling);
+        return Mathf.Clamp((StatConst[stat].Defalut + addTotal) * multiplyTotal, maxFloor, minCeiling);
     }
     
     private float ResolveNonOverlappingStatLimits

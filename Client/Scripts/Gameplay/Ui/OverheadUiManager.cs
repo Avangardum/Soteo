@@ -13,6 +13,7 @@ public sealed class OverheadUiManager : Control
     {
         Name = nameof(OverheadUiManager);
         AnchorLeft = AnchorRight = AnchorTop = AnchorBottom = 0.5f;
+        MouseFilter = MouseFilterEnum.Ignore;
         
         _camera = camera;
         _palette = palette;

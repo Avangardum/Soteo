@@ -3,8 +3,9 @@
 ## To-do
 
 - [x] Rework azimuth indicator
-- [x] Fix pixel perfect rendering
+- [ ] Fix pixel perfect rendering
 - [ ] Show statuses in HUD
+- [ ] Switch to double?
 - [ ] Status / abililty icons
 - [ ] Death
 - [ ] Status / ability tooltips
