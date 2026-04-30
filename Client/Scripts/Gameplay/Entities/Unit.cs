@@ -92,8 +92,8 @@ public abstract class Unit : Entity<UnitNode>
         set
         {
             base.Azimuth = value;
-            if (IsRemoved) return;
-            Node.AzimuthLine.RotationDegrees = value;
+            if (!IsRemoved && !IsServer)
+                Node.AzimuthIndicator.Azimuth = value;
         }
     }
     

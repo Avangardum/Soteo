@@ -14,14 +14,14 @@ public sealed class UnitNode : KinematicBody2D
         Unit = unit;
         Visuals = GetNode<Node2D>("Visuals");
         Sprite = GetNode<AnimatedSprite>("Visuals/AnimatedSprite");
-        AzimuthLine = GetNode<Line2D>("Visuals/AzimuthLine");
+        AzimuthIndicator = GetNode<AzimuthIndicator>("Visuals/AzimuthIndicator");
         Properties = GetNode<EntityProperties>("Properties");
     }
         
     public Unit Unit { get; }
     public Node2D Visuals { get; }
     public AnimatedSprite Sprite { get; }
-    public Line2D AzimuthLine { get; }
+    public AzimuthIndicator AzimuthIndicator { get; }
     public EntityProperties Properties { get; }
         
     public override void _PhysicsProcess(float delta)
