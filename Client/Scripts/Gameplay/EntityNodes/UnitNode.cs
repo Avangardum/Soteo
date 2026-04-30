@@ -16,6 +16,8 @@ public sealed class UnitNode : KinematicBody2D
         Sprite = GetNode<AnimatedSprite>("Visuals/AnimatedSprite");
         AzimuthIndicator = GetNode<AzimuthIndicator>("Visuals/AzimuthIndicator");
         Properties = GetNode<EntityProperties>("Properties");
+        
+        Sprite.Playing = true;
     }
         
     public Unit Unit { get; }

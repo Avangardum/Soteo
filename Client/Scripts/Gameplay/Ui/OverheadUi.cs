@@ -74,12 +74,12 @@ public sealed class OverheadUi : Control
                 case Variant.PlayerCharacter:
                     _playerCharacterPanel.Visible = true;
                     _tinyHealthPanel.Visible = false;
-                    _offset = new Vector2(0, -19);
+                    _offset = new Vector2(0, -22);
                     break;
                 case Variant.TinyHealth:
                     _playerCharacterPanel.Visible = false;
                     _tinyHealthPanel.Visible = true;
-                    _offset = new Vector2(0, -20);
+                    _offset = new Vector2(0, -22);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);

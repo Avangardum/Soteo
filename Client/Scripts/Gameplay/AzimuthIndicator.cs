@@ -2,8 +2,17 @@ namespace Soteo.Gameplay;
 
 public sealed class AzimuthIndicator : Line2D
 {
+    private const int SectorCount = 100;
+    private const int ArrowHalfWidthSectors = 4;
+    private const int EllipseWidth = 8;
+    private const int EllipseHeight = 4;
+    private const float ArrowTipMultiplier = 1.4f;
+    
+    private readonly Vector2[] _points;
+    
     public AzimuthIndicator()
     {
+        _points = new Vector2[SectorCount + 2 - 2 * (ArrowHalfWidthSectors - 1)];
         CalculatePoints();
     }
     
@@ -20,24 +29,24 @@ public sealed class AzimuthIndicator : Line2D
     
     private void CalculatePoints()
     {
-        const int sectorCount = 10;
-        const int arrowHalfWidthSectors = 1;
-        const int width = 10;
-        const int height = 5;
-        const float arrowTipMultiplier = 1.2f;
+        if (IsServer) return;
         
-        const float sectorAngle = 2 * Mathf.Pi / sectorCount;
-        var points = new Vector2[sectorCount + 1 - 2 * (arrowHalfWidthSectors - 1)];
-        float azimuthRad = Mathf.Deg2Rad(Azimuth);
-        var arrowTip = new Vector2(width * Mathf.Cos(azimuthRad), height * Mathf.Sin(azimuthRad)) * arrowTipMultiplier;
-        points[0] = arrowTip;
-        points[^1] = arrowTip;
-        for (int i = 1; i <= points.Length - 2; i++)
+        const float sectorAngle = 2 * Mathf.Pi / SectorCount;
+        float forwardAngle = Mathf.Deg2Rad(Azimuth) - Mathf.Pi / 2;
+        var arrowTip = new Vector2
+        (
+            EllipseWidth * Mathf.Cos(forwardAngle),
+            EllipseHeight * Mathf.Sin(forwardAngle)
+        ) * ArrowTipMultiplier;
+        _points[0] = arrowTip;
+        for (int i = 1; i <= _points.Length - 2; i++)
         {
-            float angle = azimuthRad + sectorAngle * (i + arrowHalfWidthSectors - 1);
-            points[i] = new Vector2(width * Mathf.Cos(angle), height * Mathf.Sin(angle));
+            float angle = forwardAngle + sectorAngle * (i + ArrowHalfWidthSectors - 1);
+            _points[i] = new Vector2(EllipseWidth * Mathf.Cos(angle), EllipseHeight * Mathf.Sin(angle));
         }
+        _points[^2] = _points[0];
+        _points[^1] = _points[1];
         
-        Points = points;
+        Points = _points;
     }
 }
