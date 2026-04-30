@@ -58,8 +58,7 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D
         bool halfPixelYOffset
     )
     {
-        // If zoom is not an integer, pixel perfect rendering is impossible
-        if (Camera.Value == null || Camera.Value.TrueZoom % 1 != 0) return value;
+        if (Camera.Value == null) return value;
         
         // If zoom is even, a world pixel with half pixel offset will be rendered as even number of screen pixels,
         // which will distribute equally in all directions, so pixel perfect rendering is possible without having
