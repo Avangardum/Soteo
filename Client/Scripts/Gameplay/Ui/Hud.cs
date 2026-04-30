@@ -18,6 +18,7 @@ public sealed class Hud : Control, IHud
     private readonly Label _healthLabel;
     private readonly Label _manaLabel;
     private readonly ImmutableList<AbilityButton> _abilityButtons;
+    private readonly ImmutableList<TextureProgress> _statusIndicators;
     
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
@@ -37,12 +38,16 @@ public sealed class Hud : Control, IHud
         MouseFilter = MouseFilterEnum.Ignore;
         
         Scene.InstanceAndReparentTo(this);
-        _healthBar = GetNode<TextureProgress>("UnitPanel/VBoxContainer/Health");
-        _manaBar = GetNode<TextureProgress>("UnitPanel/VBoxContainer/Mana");
+        _healthBar = GetNode<TextureProgress>("VBoxContainer/UnitPanel/VBoxContainer/Health");
+        _manaBar = GetNode<TextureProgress>("VBoxContainer/UnitPanel/VBoxContainer/Mana");
         _healthLabel = _healthBar.GetNode<Label>("Label");
         _manaLabel = _manaBar.GetNode<Label>("Label");
-        _abilityButtons =
-            GetNode("UnitPanel/VBoxContainer/Abilities").GetChildren().Cast<AbilityButton>().ToImmutableList();
+        _abilityButtons = GetNode("VBoxContainer/UnitPanel/VBoxContainer/Abilities").GetChildren()
+            .Cast<AbilityButton>()
+            .ToImmutableList();
+        _statusIndicators = GetNode("VBoxContainer/Statuses").GetChildren()
+            .Cast<TextureProgress>()
+            .ToImmutableList();
 
         for (int i = 0; i < _abilityButtons.Count; i++)
         {
@@ -73,6 +78,7 @@ public sealed class Hud : Control, IHud
         Visible = true;
         ProcessBars();
         ProcessAbilities();
+        ProcessStatuses(SelectedUnit);
     }
     
     private void ProcessBars()
@@ -121,6 +127,21 @@ public sealed class Hud : Control, IHud
             
             button.ManaCostLabel.Text = Mathf.CeilToInt(state.Ability.ManaCost(context)).ToString();
             button.ManaCostLabel.Visible = state.Ability.ManaCost(context) > 0;
+        }
+    }
+    
+    private void ProcessStatuses(Unit unit)
+    {
+        List<StatusContext> contexts = unit.Statuses.Values.Take(_statusIndicators.Count).ToList(); // todo order
+        int i = 0;
+        for (; i < contexts.Count; i++)
+        {
+            _statusIndicators[i].Visible = true;
+            _statusIndicators[i].Value = contexts[i].DisplayNormalizedRemainingTime;
+        }
+        for (; i < _statusIndicators.Count; i++)
+        {
+            _statusIndicators[i].Visible = false;
         }
     }
 }

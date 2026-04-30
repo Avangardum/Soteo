@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Textures/White.png" type="Texture" id=1]
 [ext_resource path="res://Scenes/Ui/AbilityButton.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scripts/Shared/Proxy.gd" type="Script" id=3]
+[ext_resource path="res://Scenes/Ui/StatusIndicator.tscn" type="PackedScene" id=4]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.145098, 0.145098, 0.164706, 1 )
@@ -18,49 +19,102 @@ anchor_bottom = 1.0
 mouse_filter = 2
 script = ExtResource( 3 )
 
-[node name="UnitPanel" type="PanelContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 0
+
+[node name="Statuses" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 510.0
+margin_bottom = 40.0
+
+[node name="0" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+
+[node name="1" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 44.0
+margin_right = 84.0
+
+[node name="2" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 88.0
+margin_right = 128.0
+
+[node name="3" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 132.0
+margin_right = 172.0
+
+[node name="4" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 176.0
+margin_right = 216.0
+
+[node name="5" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 220.0
+margin_right = 260.0
+
+[node name="6" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 264.0
+margin_right = 304.0
+
+[node name="7" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 308.0
+margin_right = 348.0
+
+[node name="8" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 352.0
+margin_right = 392.0
+
+[node name="9" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 396.0
+margin_right = 436.0
+
+[node name="10" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 440.0
+margin_right = 480.0
+
+[node name="UnitPanel" type="PanelContainer" parent="VBoxContainer"]
+margin_top = 44.0
+margin_right = 510.0
+margin_bottom = 192.0
+grow_horizontal = 2
+grow_vertical = 0
 rect_min_size = Vector2( 400, 0 )
 custom_styles/panel = SubResource( 1 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UnitPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/UnitPanel"]
 margin_left = 5.0
 margin_top = 5.0
 margin_right = 505.0
 margin_bottom = 143.0
 
-[node name="Abilities" type="HBoxContainer" parent="UnitPanel/VBoxContainer"]
+[node name="Abilities" type="HBoxContainer" parent="VBoxContainer/UnitPanel/VBoxContainer"]
 margin_right = 500.0
 margin_bottom = 80.0
 
-[node name="0" parent="UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
+[node name="0" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
 
-[node name="1" parent="UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
+[node name="1" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
 margin_left = 84.0
 margin_right = 164.0
 
-[node name="2" parent="UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
+[node name="2" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
 margin_left = 168.0
 margin_right = 248.0
 
-[node name="3" parent="UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
+[node name="3" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
 margin_left = 252.0
 margin_right = 332.0
 
-[node name="4" parent="UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
+[node name="4" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
 margin_left = 336.0
 margin_right = 416.0
 
-[node name="5" parent="UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
+[node name="5" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
 margin_left = 420.0
 margin_right = 500.0
 
-[node name="Health" type="TextureProgress" parent="UnitPanel/VBoxContainer"]
+[node name="Health" type="TextureProgress" parent="VBoxContainer/UnitPanel/VBoxContainer"]
 margin_top = 84.0
 margin_right = 500.0
 margin_bottom = 109.0
@@ -73,14 +127,14 @@ tint_under = Color( 0, 0, 0, 1 )
 tint_progress = Color( 0.705882, 0, 0, 1 )
 nine_patch_stretch = true
 
-[node name="Label" type="Label" parent="UnitPanel/VBoxContainer/Health"]
+[node name="Label" type="Label" parent="VBoxContainer/UnitPanel/VBoxContainer/Health"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 text = "1000 / 1000"
 align = 1
 valign = 1
 
-[node name="Mana" type="TextureProgress" parent="UnitPanel/VBoxContainer"]
+[node name="Mana" type="TextureProgress" parent="VBoxContainer/UnitPanel/VBoxContainer"]
 margin_top = 113.0
 margin_right = 500.0
 margin_bottom = 138.0
@@ -93,7 +147,7 @@ tint_under = Color( 0, 0, 0, 1 )
 tint_progress = Color( 0.254902, 0.254902, 1, 1 )
 nine_patch_stretch = true
 
-[node name="Label" type="Label" parent="UnitPanel/VBoxContainer/Mana"]
+[node name="Label" type="Label" parent="VBoxContainer/UnitPanel/VBoxContainer/Mana"]
 anchor_right = 1.0
 anchor_bottom = 1.0
 text = "1000 / 1000"

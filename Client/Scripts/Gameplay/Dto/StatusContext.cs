@@ -24,6 +24,17 @@ public sealed record StatusContext : IServiceProvider
     [MemberNotNull(nameof(AbilityContext))]
     public T AbilityAs<T>() where T : Ability => (T)AbilityContext.Required.Ability;
     
+    public float DisplayNormalizedRemainingTime
+    {
+        get
+        {
+            if (RemainingTime == float.PositiveInfinity) return 1;
+            float totalDisplayTime = RemainingTime + DisplayElapsedTime;
+            if (totalDisplayTime == 0) return 0;
+            return RemainingTime / totalDisplayTime;
+        }
+    }
+
     public DeflatedStatusContext Deflate()
     {
         return new DeflatedStatusContext
