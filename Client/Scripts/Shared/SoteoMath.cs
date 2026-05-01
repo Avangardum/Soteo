@@ -102,9 +102,20 @@ public static class SoteoMath
         });
     }
     
-    public static float LerpDecrease(float from, float to, float weight) => from > to ? Lerp(from, to, weight) : to;
+    public static float LerpDecrease(float from, float to, float weight) =>
+        from > to ? Mathf.Lerp(from, to, weight) : to;
     
-    public static float LerpIncrease(float from, float to, float weight) => from < to ? Lerp(from, to, weight) : to;
+    public static float LerpIncrease(float from, float to, float weight) =>
+        from < to ? Mathf.Lerp(from, to, weight) : to;
+    
+    public static double LerpDecrease(double from, double to, double weight) =>
+        from > to ? Lerp(from, to, weight) : to;
+    
+    public static double LerpIncrease(double from, double to, double weight) =>
+        from < to ? Lerp(from, to, weight) : to;
+    
+    public static double Lerp(double from, double to, double weight) =>
+        from + weight * (to - from);
     
     public static double InverseLerp(double from, double to, double value) =>
         to == from ? 0.5f : (value - from) / (to - from);

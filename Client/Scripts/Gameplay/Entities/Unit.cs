@@ -172,7 +172,7 @@ public abstract class Unit : Entity<UnitNode>
         for (int i = 0; i < contexts.Count; i++)
         {
             StatusContext context = contexts[i];
-            float limitedDelta = Mathf.Min(delta, context.RemainingTime);
+            float limitedDelta = Mathf.Min(delta, (float)context.RemainingTime);
             float newTickCountdown = ProcessStatusTickCountdown(context, limitedDelta);
             context = context with
             {
@@ -190,11 +190,11 @@ public abstract class Unit : Entity<UnitNode>
     private float ProcessStatusTickCountdown(StatusContext context, float delta)
     {
         if (context.TickInterval == 0) return 0;
-        float countdown = context.TickCountdown - delta;
+        float countdown = (float)context.TickCountdown - delta;
         while (countdown <= 0)
         {
             context.Status.Tick(context);
-            countdown += context.TickInterval;
+            countdown += (float)context.TickInterval;
         }
         return countdown;
     }
@@ -715,7 +715,7 @@ public abstract class Unit : Entity<UnitNode>
                 Source = reference.Source,
                 AbilityContext = reference.AbilityContext,
                 DisplayElapsedTime = 0,
-                RemainingTime = Mathf.Max(target.RemainingTime, reference.RemainingTime)
+                RemainingTime = Math.Max(target.RemainingTime, reference.RemainingTime)
             };
         }
     }

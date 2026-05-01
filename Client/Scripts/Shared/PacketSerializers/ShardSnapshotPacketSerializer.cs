@@ -178,10 +178,10 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeNullableClass(value.AbilityContext, SerializeAbilityContext, stream);
         SerializeGuid(value.UnitId, stream);
         SerializeNullableStruct(value.SourceId, SerializeGuid, stream);
-        SerializeFloat(value.TickCountdown, stream);
-        SerializeFloat(value.DisplayElapsedTime, stream);
-        SerializeFloat(value.RemainingTime, stream);
-        SerializeFloat(value.TickInterval, stream);
+        SerializeDouble(value.TickCountdown, stream);
+        SerializeDouble(value.DisplayElapsedTime, stream);
+        SerializeDouble(value.RemainingTime, stream);
+        SerializeDouble(value.TickInterval, stream);
     }
     
     private DeflatedStatusContext DeserializeStatusContext(Stream stream)
@@ -193,10 +193,10 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             AbilityContext = DeserializeNullableClass(DeserializeAbilityContext, stream),
             UnitId = DeserializeGuid(stream),
             SourceId = DeserializeNullableStruct(DeserializeGuid, stream),
-            TickCountdown = DeserializeFloat(stream),
-            DisplayElapsedTime = DeserializeFloat(stream),
-            RemainingTime = DeserializeFloat(stream),
-            TickInterval = DeserializeFloat(stream)
+            TickCountdown = DeserializeDouble(stream),
+            DisplayElapsedTime = DeserializeDouble(stream),
+            RemainingTime = DeserializeDouble(stream),
+            TickInterval = DeserializeDouble(stream)
         };
     }
 }

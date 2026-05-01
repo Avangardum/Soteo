@@ -13,10 +13,10 @@ public sealed record DeflatedStatusContext
     public required DeflatedAbilityContext? AbilityContext { get; init; }
     public required Guid UnitId { get; init; }
     public required Guid? SourceId { get; init; }
-    public required float TickCountdown { get; init; }
-    public required float DisplayElapsedTime { get; init; }
-    public required float RemainingTime { get; init; }
-    public required float TickInterval { get; init; }
+    public required double TickCountdown { get; init; }
+    public required double DisplayElapsedTime { get; init; }
+    public required double RemainingTime { get; init; }
+    public required double TickInterval { get; init; }
         
     public StatusContext Inflate(IServiceProvider serviceProvider)
     {

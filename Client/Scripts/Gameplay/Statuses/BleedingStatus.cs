@@ -18,8 +18,8 @@ public sealed class BleedingStatus : Status
 
     public override void Tick(StatusContext context)
     {
-        const float damagePerSecond = 5;
-        float damage = damagePerSecond * context.TickInterval;
+        const double damagePerSecond = 5;
+        double damage = damagePerSecond * context.TickInterval;
         context.Unit.TakeDamage(damage, context);
     }
 }
