@@ -155,7 +155,7 @@ public abstract class Unit : Entity<UnitNode>
         {
             AbilityStatesInternal[slot] = AbilityStatesInternal[slot] with
             {
-                Cooldown = Mathf.Max(AbilityStatesInternal[slot].Cooldown - delta, 0)
+                Cooldown = Math.Max(AbilityStatesInternal[slot].Cooldown - delta, 0)
             };
         }
     }
@@ -427,7 +427,7 @@ public abstract class Unit : Entity<UnitNode>
         }
         else
         {
-            remainingDeltaTime -= AbilityUseProgress.RemainingTime;
+            remainingDeltaTime -= (float)AbilityUseProgress.RemainingTime;
             TriggerAbilityEffect(context, command);
         }
     }
@@ -435,7 +435,7 @@ public abstract class Unit : Entity<UnitNode>
     private void TriggerAbilityEffect(AbilityContext context, UseAbilityCommand command)
     {
         context.Ability.TakeEffect(context);
-        float cooldown = context.Ability.Cooldown(context);
+        double cooldown = context.Ability.Cooldown(context);
         AbilityStatesInternal[command.Slot] = AbilityStatesInternal[command.Slot] with
         {
             Cooldown = cooldown,
@@ -528,8 +528,8 @@ public abstract class Unit : Entity<UnitNode>
             else
             {
                 int frameCount = Node.Sprite.Frames.GetFrameCount(ability.Animation);
-                float progress = AbilityUseProgress.NormalizedProgress;
-                Node.Sprite.Frame = Mathf.Min(Mathf.FloorToInt(frameCount * progress), frameCount - 1);
+                double progress = AbilityUseProgress.NormalizedProgress;
+                Node.Sprite.Frame = Mathf.Min(SoteoMath.FloorToInt(frameCount * progress), frameCount - 1);
                 Node.Sprite.SpeedScale = 0;
             }
         }
@@ -631,7 +631,7 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    public void AddStatus(Status status, float time, float tickInterval, AbilityContext? abilityContext, Unit? source)
+    public void AddStatus(Status status, double time, double tickInterval, AbilityContext? abilityContext, Unit? source)
     {
         if (time < 0) throw new ArgumentException();
         if (tickInterval < 0) throw new ArgumentException();

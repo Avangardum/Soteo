@@ -10,8 +10,8 @@ namespace Soteo.Gameplay.Abilities;
 public sealed class ProjectileBurstAbility : Ability
 {
     public override CanTarget Targeting => CanTarget.Nothing;
-    public override Scalable<float> StaticRange => 1000;
-    public override Scalable<float> StaticCooldown => 5;
+    public override Scalable<double> StaticRange => 1000;
+    public override Scalable<double> StaticCooldown => 5;
 
     public override void TakeEffect(AbilityContext context)
     {

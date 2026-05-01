@@ -7,10 +7,10 @@ namespace Soteo.Gameplay.Abilities;
 public sealed class BloodSacrificeAbility : Ability
 {
     public override CanTarget Targeting => CanTarget.Nothing;
-    public override Scalable<float> StaticHealthCost => 100;
-    public override Scalable<float> StaticUseTime => 0.5f;
+    public override Scalable<double> StaticHealthCost => 100;
+    public override Scalable<double> StaticUseTime => 0.5;
     private Scalable<float> ManaRestored => 200;
-    public override Scalable<float> StaticCooldown => 5;
+    public override Scalable<double> StaticCooldown => 5;
 
     public override void TakeEffect(AbilityContext context)
     {

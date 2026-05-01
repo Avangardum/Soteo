@@ -112,8 +112,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         SerializeInt(value.Ability.Id, stream);
         SerializeInt(value.Level, stream);
-        SerializeFloat(value.Cooldown, stream);
-        SerializeFloat(value.MaxCooldown, stream);
+        SerializeDouble(value.Cooldown, stream);
+        SerializeDouble(value.MaxCooldown, stream);
     }
     
     private AbilityState DeserializeAbilityState(Stream stream)
@@ -122,8 +122,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         {
             Ability = Ability.All[DeserializeInt(stream)],
             Level = DeserializeInt(stream),
-            Cooldown = DeserializeFloat(stream),
-            MaxCooldown = DeserializeFloat(stream)
+            Cooldown = DeserializeDouble(stream),
+            MaxCooldown = DeserializeDouble(stream)
         };
     }
     
@@ -157,8 +157,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     private void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream)
     {
         SerializeEnum(value.Slot, stream);
-        SerializeFloat(value.ElapsedTime, stream);
-        SerializeFloat(value.RemainingTime, stream);
+        SerializeDouble(value.ElapsedTime, stream);
+        SerializeDouble(value.RemainingTime, stream);
     }
     
     private AbilityUseProgress DeserializeAbilityUseProgress(Stream stream)
@@ -166,8 +166,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return new AbilityUseProgress
         {
             Slot = DeserializeEnum<AbilitySlot>(stream),
-            ElapsedTime = DeserializeFloat(stream),
-            RemainingTime = DeserializeFloat(stream)
+            ElapsedTime = DeserializeDouble(stream),
+            RemainingTime = DeserializeDouble(stream)
         };
     }
     

@@ -27,37 +27,37 @@ public abstract class Ability
     
     public virtual int MaxLevel => 1;
     public virtual Status? PassiveStatus => null;
-    public virtual float PassiveTickInterval => 0;
+    public virtual double PassiveTickInterval => 0;
     public virtual CanTarget Targeting => CanTarget.Passive;
     public virtual string Animation => "Attack Right";
     public virtual bool LoopAnimation => false;
     
     // Static values define what is shown in ability description. They are constant and independent of context.
-    public virtual Scalable<float> StaticHealthCost => 0;
-    public virtual Scalable<float> StaticManaCost => 0;
-    public virtual Scalable<float> StaticCooldown => 0;
-    public virtual Scalable<float> StaticRange => 0;
-    public virtual Scalable<float> StaticAngularRange => 30;
-    public virtual Scalable<float> StaticUseTime => 0;
+    public virtual Scalable<double> StaticHealthCost => 0;
+    public virtual Scalable<double> StaticManaCost => 0;
+    public virtual Scalable<double> StaticCooldown => 0;
+    public virtual Scalable<double> StaticRange => 0;
+    public virtual Scalable<double> StaticAngularRange => 30;
+    public virtual Scalable<double> StaticUseTime => 0;
    
     // Dynamic values are context dependent values declared by an ability before applying status effect modifiers.
     // By default, they are same as static values, but if an ability has a value that can't be declared statically, it
     // should override the matching dynamic value method, in which case the static value is used for ability description
     // only and should be 0 to hide it in most cases.
-    protected virtual float DynamicHealthCost(AbilityContext context) => StaticHealthCost[context.Level];
-    protected virtual float DynamicManaCost(AbilityContext context) => StaticManaCost[context.Level];
-    protected virtual float DynamicCooldown(AbilityContext context) => StaticCooldown[context.Level];
-    protected virtual float DynamicRange(AbilityContext context) => StaticRange[context.Level];
-    protected virtual float DynamicAngularRange(AbilityContext context) => StaticAngularRange[context.Level];
-    protected virtual float DynamicUseTime(AbilityContext context) => StaticUseTime[context.Level];
+    protected virtual double DynamicHealthCost(AbilityContext context) => StaticHealthCost[context.Level];
+    protected virtual double DynamicManaCost(AbilityContext context) => StaticManaCost[context.Level];
+    protected virtual double DynamicCooldown(AbilityContext context) => StaticCooldown[context.Level];
+    protected virtual double DynamicRange(AbilityContext context) => StaticRange[context.Level];
+    protected virtual double DynamicAngularRange(AbilityContext context) => StaticAngularRange[context.Level];
+    protected virtual double DynamicUseTime(AbilityContext context) => StaticUseTime[context.Level];
     
     // Unprefixed values are values after applying status effect modifiers and are used in actual gameplay.
-    public float HealthCost(AbilityContext context) => DynamicHealthCost(context);
-    public float ManaCost(AbilityContext context) => DynamicManaCost(context);
-    public float Cooldown(AbilityContext context) => DynamicCooldown(context);
-    public float Range(AbilityContext context) => DynamicRange(context);
-    public float AngularRange(AbilityContext context) => DynamicAngularRange(context);
-    public float UseTime(AbilityContext context) => DynamicUseTime(context);
+    public double HealthCost(AbilityContext context) => DynamicHealthCost(context);
+    public double ManaCost(AbilityContext context) => DynamicManaCost(context);
+    public double Cooldown(AbilityContext context) => DynamicCooldown(context);
+    public double Range(AbilityContext context) => DynamicRange(context);
+    public double AngularRange(AbilityContext context) => DynamicAngularRange(context);
+    public double UseTime(AbilityContext context) => DynamicUseTime(context);
     
     /// <summary>
     /// Called when an ability use is completed and it takes effect.
@@ -146,13 +146,13 @@ public abstract class Ability
             targetPosition != context.User.Position)
         {
             Vector2 deltaPosition = targetPosition - context.User.Position;
-            float rangeMultiplier = strict ? 1 : 1.5f;
+            double rangeMultiplier = strict ? 1 : 1.5f;
             if (deltaPosition.Length() > Range(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfRange;
             
-            float deltaAzimuth =
+            double deltaAzimuth =
                 SoteoMath.ModularDelta(context.User.Azimuth, SoteoMath.DirectionToAzimuth(deltaPosition), 360);
-            if (Mathf.Abs(deltaAzimuth) > AngularRange(context) * rangeMultiplier)
+            if (Math.Abs(deltaAzimuth) > AngularRange(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfAngularRange;
         }
         

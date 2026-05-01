@@ -123,10 +123,10 @@ public sealed class Hud : Control, IHud
                 SelectedUnit.AbilityUseProgress.NormalizedProgress;
             button.UseProgressIndicator.MaxValue = 1;
             
-            button.HealthCostLabel.Text = Mathf.CeilToInt(state.Ability.HealthCost(context)).ToString();
+            button.HealthCostLabel.Text = SoteoMath.CeilToInt(state.Ability.HealthCost(context)).ToString();
             button.HealthCostLabel.Visible = state.Ability.HealthCost(context) > 0;
             
-            button.ManaCostLabel.Text = Mathf.CeilToInt(state.Ability.ManaCost(context)).ToString();
+            button.ManaCostLabel.Text = SoteoMath.CeilToInt(state.Ability.ManaCost(context)).ToString();
             button.ManaCostLabel.Visible = state.Ability.ManaCost(context) > 0;
         }
     }
