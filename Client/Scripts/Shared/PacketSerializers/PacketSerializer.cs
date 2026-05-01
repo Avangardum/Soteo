@@ -130,6 +130,21 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         if (BitConverter.IsLittleEndian) buffer.Reverse();
         return BitConverter.ToSingle(buffer, 0);
     }
+    
+    protected void SerializeDouble(double value, Stream stream)
+    {
+        byte[] buffer = BitConverter.GetBytes(value);
+        if (BitConverter.IsLittleEndian) buffer.Reverse();
+        stream.Write(buffer);
+    }
+    
+    protected double DeserializeDouble(Stream stream)
+    {
+        byte[] buffer = new byte[sizeof(double)];
+        stream.ReadExactly(buffer);
+        if (BitConverter.IsLittleEndian) buffer.Reverse();
+        return BitConverter.ToDouble(buffer, 0);
+    }
 
     protected void SerializeVector2(Vector2 value, Stream stream)
     {

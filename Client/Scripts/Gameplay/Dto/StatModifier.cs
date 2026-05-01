@@ -8,4 +8,4 @@ namespace Soteo.Gameplay.Dto;
 /// If priorities are equal, the one with the highest value wins.
 /// Set is always prioritized over floor / ceiling, regardless of priority.
 /// </param>
-public sealed record StatModifier(Stat Stat, StatModifierKind Kind, float Value, float Priority = 0);
+public sealed record StatModifier(Stat Stat, StatModifierKind Kind, double Value, double Priority = 0);

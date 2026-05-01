@@ -13,12 +13,12 @@ public abstract class AttackAbility : Ability
     public override Scalable<float> StaticCooldown => 0;
 
     protected override float DynamicUseTime(AbilityContext context) =>
-        AttackInterval(context) * context.User.Stats[Stat.AttackUseTimeFraction];
+        AttackInterval(context) * (float)context.User.Stats[Stat.AttackUseTimeFraction];
     
     protected override float DynamicCooldown(AbilityContext context) =>
-        AttackInterval(context) * (1 - context.User.Stats[Stat.AttackUseTimeFraction]);
+        AttackInterval(context) * (1 - (float)context.User.Stats[Stat.AttackUseTimeFraction]);
 
-    private float AttackInterval(AbilityContext context) => 1 / (context.User.Stats[Stat.AttackSpeed] / 1000);
+    private float AttackInterval(AbilityContext context) => 1 / (float)(context.User.Stats[Stat.AttackSpeed] / 1000);
 
-    protected override float DynamicRange(AbilityContext context) => context.User.Stats[Stat.AttackRange];
+    protected override float DynamicRange(AbilityContext context) => (float)context.User.Stats[Stat.AttackRange];
 }

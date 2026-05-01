@@ -9,11 +9,16 @@
 - [ ] Switch to double
 - [ ] Status / abililty icons
 - [ ] Death
-- [ ] Status / ability tooltips
 - [ ] UI scaling
+- [ ] Status / ability tooltips
 - [ ] Tell apart factions at low health
+- [ ] Cluster startup / shutdown
 - [ ] Stress test / optimization
-- [ ] Items
 - [ ] Manual character creation and spawning
 - [ ] Extra data dictionary
-- [ ] Save / load
+- [ ] Shard limits
+- [ ] Travel between shards
+- [ ] Navigation
+- [ ] Items
+- [ ] Singleplayer scenarios
+- [ ] Email sending

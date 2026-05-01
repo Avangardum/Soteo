@@ -93,8 +93,8 @@ public sealed class OverheadUi : Control
         RectPosition = (_unit.Position - _camera.Position + _offset) * _camera.TrueZoom;
         SelectVariant();
         SetFaction(_unit.Faction);
-        SetHealth(_unit.Stats[Stat.CurrentHealth], _unit.Stats[Stat.MaxHealth]);
-        SetMana(_unit.Stats[Stat.CurrentMana], _unit.Stats[Stat.MaxMana]);
+        SetHealth((float)_unit.Stats[Stat.CurrentHealth], (float)_unit.Stats[Stat.MaxHealth]);
+        SetMana((float)_unit.Stats[Stat.CurrentMana], (float)_unit.Stats[Stat.MaxMana]);
     }
     
     private void SelectVariant()

@@ -49,7 +49,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeEnum(EntityKind.Unit, stream);
         SerializeBaseEntity(unit, stream);
         SerializeBool(unit.IsMoving, stream);
-        SerializeDictionary(unit.Stats, SerializeEnum, SerializeFloat, stream);
+        SerializeDictionary(unit.Stats, SerializeEnum, SerializeDouble, stream);
         SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilityState, stream);
         SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
         SerializeIndexedDictionary(unit.Statuses, SerializeStatusContext, stream);
@@ -89,7 +89,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeFloat(stream),
             IsMoving = DeserializeBool(stream),
-            Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, stream),
+            Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializeStatusContext, it => it.Id, stream)
@@ -132,7 +132,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeInt(context.AbilityId, stream);
         SerializeInt(context.Level, stream);
         SerializeGuid(context.UserId, stream);
-        SerializeDictionary(context.UserStats, SerializeEnum, SerializeFloat, stream);
+        SerializeDictionary(context.UserStats, SerializeEnum, SerializeDouble, stream);
         SerializeNullableStruct(context.TargetPosition, SerializeVector2, stream);
         SerializeNullableStruct(context.TargetUnitId, SerializeGuid, stream);
         SerializeNullableStruct(context.TargetDirection, SerializeVector2, stream);
@@ -146,7 +146,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             AbilityId = DeserializeInt(stream),
             Level = DeserializeInt(stream),
             UserId = DeserializeGuid(stream),
-            UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeFloat, stream),
+            UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             TargetPosition = DeserializeNullableStruct(DeserializeVector2, stream),
             TargetUnitId = DeserializeNullableStruct(DeserializeGuid, stream),
             TargetDirection = DeserializeNullableStruct(DeserializeVector2, stream),

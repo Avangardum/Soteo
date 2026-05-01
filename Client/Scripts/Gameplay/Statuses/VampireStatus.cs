@@ -18,17 +18,17 @@ public sealed class VampireStatus : Status
 
     public override void Tick(StatusContext context)
     {
-        float maxStableHealth = context.Unit.Stats[Stat.MaxHealth] * 0.7f;
-        float unstableHealth = context.Unit.Stats[Stat.CurrentHealth] - maxStableHealth;
+        double maxStableHealth = context.Unit.Stats[Stat.MaxHealth] * 0.7;
+        double unstableHealth = context.Unit.Stats[Stat.CurrentHealth] - maxStableHealth;
         if (unstableHealth > 0)
         {
-            const float healthDrainPerSecond = 5;
-            float healthDrain = Mathf.Min(unstableHealth, healthDrainPerSecond * context.TickInterval);
+            const double healthDrainPerSecond = 5;
+            double healthDrain = Math.Min(unstableHealth, healthDrainPerSecond * context.TickInterval);
             context.Unit.SpendHealth(healthDrain, context.AbilityContext.Required.Ability);
         }
     }
 
-    public override void OnDealAttackDamage(StatusContext context, Unit target, float damage)
+    public override void OnDealAttackDamage(StatusContext context, Unit target, double damage)
     {
         float lifestealFactor = context.AbilityAs<VampireAbility>().LifestealFactor[context.AbilityContext.Level];
         context.Unit.RestoreHealth(damage * lifestealFactor, context.Unit, context.AbilityContext.Ability);

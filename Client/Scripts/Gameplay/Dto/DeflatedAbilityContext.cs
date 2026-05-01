@@ -12,7 +12,7 @@ public sealed record DeflatedAbilityContext
     public required int AbilityId { get; init; }
     public required int Level { get; init; }
     public required Guid UserId { get; init; }
-    public required IReadOnlyDictionary<Stat, float> UserStats { get; init; }
+    public required IReadOnlyDictionary<Stat, double> UserStats { get; init; }
     public Vector2? TargetPosition { get; init; }
     public Guid? TargetUnitId { get; init; }
     public Vector2? TargetDirection { get; init; }

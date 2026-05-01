@@ -38,28 +38,28 @@ public abstract class Unit : Entity<UnitNode>
         Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
     
-    public static readonly IReadOnlyDictionary<Stat, (float Min, float Defalut, float Max)> StatConst =
-        new Dictionary<Stat, (float, float, float)>
+    public static readonly IReadOnlyDictionary<Stat, (double Min, double Defalut, double Max)> StatConst =
+        new Dictionary<Stat, (double, double, double)>
         {
             [Stat.MaxHealth] = (0, 1000, 10_000),
             [Stat.CurrentHealth] = (0, 1000, 10_000),
-            [Stat.HealthRegen] = (float.NegativeInfinity, 2, float.PositiveInfinity),
-            [Stat.ManaRegen] = (float.NegativeInfinity, 2, float.PositiveInfinity),
+            [Stat.HealthRegen] = (double.NegativeInfinity, 2, double.PositiveInfinity),
+            [Stat.ManaRegen] = (double.NegativeInfinity, 2, double.PositiveInfinity),
             [Stat.MaxMana] = (0, 1000, 10_000),
             [Stat.CurrentMana] = (0, 1000, 10_000),
             [Stat.MoveSpeed] = (5, 50, 500),
             [Stat.TurnSpeed] = (36, 360, 3600),
-            [Stat.AttackDamage] = (0, 50, float.PositiveInfinity),
+            [Stat.AttackDamage] = (0, 50, double.PositiveInfinity),
             [Stat.AttackSpeed] = (100, 1000, 10_000),
-            [Stat.AttackUseTimeFraction] = (0, 0.5f, 1),
-            [Stat.AttackRange] = (10, 100, float.PositiveInfinity),
+            [Stat.AttackUseTimeFraction] = (0, 0.5, 1),
+            [Stat.AttackRange] = (10, 100, double.PositiveInfinity),
             [Stat.AttackProjectileSpeed] = (50, 500, 5000)
         }.ToImmutableDictionary();
     
     private Queue<ICommand> Commands { get; } = [];
     
-    private Dictionary<Stat, float> StatsInternal { get; set; } = [];
-    public IReadOnlyDictionary<Stat, float> Stats => StatsInternal;
+    private Dictionary<Stat, double> StatsInternal { get; set; } = [];
+    public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
     
     protected Dictionary<AbilitySlot, AbilityState> AbilityStatesInternal { get; set; } = [];
     public IReadOnlyDictionary<AbilitySlot, AbilityState> AbilityStates => AbilityStatesInternal;
@@ -214,8 +214,8 @@ public abstract class Unit : Entity<UnitNode>
         foreach (StatModifier modifier in Statuses.Values.SelectMany(it => it.Status.StatModifiers(it)))
             modifiers[modifier.Stat][modifier.Kind].Add(modifier);
         
-        float oldMaxHealth = Stats[Stat.MaxHealth];
-        float oldMaxMana = Stats[Stat.MaxMana];
+        double oldMaxHealth = Stats[Stat.MaxHealth];
+        double oldMaxMana = Stats[Stat.MaxMana];
         
         foreach (Stat stat in Stat.AllNonVolatile)
             StatsInternal[stat] = CalculateStatValue(stat, modifiers[stat]);
@@ -224,7 +224,7 @@ public abstract class Unit : Entity<UnitNode>
         UpdateResourceStat(Stat.CurrentMana, Stat.MaxMana, oldMaxMana);
     }
 
-    private float CalculateStatValue
+    private double CalculateStatValue
     (
         Stat stat,
         Dictionary<StatModifierKind, List<StatModifier>> modifiers
@@ -238,23 +238,23 @@ public abstract class Unit : Entity<UnitNode>
 
         List<StatModifier> floorModifiers = modifiers[StatModifierKind.Floor];
         List<StatModifier> ceilingModifiers = modifiers[StatModifierKind.Ceiling];
-        float maxFloor = floorModifiers
+        double maxFloor = floorModifiers
             .Select(it => it.Value)
             .OrderDescending()
             .FirstOrDefault(StatConst[stat].Min);
-        float minCeiling = ceilingModifiers
+        double minCeiling = ceilingModifiers
             .Select(it => it.Value)
             .Order()
             .FirstOrDefault(StatConst[stat].Max);
         if (maxFloor > minCeiling)
             return ResolveNonOverlappingStatLimits(floorModifiers, ceilingModifiers);
             
-        float addTotal = modifiers[StatModifierKind.Add].Sum(it => it.Value);
-        float multiplyTotal = modifiers[StatModifierKind.Multiply].Product(it => it.Value);
-        return Mathf.Clamp((StatConst[stat].Defalut + addTotal) * multiplyTotal, maxFloor, minCeiling);
+        double addTotal = modifiers[StatModifierKind.Add].Sum(it => it.Value);
+        double multiplyTotal = modifiers[StatModifierKind.Multiply].Product(it => it.Value);
+        return SoteoMath.Clamp((StatConst[stat].Defalut + addTotal) * multiplyTotal, maxFloor, minCeiling);
     }
     
-    private float ResolveNonOverlappingStatLimits
+    private double ResolveNonOverlappingStatLimits
     (
         IReadOnlyList<StatModifier> floorModifiers,
         IReadOnlyList<StatModifier> ceilingModifiers
@@ -281,9 +281,9 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    private void UpdateResourceStat(Stat stat, Stat maxStat, float oldMax)
+    private void UpdateResourceStat(Stat stat, Stat maxStat, double oldMax)
     {
-        float normalized = Stats[stat] / oldMax;
+        double normalized = Stats[stat] / oldMax;
         StatsInternal[stat] = Stats[maxStat] * normalized;
     }
 
@@ -332,7 +332,7 @@ public abstract class Unit : Entity<UnitNode>
         
         float desiredDeltaAzimuth = SoteoMath.ModularDelta(Azimuth, azimuth, 360);
         
-        float timeToComplete = Mathf.Abs(desiredDeltaAzimuth) / Stats[Stat.TurnSpeed];
+        float timeToComplete = Mathf.Abs(desiredDeltaAzimuth) / (float)Stats[Stat.TurnSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
             Azimuth += desiredDeltaAzimuth;
@@ -341,7 +341,7 @@ public abstract class Unit : Entity<UnitNode>
         }
         else
         {
-            Azimuth += Mathf.Sign(desiredDeltaAzimuth) * remainingDeltaTime * Stats[Stat.TurnSpeed];
+            Azimuth += Mathf.Sign(desiredDeltaAzimuth) * remainingDeltaTime * (float)Stats[Stat.TurnSpeed];
             remainingDeltaTime = 0;
         }
     }
@@ -359,7 +359,7 @@ public abstract class Unit : Entity<UnitNode>
             return;
         }
         Vector2 normalizedDesiredMovement = desiredMovement / desiredMovementLength;
-        float timeToComplete = desiredMovementLength / Stats[Stat.MoveSpeed];
+        float timeToComplete = desiredMovementLength / (float)Stats[Stat.MoveSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
             MoveAndCollide(desiredMovement, node);
@@ -368,7 +368,7 @@ public abstract class Unit : Entity<UnitNode>
         }
         else
         {
-            Vector2 movement = normalizedDesiredMovement * Stats[Stat.MoveSpeed] * remainingDeltaTime;
+            Vector2 movement = normalizedDesiredMovement * (float)Stats[Stat.MoveSpeed] * remainingDeltaTime;
             MoveAndCollide(movement, node);
             remainingDeltaTime = 0;
         }
@@ -537,7 +537,7 @@ public abstract class Unit : Entity<UnitNode>
         {
             Node.Sprite.Animation = "Walk Right";
             const float referenceMoveSpeed = 35;
-            Node.Sprite.SpeedScale = Stats[Stat.MoveSpeed] / referenceMoveSpeed;
+            Node.Sprite.SpeedScale = (float)Stats[Stat.MoveSpeed] / referenceMoveSpeed;
         }
         else
         {
@@ -561,51 +561,51 @@ public abstract class Unit : Entity<UnitNode>
     
     public bool IsAlliedTo(Unit other) => Faction != Faction.Neutral && other.Faction == Faction;
     
-    public void SpendHealth(float amount, Ability? ability)
+    public void SpendHealth(double amount, Ability? ability)
     {
         ChangeStat(Stat.CurrentHealth, -amount);
     }
     
-    public void SpendMana(float amount, Ability? ability)
+    public void SpendMana(double amount, Ability? ability)
     {
         ChangeStat(Stat.CurrentMana, -amount);
     }
     
-    public void TakeDamage(float amount, Unit? source, Ability? ability)
+    public void TakeDamage(double amount, Unit? source, Ability? ability)
     {
         ChangeStat(Stat.CurrentHealth, -amount);
     }
     
-    public void TakeDamage(float amount, StatusContext context) =>
+    public void TakeDamage(double amount, StatusContext context) =>
         TakeDamage(amount, context.Source, context.AbilityContext?.Ability);
     
-    public void TakeDamage(float amount, AbilityContext context) =>
+    public void TakeDamage(double amount, AbilityContext context) =>
         TakeDamage(amount, context.User, context.Ability);
     
-    public void RestoreHealth(float amount, Unit? source, Ability? ability)
+    public void RestoreHealth(double amount, Unit? source, Ability? ability)
     {
         ChangeStat(Stat.CurrentHealth, amount);
     }
     
-    public void RestoreMana(float amount, Unit? source, Ability? ability)
+    public void RestoreMana(double amount, Unit? source, Ability? ability)
     {
         ChangeStat(Stat.CurrentMana, amount);
     }
     
-    protected void ChangeStat(Stat stat, float delta) => SetStat(stat, Stats[stat] + delta);
+    protected void ChangeStat(Stat stat, double delta) => SetStat(stat, Stats[stat] + delta);
 
-    protected void SetStat(Stat stat, float value)
+    protected void SetStat(Stat stat, double value)
     {
         if (!stat.IsVolatile)
             throw new ArgumentException($"{nameof(SetStat)} can only be used with volatile stats");
-        float min = 0;
-        float max = stat switch
+        double min = 0;
+        double max = stat switch
         {
             Stat.CurrentHealth => Stats[Stat.MaxHealth],
             Stat.CurrentMana => Stats[Stat.MaxMana],
-            _ => float.PositiveInfinity
+            _ => double.PositiveInfinity
         };
-        StatsInternal[stat] = Mathf.Clamp(value, min, max);
+        StatsInternal[stat] = SoteoMath.Clamp(value, min, max);
     }
     
     public void DealAttackDamageTo(Unit target, Ability ability)

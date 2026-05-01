@@ -16,10 +16,17 @@ public static class LinqExtensions
         public T FirstOrDefault(T defaultValue) => self.Any() ? self.First() : defaultValue;
         
         public float Product(Func<T, float> selector) => self.Select(selector).Product();
+        
+        public double Product(Func<T, double> selector) => self.Select(selector).Product();
     }
     
     extension (IEnumerable<float> self)
     {
         public float Product() => self.Aggregate(1f, (a, b) => a * b);
+    }
+    
+    extension (IEnumerable<double> self)
+    {
+        public double Product() => self.Aggregate(1.0, (a, b) => a * b);
     }
 }

@@ -6,7 +6,7 @@ namespace Soteo.Gameplay.Dto.Snapshots;
 public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
 {
     public required bool IsMoving { get; init; }
-    public required IReadOnlyDictionary<Stat, float> Stats { get; init; }
+    public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
     public required IReadOnlyDictionary<AbilitySlot, AbilityState> AbilityStates { get; init; }
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, DeflatedStatusContext> Statuses { get; init; }

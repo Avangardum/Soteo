@@ -28,5 +28,5 @@ public abstract class Status
     
     public virtual void Tick(StatusContext context) { }
     
-    public virtual void OnDealAttackDamage(StatusContext context, Unit target, float damage) { }
+    public virtual void OnDealAttackDamage(StatusContext context, Unit target, double damage) { }
 }

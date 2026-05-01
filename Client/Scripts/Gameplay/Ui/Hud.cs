@@ -4,6 +4,7 @@ using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Shared;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 
@@ -92,12 +93,12 @@ public sealed class Hud : Control, IHud
         
         _healthBar.Value = SelectedUnit.Stats[Stat.CurrentHealth];
         _healthBar.MaxValue = SelectedUnit.Stats[Stat.MaxHealth];
-        _healthLabel.Text = $"{Mathf.CeilToInt(SelectedUnit.Stats[Stat.CurrentHealth])} / " +
-            $"{Mathf.CeilToInt(SelectedUnit.Stats[Stat.MaxHealth])}";
+        _healthLabel.Text = $"{SoteoMath.CeilToInt(SelectedUnit.Stats[Stat.CurrentHealth])} / " +
+             $"{SoteoMath.CeilToInt(SelectedUnit.Stats[Stat.MaxHealth])}";
         _manaBar.Value = SelectedUnit.Stats[Stat.CurrentMana];
         _manaBar.MaxValue = SelectedUnit.Stats[Stat.MaxMana];
-        _manaLabel.Text = $"{Mathf.CeilToInt(SelectedUnit.Stats[Stat.CurrentMana])} / " +
-        $"  {Mathf.CeilToInt(SelectedUnit.Stats[Stat.MaxMana])}";
+        _manaLabel.Text = $"{SoteoMath.CeilToInt(SelectedUnit.Stats[Stat.CurrentMana])} / " +
+            $"{SoteoMath.CeilToInt(SelectedUnit.Stats[Stat.MaxMana])}";
     }
     
     private void ProcessAbilities()

@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using static System.Math;
 using static Godot.Mathf;
 
 namespace Soteo.Shared;
@@ -128,4 +127,14 @@ public static class SoteoMath
     /// </summary>
     public static float RoundToMultipleOfPlusHalf(float multipleOf, float value) =>
         multipleOf == 0 ? 0 : RoundToNonIntHalf(value / multipleOf) * multipleOf;
+    
+    public static double Clamp(double value, double min, double max)
+    {
+        if (min > max) throw new ArgumentException("Min was greater than max");
+        return Math.Min(Math.Max(value, min), max);
+    }
+    
+    public static int FloorToInt(double value) => (int)Math.Floor(value);
+    
+    public static int CeilToInt(double value) => (int)Math.Ceiling(value);
 }
