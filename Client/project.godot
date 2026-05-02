@@ -152,6 +152,7 @@ project/assembly_name="Soteo"
 [network]
 
 ssl/certificates="res://devcert.crt"
+limits/webrtc/max_channel_in_buffer_kb=10000
 
 [physics]
 
