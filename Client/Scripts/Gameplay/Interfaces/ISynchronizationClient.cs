@@ -4,7 +4,7 @@ namespace Soteo.Gameplay.Interfaces;
 
 public interface ISynchronizationClient
 {
-    float? Latency { get; }
+    double? Latency { get; }
     
     void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet);
 }

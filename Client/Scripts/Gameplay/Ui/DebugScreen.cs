@@ -7,9 +7,9 @@ namespace Soteo.Gameplay.Ui;
 
 public sealed class DebugScreen : Label
 {
-    private const float UpdateInterval = 0.2f;
+    private const double UpdateInterval = 0.2;
     
-    private float _timeSinceUpdate;
+    private double _timeSinceUpdate;
     
     private readonly IPingMeasurer _pingMeasurer;
     private readonly IShardServiceProviderSource _shardServiceProviderSource;
@@ -38,7 +38,7 @@ public sealed class DebugScreen : Label
         }
     }
     
-    private void UpdateText(float delta)
+    private void UpdateText(double delta)
     {
         double fps = 1 / delta;
         double? ping = _pingMeasurer.Ping(Const.TestShardId);

@@ -8,11 +8,11 @@ public sealed class SoteoCamera : Camera2D, ICamera
     [Export] private int _minZoomLog2;
     [Export] private int _maxZoomLog2;
     [Export] private int _defaultZoomLog2;
-    [Export] private float _zoomLog2Step;
+    [Export] private double _zoomLog2Step;
     [Export] private bool _roundZoomToInt;
-    [Export] private float _scrollSpeed;
-    [Export] private float _scrollZoneThickness;
-    [Export] private float _limit;
+    [Export] private double _scrollSpeed;
+    [Export] private double _scrollZoneThickness;
+    [Export] private double _limit;
     
     private Vector2 _prevGlobalMousePos;
     private bool _wasDraggingInPrevFrame;
@@ -33,7 +33,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
         }
     }
 
-    private float TargetZoomLog2
+    private double TargetZoomLog2
     {
         get;
         set
@@ -41,12 +41,12 @@ public sealed class SoteoCamera : Camera2D, ICamera
             // When rounding zoom to int, dead zones appear near min and max values, in which resulting zoom is
             // the same. In this case, we cut these dead zones off, so that a single scroll tick from an edge
             // value changes the zoom.
-            float min = _roundZoomToInt ? Maths.Log(Mathf.Pow(2, _minZoomLog2) + 0.499f, 2) : _minZoomLog2;
-            float max = _roundZoomToInt ? Maths.Log(Mathf.Pow(2, _maxZoomLog2) - 0.499f, 2) : _maxZoomLog2;
+            double min = _roundZoomToInt ? Math.Log(Math.Pow(2, _minZoomLog2) + 0.499f, 2) : _minZoomLog2;
+            double max = _roundZoomToInt ? Math.Log(Math.Pow(2, _maxZoomLog2) - 0.499f, 2) : _maxZoomLog2;
             
-            field = Mathf.Clamp(value, min, max);
-            float targetZoom = Mathf.Pow(2, field);
-            TrueZoom = _roundZoomToInt ? Mathf.Round(targetZoom) : targetZoom;
+            field = Maths.Clamp(value, min, max);
+            double targetZoom = Math.Pow(2, field);
+            TrueZoom = _roundZoomToInt ? Math.Round(targetZoom) : targetZoom;
         }
     }
 
@@ -87,7 +87,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
         globalMousePos += deltaPos;
     }
     
-    private void Scroll(float delta)
+    private void Scroll(double delta)
     {
         if (OS.GetCmdlineArgs().Contains("--no-scroll")) return;
         Vector2 viewportMousePos = GetViewport().GetMousePosition();
@@ -108,15 +108,15 @@ public sealed class SoteoCamera : Camera2D, ICamera
         Vector2 viewportHalfSizeInWorldSpace = GetViewport().GetVisibleRect().Size / TrueZoom / 2;
         Vector2 position = Position;
         
-        float minX = -_limit + viewportHalfSizeInWorldSpace.x;
-        float maxX = _limit - viewportHalfSizeInWorldSpace.x;
+        double minX = -_limit + viewportHalfSizeInWorldSpace.x;
+        double maxX = _limit - viewportHalfSizeInWorldSpace.x;
         if (minX > maxX) minX = maxX = 0;
-        position.x = Mathf.Clamp(position.x, minX, maxX);
+        position.x = (float)Maths.Clamp(position.x, minX, maxX);
         
-        float minY = -_limit + viewportHalfSizeInWorldSpace.y;
-        float maxY = _limit - viewportHalfSizeInWorldSpace.y;
+        double minY = -_limit + viewportHalfSizeInWorldSpace.y;
+        double maxY = _limit - viewportHalfSizeInWorldSpace.y;
         if (minY > maxY) minY = maxY = 0;
-        position.y = Mathf.Clamp(position.y, minY, maxY);
+        position.y = (float)Maths.Clamp(position.y, minY, maxY);
         
         Position = position;
     }

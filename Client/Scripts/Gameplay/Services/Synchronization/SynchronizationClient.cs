@@ -24,12 +24,12 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     // same time it's desirable to keep it as low as possible, without risking it going below 0, in order to minimize
     // latency and recover from past pauses caused by one-off network issues. Therefore, if all recent values are above
     // _deltaToLastSnapshotTickMinValueToFastForward, synchronization will fast-forward accordingly.
-    private readonly float[] _deltaToLastSnapshotTickHistoryRing = new float[5];
-    private readonly float _deltaToLastSnapshotTickMinSafeValue;
-    private readonly float _deltaToLastSnapshotTickMinValueToFastForward;
+    private readonly double[] _deltaToLastSnapshotTickHistoryRing = new double[5];
+    private readonly double _deltaToLastSnapshotTickMinSafeValue;
+    private readonly double _deltaToLastSnapshotTickMinValueToFastForward;
     
-    public float? Latency =>
-        _tick == -1 || _serverTick == -1 ? null : (float)((_serverTick - _tick) / _ticksPerSecond);
+    public double? Latency =>
+        _tick == -1 || _serverTick == -1 ? null : (_serverTick - _tick) / _ticksPerSecond;
     
     private long SnapshotRingEarliestValidTick => _lastSnapshotTick - _snapshotRing.Length + 1;
 
@@ -69,13 +69,13 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         _tick += delta * _ticksPerSecond;
         _second = _tick / _ticksPerSecond;
         if ((long)_second > (long)prevSecondValue)
-            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, float.MaxValue);
+            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, double.MaxValue);
 
         if (TryGetNearestSnapshotTicks(out int fromTick, out int toTick))
         {
             ShardSnapshot fromSnapshot = _snapshotRing.RingGet(fromTick)!;
             ShardSnapshot toSnapshot = _snapshotRing.RingGet(toTick)!;
-            float weight = (float)Maths.InverseLerp(fromTick, toTick, _tick);
+            double weight = Maths.InverseLerp(fromTick, toTick, _tick);
             ShardSnapshot interpolatedSnapshot = fromSnapshot.Interpolate(toSnapshot, weight);
             ReplicateSnapshot(interpolatedSnapshot);
         }
@@ -143,7 +143,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
 
     private void WriteDeltaToLastSnapshotTickHistory()
     {
-        float deltaToLastSnapshotTick = (float)(_lastSnapshotTick - _tick);
+        double deltaToLastSnapshotTick = (_lastSnapshotTick - _tick);
         if (deltaToLastSnapshotTick < _deltaToLastSnapshotTickHistoryRing.RingGet((long)_second))
             _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, deltaToLastSnapshotTick);
     }
@@ -152,10 +152,10 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     {
         if (_deltaToLastSnapshotTickHistoryRing.All(it => it > _deltaToLastSnapshotTickMinValueToFastForward))
         {
-            float minDelta = _deltaToLastSnapshotTickHistoryRing.Min();
-            float fastForwardTicks = minDelta - _deltaToLastSnapshotTickMinSafeValue;
+            double minDelta = _deltaToLastSnapshotTickHistoryRing.Min();
+            double fastForwardTicks = minDelta - _deltaToLastSnapshotTickMinSafeValue;
             _tick += fastForwardTicks;
-            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, (float)(_lastSnapshotTick - _tick));
+            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, _lastSnapshotTick - _tick);
         }
     }
 }

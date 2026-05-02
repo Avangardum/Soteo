@@ -6,8 +6,8 @@ namespace Soteo.Gameplay.Statuses;
 
 public sealed class BleedingStatus : Status
 {
-    public const float Time = 5;
-    public const float TickInterval = 0.2f;
+    public const double Time = 5;
+    public const double TickInterval = 0.2;
     
     public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Refresh;
 
