@@ -17,10 +17,10 @@ public sealed class ProjectileBurstAbility : Ability
     {
         base.TakeEffect(context);
         var entityManager = context.GetRequiredService<IEntityManager>();
-        for (float azimuth = 0; azimuth <= 360; azimuth++)
+        for (double azimuth = 0; azimuth <= 360; azimuth++)
         {
             Vector2 target = context.User.Position + SoteoMath.AzimuthToDirection(azimuth) * 1000;
-            float speed = 150 + 15 * Mathf.Sin(Mathf.Deg2Rad(azimuth) * 20);
+            double speed = 150 + 15 * Math.Sin(SoteoMath.Deg2Rad(azimuth) * 20);
             entityManager.SpawnAttackProjectile(context with { TargetPosition = target }, speed);
         }
     }

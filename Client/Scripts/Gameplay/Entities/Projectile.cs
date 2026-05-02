@@ -17,7 +17,7 @@ public abstract class Projectile : Entity<ProjectileNode>
     (
         Guid id,
         AbilityContext abilityContext,
-        float speed,
+        double speed,
         PackedScene scene,
         IServiceProvider serviceProvider
     ) : base(id, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
@@ -57,7 +57,7 @@ public abstract class Projectile : Entity<ProjectileNode>
     }
     
     protected AbilityContext AbilityContext { get; private set; }
-    protected float Speed { get; private set; }
+    protected double Speed { get; private set; }
     
     public override EntitySnapshot CreateSnapshot()
     {

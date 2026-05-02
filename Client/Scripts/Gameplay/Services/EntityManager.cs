@@ -64,7 +64,7 @@ public sealed class EntityManager : Node, IEntityManager
     
     public PlayerCharacter SpawnPlayerCharacter(Guid id) => Add(new PlayerCharacter(id, _serviceProvider));
 
-    public AttackProjectile SpawnAttackProjectile(AbilityContext abilityContext, float speed)
+    public AttackProjectile SpawnAttackProjectile(AbilityContext abilityContext, double speed)
     {
         return Add(new AttackProjectile(Guid.NewGuid(), abilityContext, speed, _serviceProvider)
         {

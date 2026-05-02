@@ -1,17 +1,18 @@
 using System.Collections.Immutable;
+using Soteo.Shared.Extensions;
 using static Godot.Mathf;
 
 namespace Soteo.Shared;
 
 public static class SoteoMath
 {
-    public static float DirectionToAzimuth(Vector2 direction) =>
+    public static double DirectionToAzimuth(Vector2 direction) =>
         Rad2Deg(Mathf.PosMod(Atan2(direction.y, direction.x) + Pi / 2, 2 * Pi));
     
-    public static Vector2 AzimuthToDirection(float azimuth)
+    public static Vector2 AzimuthToDirection(double azimuth)
     {
-        float atan2 = Deg2Rad(azimuth) - Pi / 2;
-        return new Vector2(Cos(atan2), Sin(atan2));
+        double atan2 = Deg2Rad(azimuth) - Pi / 2;
+        return Vector2.New(Math.Cos(atan2), Math.Sin(atan2));
     }
     
     /// <summary>
@@ -152,4 +153,8 @@ public static class SoteoMath
     public static int FloorToInt(double value) => (int)Math.Floor(value);
     
     public static int CeilToInt(double value) => (int)Math.Ceiling(value);
+    
+    public static double Rad2Deg(double radians) => radians * 180 / Math.PI;
+    
+    public static double Deg2Rad(double degrees) => degrees * Math.PI / 180;
 }

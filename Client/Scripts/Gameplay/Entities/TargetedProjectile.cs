@@ -1,5 +1,6 @@
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.EntityNodes;
+using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Entities;
 
@@ -11,7 +12,7 @@ public abstract class TargetedProjectile : Projectile
     (
         Guid id,
         AbilityContext abilityContext,
-        float speed,
+        double speed,
         PackedScene scene,
         IServiceProvider serviceProvider
     ) : base(id, abilityContext, speed, scene, serviceProvider) { }
@@ -29,7 +30,7 @@ public abstract class TargetedProjectile : Projectile
         Vector2 targetPosition =
             AbilityContext.TargetUnit?.Position ?? AbilityContext.TargetPosition ?? Position;
         Vector2 directionToTarget = targetPosition - Position;
-        float movementLength = Speed * delta;
+        double movementLength = Speed * delta;
         if (movementLength * movementLength < directionToTarget.LengthSquared())
         {
             Position += directionToTarget.Normalized() * movementLength;

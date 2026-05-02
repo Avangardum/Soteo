@@ -12,7 +12,7 @@ public sealed class AttackProjectile : TargetedProjectile
     (
         Guid id,
         AbilityContext abilityContext,
-        float speed,
+        double speed,
         IServiceProvider serviceProvider
     ) : base(id, abilityContext, speed, Scene, serviceProvider) { }
     

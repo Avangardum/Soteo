@@ -59,7 +59,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         SerializeEnum(EntityKind.Projectile, stream);
         SerializeBaseEntity(projectile, stream);
-        SerializeFloat(projectile.Speed, stream);
+        SerializeDouble(projectile.Speed, stream);
         SerializeAbilityContext(projectile.AbilityContext, stream);
     }
 
@@ -103,7 +103,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Id = DeserializeGuid(stream),
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream),
-            Speed = DeserializeFloat(stream),
+            Speed = DeserializeDouble(stream),
             AbilityContext = DeserializeAbilityContext(stream)
         };
     }

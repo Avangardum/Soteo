@@ -10,5 +10,7 @@ public static class VectorExtensions
         public static Vector2 operator *(Vector2 a, double b) => a * (float)b;
         
         public static Vector2 operator /(Vector2 a, double b) => a / (float)b;
+        
+        public static Vector2 New(double x, double y) => new((float)x, (float)y);
     }
 }
