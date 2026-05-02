@@ -8,7 +8,7 @@ public interface IEntity
     
     Guid Id { get; }
     Vector2 Position { get; set; }
-    float Azimuth { get; set; }
+    double Azimuth { get; set; }
     
     EntitySnapshot CreateSnapshot();
     void ReplicateSnapshot(EntitySnapshot snapshot);

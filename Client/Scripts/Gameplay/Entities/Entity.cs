@@ -22,7 +22,7 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D
     protected abstract TNode? Node { get; }
     public Guid Id { get; }
     public abstract Vector2 Position { get; set; }
-    public virtual float Azimuth { get; set => field = Mathf.PosMod(value, 360); }
+    public virtual double Azimuth { get; set => field = SoteoMath.PosMod(value, 360); }
 
     public abstract EntitySnapshot CreateSnapshot();
 

@@ -7,7 +7,7 @@ public abstract record EntitySnapshot
 {
     public required Guid Id { get; init; }
     public required Vector2 Position { get; init; }
-    public required float Azimuth { get; init; }
+    public required double Azimuth { get; init; }
     
     public abstract EntitySnapshot Interpolate(EntitySnapshot to, float weight);
 }

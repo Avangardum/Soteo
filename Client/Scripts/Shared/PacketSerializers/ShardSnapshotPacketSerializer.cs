@@ -41,7 +41,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         SerializeGuid(unit.Id, stream);
         SerializeVector2(unit.Position, stream);
-        SerializeFloat(unit.Azimuth, stream);
+        SerializeDouble(unit.Azimuth, stream);
     }
     
     private void SerializeUnit(UnitSnapshot unit, Stream stream)
@@ -87,7 +87,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         {
             Id = DeserializeGuid(stream),
             Position = DeserializeVector2(stream),
-            Azimuth = DeserializeFloat(stream),
+            Azimuth = DeserializeDouble(stream),
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, stream),
@@ -102,7 +102,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         {
             Id = DeserializeGuid(stream),
             Position = DeserializeVector2(stream),
-            Azimuth = DeserializeFloat(stream),
+            Azimuth = DeserializeDouble(stream),
             Speed = DeserializeFloat(stream),
             AbilityContext = DeserializeAbilityContext(stream)
         };

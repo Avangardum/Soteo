@@ -93,14 +93,14 @@ public abstract class Unit : Entity<UnitNode>
             Node.Properties.HalfPixelXVisualOffset, Node.Properties.HalfPixelYVisualOffset) - Node.Position;
     }
     
-    public override float Azimuth
+    public override double Azimuth
     {
         get => base.Azimuth;
         set
         {
             base.Azimuth = value;
             if (!IsRemoved && !IsServer)
-                Node.AzimuthIndicator.Azimuth = value;
+                Node.AzimuthIndicator.Azimuth = (float)value;
         }
     }
     
@@ -330,18 +330,18 @@ public abstract class Unit : Entity<UnitNode>
     {
         if (remainingDeltaTime == 0 || Stats[Stat.TurnSpeed] == 0) return;
         
-        float desiredDeltaAzimuth = SoteoMath.ModularDelta(Azimuth, azimuth, 360);
+        double desiredDeltaAzimuth = SoteoMath.ModularDelta(Azimuth, azimuth, 360);
         
-        float timeToComplete = Mathf.Abs(desiredDeltaAzimuth) / (float)Stats[Stat.TurnSpeed];
+        double timeToComplete = Math.Abs(desiredDeltaAzimuth) / (float)Stats[Stat.TurnSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
             Azimuth += desiredDeltaAzimuth;
-            remainingDeltaTime -= timeToComplete;
+            remainingDeltaTime -= (float)timeToComplete;
             if (Commands.PeekOrDefault() is LookCommand) Commands.Dequeue();
         }
         else
         {
-            Azimuth += Mathf.Sign(desiredDeltaAzimuth) * remainingDeltaTime * (float)Stats[Stat.TurnSpeed];
+            Azimuth += Math.Sign(desiredDeltaAzimuth) * remainingDeltaTime * (float)Stats[Stat.TurnSpeed];
             remainingDeltaTime = 0;
         }
     }
