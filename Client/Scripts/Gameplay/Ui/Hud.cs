@@ -133,7 +133,10 @@ public sealed class Hud : Control, IHud
     
     private void ProcessStatuses(Unit unit)
     {
-        List<StatusContext> contexts = unit.Statuses.Values.Take(_statusIndicators.Count).ToList(); // todo order
+        List<StatusContext> contexts = unit.Statuses.Values
+            .OrderBy(it => it.Ordinal)
+            .Take(_statusIndicators.Count)
+            .ToList();
         int i = 0;
         for (; i < contexts.Count; i++)
         {

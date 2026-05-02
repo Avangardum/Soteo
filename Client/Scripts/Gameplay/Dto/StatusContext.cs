@@ -17,6 +17,7 @@ public sealed record StatusContext : IServiceProvider
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
     public required double TickInterval { get; init; }
+    public required long Ordinal { get; init; }
     public required IServiceProvider ServiceProvider { get; init; }
     
     public object? GetService(Type type) => ServiceProvider.GetService(type);
@@ -47,7 +48,8 @@ public sealed record StatusContext : IServiceProvider
             TickCountdown = TickCountdown,
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
-            TickInterval = TickInterval
+            TickInterval = TickInterval,
+            Ordinal = Ordinal
         };
     }
 }

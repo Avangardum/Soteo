@@ -17,6 +17,7 @@ public sealed record DeflatedStatusContext
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
     public required double TickInterval { get; init; }
+    public required long Ordinal { get; init; }
         
     public StatusContext Inflate(IServiceProvider serviceProvider)
     {
@@ -32,6 +33,7 @@ public sealed record DeflatedStatusContext
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
             TickInterval = TickInterval,
+            Ordinal = Ordinal,
             ServiceProvider = serviceProvider
         };
     }

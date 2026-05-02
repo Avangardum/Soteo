@@ -12,7 +12,6 @@ using Soteo.Gameplay.Statuses;
 using Soteo.Gameplay.Util;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Entities;
 
@@ -22,6 +21,7 @@ public abstract class Unit : Entity<UnitNode>
     private readonly IEntityManager _entityManager;
     
     private bool _isMoving;
+    private long _nextStatusOrdinal;
     
     protected Unit(Guid id, PackedScene scene, IServiceProvider serviceProvider) :
         base(id, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
@@ -130,6 +130,7 @@ public abstract class Unit : Entity<UnitNode>
         AbilityStatesInternal = s.AbilityStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
         StatusesInternal = s.Statuses.ToDictionary(it => it.Key, it => it.Value.Inflate(_serviceProvider));
+        _nextStatusOrdinal = Statuses.Values.Max(it => it.Ordinal) + 1;
         
         UpdateAnimation();
     }
@@ -648,6 +649,7 @@ public abstract class Unit : Entity<UnitNode>
             DisplayElapsedTime = 0,
             RemainingTime = time,
             TickInterval = tickInterval,
+            Ordinal = _nextStatusOrdinal++,
             ServiceProvider = _serviceProvider
         };
         

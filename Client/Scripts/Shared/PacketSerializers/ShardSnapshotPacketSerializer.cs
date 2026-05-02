@@ -182,6 +182,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeDouble(value.DisplayElapsedTime, stream);
         SerializeDouble(value.RemainingTime, stream);
         SerializeDouble(value.TickInterval, stream);
+        SerializeLong(value.Ordinal, stream);
     }
     
     private DeflatedStatusContext DeserializeStatusContext(Stream stream)
@@ -196,7 +197,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             TickCountdown = DeserializeDouble(stream),
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
-            TickInterval = DeserializeDouble(stream)
+            TickInterval = DeserializeDouble(stream),
+            Ordinal = DeserializeLong(stream)
         };
     }
 }
