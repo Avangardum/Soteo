@@ -185,7 +185,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         {
             ["negotiated"] = true,
             ["id"] = 1,
-            ["maxRetransmits"] = 0
+            ["maxRetransmits"] = 0,
+            ["ordered"] = true
         });
         
         _peerConnectionsAndChannels[peerId] =
