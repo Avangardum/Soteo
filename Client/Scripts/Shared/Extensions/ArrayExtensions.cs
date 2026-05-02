@@ -4,8 +4,8 @@ public static class ArrayExtensions
 {
     extension<T> (T[] self)
     {
-        public T RingGet(long i) => self[SoteoMath.PosMod(i, self.Length)];
+        public T RingGet(long i) => self[Maths.PosMod(i, self.Length)];
         
-        public void RingSet(long i, T value) => self[SoteoMath.PosMod(i, self.Length)] = value;
+        public void RingSet(long i, T value) => self[Maths.PosMod(i, self.Length)] = value;
     }
 }

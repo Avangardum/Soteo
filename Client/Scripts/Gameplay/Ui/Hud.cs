@@ -93,12 +93,12 @@ public sealed class Hud : Control, IHud
         
         _healthBar.Value = SelectedUnit.Stats[Stat.CurrentHealth];
         _healthBar.MaxValue = SelectedUnit.Stats[Stat.MaxHealth];
-        _healthLabel.Text = $"{SoteoMath.CeilToInt(SelectedUnit.Stats[Stat.CurrentHealth])} / " +
-             $"{SoteoMath.CeilToInt(SelectedUnit.Stats[Stat.MaxHealth])}";
+        _healthLabel.Text = $"{Maths.CeilToInt(SelectedUnit.Stats[Stat.CurrentHealth])} / " +
+             $"{Maths.CeilToInt(SelectedUnit.Stats[Stat.MaxHealth])}";
         _manaBar.Value = SelectedUnit.Stats[Stat.CurrentMana];
         _manaBar.MaxValue = SelectedUnit.Stats[Stat.MaxMana];
-        _manaLabel.Text = $"{SoteoMath.CeilToInt(SelectedUnit.Stats[Stat.CurrentMana])} / " +
-            $"{SoteoMath.CeilToInt(SelectedUnit.Stats[Stat.MaxMana])}";
+        _manaLabel.Text = $"{Maths.CeilToInt(SelectedUnit.Stats[Stat.CurrentMana])} / " +
+            $"{Maths.CeilToInt(SelectedUnit.Stats[Stat.MaxMana])}";
     }
     
     private void ProcessAbilities()
@@ -123,10 +123,10 @@ public sealed class Hud : Control, IHud
                 SelectedUnit.AbilityUseProgress.NormalizedProgress;
             button.UseProgressIndicator.MaxValue = 1;
             
-            button.HealthCostLabel.Text = SoteoMath.CeilToInt(state.Ability.HealthCost(context)).ToString();
+            button.HealthCostLabel.Text = Maths.CeilToInt(state.Ability.HealthCost(context)).ToString();
             button.HealthCostLabel.Visible = state.Ability.HealthCost(context) > 0;
             
-            button.ManaCostLabel.Text = SoteoMath.CeilToInt(state.Ability.ManaCost(context)).ToString();
+            button.ManaCostLabel.Text = Maths.CeilToInt(state.Ability.ManaCost(context)).ToString();
             button.ManaCostLabel.Visible = state.Ability.ManaCost(context) > 0;
         }
     }

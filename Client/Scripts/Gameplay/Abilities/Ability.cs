@@ -151,7 +151,7 @@ public abstract class Ability
                 return AbilityValidationResult.OutOfRange;
             
             double deltaAzimuth =
-                SoteoMath.ModularDelta(context.User.Azimuth, SoteoMath.DirectionToAzimuth(deltaPosition), 360);
+                Maths.ModularDelta(context.User.Azimuth, Maths.DirectionToAzimuth(deltaPosition), 360);
             if (Math.Abs(deltaAzimuth) > AngularRange(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfAngularRange;
         }

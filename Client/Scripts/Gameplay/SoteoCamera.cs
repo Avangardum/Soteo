@@ -41,8 +41,8 @@ public sealed class SoteoCamera : Camera2D, ICamera
             // When rounding zoom to int, dead zones appear near min and max values, in which resulting zoom is
             // the same. In this case, we cut these dead zones off, so that a single scroll tick from an edge
             // value changes the zoom.
-            float min = _roundZoomToInt ? SoteoMath.Log(Mathf.Pow(2, _minZoomLog2) + 0.499f, 2) : _minZoomLog2;
-            float max = _roundZoomToInt ? SoteoMath.Log(Mathf.Pow(2, _maxZoomLog2) - 0.499f, 2) : _maxZoomLog2;
+            float min = _roundZoomToInt ? Maths.Log(Mathf.Pow(2, _minZoomLog2) + 0.499f, 2) : _minZoomLog2;
+            float max = _roundZoomToInt ? Maths.Log(Mathf.Pow(2, _maxZoomLog2) - 0.499f, 2) : _maxZoomLog2;
             
             field = Mathf.Clamp(value, min, max);
             float targetZoom = Mathf.Pow(2, field);

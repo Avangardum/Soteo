@@ -251,7 +251,7 @@ public abstract class Unit : Entity<UnitNode>
             
         double addTotal = modifiers[StatModifierKind.Add].Sum(it => it.Value);
         double multiplyTotal = modifiers[StatModifierKind.Multiply].Product(it => it.Value);
-        return SoteoMath.Clamp((StatConst[stat].Defalut + addTotal) * multiplyTotal, maxFloor, minCeiling);
+        return Maths.Clamp((StatConst[stat].Defalut + addTotal) * multiplyTotal, maxFloor, minCeiling);
     }
     
     private double ResolveNonOverlappingStatLimits
@@ -323,14 +323,14 @@ public abstract class Unit : Entity<UnitNode>
     
     private void LookInDirection(Vector2 direction, ref double remainingDeltaTime)
     {
-        LookAtAzimuth(SoteoMath.DirectionToAzimuth(direction), ref remainingDeltaTime);
+        LookAtAzimuth(Maths.DirectionToAzimuth(direction), ref remainingDeltaTime);
     }
     
     private void LookAtAzimuth(double azimuth, ref double remainingDeltaTime)
     {
         if (remainingDeltaTime == 0 || Stats[Stat.TurnSpeed] == 0) return;
         
-        double desiredDeltaAzimuth = SoteoMath.ModularDelta(Azimuth, azimuth, 360);
+        double desiredDeltaAzimuth = Maths.ModularDelta(Azimuth, azimuth, 360);
         
         double timeToComplete = Math.Abs(desiredDeltaAzimuth) / Stats[Stat.TurnSpeed];
         if (timeToComplete <= remainingDeltaTime)
@@ -530,7 +530,7 @@ public abstract class Unit : Entity<UnitNode>
             {
                 int frameCount = Node.Sprite.Frames.GetFrameCount(ability.Animation);
                 double progress = AbilityUseProgress.NormalizedProgress;
-                Node.Sprite.Frame = Mathf.Min(SoteoMath.FloorToInt(frameCount * progress), frameCount - 1);
+                Node.Sprite.Frame = Mathf.Min(Maths.FloorToInt(frameCount * progress), frameCount - 1);
                 Node.Sprite.SpeedScale = 0;
             }
         }
@@ -606,7 +606,7 @@ public abstract class Unit : Entity<UnitNode>
             Stat.CurrentMana => Stats[Stat.MaxMana],
             _ => double.PositiveInfinity
         };
-        StatsInternal[stat] = SoteoMath.Clamp(value, min, max);
+        StatsInternal[stat] = Maths.Clamp(value, min, max);
     }
     
     public void DealAttackDamageTo(Unit target, Ability ability)

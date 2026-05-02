@@ -23,7 +23,7 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D
     protected abstract TNode? Node { get; }
     public Guid Id { get; }
     public abstract Vector2 Position { get; set; }
-    public virtual double Azimuth { get; set => field = SoteoMath.PosMod(value, 360); }
+    public virtual double Azimuth { get; set => field = Maths.PosMod(value, 360); }
 
     public abstract EntitySnapshot CreateSnapshot();
 
@@ -64,14 +64,14 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D
         // If zoom is even, a world pixel with half pixel offset will be rendered as even number of screen pixels,
         // which will distribute equally in all directions, so pixel perfect rendering is possible without having
         // to compensate for this offset.
-        if (SoteoMath.IsMultipleOf(2, Camera.Value.TrueZoom))
+        if (Maths.IsMultipleOf(2, Camera.Value.TrueZoom))
             halfPixelXOffset = halfPixelYOffset = false;
         
         double screenPixelSizeInWorldPixels = 1 / Camera.Value.TrueZoom;
-        double roundedX = halfPixelXOffset ? SoteoMath.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.x) :
-            SoteoMath.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.x);
-        double roundedY = halfPixelYOffset ? SoteoMath.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.y) :
-            SoteoMath.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.y);
+        double roundedX = halfPixelXOffset ? Maths.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.x) :
+            Maths.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.x);
+        double roundedY = halfPixelYOffset ? Maths.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.y) :
+            Maths.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.y);
         return Vector2.New(roundedX, roundedY);
     }
 }
