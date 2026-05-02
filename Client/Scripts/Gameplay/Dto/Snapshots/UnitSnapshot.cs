@@ -11,7 +11,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, DeflatedStatusContext> Statuses { get; init; }
     
-    public override UnitSnapshot Interpolate(UnitSnapshot to, float weight)
+    public override UnitSnapshot Interpolate(UnitSnapshot to, double weight)
     {
         UnitSnapshot from = this;
         return base.Interpolate(to, weight) with
@@ -23,14 +23,14 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
         };
     }
     
-    private AbilityState InterpolateAbilityState(AbilityState from, AbilityState to, float weight) =>
+    private AbilityState InterpolateAbilityState(AbilityState from, AbilityState to, double weight) =>
         to with { Cooldown = LerpDecrease(from.Cooldown, to.Cooldown, weight) };
     
     private DeflatedStatusContext InterpolateStatusContext
     (
         DeflatedStatusContext from,
         DeflatedStatusContext to,
-        float weight
+        double weight
     )
     {
         return to with { DisplayElapsedTime = LerpIncrease(from.DisplayElapsedTime, to.DisplayElapsedTime, weight) };
@@ -40,7 +40,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     (
         AbilityUseProgress from,
         AbilityUseProgress to,
-        float weight
+        double weight
     )
     {
         return to with

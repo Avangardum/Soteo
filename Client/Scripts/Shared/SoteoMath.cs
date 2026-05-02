@@ -28,8 +28,8 @@ public static class SoteoMath
     /// direction. Useful for animations.<br />
     /// Examples: f(350, 30, 0.5, 360) = 20, f(100, 80, 0.5, 360) = 270.
     /// </summary>
-    public static float ModularLerpPositive(float from, float to, float weight, float modulo) =>
-        Mathf.PosMod(from + ModularDeltaPositive(from, to, modulo) * weight, modulo);
+    public static double ModularLerpPositive(double from, double to, double weight, double modulo) =>
+        PosMod(from + ModularDeltaPositive(from, to, modulo) * weight, modulo);
 
     /// <summary>
     /// Find difference, but for modular arithmetics with possible wrapping around zero. Useful for azimuth.<br />
@@ -51,12 +51,12 @@ public static class SoteoMath
     /// direction.<br />
     /// Examples: f(350, 30, 360) = +40, f(100, 80, 360) = 340.
     /// </summary>
-    public static float ModularDeltaPositive(float from, float to, float modulo)
+    public static double ModularDeltaPositive(double from, double to, double modulo)
     {
         if (from < 0 || from >= modulo) throw new ArgumentException();
         if (to < 0 || to >= modulo) throw new ArgumentException();
         
-        float delta = to - from;
+        double delta = to - from;
         if (delta < 0) delta += modulo;
         return delta;
     }
@@ -67,7 +67,7 @@ public static class SoteoMath
         return interpolate(from.Value, to.Value);
     }
     
-    public static T? InterpolateNullable<T>(T? from, T? to, float weight, Func<T, T, float, T> interpolate)
+    public static T? InterpolateNullable<T>(T? from, T? to, double weight, Func<T, T, double, T> interpolate)
         where T : struct
     {
         if (from == null || to == null) return to;
@@ -80,7 +80,7 @@ public static class SoteoMath
         return interpolate(from, to);
     }
     
-    public static T? InterpolateNullable<T>(T? from, T? to, float weight, Func<T, T, float, T> interpolate)
+    public static T? InterpolateNullable<T>(T? from, T? to, double weight, Func<T, T, double, T> interpolate)
         where T : class
     {
         if (from == null || to == null) return to;
@@ -91,8 +91,8 @@ public static class SoteoMath
     (
         IReadOnlyDictionary<TKey, TValue> from,
         IReadOnlyDictionary<TKey, TValue> to,
-        float weight,
-        Func<TValue, TValue, float, TValue> interpolateValue
+        double weight,
+        Func<TValue, TValue, double, TValue> interpolateValue
     ) where TKey : notnull
     {
         return to.ToImmutableDictionary(it => it.Key, it =>
@@ -102,12 +102,6 @@ public static class SoteoMath
             return interpolateValue(f, t, weight);
         });
     }
-    
-    public static float LerpDecrease(float from, float to, float weight) =>
-        from > to ? Mathf.Lerp(from, to, weight) : to;
-    
-    public static float LerpIncrease(float from, float to, float weight) =>
-        from < to ? Mathf.Lerp(from, to, weight) : to;
     
     public static double LerpDecrease(double from, double to, double weight) =>
         from > to ? Lerp(from, to, weight) : to;
@@ -132,16 +126,16 @@ public static class SoteoMath
     /// <summary>
     /// Round a value to the nearest noninteger multiple of 0.5
     /// </summary>
-    public static float RoundToNonIntHalf(float value) => Mathf.Floor(value - 0.5f) + 0.5f;
+    public static double RoundToNonIntHalf(double value) => Math.Floor(value - 0.5f) + 0.5f;
     
-    public static float RoundToMultipleOf(float multipleOf, float value) =>
-        multipleOf == 0 ? 0 : Round(value / multipleOf) * multipleOf;
+    public static double RoundToMultipleOf(double multipleOf, double value) =>
+        multipleOf == 0 ? 0 : Math.Round(value / multipleOf) * multipleOf;
     
     /// <summary>
     /// Round a value to a multiple of a given number plus half of that number.
     /// For example, specifying multipleOf: 10 rounds to one of the following: ..., -15, -5, 5, 15, ... 
     /// </summary>
-    public static float RoundToMultipleOfPlusHalf(float multipleOf, float value) =>
+    public static double RoundToMultipleOfPlusHalf(double multipleOf, double value) =>
         multipleOf == 0 ? 0 : RoundToNonIntHalf(value / multipleOf) * multipleOf;
     
     public static double Clamp(double value, double min, double max)
@@ -157,4 +151,10 @@ public static class SoteoMath
     public static double Rad2Deg(double radians) => radians * 180 / Math.PI;
     
     public static double Deg2Rad(double degrees) => degrees * Math.PI / 180;
+    
+    public static bool IsMultipleOf(double factor, double value, double tolerance = 0.001)
+    {
+        double mod = PosMod(value, factor);
+        return mod < tolerance || mod > factor - tolerance;
+    }
 }

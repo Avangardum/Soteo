@@ -14,7 +14,7 @@ public abstract record EntitySnapshot
 
 public abstract record EntitySnapshot<T> : EntitySnapshot where T : EntitySnapshot<T>
 {
-    public virtual T Interpolate(T to, float weight)
+    public virtual T Interpolate(T to, double weight)
     {
         EntitySnapshot<T> from = this;
         if (from.Id != to.Id) throw new ArgumentException();
