@@ -139,7 +139,7 @@ public abstract class Unit : Entity<UnitNode>
         UpdateVisualsPosition();
     }
 
-    public virtual void _PhysicsProcessServer(UnitNode node, float delta)
+    public virtual void _PhysicsProcessServer(UnitNode node, double delta)
     {
         _isMoving = false;
         UpdateStats();
@@ -149,7 +149,7 @@ public abstract class Unit : Entity<UnitNode>
         ExecuteCommands(node, delta);
     }
     
-    private void DecreaseCooldowns(float delta)
+    private void DecreaseCooldowns(double delta)
     {
         foreach (AbilitySlot slot in AbilityStatesInternal.Keys.ToList())
         {
@@ -160,20 +160,20 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    private void ApplyRegen(float delta)
+    private void ApplyRegen(double delta)
     {
         ChangeStat(Stat.CurrentHealth, Stats[Stat.HealthRegen] * delta);
         ChangeStat(Stat.CurrentMana, Stats[Stat.ManaRegen] * delta);
     }
     
-    private void ProcessStatuses(float delta)
+    private void ProcessStatuses(double delta)
     {
         List<StatusContext> contexts = Statuses.Values.ToList();
         for (int i = 0; i < contexts.Count; i++)
         {
             StatusContext context = contexts[i];
-            float limitedDelta = Mathf.Min(delta, (float)context.RemainingTime);
-            float newTickCountdown = ProcessStatusTickCountdown(context, limitedDelta);
+            double limitedDelta = Math.Min(delta, context.RemainingTime);
+            double newTickCountdown = ProcessStatusTickCountdown(context, limitedDelta);
             context = context with
             {
                 TickCountdown = newTickCountdown,
@@ -187,14 +187,14 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    private float ProcessStatusTickCountdown(StatusContext context, float delta)
+    private double ProcessStatusTickCountdown(StatusContext context, double delta)
     {
         if (context.TickInterval == 0) return 0;
-        float countdown = (float)context.TickCountdown - delta;
+        double countdown = context.TickCountdown - delta;
         while (countdown <= 0)
         {
             context.Status.Tick(context);
-            countdown += (float)context.TickInterval;
+            countdown += context.TickInterval;
         }
         return countdown;
     }
@@ -287,15 +287,15 @@ public abstract class Unit : Entity<UnitNode>
         StatsInternal[stat] = Stats[maxStat] * normalized;
     }
 
-    public virtual void _PhysicsProcessClient(UnitNode node, float delta)
+    public virtual void _PhysicsProcessClient(UnitNode node, double delta)
     {
         node.Position = Position;
         UpdateVisualsPosition();
     }
 
-    private void ExecuteCommands(UnitNode node, float deltaTime)
+    private void ExecuteCommands(UnitNode node, double deltaTime)
     {
-        float remainingDeltaTime = deltaTime;
+        double remainingDeltaTime = deltaTime;
         int iterations = 0;
         const int maxIterations = 5;
         while (Commands.Count > 0 && remainingDeltaTime > 0 && iterations < maxIterations)
@@ -316,50 +316,50 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    private void LookAtPosition(Vector2 position, ref float remainingDeltaTime)
+    private void LookAtPosition(Vector2 position, ref double remainingDeltaTime)
     {
         LookInDirection(position - Position, ref remainingDeltaTime);
     }
     
-    private void LookInDirection(Vector2 direction, ref float remainingDeltaTime)
+    private void LookInDirection(Vector2 direction, ref double remainingDeltaTime)
     {
         LookAtAzimuth(SoteoMath.DirectionToAzimuth(direction), ref remainingDeltaTime);
     }
     
-    private void LookAtAzimuth(float azimuth, ref float remainingDeltaTime)
+    private void LookAtAzimuth(double azimuth, ref double remainingDeltaTime)
     {
         if (remainingDeltaTime == 0 || Stats[Stat.TurnSpeed] == 0) return;
         
         double desiredDeltaAzimuth = SoteoMath.ModularDelta(Azimuth, azimuth, 360);
         
-        double timeToComplete = Math.Abs(desiredDeltaAzimuth) / (float)Stats[Stat.TurnSpeed];
+        double timeToComplete = Math.Abs(desiredDeltaAzimuth) / Stats[Stat.TurnSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
             Azimuth += desiredDeltaAzimuth;
-            remainingDeltaTime -= (float)timeToComplete;
+            remainingDeltaTime -= timeToComplete;
             if (Commands.PeekOrDefault() is LookCommand) Commands.Dequeue();
         }
         else
         {
-            Azimuth += Math.Sign(desiredDeltaAzimuth) * remainingDeltaTime * (float)Stats[Stat.TurnSpeed];
+            Azimuth += Math.Sign(desiredDeltaAzimuth) * remainingDeltaTime * Stats[Stat.TurnSpeed];
             remainingDeltaTime = 0;
         }
     }
     
-    private void MoveToPosition(Vector2 position, ref float remainingDeltaTime, UnitNode node)
+    private void MoveToPosition(Vector2 position, ref double remainingDeltaTime, UnitNode node)
     {
         LookAtPosition(position, ref remainingDeltaTime);
         if (remainingDeltaTime == 0 || Stats[Stat.MoveSpeed] == 0) return;
         
         Vector2 desiredMovement = position - Position;
-        float desiredMovementLength = desiredMovement.Length();
+        double desiredMovementLength = desiredMovement.Length();
         if (desiredMovementLength == 0)
         {
             if (Commands.PeekOrDefault() is MoveCommand) Commands.Dequeue();
             return;
         }
         Vector2 normalizedDesiredMovement = desiredMovement / desiredMovementLength;
-        float timeToComplete = desiredMovementLength / (float)Stats[Stat.MoveSpeed];
+        double timeToComplete = desiredMovementLength / Stats[Stat.MoveSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
             MoveAndCollide(desiredMovement, node);
@@ -368,7 +368,7 @@ public abstract class Unit : Entity<UnitNode>
         }
         else
         {
-            Vector2 movement = normalizedDesiredMovement * (float)Stats[Stat.MoveSpeed] * remainingDeltaTime;
+            Vector2 movement = normalizedDesiredMovement * Stats[Stat.MoveSpeed] * remainingDeltaTime;
             MoveAndCollide(movement, node);
             remainingDeltaTime = 0;
         }
@@ -382,7 +382,7 @@ public abstract class Unit : Entity<UnitNode>
         return collision;
     }
 
-    private void UseAbility(UseAbilityCommand command, ref float remainingDeltaTime, UnitNode node)
+    private void UseAbility(UseAbilityCommand command, ref double remainingDeltaTime, UnitNode node)
     {
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
         {
@@ -427,7 +427,7 @@ public abstract class Unit : Entity<UnitNode>
         }
         else
         {
-            remainingDeltaTime -= (float)AbilityUseProgress.RemainingTime;
+            remainingDeltaTime -= AbilityUseProgress.RemainingTime;
             TriggerAbilityEffect(context, command);
         }
     }
@@ -446,10 +446,11 @@ public abstract class Unit : Entity<UnitNode>
             Commands.Dequeue();
     }
     
-    private void WaitForAbilityCooldown(AbilityContext context, ref float remainingDeltaTime)
+    private void WaitForAbilityCooldown(AbilityContext context, ref double remainingDeltaTime)
     {
         Vector2? targetPosition = context.TargetPosition ?? context.TargetUnit?.Position;
-        if (targetPosition != null) LookAtPosition(targetPosition.Value, ref remainingDeltaTime);
+        if (targetPosition != null)
+            LookAtPosition(targetPosition.Value, ref remainingDeltaTime);
         remainingDeltaTime = 0;
     }
     
@@ -480,7 +481,7 @@ public abstract class Unit : Entity<UnitNode>
         Ability ability,
         AbilityContext context,
         UseAbilityCommand command,
-        ref float remainingDeltaTime,
+        ref double remainingDeltaTime,
         UnitNode node
     )
     {
@@ -536,8 +537,8 @@ public abstract class Unit : Entity<UnitNode>
         else if (_isMoving)
         {
             Node.Sprite.Animation = "Walk Right";
-            const float referenceMoveSpeed = 35;
-            Node.Sprite.SpeedScale = (float)Stats[Stat.MoveSpeed] / referenceMoveSpeed;
+            const double referenceMoveSpeed = 35;
+            Node.Sprite.SpeedScale = (float)(Stats[Stat.MoveSpeed] / referenceMoveSpeed);
         }
         else
         {
@@ -627,7 +628,7 @@ public abstract class Unit : Entity<UnitNode>
         if (ability.PassiveStatus != null)
         {
             AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand(slot));
-            AddStatus(ability.PassiveStatus, float.PositiveInfinity, ability.PassiveTickInterval, abilityContext, this);
+            AddStatus(ability.PassiveStatus, double.PositiveInfinity, ability.PassiveTickInterval, abilityContext, this);
         }
     }
     
@@ -682,18 +683,18 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    public void AddStatus(Status status, float time, float tickInterval, StatusContext sourceStatusContext)
+    public void AddStatus(Status status, double time, double tickInterval, StatusContext sourceStatusContext)
     {
         AddStatus(status, time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
     }
     
-    public void AddStatus<T>(float time, float tickInterval, AbilityContext? abilityContext, Unit? source)
+    public void AddStatus<T>(double time, double tickInterval, AbilityContext? abilityContext, Unit? source)
         where T : Status
     {
         AddStatus(Status.Instance<T>(), time, tickInterval, abilityContext, source);
     }
     
-    public void AddStatus<T>(float time, float tickInterval, StatusContext sourceStatusContext)
+    public void AddStatus<T>(double time, double tickInterval, StatusContext sourceStatusContext)
         where T : Status
     {
         AddStatus<T>(time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
