@@ -23,4 +23,6 @@ public class ServerDependency<T> where T : class
         }
         private set;
     }
+    
+    public T Required => Value.Required;
 }

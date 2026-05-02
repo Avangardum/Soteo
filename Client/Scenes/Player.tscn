@@ -270,9 +270,8 @@ animation = "Idle Right"
 [node name="AzimuthIndicator" type="Line2D" parent="Visuals"]
 position = Vector2( 0, -1 )
 z_index = -1
-width = 0.2
+width = 2.0
 default_color = Color( 1, 1, 1, 1 )
-antialiased = true
 script = ExtResource( 4 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

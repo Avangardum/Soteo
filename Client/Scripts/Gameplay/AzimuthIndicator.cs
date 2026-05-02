@@ -10,32 +10,17 @@ public sealed class AzimuthIndicator : Line2D
     private const int EllipseWidth = 8;
     private const int EllipseHeight = 4;
     private const double ArrowTipMultiplier = 1.4;
+    private const double LineWidth = 2;
+    private const double ZoomFactor = 0.1;
     
-    private readonly Vector2[] _points;
-    
-    public AzimuthIndicator()
-    {
-        _points = new Vector2[SectorCount + 2 - 2 * (ArrowHalfWidthSectors - 1)];
-        CalculatePoints();
-    }
-    
-    public double Azimuth
-    {
-        get;
-        set
-        {
-            if (field == value) return;
-            field = value;
-            CalculatePoints();
-        }
-    }
-    
-    private void CalculatePoints()
+    private readonly Vector2[] _points = new Vector2[SectorCount + 2 - 2 * (ArrowHalfWidthSectors - 1)];
+
+    public void CalculatePoints(double azimuth, double zoom)
     {
         if (IsServer) return;
         
         const double sectorAngle = 2 * Math.PI / SectorCount;
-        double forwardAngle = Maths.Deg2Rad(Azimuth) - Math.PI / 2;
+        double forwardAngle = Maths.Deg2Rad(azimuth) - Math.PI / 2;
         var arrowTip = Vector2.New
         (
             EllipseWidth * Math.Cos(forwardAngle),
@@ -51,5 +36,6 @@ public sealed class AzimuthIndicator : Line2D
         _points[^1] = _points[1];
         
         Points = _points;
+        Width = (float)Maths.Lerp(LineWidth / zoom, LineWidth, ZoomFactor);
     }
 }

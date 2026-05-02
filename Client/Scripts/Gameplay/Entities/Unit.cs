@@ -100,7 +100,7 @@ public abstract class Unit : Entity<UnitNode>
         {
             base.Azimuth = value;
             if (!IsRemoved && !IsServer)
-                Node.AzimuthIndicator.Azimuth = (float)value;
+                Node.AzimuthIndicator.CalculatePoints(Azimuth, Camera.Required.TrueZoom);
         }
     }
     

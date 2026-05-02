@@ -22,4 +22,6 @@ public class ClientDependency<T> where T : class
             return field ?? throw new InvalidOperationException($"Missing client dependency: {typeof(T)}");
         }
     }
+    
+    public T Required => Value.Required;
 }
