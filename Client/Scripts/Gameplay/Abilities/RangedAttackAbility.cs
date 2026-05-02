@@ -11,7 +11,7 @@ public sealed class RangedAttackAbility : AttackAbility
     public override void TakeEffect(AbilityContext context)
     {
         base.TakeEffect(context);
-        float projectileSpeed = (float)context.UserStats[Stat.AttackProjectileSpeed];
+        double projectileSpeed = context.UserStats[Stat.AttackProjectileSpeed];
         context.GetRequiredService<IEntityManager>().SpawnAttackProjectile(context, projectileSpeed);
     }
 

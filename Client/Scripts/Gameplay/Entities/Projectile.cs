@@ -80,7 +80,7 @@ public abstract class Projectile : Entity<ProjectileNode>
         Speed = s.Speed;
     }
     
-    public virtual void _PhysicsProcessServer(ProjectileNode node, float delta) { }
+    public virtual void _PhysicsProcessServer(ProjectileNode node, double delta) { }
 
     protected override void OnZoomChanged()
     {

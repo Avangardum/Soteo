@@ -17,7 +17,7 @@ public abstract class TargetedProjectile : Projectile
         IServiceProvider serviceProvider
     ) : base(id, abilityContext, speed, scene, serviceProvider) { }
 
-    public override void _PhysicsProcessServer(ProjectileNode node, float delta)
+    public override void _PhysicsProcessServer(ProjectileNode node, double delta)
     {
         base._PhysicsProcessServer(node, delta);
         

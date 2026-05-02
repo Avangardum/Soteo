@@ -40,8 +40,8 @@ public sealed class DebugScreen : Label
     
     private void UpdateText(float delta)
     {
-        float fps = 1 / delta;
-        float? ping = _pingMeasurer.Ping(Const.TestShardId);
+        double fps = 1 / delta;
+        double? ping = _pingMeasurer.Ping(Const.TestShardId);
         ISynchronizationClient? synchronizationClient = _shardServiceProviderSource.ShardServiceProviders
             .GetOrDefault(Const.TestShardId)
             ?.GetRequiredService<ISynchronizationClient>();
@@ -54,7 +54,7 @@ public sealed class DebugScreen : Label
              """;
     }
     
-    private string ToMillisecondsString(float? seconds) =>
+    private string ToMillisecondsString(double? seconds) =>
         seconds == null ? "?" : (seconds.Value * 1000).ToString("N0") + "ms";
 
     public override void _UnhandledInput(InputEvent e)

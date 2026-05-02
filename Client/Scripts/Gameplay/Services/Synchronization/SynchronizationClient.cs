@@ -8,9 +8,9 @@ namespace Soteo.Gameplay.Services.Synchronization;
 
 public sealed class SynchronizationClient : Node, ISynchronizationClient
 {
-    private IEntityManager _entityManager = null!;
-    private IShard _shard = null!;
-    private IPingMeasurer _pingMeasurer = null!;
+    private readonly IEntityManager _entityManager;
+    private readonly IShard _shard;
+    private readonly IPingMeasurer _pingMeasurer;
     
     private readonly int _ticksPerSecond;
     private double _tick = -1;
@@ -122,7 +122,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet)
     {
         _snapshotRing.RingSet(packet.Tick, packet.Snapshot);
-        float? halfPingTicks = _pingMeasurer.Ping(_shard.Id) * _ticksPerSecond / 2;
+        double? halfPingTicks = _pingMeasurer.Ping(_shard.Id) * _ticksPerSecond / 2;
         _serverTick = halfPingTicks == null ? -1 : packet.Tick + halfPingTicks.Value;
         
         if (_lastSnapshotTick != -1 && packet.Tick > _lastSnapshotTick && _lastSnapshotTick != packet.Tick - 1)

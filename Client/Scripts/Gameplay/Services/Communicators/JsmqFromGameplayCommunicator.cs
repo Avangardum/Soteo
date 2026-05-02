@@ -103,5 +103,5 @@ public sealed class JsmqFromGameplayCommunicator : Node, IMasterServerCommunicat
 
     void IMasterServerCommunicator.SendPacket(Packet packet) => SendReliable(packet, MasterServerId);
     
-    public float? Ping(Guid peerId) => 0;
+    public double? Ping(Guid peerId) => 0;
 }

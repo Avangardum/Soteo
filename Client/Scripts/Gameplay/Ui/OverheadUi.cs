@@ -99,10 +99,11 @@ public sealed class OverheadUi : Control
     
     private void SelectVariant()
     {
-        const float tinyHealthMinZoom = 0.9f;
-        const float tinyHealthMaxZoom = 2.4f;
-        float zoom = _camera.TrueZoom;
-        CurrentVariant = zoom < tinyHealthMinZoom ? Variant.None : zoom <= tinyHealthMaxZoom ? Variant.TinyHealth :
+        const double tinyHealthMinZoom = 0.9;
+        const double tinyHealthMaxZoom = 2.4;
+        double zoom = _camera.TrueZoom;
+        CurrentVariant = zoom < tinyHealthMinZoom ? Variant.None :
+            zoom <= tinyHealthMaxZoom ? Variant.TinyHealth :
             Variant.PlayerCharacter;
     }
     

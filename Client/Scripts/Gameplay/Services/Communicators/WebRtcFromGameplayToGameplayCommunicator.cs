@@ -23,13 +23,13 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         WebRTCDataChannel UnreliableChannel
     );
     
-    private const float PingInterval = 1;
-    private float _timeSinceLastPing;
+    private const double PingInterval = 1;
+    private double _timeSinceLastPing;
     private Guid _lastPingId;
     
     private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
         _peerConnectionsAndChannels = [];
-    private readonly System.Collections.Generic.Dictionary<Guid, (Guid PingId, float ResponseTime)> _ping = [];
+    private readonly System.Collections.Generic.Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
     
     private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
     
@@ -261,6 +261,6 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         connection.AddIceCandidate(packet.Media, packet.Index, packet.Name);
     }
 
-    public float? Ping(Guid peerId) =>
+    public double? Ping(Guid peerId) =>
         _ping.TryGetValue(peerId, out var tuple) ? tuple.ResponseTime : null;
 }

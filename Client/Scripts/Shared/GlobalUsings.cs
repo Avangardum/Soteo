@@ -1,5 +1,6 @@
 global using Godot;
 global using System;
+global using Soteo.Shared.Extensions;
 global using static Soteo.Shared.Globals;
 global using SysEnvironment = System.Environment;
 global using GdEnvironment = Godot.Environment;

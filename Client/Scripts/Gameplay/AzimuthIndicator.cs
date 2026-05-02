@@ -1,3 +1,6 @@
+using Soteo.Shared;
+using Soteo.Shared.Extensions;
+
 namespace Soteo.Gameplay;
 
 public sealed class AzimuthIndicator : Line2D
@@ -6,7 +9,7 @@ public sealed class AzimuthIndicator : Line2D
     private const int ArrowHalfWidthSectors = 4;
     private const int EllipseWidth = 8;
     private const int EllipseHeight = 4;
-    private const float ArrowTipMultiplier = 1.4f;
+    private const double ArrowTipMultiplier = 1.4;
     
     private readonly Vector2[] _points;
     
@@ -16,7 +19,7 @@ public sealed class AzimuthIndicator : Line2D
         CalculatePoints();
     }
     
-    public float Azimuth
+    public double Azimuth
     {
         get;
         set
@@ -31,18 +34,18 @@ public sealed class AzimuthIndicator : Line2D
     {
         if (IsServer) return;
         
-        const float sectorAngle = 2 * Mathf.Pi / SectorCount;
-        float forwardAngle = Mathf.Deg2Rad(Azimuth) - Mathf.Pi / 2;
-        var arrowTip = new Vector2
+        const double sectorAngle = 2 * Math.PI / SectorCount;
+        double forwardAngle = Maths.Deg2Rad(Azimuth) - Math.PI / 2;
+        var arrowTip = Vector2.New
         (
-            EllipseWidth * Mathf.Cos(forwardAngle),
-            EllipseHeight * Mathf.Sin(forwardAngle)
+            EllipseWidth * Math.Cos(forwardAngle),
+            EllipseHeight * Math.Sin(forwardAngle)
         ) * ArrowTipMultiplier;
         _points[0] = arrowTip;
         for (int i = 1; i <= _points.Length - 2; i++)
         {
-            float angle = forwardAngle + sectorAngle * (i + ArrowHalfWidthSectors - 1);
-            _points[i] = new Vector2(EllipseWidth * Mathf.Cos(angle), EllipseHeight * Mathf.Sin(angle));
+            double angle = forwardAngle + sectorAngle * (i + ArrowHalfWidthSectors - 1);
+            _points[i] = Vector2.New(EllipseWidth * Math.Cos(angle), EllipseHeight * Math.Sin(angle));
         }
         _points[^2] = _points[0];
         _points[^1] = _points[1];

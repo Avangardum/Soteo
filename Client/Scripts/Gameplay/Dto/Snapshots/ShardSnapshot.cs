@@ -6,7 +6,7 @@ public sealed record ShardSnapshot
 {
     public required ImmutableList<EntitySnapshot> Entities { get; init; }
     
-    public ShardSnapshot Interpolate(ShardSnapshot to, float weight)
+    public ShardSnapshot Interpolate(ShardSnapshot to, double weight)
     {
         ShardSnapshot from = this;
         ImmutableDictionary<Guid, EntitySnapshot> fromEntities = from.Entities.ToImmutableDictionary(it => it.Id);

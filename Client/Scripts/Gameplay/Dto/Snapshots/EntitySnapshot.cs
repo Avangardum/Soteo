@@ -9,7 +9,7 @@ public abstract record EntitySnapshot
     public required Vector2 Position { get; init; }
     public required double Azimuth { get; init; }
     
-    public abstract EntitySnapshot Interpolate(EntitySnapshot to, float weight);
+    public abstract EntitySnapshot Interpolate(EntitySnapshot to, double weight);
 }
 
 public abstract record EntitySnapshot<T> : EntitySnapshot where T : EntitySnapshot<T>
@@ -25,5 +25,5 @@ public abstract record EntitySnapshot<T> : EntitySnapshot where T : EntitySnapsh
         };
     }
 
-    public sealed override EntitySnapshot Interpolate(EntitySnapshot to, float weight) => Interpolate((T)to, weight);
+    public sealed override EntitySnapshot Interpolate(EntitySnapshot to, double weight) => Interpolate((T)to, weight);
 }

@@ -20,7 +20,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
     public event Action ZoomChanged = delegate {};
 
     /// <inheritdoc/>
-    public float TrueZoom
+    public double TrueZoom
     {
         get => 1 / Zoom.x;
         private set
