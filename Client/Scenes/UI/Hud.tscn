@@ -26,10 +26,12 @@ anchor_right = 0.5
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 
 [node name="Statuses" type="HBoxContainer" parent="VBoxContainer"]
 margin_right = 510.0
 margin_bottom = 40.0
+mouse_filter = 2
 
 [node name="0" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
 

@@ -6,7 +6,7 @@
 - [x] Fix pixel perfect rendering
 - [x] Show statuses in HUD
 - [ ] Stop command
-- [ ] Switch to double
+- [x] Switch to double
 - [ ] Status / abililty icons
 - [ ] Death
 - [ ] UI scaling
