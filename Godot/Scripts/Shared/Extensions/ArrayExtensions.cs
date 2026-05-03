@@ -13,5 +13,12 @@ public static class ArrayExtensions
             for (int i = 0; i < self.Length; i++)
                 target[i] = self.RingGet(start + i);
         }
+        
+        public T[] UnrollRing(long start)
+        {
+            T[] result = new T[self.Length];
+            self.UnrollRingTo(result, start);
+            return result;
+        }
     }
 }

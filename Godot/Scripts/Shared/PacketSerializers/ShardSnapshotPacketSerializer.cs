@@ -21,6 +21,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         base.SerializeInternal(packet, stream);
         SerializeLong(packet.Tick, stream);
+        SerializeDouble(packet.ServerLoad, stream);
         SerializeList(packet.Snapshot.Entities, SerializeEntity, stream);
     }
     
@@ -67,6 +68,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         var message = base.DeserializeInternal(stream);
         message.Tick = DeserializeLong(stream);
+        message.ServerLoad = DeserializeDouble(stream);
         var entities = DeserializeList(DeserializeEntity, stream).ToImmutableList();
         message.Snapshot = new ShardSnapshot { Entities = entities };
         return message;

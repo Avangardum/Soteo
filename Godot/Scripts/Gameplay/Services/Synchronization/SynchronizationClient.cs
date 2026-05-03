@@ -28,12 +28,16 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     private readonly double _deltaToLastSnapshotTickMinSafeValue;
     private readonly double _deltaToLastSnapshotTickMinValueToFastForward;
     
+    private readonly double[] _serverLoadRing;
+    
+    public IReadOnlyList<double> ServerLoadHistory => _serverLoadRing.UnrollRing(_lastSnapshotTick + 1);
+    
     public double? Latency =>
         _tick == -1 || _serverTick == -1 ? null : (_serverTick - _tick) / _ticksPerSecond;
     
     public int WaitFrameCount { get; private set; }
     public int FastForwardCount { get; private set; }
-    
+
     private long SnapshotRingEarliestValidTick => _lastSnapshotTick - _snapshotRing.Length + 1;
 
     public SynchronizationClient(IEntityManager entityManager, IShard shard, INetworkDebugger networkDebugger)
@@ -46,6 +50,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         
         _ticksPerSecond = (int)ProjectSettings.GetSetting("physics/common/physics_fps");
         _snapshotRing = new ShardSnapshot[10 * _ticksPerSecond];
+        _serverLoadRing = new double[_snapshotRing.Length];
         
         _deltaToLastSnapshotTickMinSafeValue = 0.05f * _ticksPerSecond;
         _deltaToLastSnapshotTickMinValueToFastForward = _deltaToLastSnapshotTickMinSafeValue + 0.01f * _ticksPerSecond;
@@ -127,6 +132,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet)
     {
         _snapshotRing.RingSet(packet.Tick, packet.Snapshot);
+        _serverLoadRing.RingSet(packet.Tick, packet.ServerLoad);
         double? halfPingTicks = _networkDebugger.Ping(_shard.Id) * _ticksPerSecond / 2;
         _serverTick = halfPingTicks == null ? -1 : packet.Tick + halfPingTicks.Value;
         

@@ -21,6 +21,7 @@ public sealed class DebugScreen : Control
     
     private readonly Label _label;
     private readonly Graph _fpsGraph;
+    private readonly Graph _serverLoadGraph;
     
     public DebugScreen(INetworkDebugger networkDebugger, IShardServiceProviderSource shardServiceProviderSource)
     {
@@ -35,16 +36,23 @@ public sealed class DebugScreen : Control
         Scene.InstanceAndReparentTo(this);
         _label = GetNode<Label>("Label");
         _fpsGraph = GetNode<Graph>("FpsGraph");
+        _serverLoadGraph = GetNode<Graph>("ServerLoadGraph");
     }
     
     public override void _Process(float delta)
     {
+        ISynchronizationClient? synchronizationClient = _shardServiceProviderSource.ShardServiceProviders
+            .GetOrDefault(Const.TestShardId)
+            ?.GetRequiredService<ISynchronizationClient>();
+        
         ProcessFpsGraph(delta);
+        if (synchronizationClient != null)
+            _serverLoadGraph.SetData(synchronizationClient.ServerLoadHistory, "N2", 0, 1);
         
         _timeSinceUpdate += delta;
         if (_timeSinceUpdate >= UpdateInterval)
         {
-            UpdateText();
+            UpdateText(synchronizationClient);
             _timeSinceUpdate = 0;
         }
     }
@@ -63,12 +71,8 @@ public sealed class DebugScreen : Control
         _fpsGraph.SetData(_unrolledFpsRing, "N0", 0);
     }
     
-    private void UpdateText()
+    private void UpdateText(ISynchronizationClient? synchronizationClient)
     {
-        ISynchronizationClient? synchronizationClient = _shardServiceProviderSource.ShardServiceProviders
-            .GetOrDefault(Const.TestShardId)
-            ?.GetRequiredService<ISynchronizationClient>();
-        
         _label.Text =
             $"""
              fps: {Engine.GetFramesPerSecond():N0}
