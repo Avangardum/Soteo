@@ -1,8 +1,8 @@
-using Soteo.MasterServer.GameState.DataObjects;
-using Soteo.MasterServer.Interfaces;
+using Soteo.CampaignServer.GameState.DataObjects;
+using Soteo.CampaignServer.Interfaces;
 using Soteo.Shared.Packets;
 
-namespace Soteo.MasterServer.PacketHandlers;
+namespace Soteo.CampaignServer.PacketHandlers;
 
 public sealed class CharacterRecalledPacketHandler(ICharacterRepository characterRepository) :
     PacketHandler<CharacterRecalledPacket>

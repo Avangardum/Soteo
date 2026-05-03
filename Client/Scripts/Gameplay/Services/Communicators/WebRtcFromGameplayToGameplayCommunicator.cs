@@ -33,17 +33,17 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
     
     private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
     
-    private readonly IMasterServerCommunicator _masterServerCommunicator;
+    private readonly ICampaignServerCommunicator _campaignServerCommunicator;
     private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
     private readonly IPacketHandler _packetHandler;
     
     public long BytesSent { get; private set; }
     public long BytesReceived { get; private set; }
 
-    public WebRtcFromGameplayToGameplayCommunicator(IMasterServerCommunicator masterServerCommunicator, IPacketHandler packetHandler)
+    public WebRtcFromGameplayToGameplayCommunicator(ICampaignServerCommunicator campaignServerCommunicator, IPacketHandler packetHandler)
     {
-        _masterServerCommunicator = masterServerCommunicator;
-        _masterServerCommunicator.ConnectionEstablished += OnMasterServerConnectionEstablished;
+        _campaignServerCommunicator = campaignServerCommunicator;
+        _campaignServerCommunicator.ConnectionEstablished += OnCampaignServerConnectionEstablished;
         
         _packetHandler = packetHandler;
         
@@ -155,7 +155,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         }
     }
     
-    private void OnMasterServerConnectionEstablished()
+    private void OnCampaignServerConnectionEstablished()
     {
         if (!IsServer)
             ConnectToShardServer(Const.TestShardId);
@@ -202,13 +202,13 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
     {
         var peerId = new Guid(peerIdBytes);
         _peerConnectionsAndChannels[peerId].Connection.SetLocalDescription(type, sdp);
-        _masterServerCommunicator.SendPacket(new WebrtcSdpPacket { Sdp = sdp, PeerId = peerId } );
+        _campaignServerCommunicator.SendPacket(new WebrtcSdpPacket { Sdp = sdp, PeerId = peerId } );
     }
     
     private void OnIceCandidateCreated(string media, int index, String name, byte[] peerIdBytes)
     {
         var peerId = new Guid(peerIdBytes);
-        _masterServerCommunicator.SendPacket(new WebrtcIceCandidatePacket
+        _campaignServerCommunicator.SendPacket(new WebrtcIceCandidatePacket
         {
             Media = media,
             Index = index,

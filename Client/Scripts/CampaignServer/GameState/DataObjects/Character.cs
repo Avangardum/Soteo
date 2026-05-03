@@ -1,4 +1,4 @@
-namespace Soteo.MasterServer.GameState.DataObjects;
+namespace Soteo.CampaignServer.GameState.DataObjects;
 
 public sealed class Character
 {

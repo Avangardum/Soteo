@@ -1,17 +1,17 @@
 using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
-using Soteo.MasterServer.GameState.DataObjects;
-using Soteo.MasterServer.Interfaces;
+using Soteo.CampaignServer.GameState.DataObjects;
+using Soteo.CampaignServer.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes.Autoloads;
 using Soteo.Shared.Packets;
 
-namespace Soteo.MasterServer.Communicators;
+namespace Soteo.CampaignServer.Communicators;
 
-public sealed class WebSocketFromMasterServerToGameplayCommunicator : Object, ICommunicator
+public sealed class WebSocketFromCampaignServerToGameplayCommunicator : Object, ICommunicator
 {
     private readonly WebSocketServer _wsServer = new();
     private readonly IPacketSerializer _packetSerializer;
@@ -21,7 +21,7 @@ public sealed class WebSocketFromMasterServerToGameplayCommunicator : Object, IC
 
     private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = [];
     
-    public WebSocketFromMasterServerToGameplayCommunicator
+    public WebSocketFromCampaignServerToGameplayCommunicator
     (
         IPacketSerializer packetSerializer,
         IPacketHandler packetHandler,
@@ -103,7 +103,7 @@ public sealed class WebSocketFromMasterServerToGameplayCommunicator : Object, IC
     
     private void HandleHandshakePacket(Packet packet, int wsPeerId, WebSocketPeer peer)
     {
-        if (packet is not MasterServerHandshakePacket handshake)
+        if (packet is not CampaignServerHandshakePacket handshake)
         {
             peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Handshake expected" } ));
             return;

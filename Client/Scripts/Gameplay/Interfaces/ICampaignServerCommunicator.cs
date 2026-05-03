@@ -2,7 +2,7 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Interfaces;
 
-public interface IMasterServerCommunicator
+public interface ICampaignServerCommunicator
 {
     event Action ConnectionEstablished;
     void ConnectAsPlayer(string email, string password);

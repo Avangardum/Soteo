@@ -6,8 +6,8 @@ public enum PacketType : byte
     Ok,
     BadInput,
     Ping,
-    // Master server <--> Client / Shard server
-    MasterServerHandshake,
+    // Campaign server <--> Client / Shard server
+    CampaignServerHandshake,
     SpawnCharacter,
     CharacterRecalled,
     WebrtcSdp,

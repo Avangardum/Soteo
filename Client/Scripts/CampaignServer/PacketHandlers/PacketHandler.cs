@@ -1,11 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
-using Soteo.MasterServer.GameState.DataObjects;
-using Soteo.MasterServer.Interfaces;
-using Soteo.Shared;
+using Soteo.CampaignServer.GameState.DataObjects;
+using Soteo.CampaignServer.Interfaces;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Packets;
 
-namespace Soteo.MasterServer.PacketHandlers;
+namespace Soteo.CampaignServer.PacketHandlers;
 
 public abstract class PacketHandler<T> : IPacketHandler where T : Packet
 {

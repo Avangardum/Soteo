@@ -24,7 +24,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private Hud? _hud;
     private Node2D? _shardRoot;
-    private WebSocketFromGameplayToMasterServerCommunicator? _webSocketMasterServerCommunicator;
+    private WebSocketFromGameplayToCampaignServerCommunicator? _webSocketCampaignServerCommunicator;
     private WebRtcFromGameplayToGameplayCommunicator? _webRtcGameplayCommunicator;
     private JsmqFromGameplayCommunicator? _jsmqCommunicator;
     
@@ -75,9 +75,9 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         }
         else
         {
-            _webSocketMasterServerCommunicator =
-                ActivatorUtilities.CreateInstance<WebSocketFromGameplayToMasterServerCommunicator>(_rootServiceProvider.Required);
-            AddChild(_webSocketMasterServerCommunicator);
+            _webSocketCampaignServerCommunicator =
+                ActivatorUtilities.CreateInstance<WebSocketFromGameplayToCampaignServerCommunicator>(_rootServiceProvider.Required);
+            AddChild(_webSocketCampaignServerCommunicator);
             _webRtcGameplayCommunicator =
                 ActivatorUtilities.CreateInstance<WebRtcFromGameplayToGameplayCommunicator>(_rootServiceProvider);
             AddChild(_webRtcGameplayCommunicator);
@@ -125,15 +125,15 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         if (UseJsmq)
         {
-            services.AddSingleton<IMasterServerCommunicator>(_ => _jsmqCommunicator.Required);
+            services.AddSingleton<ICampaignServerCommunicator>(_ => _jsmqCommunicator.Required);
             services.AddSingleton<IPacketSender>(_ => _jsmqCommunicator.Required);
             services.AddSingleton<INetworkDebugger>(_ => _jsmqCommunicator.Required);
         }
         else
         {
-            services.AddSingleton<IMasterServerCommunicator>(_ => _webSocketMasterServerCommunicator.Required);
+            services.AddSingleton<ICampaignServerCommunicator>(_ => _webSocketCampaignServerCommunicator.Required);
             services.AddSingleton<IPacketSender>(_ => new RoutingPacketSender(
-                _webSocketMasterServerCommunicator.Required, _webRtcGameplayCommunicator.Required));
+                _webSocketCampaignServerCommunicator.Required, _webRtcGameplayCommunicator.Required));
             services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
             services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
         }

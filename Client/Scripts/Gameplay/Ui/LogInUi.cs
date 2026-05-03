@@ -9,11 +9,11 @@ public class LogInUi : Control
     
     private readonly LineEdit _emailLineEdit;
     private readonly LineEdit _passwordLineEdit;
-    private readonly IMasterServerCommunicator _masterServerCommunicator;
+    private readonly ICampaignServerCommunicator _campaignServerCommunicator;
 
-    public LogInUi(IMasterServerCommunicator masterServerCommunicator)
+    public LogInUi(ICampaignServerCommunicator campaignServerCommunicator)
     {
-        _masterServerCommunicator = masterServerCommunicator;
+        _campaignServerCommunicator = campaignServerCommunicator;
         Scene.InstanceAndReparentTo(this);
         _emailLineEdit = GetNode<LineEdit>("Email");
         _passwordLineEdit = GetNode<LineEdit>("Password");
@@ -34,7 +34,7 @@ public class LogInUi : Control
     {
         string email = _emailLineEdit.Text;
         string password = _passwordLineEdit.Text;
-        _masterServerCommunicator.ConnectAsPlayer(email, password);
+        _campaignServerCommunicator.ConnectAsPlayer(email, password);
         Visible = false;
     }
 }

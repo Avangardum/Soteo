@@ -1,15 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.MasterServer.Communicators;
-using Soteo.MasterServer.GameState.Repositories;
-using Soteo.MasterServer.Interfaces;
-using Soteo.MasterServer.PacketHandlers;
-using Soteo.Shared.Extensions;
+using Soteo.CampaignServer.Communicators;
+using Soteo.CampaignServer.GameState.Repositories;
+using Soteo.CampaignServer.Interfaces;
+using Soteo.CampaignServer.PacketHandlers;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.PacketSerializers;
 
-namespace Soteo.MasterServer;
+namespace Soteo.CampaignServer;
 
-public sealed class MasterServer : Node
+public sealed class CampaignServer : Node
 {
     private ICommunicator _communicator = null!;
     
@@ -34,8 +33,8 @@ public sealed class MasterServer : Node
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IPacketSender, ICommunicator>();
         
-        if (UseJsmq) services.AddSingleton<ICommunicator, JsmqFromMasterServerCommunicator>();
-        else services.AddSingleton<ICommunicator, WebSocketFromMasterServerToGameplayCommunicator>();
+        if (UseJsmq) services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
+        else services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
     }

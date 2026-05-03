@@ -1,9 +1,8 @@
-using Soteo.MasterServer.Interfaces;
-using Soteo.MasterServer.PacketHandlers;
+using Soteo.CampaignServer.Interfaces;
+using Soteo.CampaignServer.PacketHandlers;
 using Soteo.Shared.Enums;
-using Soteo.Shared.Extensions;
 
-namespace Soteo.MasterServer;
+namespace Soteo.CampaignServer;
 
 public static class TypeLocator
 {

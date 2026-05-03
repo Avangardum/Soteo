@@ -19,13 +19,13 @@ public sealed class RoutingPacketHandler
     {
         IServiceProvider? serviceProvider =
             IsServer ? shardServiceProviderSource.ShardServiceProviders[currentUserIdRepository.UserId] :
-            senderId == MasterServerId ? rootServiceProvider :
+            senderId == CampaignServerId ? rootServiceProvider :
             shardServiceProviderSource.ShardServiceProviders[senderId];
         if (serviceProvider == null) return;
 
         if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type handlerType))
             throw new BadPacketException($"Packet of type {packet.Type} can't be handled");
-        if (IsServer && senderId != MasterServerId && !handlerType.HasAttribute<AllowClientPacketsAttribute>())
+        if (IsServer && senderId != CampaignServerId && !handlerType.HasAttribute<AllowClientPacketsAttribute>())
             throw new BadPacketException($"Clients are not allowed to send packets of type {packet.Type}");
         var handler = (IPacketHandler)serviceProvider.GetRequiredService(handlerType);
         await handler.HandleAsync(packet, senderId);

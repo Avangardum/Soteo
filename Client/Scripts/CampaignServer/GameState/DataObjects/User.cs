@@ -1,4 +1,4 @@
-namespace Soteo.MasterServer.GameState.DataObjects;
+namespace Soteo.CampaignServer.GameState.DataObjects;
 
 public sealed record User
 {

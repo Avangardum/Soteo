@@ -1,12 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.MasterServer.GameState.DataObjects;
-using Soteo.MasterServer.Interfaces;
+using Soteo.CampaignServer.GameState.DataObjects;
+using Soteo.CampaignServer.Interfaces;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Exceptions;
-using Soteo.Shared.Extensions;
 using Soteo.Shared.Packets;
 
-namespace Soteo.MasterServer.PacketHandlers;
+namespace Soteo.CampaignServer.PacketHandlers;
 
 public sealed class RoutingPacketHandler(IServiceProvider serviceProvider) : IPacketHandler
 {

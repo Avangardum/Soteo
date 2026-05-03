@@ -1,7 +1,7 @@
-using Soteo.MasterServer.GameState.DataObjects;
+using Soteo.CampaignServer.GameState.DataObjects;
 using Soteo.Shared.Packets;
 
-namespace Soteo.MasterServer.Interfaces;
+namespace Soteo.CampaignServer.Interfaces;
 
 public interface IPacketHandler
 {

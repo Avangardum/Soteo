@@ -1,6 +1,6 @@
-using Soteo.MasterServer.GameState.DataObjects;
+using Soteo.CampaignServer.GameState.DataObjects;
 
-namespace Soteo.MasterServer.Interfaces;
+namespace Soteo.CampaignServer.Interfaces;
 
 public interface ICharacterRepository : IDictionary<Guid, Character>
 {

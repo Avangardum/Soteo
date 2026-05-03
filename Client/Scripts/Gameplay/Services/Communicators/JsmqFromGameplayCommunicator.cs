@@ -10,7 +10,7 @@ namespace Soteo.Gameplay.Services.Communicators;
 /// <summary>
 /// Communicator using the JavaScript message queue instead of WebSockets / WebRTC. Used for singleplayer in browser.
 /// </summary>
-public sealed class JsmqFromGameplayCommunicator : Node, IMasterServerCommunicator, IPacketSender, INetworkDebugger
+public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunicator, IPacketSender, INetworkDebugger
 {
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPacketSerializer _packetSerializer;
@@ -56,18 +56,18 @@ public sealed class JsmqFromGameplayCommunicator : Node, IMasterServerCommunicat
     public void ConnectAsPlayer(string email, string password)
     {
         _currentUserIdRepository.UserId = Const.SingleplayerPlayerId;
-        SendReliable(new MasterServerHandshakePacket { Token = "player" }, MasterServerId );
+        SendReliable(new CampaignServerHandshakePacket { Token = "player" }, CampaignServerId );
         ConnectionEstablished();
         if (!IsServer)
         {
-            SendReliable(new SpawnCharacterPacket { PeerId = Const.TestShardId }, MasterServerId);
+            SendReliable(new SpawnCharacterPacket { PeerId = Const.TestShardId }, CampaignServerId);
             _shardLoader.LoadShard();
         }
     }
 
     public void ConnectAsShardServer()
     {
-        SendReliable(new MasterServerHandshakePacket { Token = "shard" }, MasterServerId );
+        SendReliable(new CampaignServerHandshakePacket { Token = "shard" }, CampaignServerId );
         ConnectionEstablished();
     }
     
@@ -101,7 +101,7 @@ public sealed class JsmqFromGameplayCommunicator : Node, IMasterServerCommunicat
 
     public void BroadcastUnreliable(Packet packet) => BroadcastReliable(packet);
 
-    void IMasterServerCommunicator.SendPacket(Packet packet) => SendReliable(packet, MasterServerId);
+    void ICampaignServerCommunicator.SendPacket(Packet packet) => SendReliable(packet, CampaignServerId);
 
     public long BytesSent => 0;
 

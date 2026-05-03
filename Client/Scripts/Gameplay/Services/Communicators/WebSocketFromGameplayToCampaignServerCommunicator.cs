@@ -9,11 +9,11 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Services.Communicators;
 
-public sealed class WebSocketFromGameplayToMasterServerCommunicator : Node, IMasterServerCommunicator
+public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, ICampaignServerCommunicator
 {
     private enum Status { Disconnected, Connecting, Connected }
     
-    private const string MasterServerUrl = "wss://localhost:3706";
+    private const string CampaignServerUrl = "wss://localhost:3706";
     private const string AuthServerUrl = "https://localhost:3705";
 
     private readonly WebSocketClient _wsClient = new();
@@ -26,7 +26,7 @@ public sealed class WebSocketFromGameplayToMasterServerCommunicator : Node, IMas
     private string _token = "";
     private Status _status;
 
-    public WebSocketFromGameplayToMasterServerCommunicator
+    public WebSocketFromGameplayToCampaignServerCommunicator
     (
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer,
@@ -39,7 +39,7 @@ public sealed class WebSocketFromGameplayToMasterServerCommunicator : Node, IMas
         _shardLoader = shardLoader;
         _currentUserIdRepository = currentUserIdRepository;
         
-        Name = nameof(WebSocketFromGameplayToMasterServerCommunicator);
+        Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
     }
     
     public event Action ConnectionEstablished = delegate {};
@@ -86,7 +86,7 @@ public sealed class WebSocketFromGameplayToMasterServerCommunicator : Node, IMas
     public void OnConnectionEstablished(string protocol)
     {
         _status = Status.Connected;
-        SendPacket(new MasterServerHandshakePacket { Token = _token, Version = Const.Version });
+        SendPacket(new CampaignServerHandshakePacket { Token = _token, Version = Const.Version });
         _token = "";
         ConnectionEstablished();
         
@@ -101,7 +101,7 @@ public sealed class WebSocketFromGameplayToMasterServerCommunicator : Node, IMas
     {
         byte[] bytes = _wsClient.GetPeer(1).GetPacket();
         Packet packet = _packetSerializer.Deserialize(bytes);
-        _packetHandler.HandleAsync(packet, MasterServerId).CollectException();
+        _packetHandler.HandleAsync(packet, CampaignServerId).CollectException();
     }
     
     public void OnServerCloseRequest(int code, string reason)
@@ -153,7 +153,7 @@ public sealed class WebSocketFromGameplayToMasterServerCommunicator : Node, IMas
         {
             _token = Encoding.UTF8.GetString(body);
             _currentUserIdRepository.UserId = GetPlayerIdFromTrustedToken(_token);
-            _wsClient.ConnectToUrl(MasterServerUrl);
+            _wsClient.ConnectToUrl(CampaignServerUrl);
         }
     }
     
