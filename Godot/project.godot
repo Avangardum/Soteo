@@ -147,7 +147,7 @@ debug_screen={
 
 [mono]
 
-project/assembly_name="Soteo"
+project/assembly_name="Godot"
 
 [network]
 

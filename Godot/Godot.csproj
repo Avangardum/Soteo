@@ -5,6 +5,7 @@
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Soteo</RootNamespace>
     </PropertyGroup>
     
     <ItemGroup>
