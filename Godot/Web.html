@@ -16,7 +16,7 @@
     <button onclick="startMultiplayer()">Multiplayer</button>
 </div>
 <canvas id="clientCanvas"></canvas>
-<canvas id="masterServerCanvas" style="display: none"></canvas>
+<canvas id="campaignServerCanvas" style="display: none"></canvas>
 <canvas id="shardServerCanvas" style="display: none"></canvas>
 <script src="$GODOT_URL"></script>
 <script>
@@ -59,18 +59,18 @@
     }
     
     function startSingleplayer() {
-        const masterServer = new Engine(config);
+        const campaignServer = new Engine(config);
         const shardServer = new Engine(config);
         const client = new Engine(config);
 
         Promise.resolve().then(() =>
-            masterServer.startGame({
+            campaignServer.startGame({
                 unloadAfterInit: false,
                 canvasResizePolicy: 0,
-                args: ["--singleplayer", "Scenes/MasterServer.tscn"],
-                canvas: document.querySelector("#masterServerCanvas"),
-                onPrint: text => print(text, console.log, "Master server"),
-                onPrintError: text => print(text, console.error, "Master server"),
+                args: ["--singleplayer", "Scenes/CampaignServer.tscn"],
+                canvas: document.querySelector("#campaignServerCanvas"),
+                onPrint: text => print(text, console.log, "Campaign server"),
+                onPrintError: text => print(text, console.error, "Campaign server"),
             })
         ).then(() =>
             shardServer.startGame({
