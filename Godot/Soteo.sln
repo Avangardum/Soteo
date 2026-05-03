@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Godot", "Godot.csproj", "{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo", "Soteo.csproj", "{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServer", "..\AuthServer\AuthServer.csproj", "{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}"
 EndProject
