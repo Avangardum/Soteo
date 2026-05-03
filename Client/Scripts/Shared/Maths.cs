@@ -147,6 +147,8 @@ public static class Maths
     
     public static int CeilToInt(double value) => (int)Math.Ceiling(value);
     
+    public static int RoundToInt(double value) => (int)Math.Round(value);
+    
     public static double Rad2Deg(double radians) => radians * 180 / Math.PI;
     
     public static double Deg2Rad(double degrees) => degrees * Math.PI / 180;

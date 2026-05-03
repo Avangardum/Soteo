@@ -18,6 +18,18 @@ public static class LinqExtensions
         public float Product(Func<T, float> selector) => self.Select(selector).Product();
         
         public double Product(Func<T, double> selector) => self.Select(selector).Product();
+        
+        public IEnumerable<T> TakeLast(int count)
+        {
+            T[] array = self.ToArray();
+            
+            if (array.Length <= count)
+                foreach(T item in array)
+                    yield return item;
+            
+            for (int i = array.Length - count; i < array.Length; i++)
+                yield return array[i];
+        }
     }
     
     extension (IEnumerable<float> self)

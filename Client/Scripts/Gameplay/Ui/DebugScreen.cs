@@ -5,52 +5,79 @@ using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Ui;
 
-public sealed class DebugScreen : Label
+public sealed class DebugScreen : Control
 {
     private const double UpdateInterval = 0.2;
+    private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/DebugScreen.tscn"); 
     
     private double _timeSinceUpdate;
+    private readonly double[] _fpsRing = new double[1000];
+    private readonly double[] _unrolledFpsRing = new double[1000];
+    private int _fpsRingNextIndex;
+    private double _fpsSamplingCountdown;
     
-    private readonly IPingMeasurer _pingMeasurer;
+    private readonly INetworkDebugger _networkDebugger;
     private readonly IShardServiceProviderSource _shardServiceProviderSource;
     
-    public DebugScreen(IPingMeasurer pingMeasurer, IShardServiceProviderSource shardServiceProviderSource)
+    private readonly Label _label;
+    private readonly Graph _fpsGraph;
+    
+    public DebugScreen(INetworkDebugger networkDebugger, IShardServiceProviderSource shardServiceProviderSource)
     {
-        Visible = false;
-        
-        _pingMeasurer = pingMeasurer;
+        _networkDebugger = networkDebugger;
         _shardServiceProviderSource = shardServiceProviderSource;
+        
+        Visible = false;
+        MouseFilter = MouseFilterEnum.Ignore;
+        AnchorRight = 1;
+        AnchorBottom = 1;
+        
+        Scene.InstanceAndReparentTo(this);
+        _label = GetNode<Label>("Label");
+        _fpsGraph = GetNode<Graph>("FpsGraph");
     }
     
     public override void _Process(float delta)
     {
-        if (IsServer)
-        {
-            QueueFree();
-            return;
-        }
+        ProcessFpsGraph(delta);
         
         _timeSinceUpdate += delta;
         if (_timeSinceUpdate >= UpdateInterval)
         {
-            UpdateText(delta);
+            UpdateText();
             _timeSinceUpdate = 0;
         }
     }
     
-    private void UpdateText(double delta)
+    private void ProcessFpsGraph(double delta)
     {
-        double fps = 1 / delta;
-        double? ping = _pingMeasurer.Ping(Const.TestShardId);
+        const double fpsSamplingInterval = 0.02;
+        _fpsSamplingCountdown -= delta;
+        while (_fpsSamplingCountdown <= 0)
+        {
+            _fpsSamplingCountdown += fpsSamplingInterval;
+            _fpsRing[_fpsRingNextIndex] = Engine.GetFramesPerSecond();
+            _fpsRingNextIndex = (_fpsRingNextIndex + 1) % _fpsRing.Length;
+        }
+        _fpsRing.UnrollRingTo(_unrolledFpsRing, _fpsRingNextIndex);
+        _fpsGraph.SetData(_unrolledFpsRing, "N0", 0);
+    }
+    
+    private void UpdateText()
+    {
         ISynchronizationClient? synchronizationClient = _shardServiceProviderSource.ShardServiceProviders
             .GetOrDefault(Const.TestShardId)
             ?.GetRequiredService<ISynchronizationClient>();
         
-        Text =
+        _label.Text =
             $"""
-             fps: {fps:N0}
-             ping: {ToMillisecondsString(ping)}
+             fps: {Engine.GetFramesPerSecond():N0}
+             ping: {ToMillisecondsString(_networkDebugger.Ping(Const.TestShardId))}
              sync latency: {ToMillisecondsString(synchronizationClient?.Latency)}
+             wait frames: {synchronizationClient?.WaitFrameCount ?? 0}
+             fast-forwards: {synchronizationClient?.FastForwardCount ?? 0}
+             bytes sent: {_networkDebugger.BytesSent:N0}
+             bytes received: {_networkDebugger.BytesReceived:N0}
              """;
     }
     

@@ -10,7 +10,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
 {
     private readonly IEntityManager _entityManager;
     private readonly IShard _shard;
-    private readonly IPingMeasurer _pingMeasurer;
+    private readonly INetworkDebugger _networkDebugger;
     
     private readonly int _ticksPerSecond;
     private double _tick = -1;
@@ -31,15 +31,18 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     public double? Latency =>
         _tick == -1 || _serverTick == -1 ? null : (_serverTick - _tick) / _ticksPerSecond;
     
+    public int WaitFrameCount { get; private set; }
+    public int FastForwardCount { get; private set; }
+    
     private long SnapshotRingEarliestValidTick => _lastSnapshotTick - _snapshotRing.Length + 1;
 
-    public SynchronizationClient(IEntityManager entityManager, IShard shard, IPingMeasurer pingMeasurer)
+    public SynchronizationClient(IEntityManager entityManager, IShard shard, INetworkDebugger networkDebugger)
     {
         Name = nameof(SynchronizationClient);
         
         _entityManager = entityManager;
         _shard = shard;
-        _pingMeasurer = pingMeasurer;
+        _networkDebugger = networkDebugger;
         
         _ticksPerSecond = (int)ProjectSettings.GetSetting("physics/common/physics_fps");
         _snapshotRing = new ShardSnapshot[10 * _ticksPerSecond];
@@ -57,10 +60,12 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     {
         if (_tick == -1 && !TryInitialize()) return;
         
-        if (_serverTick != -1) _serverTick += delta * _ticksPerSecond;
+        if (_serverTick != -1)
+            _serverTick += delta * _ticksPerSecond;
         
         if (_tick > _lastSnapshotTick)
         {
+            WaitFrameCount++;
             _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, -1);
             return;
         }
@@ -73,8 +78,8 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
 
         if (TryGetNearestSnapshotTicks(out int fromTick, out int toTick))
         {
-            ShardSnapshot fromSnapshot = _snapshotRing.RingGet(fromTick)!;
-            ShardSnapshot toSnapshot = _snapshotRing.RingGet(toTick)!;
+            ShardSnapshot fromSnapshot = _snapshotRing.RingGet(fromTick).Required;
+            ShardSnapshot toSnapshot = _snapshotRing.RingGet(toTick).Required;
             double weight = Maths.InverseLerp(fromTick, toTick, _tick);
             ShardSnapshot interpolatedSnapshot = fromSnapshot.Interpolate(toSnapshot, weight);
             ReplicateSnapshot(interpolatedSnapshot);
@@ -122,7 +127,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet)
     {
         _snapshotRing.RingSet(packet.Tick, packet.Snapshot);
-        double? halfPingTicks = _pingMeasurer.Ping(_shard.Id) * _ticksPerSecond / 2;
+        double? halfPingTicks = _networkDebugger.Ping(_shard.Id) * _ticksPerSecond / 2;
         _serverTick = halfPingTicks == null ? -1 : packet.Tick + halfPingTicks.Value;
         
         if (_lastSnapshotTick != -1 && packet.Tick > _lastSnapshotTick && _lastSnapshotTick != packet.Tick - 1)
@@ -156,6 +161,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
             double fastForwardTicks = minDelta - _deltaToLastSnapshotTickMinSafeValue;
             _tick += fastForwardTicks;
             _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, _lastSnapshotTick - _tick);
+            FastForwardCount++;
         }
     }
 }

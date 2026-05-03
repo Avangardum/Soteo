@@ -14,7 +14,7 @@ namespace Soteo.Gameplay.Services.Communicators;
 /// <summary>
 /// Communicates between clients and shard servers
 /// </summary>
-public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver, IPingMeasurer
+public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver, INetworkDebugger
 {
     private record PeerConnectionAndChannels
     (
@@ -36,6 +36,9 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
     private readonly IMasterServerCommunicator _masterServerCommunicator;
     private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
     private readonly IPacketHandler _packetHandler;
+    
+    public long BytesSent { get; private set; }
+    public long BytesReceived { get; private set; }
 
     public WebRtcFromGameplayToGameplayCommunicator(IMasterServerCommunicator masterServerCommunicator, IPacketHandler packetHandler)
     {
@@ -70,7 +73,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         ((
              Guid peerId, 
              (WebRTCPeerConnection connection, WebRTCDataChannel reliableChannel, WebRTCDataChannel unreliableChannel)
-         ) in _peerConnectionsAndChannels)
+        ) in _peerConnectionsAndChannels)
         {
             connection.Poll();
             HandlePackets(reliableChannel, peerId);
@@ -96,6 +99,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         while (channel.GetAvailablePacketCount() > 0)
         {
             byte[] bytes = channel.GetPacket();
+            BytesReceived += bytes.Length;
             HandlePacket(bytes, senderId);
         }
     }
@@ -244,6 +248,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         WebRTCDataChannel channel = channelSelector(connectionAndChannels);
         if (channel.GetReadyState() != WebRTCDataChannel.ChannelState.Open) return;
         channel.PutPacket(bytes);
+        BytesSent += bytes.Length;
     }
     
     public void ReceiveWebrtcSdpPacket(WebrtcSdpPacket packet)

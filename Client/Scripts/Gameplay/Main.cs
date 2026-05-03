@@ -127,7 +127,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         {
             services.AddSingleton<IMasterServerCommunicator>(_ => _jsmqCommunicator.Required);
             services.AddSingleton<IPacketSender>(_ => _jsmqCommunicator.Required);
-            services.AddSingleton<IPingMeasurer>(_ => _jsmqCommunicator.Required);
+            services.AddSingleton<INetworkDebugger>(_ => _jsmqCommunicator.Required);
         }
         else
         {
@@ -135,7 +135,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
             services.AddSingleton<IPacketSender>(_ => new RoutingPacketSender(
                 _webSocketMasterServerCommunicator.Required, _webRtcGameplayCommunicator.Required));
             services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
-            services.AddSingleton<IPingMeasurer>(_ => _webRtcGameplayCommunicator.Required);
+            services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
         }
     }
     

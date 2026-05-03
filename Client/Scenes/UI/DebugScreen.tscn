@@ -1,0 +1,64 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Scripts/Shared/Proxy.gd" type="Script" id=1]
+[ext_resource path="res://Scripts/Gameplay/Ui/Graph.cs" type="Script" id=2]
+
+[node name="DebugScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="."]
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 40.0
+margin_bottom = 22.0
+
+[node name="FpsGraphLabel" type="Label" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -132.0
+margin_right = -132.0
+grow_horizontal = 2
+text = "fps"
+
+[node name="FpsGraph" type="Control" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -260.0
+margin_top = 25.0
+margin_right = -4.0
+margin_bottom = 100.0
+mouse_filter = 2
+script = ExtResource( 2 )
+
+[node name="DataRect" type="Control" parent="FpsGraph"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 50.0
+margin_top = 10.0
+margin_right = -50.0
+margin_bottom = -10.0
+
+[node name="Line2D" type="Line2D" parent="FpsGraph"]
+width = 2.0
+default_color = Color( 1, 1, 1, 1 )
+
+[node name="Max" type="Label" parent="FpsGraph"]
+text = "000"
+
+[node name="Min" type="Label" parent="FpsGraph"]
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+text = "000"
+
+[node name="Last" type="Label" parent="FpsGraph"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 2
+text = "000"
