@@ -28,6 +28,7 @@ public sealed class DebugScreen : Control
         _networkDebugger = networkDebugger;
         _shardServiceProviderSource = shardServiceProviderSource;
         
+        Name = nameof(DebugScreen);
         Visible = false;
         MouseFilter = MouseFilterEnum.Ignore;
         AnchorRight = 1;

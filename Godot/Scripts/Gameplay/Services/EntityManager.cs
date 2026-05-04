@@ -10,24 +10,24 @@ namespace Soteo.Gameplay.Services;
 
 public sealed class EntityManager : Node, IEntityManager
 {
-    private static readonly PackedScene UnitScene = ResourceLoader.Load<PackedScene>("res://Scenes/Player.tscn");
+    private static readonly PackedScene UnitScene =
+        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Unit.tscn");
+    
     private static readonly PackedScene ProjectileScene =
-        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Projectiles/AttackProjectile.tscn");
+        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Projectile.tscn");
     
     private readonly IServiceProvider _serviceProvider;
     private readonly IShard _shard;
-    private readonly ClientDependency<ICamera> _camera;
     
     private readonly Dictionary<Guid, IEntity> _entities = [];
     private readonly Dictionary<Guid, IEntityNode> _entityNodes = [];
     
-    public EntityManager(IServiceProvider serviceProvider, IShard shard, ClientDependency<ICamera> camera)
+    public EntityManager(IServiceProvider serviceProvider, IShard shard)
     {
         Name = nameof(EntityManager);
         
         _serviceProvider = serviceProvider;
         _shard = shard;
-        _camera = camera;
     }
     
     public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;
