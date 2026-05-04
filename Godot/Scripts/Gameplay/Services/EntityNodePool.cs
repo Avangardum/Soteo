@@ -11,8 +11,20 @@ public sealed class EntityNodePool : IEntityNodePool
     private static readonly PackedScene ProjectileScene =
         ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Projectile.tscn");
     
-    private readonly Stack<UnitNode> _unitNodes = [];
-    private readonly Stack<ProjectileNode> _projectileNodes = [];
+    private const int PreloadedUnitCount = 1000;
+    private const int PreloadedProjectileCount = 1000;
+    
+    private readonly Stack<UnitNode> _unitNodes = new(PreloadedUnitCount);
+    private readonly Stack<ProjectileNode> _projectileNodes = new(PreloadedProjectileCount);
+
+    public EntityNodePool()
+    {
+        for (int i = 0; i < PreloadedUnitCount; i++)
+            _unitNodes.Push(UnitScene.Instance<UnitNode>());
+        
+        for (int i = 0; i < PreloadedProjectileCount; i++)
+            _projectileNodes.Push(ProjectileScene.Instance<ProjectileNode>());
+    }
     
     public UnitNode GetUnitNode()
     {
