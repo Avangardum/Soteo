@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.Entities;
@@ -10,24 +11,20 @@ namespace Soteo.Gameplay.Services;
 
 public sealed class EntityManager : Node, IEntityManager
 {
-    private static readonly PackedScene UnitScene =
-        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Unit.tscn");
-    
-    private static readonly PackedScene ProjectileScene =
-        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Projectile.tscn");
-    
     private readonly IServiceProvider _serviceProvider;
     private readonly IShard _shard;
+    private readonly IEntityNodePool _entityNodePool;
     
     private readonly Dictionary<Guid, IEntity> _entities = [];
     private readonly Dictionary<Guid, IEntityNode> _entityNodes = [];
     
-    public EntityManager(IServiceProvider serviceProvider, IShard shard)
+    public EntityManager(IServiceProvider serviceProvider)
     {
         Name = nameof(EntityManager);
         
         _serviceProvider = serviceProvider;
-        _shard = shard;
+        _shard = serviceProvider.GetRequiredService<IShard>();
+        _entityNodePool = serviceProvider.GetRequiredService<IEntityNodePool>();
     }
     
     public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;
@@ -92,7 +89,7 @@ public sealed class EntityManager : Node, IEntityManager
     
     private UnitNode GetUnitNode(Guid id)
     {
-        var node = UnitScene.Instance<UnitNode>();
+        UnitNode node = _entityNodePool.GetUnitNode();
         node.Name = $"Unit {id}";
         _shard.EntityRoot.AddChild(node);
         _entityNodes[id] = node;
@@ -101,16 +98,18 @@ public sealed class EntityManager : Node, IEntityManager
     
     private ProjectileNode GetProjectileNode(Guid id)
     {
-        var node = ProjectileScene.Instance<ProjectileNode>();
+        ProjectileNode node = _entityNodePool.GetProjectileNode();
         node.Name = $"Projectile {id}";
         _shard.EntityRoot.AddChild(node);
         _entityNodes[id] = node;
         return node;
     }
-    
-    public void OnEntityRemoved(IEntity entity)
+
+    private void OnEntityRemoved(IEntity entity)
     {
-        _entityNodes[entity.Id].Node.QueueFree();
+        IEntityNode node = _entityNodes[entity.Id];
+        _shard.EntityRoot.RemoveChild(node.Node);
+        _entityNodePool.ReturnNode(node);
         _entityNodes.Remove(entity.Id);
         _entities.Remove(entity.Id);
         EntityRemoved(entity);
