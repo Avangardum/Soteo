@@ -1,6 +1,6 @@
 [gd_scene load_steps=56 format=2]
 
-[ext_resource path="res://Scripts/Shared/Proxy.gd" type="Script" id=1]
+[ext_resource path="res://Scripts/Gameplay/EntityNodes/UnitNode.cs" type="Script" id=1]
 [ext_resource path="res://Textures/Cute Fantasy Free/Player/Player.png" type="Texture" id=2]
 [ext_resource path="res://Scripts/Gameplay/Entities/EntityProperties.cs" type="Script" id=3]
 [ext_resource path="res://Scripts/Gameplay/AzimuthIndicator.cs" type="Script" id=4]
@@ -253,7 +253,7 @@ height = 5.0
 radius = 5.0
 height = 10.0
 
-[node name="Player" type="Node"]
+[node name="Player" type="KinematicBody2D"]
 script = ExtResource( 1 )
 
 [node name="Properties" type="Node" parent="."]

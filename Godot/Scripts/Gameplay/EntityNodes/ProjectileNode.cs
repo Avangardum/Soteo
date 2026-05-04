@@ -4,21 +4,27 @@ using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.EntityNodes;
 
-public sealed class ProjectileNode : Area2D
+public sealed class ProjectileNode : Area2D, IEntityNode
 {
-    private readonly Projectile _projectile;
-    public EntityProperties Properties { get; }
-
-    public ProjectileNode(Projectile projectile, PackedScene scene, IShard shard)
+    public Node2D Node => this;
+    
+    public Projectile? Projectile { get; set; }
+    
+    public IEntity? Entity
     {
-        _projectile = projectile;
-        scene.InstanceAndReparentTo(this);
-        shard.EntityRoot.AddChild(this);
+        get => Projectile;
+        set => Projectile = (Projectile?)value;
+    }
+    
+    public EntityProperties Properties { get; private set; } = null!;
+
+    public override void _Ready()
+    {
         Properties = GetNode<EntityProperties>("Properties");
     }
 
     public override void _PhysicsProcess(float delta)
     {
-        if (IsServer) _projectile._PhysicsProcessServer(this, delta);
+        if (IsServer) Projectile?._PhysicsProcessServer(this, delta);
     }
 }

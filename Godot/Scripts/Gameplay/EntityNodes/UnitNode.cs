@@ -4,14 +4,25 @@ using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.EntityNodes;
 
-public sealed class UnitNode : KinematicBody2D
+public sealed class UnitNode : KinematicBody2D, IEntityNode
 {
-    public UnitNode(Unit unit, PackedScene scene, IShard shard)
+    public Node2D Node => this;
+        
+    public Unit? Unit { get; set; }
+    
+    public IEntity? Entity
     {
-        scene.InstanceAndReparentTo(this);
-        shard.EntityRoot.AddChild(this);
-            
-        Unit = unit;
+        get => Unit;
+        set => Unit = (Unit?)value;
+    }
+    
+    public Node2D Visuals { get; private set; } = null!;
+    public AnimatedSprite Sprite { get; private set; } = null!;
+    public AzimuthIndicator AzimuthIndicator { get; private set; } = null!;
+    public EntityProperties Properties { get; private set; } = null!;
+        
+    public override void _Ready()
+    {
         Visuals = GetNode<Node2D>("Visuals");
         Sprite = GetNode<AnimatedSprite>("Visuals/AnimatedSprite");
         AzimuthIndicator = GetNode<AzimuthIndicator>("Visuals/AzimuthIndicator");
@@ -19,16 +30,10 @@ public sealed class UnitNode : KinematicBody2D
         
         Sprite.Playing = true;
     }
-        
-    public Unit Unit { get; }
-    public Node2D Visuals { get; }
-    public AnimatedSprite Sprite { get; }
-    public AzimuthIndicator AzimuthIndicator { get; }
-    public EntityProperties Properties { get; }
-        
+    
     public override void _PhysicsProcess(float delta)
     {
-        if (IsServer) Unit._PhysicsProcessServer(this, delta);
-        else Unit._PhysicsProcessClient(this, delta);
+        if (IsServer) Unit?._PhysicsProcessServer(this, delta);
+        else Unit?._PhysicsProcessClient(this, delta);
     }
 }

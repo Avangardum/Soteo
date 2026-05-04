@@ -3,15 +3,18 @@ using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
 using Soteo.Shared;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class Entity<TNode> : IEntity where TNode : Node2D
+public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
 {
-    protected Entity(Guid id, ClientDependency<ICamera> camera)
+    protected Entity(Guid id, TNode node, ClientDependency<ICamera> camera)
     {
         Id = id;
+        
+        Node = node;
+        node.Entity = this;
+        
         Camera = camera;
         Camera.Value?.ZoomChanged += OnZoomChanged;
     }
@@ -19,8 +22,8 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D
     public event Action Removed = delegate {};
 
     protected ClientDependency<ICamera> Camera { get; }
-    [MemberNotNullWhen(false, nameof(Node))] public abstract bool IsRemoved { get; protected set; }
-    protected abstract TNode? Node { get; }
+    [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
+    protected TNode? Node { get; private set; }
     public Guid Id { get; }
     public abstract Vector2 Position { get; set; }
     public virtual double Azimuth { get; set => field = Maths.PosMod(value, 360); }
@@ -34,7 +37,8 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D
         if (IsRemoved) return;
         IsRemoved = true;
         Camera.Value?.ZoomChanged -= OnZoomChanged;
-        Node.QueueFree();
+        Node.Entity = null;
+        Node = null;
         Removed();
     }
     

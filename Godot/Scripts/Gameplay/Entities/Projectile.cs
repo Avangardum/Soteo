@@ -18,20 +18,14 @@ public abstract class Projectile : Entity<ProjectileNode>
         Guid id,
         AbilityContext abilityContext,
         double speed,
-        PackedScene scene,
+        ProjectileNode node,
         IServiceProvider serviceProvider
-    ) : base(id, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
+    ) : base(id, node, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
     {
         AbilityContext = abilityContext;
         Speed = speed;
         _serviceProvider = serviceProvider;
-        
-        var shard = serviceProvider.GetRequiredService<IShard>();
-        Node = new ProjectileNode(this, scene, shard) { Name = $"{GetType().Name} {id}" };
     }
-
-    [MemberNotNullWhen(false, nameof(Node))] public override bool IsRemoved { get; protected set; }
-    protected override ProjectileNode? Node => field.AsValid();
 
     public override Vector2 Position
     {
@@ -84,6 +78,6 @@ public abstract class Projectile : Entity<ProjectileNode>
 
     protected override void OnZoomChanged()
     {
-        
+        // todo
     }
 }

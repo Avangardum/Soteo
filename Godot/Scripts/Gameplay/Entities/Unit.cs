@@ -23,14 +23,11 @@ public abstract class Unit : Entity<UnitNode>
     private bool _isMoving;
     private long _nextStatusOrdinal;
     
-    protected Unit(Guid id, PackedScene scene, IServiceProvider serviceProvider) :
-        base(id, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
+    protected Unit(Guid id, UnitNode node, IServiceProvider serviceProvider) :
+        base(id, node, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
     {
         _serviceProvider = serviceProvider;
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
-        
-        Node = new UnitNode(this, scene, serviceProvider.GetRequiredService<IShard>());
-        Node.Name = $"{GetType().Name} {id}";
         
         foreach (Stat stat in Stat.All)
             StatsInternal[stat] = StatConst[stat].Defalut;
@@ -66,12 +63,8 @@ public abstract class Unit : Entity<UnitNode>
     
     protected Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
-
-    [MemberNotNullWhen(false, nameof(Node))]
-    public override bool IsRemoved { get; protected set; }
     
     public AbilityUseProgress? AbilityUseProgress { get; private set; }
-    protected override UnitNode? Node => field.AsValid();
     public Faction Faction { get; }
 
     public override Vector2 Position

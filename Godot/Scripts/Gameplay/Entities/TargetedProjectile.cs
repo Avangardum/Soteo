@@ -1,21 +1,25 @@
 using Soteo.Gameplay.Dto;
+using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.EntityNodes;
 using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class TargetedProjectile : Projectile
+public sealed class TargetedProjectile : Projectile
 {
     private bool _didHit;
     
-    protected TargetedProjectile
+    public TargetedProjectile
     (
         Guid id,
         AbilityContext abilityContext,
         double speed,
-        PackedScene scene,
+        ProjectileNode node,
         IServiceProvider serviceProvider
-    ) : base(id, abilityContext, speed, scene, serviceProvider) { }
+    ) : base(id, abilityContext, speed, node, serviceProvider) { }
+    
+    public TargetedProjectile(ProjectileSnapshot snapshot, ProjectileNode node, IServiceProvider serviceProvider) :
+        this(snapshot.Id, null!, snapshot.Speed, node, serviceProvider) { }
 
     public override void _PhysicsProcessServer(ProjectileNode node, double delta)
     {
