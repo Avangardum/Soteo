@@ -35,7 +35,7 @@ See Architecture.md files in subfolders to learn about specific components.
 - [x] Rework azimuth indicator
 - [x] Fix pixel perfect rendering
 - [x] Show statuses in HUD
-- [ ] Stop command
+- [x] Stop command
 - [x] Switch to double
 - [ ] Status / abililty icons
 - [ ] Death
