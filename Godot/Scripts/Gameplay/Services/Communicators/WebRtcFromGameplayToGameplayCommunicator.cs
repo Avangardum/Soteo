@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Godot.Collections;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
@@ -134,19 +133,16 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     private void HandlePackets(WebRTCDataChannel channel, Guid senderId, double delta)
     {
+        // Snapshot deserialization can take a long time. If FPS is low, several snapshot packets may accumulate
+        // per frame, which lower FPS further, causing a snowball effect. To prevent this, if FPS is low, only
+        // the last snapshot packet is handled every frame.
+        bool deferShardSnapshotPacket = delta >= 1.0 / 20.0;
         _deferredShardSnapshotPacketBytes = null;
         
         while (channel.GetAvailablePacketCount() > 0)
         {
             byte[] bytes = channel.GetPacket();
             BytesReceived += bytes.Length;
-            
-            // Snapshot deserialization can take a long time. If FPS is low, several snapshot packets may accumulate
-            // per frame, which lower FPS further, causing a snowball effect. To prevent this, if FPS is low, only
-            // the last snapshot packet is handled every frame.
-            const double minDeltaToDeferSnapshotPackets = 1.0 / 20.0;
-            bool deferShardSnapshotPacket = delta >= minDeltaToDeferSnapshotPackets;
-            
             HandlePacket(bytes, senderId, deferShardSnapshotPacket);
         }
         if (_deferredShardSnapshotPacketBytes != null)
