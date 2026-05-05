@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using Godot.Collections;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Shared.Enums;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes.Autoloads;
@@ -32,6 +34,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private double _timeSinceLastPing;
     private Guid _lastPingId;
     private bool _didPollThisFrame;
+    private byte[]? _deferredShardSnapshotPacketBytes;
     
     private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
         _peerConnectionsAndChannels = [];
@@ -71,7 +74,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     {
         // Poll() is duplicated in _PhysicsProcess because it runs before _Process, so any packets received during
         // _Process would be delayed to the next physics frame otherwise.
-        Poll();
+        Poll(delta);
         
         if (IsServer)
         {
@@ -85,13 +88,13 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     public override void _Process(float delta)
     {
-        Poll();
+        Poll(delta);
         ProcessPing(delta);
         
         _didPollThisFrame = false;
     }
     
-    private void Poll()
+    private void Poll(double delta)
     {
         if (_didPollThisFrame) return;
         _didPollThisFrame = true;
@@ -110,8 +113,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             }
             
             connection.Poll();
-            HandlePackets(reliableChannel, peerId);
-            HandlePackets(unreliableChannel, peerId);
+            HandlePackets(reliableChannel, peerId, delta);
+            HandlePackets(unreliableChannel, peerId, delta);
         }
     }
     
@@ -129,20 +132,37 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         }
     }
     
-    private void HandlePackets(WebRTCDataChannel channel, Guid senderId)
+    private void HandlePackets(WebRTCDataChannel channel, Guid senderId, double delta)
     {
+        _deferredShardSnapshotPacketBytes = null;
+        
         while (channel.GetAvailablePacketCount() > 0)
         {
             byte[] bytes = channel.GetPacket();
             BytesReceived += bytes.Length;
-            HandlePacket(bytes, senderId);
+            
+            // Snapshot deserialization can take a long time. If FPS is low, several snapshot packets may accumulate
+            // per frame, which lower FPS further, causing a snowball effect. To prevent this, if FPS is low, only
+            // the last snapshot packet is handled every frame.
+            const double minDeltaToDeferSnapshotPackets = 1.0 / 20.0;
+            bool deferShardSnapshotPacket = delta >= minDeltaToDeferSnapshotPackets;
+            
+            HandlePacket(bytes, senderId, deferShardSnapshotPacket);
         }
+        if (_deferredShardSnapshotPacketBytes != null)
+            HandlePacket(_deferredShardSnapshotPacketBytes, senderId, false);
     }
     
-    private void HandlePacket(byte[] bytes, Guid senderId)
+    private void HandlePacket(byte[] bytes, Guid senderId, bool deferShardSnapshotPacket)
     {
         Try(senderId, async () =>
         {
+            if (bytes.Length == 0) return;
+            if (deferShardSnapshotPacket && bytes[0] == (byte)PacketType.ShardSnapshot)
+            {
+                _deferredShardSnapshotPacketBytes = bytes;
+                return;
+            }
             Packet packet = _packetSerializer.Deserialize(bytes);
             if (packet is PingPacket pingPacket)
             {
@@ -153,7 +173,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             {
                 byte[]? restoredPacketBytes = _chunkCollector.AddChunk(chunkPacket, senderId);
                 if (restoredPacketBytes != null)
-                    HandlePacket(restoredPacketBytes, senderId);
+                    HandlePacket(restoredPacketBytes, senderId, deferShardSnapshotPacket);
                 return;
             }
             
