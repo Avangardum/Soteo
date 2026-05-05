@@ -3,18 +3,17 @@ using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Exceptions;
-using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes.Autoloads;
 using Soteo.Shared.Packets;
-using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay.Services.Communicators;
 
 /// <summary>
 /// Communicates between clients and shard servers
 /// </summary>
-public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSender, IWebrtcPacketReceiver, INetworkDebugger
+public sealed class WebRtcFromGameplayToGameplayCommunicator :
+    Node, IPacketSender, IWebrtcPacketReceiver, INetworkDebugger
 {
     private record PeerConnectionAndChannels
     (
@@ -26,6 +25,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
     private const double PingInterval = 1;
     private double _timeSinceLastPing;
     private Guid _lastPingId;
+    private bool _didPollThisFrame;
     
     private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
         _peerConnectionsAndChannels = [];
@@ -34,29 +34,35 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
     private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
     
     private readonly ICampaignServerCommunicator _campaignServerCommunicator;
-    private readonly IPacketSerializer _packetSerializer = new RoutingPacketSerializer();
+    private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     
     public long BytesSent { get; private set; }
     public long BytesReceived { get; private set; }
 
-    public WebRtcFromGameplayToGameplayCommunicator(ICampaignServerCommunicator campaignServerCommunicator, IPacketHandler packetHandler)
+    public WebRtcFromGameplayToGameplayCommunicator
+    (
+        ICampaignServerCommunicator campaignServerCommunicator,
+        IPacketHandler packetHandler,
+        IPacketSerializer packetSerializer
+    )
     {
         _campaignServerCommunicator = campaignServerCommunicator;
         _campaignServerCommunicator.ConnectionEstablished += OnCampaignServerConnectionEstablished;
         
         _packetHandler = packetHandler;
+        _packetSerializer = packetSerializer;
         
         Name = nameof(WebRtcFromGameplayToGameplayCommunicator);
-    }
-
-    public override void _Ready()
-    {
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
     }
 
     public override void _PhysicsProcess(float delta)
     {
+        // Poll() is duplicated in _PhysicsProcess because it runs before _Process, so any packets received during
+        // _Process would be delayed to the next physics frame otherwise.
+        Poll();
+        
         if (IsServer)
         {
             while (_packetQueue.Count > 0)
@@ -69,28 +75,47 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
 
     public override void _Process(float delta)
     {
+        Poll();
+        ProcessPing(delta);
+        
+        _didPollThisFrame = false;
+    }
+    
+    private void Poll()
+    {
+        if (_didPollThisFrame) return;
+        _didPollThisFrame = true;
+        
         foreach 
         ((
              Guid peerId, 
              (WebRTCPeerConnection connection, WebRTCDataChannel reliableChannel, WebRTCDataChannel unreliableChannel)
-        ) in _peerConnectionsAndChannels)
+        ) in _peerConnectionsAndChannels.ToDictionary())
         {
+            if (connection.GetConnectionState() == WebRTCPeerConnection.ConnectionState.Closed)
+            {
+                _peerConnectionsAndChannels.Remove(peerId);
+                _ping.Remove(peerId);
+                continue;
+            }
+            
             connection.Poll();
             HandlePackets(reliableChannel, peerId);
             HandlePackets(unreliableChannel, peerId);
         }
-        
-        if (!IsServer)
+    }
+    
+    private void ProcessPing(double delta)
+    {
+        if (IsServer) return;
+        _timeSinceLastPing += delta;
+        if (_timeSinceLastPing >= PingInterval)
         {
-            _timeSinceLastPing += delta;
-            if (_timeSinceLastPing >= PingInterval)
-            {
-                foreach ((Guid peerId, (Guid pingId, _)) in _ping.ToList())
-                    if (pingId != _lastPingId) _ping.Remove(peerId);
-                _timeSinceLastPing = 0;
-                _lastPingId = Guid.NewGuid();
-                BroadcastUnreliable(new PingPacket { Id = _lastPingId });
-            }
+            foreach ((Guid peerId, (Guid pingId, _)) in _ping.ToList())
+                if (pingId != _lastPingId) _ping.Remove(peerId);
+            _timeSinceLastPing = 0;
+            _lastPingId = Guid.NewGuid();
+            BroadcastUnreliable(new PingPacket { Id = _lastPingId });
         }
     }
     
@@ -123,7 +148,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         });
     }
     
-    public async void Try(Guid senderId, Func<Task> func)
+    private async void Try(Guid senderId, Func<Task> func)
     {
         try
         {
@@ -131,8 +156,10 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         }
         catch (BadPacketException e)
         {
-            if (IsServer) SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
-            else AsyncExceptionCollector.Collect(e);
+            if (IsServer)
+                SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
+            else
+                AsyncExceptionCollector.Collect(e);
         }
         catch (Exception e)
         {
@@ -171,9 +198,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
     private WebRTCPeerConnection CreateConnection(Guid peerId)
     {
         if (_peerConnectionsAndChannels.TryGetValue(peerId, out PeerConnectionAndChannels existing))
-        {
             existing.Connection.Close();
-        }
 
         var connection = new WebRTCPeerConnection();
         byte[] peerIdBytes = peerId.ToByteArray();
@@ -190,7 +215,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
             ["negotiated"] = true,
             ["id"] = 1,
             ["maxRetransmits"] = 0,
-            ["ordered"] = true
+            ["ordered"] = false
         });
         
         _peerConnectionsAndChannels[peerId] =
@@ -256,15 +281,13 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator : Node, IPacketSend
         string type = IsServer ? "offer" : "answer";
         WebRTCPeerConnection? connection = IsServer ? CreateConnection(packet.PeerId) :
             _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
-        if (connection == null) return;
-        connection.SetRemoteDescription(type, packet.Sdp);
+        connection?.SetRemoteDescription(type, packet.Sdp);
     }
     
     public void ReceiveWebrtcIceCandidatePacket(WebrtcIceCandidatePacket packet)
     {
         WebRTCPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
-        if (connection == null) return;
-        connection.AddIceCandidate(packet.Media, packet.Index, packet.Name);
+        connection?.AddIceCandidate(packet.Media, packet.Index, packet.Name);
     }
 
     public double? Ping(Guid peerId) =>
