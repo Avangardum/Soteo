@@ -47,6 +47,8 @@ public sealed class InputHandler : Node2D
             HandleSelect();
         if (e.IsActionPressed("interact"))
             HandleInteract();
+        if (e.IsActionPressed("stop"))
+            _packetSender.SendReliable(new StopPacket(), Const.TestShardId);
         
         foreach (var slot in Enum.GetValues<AbilitySlot>().Distinct())
         {
