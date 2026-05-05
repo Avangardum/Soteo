@@ -55,11 +55,6 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         _deltaToLastSnapshotTickMinSafeValue = 0.05f * _ticksPerSecond;
         _deltaToLastSnapshotTickMinValueToFastForward = _deltaToLastSnapshotTickMinSafeValue + 0.01f * _ticksPerSecond;
     }
-    
-    public override void _Ready()
-    {
-        if (IsServer) QueueFree();
-    }
 
     public override void _Process(float delta)
     {
@@ -80,6 +75,13 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         _second = _tick / _ticksPerSecond;
         if ((long)_second > (long)prevSecondValue)
             _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, double.MaxValue);
+        
+        if (_tick > _lastSnapshotTick)
+        {
+            WaitFrameCount++;
+            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, -1);
+            return;
+        }
 
         if (TryGetNearestSnapshotTicks(out int fromTick, out int toTick))
         {
