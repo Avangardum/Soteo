@@ -5,6 +5,8 @@
 [ext_resource path="res://Scripts/Gameplay/Entities/EntityProperties.cs" type="Script" id=3]
 
 [node name="AttackProjectile" type="Area2D"]
+monitoring = false
+monitorable = false
 script = ExtResource( 2 )
 
 [node name="Properties" type="Node" parent="."]
