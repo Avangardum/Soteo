@@ -552,6 +552,7 @@ public abstract class Unit : Entity<UnitNode>
     public void CancelCommands()
     {
         Commands.Clear();
+        AbilityUseProgress = null;
     }
     
     public bool IsAlliedTo(Unit other) => Faction != Faction.Neutral && other.Faction == Faction;
