@@ -212,21 +212,37 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
     )
     {
         SerializeInt(value.Count, stream);
-        foreach (var element in value)
-            serializeElement(element, stream);
+        
+        if (value is byte[] bytes)
+        {
+            stream.Write(bytes);
+        }
+        else
+        {
+            foreach (var element in value)
+                serializeElement(element, stream);
+        }
     }
 
     protected TElement[] DeserializeList<TElement>
     (
-        Deserializer<TElement> deserializeElement, Stream stream
+        Deserializer<TElement> deserializeElement,
+        Stream stream
     )
     {
         int length = DeserializeInt(stream);
         if (length < 0 || length > stream.Length - stream.Position)
-            throw new BadPacketException("Invalid array length");
+            throw new BadPacketException("Invalid list length");
         var result = new TElement[length];
-        for (int i = 0; i < length; i++)
-            result[i] = deserializeElement(stream);
+        if (typeof(TElement) == typeof(byte))
+        {
+            stream.ReadExactly((byte[])(object)result);
+        }
+        else
+        {
+            for (int i = 0; i < length; i++)
+                result[i] = deserializeElement(stream);
+        }
         return result;
     }
 
