@@ -119,6 +119,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddSingleton<IEntityNodePool>(new EntityNodePool());
+        services.AddSingleton<IChunkCollector, ChunkCollector>();
         
         services.AddScoped<IShard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));

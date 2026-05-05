@@ -3,6 +3,7 @@ namespace Soteo.Shared.Enums;
 public enum PacketType : byte
 {
     // Shared
+    Chunk,
     Ok,
     BadInput,
     Ping,
