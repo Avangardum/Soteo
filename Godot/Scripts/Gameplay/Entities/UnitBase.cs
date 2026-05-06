@@ -57,7 +57,7 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : Node2D, IEnt
         Azimuth = s.Azimuth;
         IsMoving = s.IsMoving;
         StatsInternal = s.Stats.ToDictionary();
-        AbilitySlotStatesInternal = s.AbilityStates.ToDictionary();
+        AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
     }
     

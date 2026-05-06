@@ -51,7 +51,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeBaseEntity(unit, stream);
         SerializeBool(unit.IsMoving, stream);
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeDouble, stream);
-        SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilitySlotState, stream);
+        SerializeDictionary(unit.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
         SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
         SerializeIndexedDictionary(unit.Statuses, SerializeStatusContext, stream);
     }
@@ -92,7 +92,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Azimuth = DeserializeDouble(stream),
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
-            AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
+            AbilitySlotStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializeStatusContext, it => it.Id, stream)
         };

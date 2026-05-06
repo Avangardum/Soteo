@@ -49,7 +49,7 @@ public abstract class Unit : UnitBase<UnitNode>
             Azimuth = Azimuth,
             IsMoving = IsMoving,
             Stats = Stats.ToImmutableDictionary(),
-            AbilityStates = AbilitySlotStatesInternal.ToImmutableDictionary(),
+            AbilitySlotStates = AbilitySlotStatesInternal.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress,
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.Deflate())
         };

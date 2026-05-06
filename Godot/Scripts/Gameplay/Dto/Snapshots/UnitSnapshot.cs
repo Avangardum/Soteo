@@ -7,7 +7,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
 {
     public required bool IsMoving { get; init; }
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
-    public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilityStates { get; init; }
+    public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, DeflatedStatusContext> Statuses { get; init; }
     
@@ -16,7 +16,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
         UnitSnapshot from = this;
         return base.Interpolate(to, weight) with
         {
-            AbilityStates = InterpolateDictionary(from.AbilityStates, to.AbilityStates, weight, InterpolateAbilityState),
+            AbilitySlotStates = InterpolateDictionary(from.AbilitySlotStates, to.AbilitySlotStates, weight, InterpolateAbilityState),
             AbilityUseProgress = InterpolateNullable(from.AbilityUseProgress, to.AbilityUseProgress, weight,
                 InterpolateAbilityUseProgress),
             Statuses = InterpolateDictionary(from.Statuses, to.Statuses, weight, InterpolateStatusContext)
