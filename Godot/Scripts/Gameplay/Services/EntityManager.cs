@@ -14,6 +14,7 @@ public sealed class EntityManager : Node, IEntityManager
     private readonly IServiceProvider _serviceProvider;
     private readonly IShard _shard;
     private readonly IEntityNodePool _entityNodePool;
+    private readonly ClientDependency<ICamera> _camera;
     
     private readonly Dictionary<Guid, IEntity> _entities = [];
     private readonly Dictionary<Guid, IEntityNode> _entityNodes = [];
@@ -25,6 +26,7 @@ public sealed class EntityManager : Node, IEntityManager
         _serviceProvider = serviceProvider;
         _shard = serviceProvider.GetRequiredService<IShard>();
         _entityNodePool = serviceProvider.GetRequiredService<IEntityNodePool>();
+        _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
     }
     
     public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;
@@ -61,7 +63,7 @@ public sealed class EntityManager : Node, IEntityManager
         return snapshot switch
         {
             UnitSnapshot s => Add(new PlayerCharacter(s, GetUnitNode(snapshot.Id), _serviceProvider)),
-            ProjectileSnapshot s => Add(new TargetedProjectile(s, GetProjectileNode(snapshot.Id), _serviceProvider))
+            ProjectileSnapshot s => Add(new ProjectilePuppet(s.Id, GetProjectileNode(s.Id), _camera.Required))
         };
     }
     

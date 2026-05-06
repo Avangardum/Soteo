@@ -13,7 +13,7 @@ public sealed class ProjectileNode : Area2D, IEntityNode
     public IEntity? Entity
     {
         get => Projectile;
-        set => Projectile = (Projectile?)value;
+        set => Projectile = value as Projectile; // todo strict cast
     }
     
     public EntityProperties Properties { get; private set; } = null!;
