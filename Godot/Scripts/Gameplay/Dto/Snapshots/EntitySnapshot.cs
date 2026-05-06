@@ -10,6 +10,8 @@ public abstract record EntitySnapshot
     public required double Azimuth { get; init; }
     
     public abstract EntitySnapshot Interpolate(EntitySnapshot to, double weight);
+    
+    public virtual EntitySnapshot ToPuppet() => this;
 }
 
 public abstract record EntitySnapshot<T> : EntitySnapshot where T : EntitySnapshot<T>

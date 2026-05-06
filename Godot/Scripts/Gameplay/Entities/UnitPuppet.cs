@@ -32,7 +32,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         }
     }
     
-    public IReadOnlyList<DeflatedStatusContext> Statuses { get; private set; }
+    public IReadOnlyList<DeflatedStatusContext> Statuses { get; private set; } = [];
     
     private void UpdateNodePosition()
     {
@@ -62,6 +62,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     private void UpdateAnimation()
     {
         if (IsRemoved) return;
+        
         Node.Sprite.FlipH = Azimuth >= 180;
         
         if (AbilityUseProgress != null)

@@ -13,8 +13,10 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
 {
     private enum EntityKind : byte
     {
-        Unit = 0,
-        Projectile = 1
+        Unit,
+        Projectile,
+        UnitPuppet,
+        ProjectilePuppet
     }
     
     protected override void SerializeInternal(ShardSnapshotPacket packet, Stream stream)
@@ -35,14 +37,20 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             case ProjectileSnapshot projectile:
                 SerializeProjectile(projectile, stream);
                 break;
+            // case UnitPuppetSnapshot unitPuppet:
+            //     SerializeUnitPuppet(unitPuppet);
+            //     break;
+            case ProjectilePuppetSnapshot projectilePuppet:
+                SerializeProjectilePuppet(projectilePuppet, stream);
+                break;
         }
     }
     
-    private void SerializeBaseEntity(EntitySnapshot unit, Stream stream)
+    private void SerializeBaseEntity(EntitySnapshot entity, Stream stream)
     {
-        SerializeGuid(unit.Id, stream);
-        SerializeVector2(unit.Position, stream);
-        SerializeDouble(unit.Azimuth, stream);
+        SerializeGuid(entity.Id, stream);
+        SerializeVector2(entity.Position, stream);
+        SerializeDouble(entity.Azimuth, stream);
     }
     
     private void SerializeUnit(UnitSnapshot unit, Stream stream)
@@ -63,6 +71,12 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeDouble(projectile.Speed, stream);
         SerializeAbilityContext(projectile.AbilityContext, stream);
     }
+    
+    private void SerializeProjectilePuppet(ProjectilePuppetSnapshot projectilePuppet, Stream stream)
+    {
+        SerializeEnum(EntityKind.ProjectilePuppet, stream);
+        SerializeBaseEntity(projectilePuppet, stream);
+    }
 
     protected override ShardSnapshotPacket DeserializeInternal(Stream stream)
     {
@@ -79,7 +93,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return DeserializeEnum<EntityKind>(stream) switch
         {
             EntityKind.Unit => DeserializeUnit(stream),
-            EntityKind.Projectile => DeserializeProjectile(stream)
+            EntityKind.Projectile => DeserializeProjectile(stream),
+            EntityKind.ProjectilePuppet => DeserializeProjectilePuppet(stream)
         };
     }
     
@@ -107,6 +122,16 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Azimuth = DeserializeDouble(stream),
             Speed = DeserializeDouble(stream),
             AbilityContext = DeserializeAbilityContext(stream)
+        };
+    }
+    
+    private ProjectilePuppetSnapshot DeserializeProjectilePuppet(Stream stream)
+    {
+        return new ProjectilePuppetSnapshot
+        {
+            Id = DeserializeGuid(stream),
+            Position = DeserializeVector2(stream),
+            Azimuth = DeserializeDouble(stream)
         };
     }
 

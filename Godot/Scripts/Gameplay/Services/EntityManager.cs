@@ -63,7 +63,7 @@ public sealed class EntityManager : Node, IEntityManager
         return snapshot switch
         {
             UnitSnapshot s => Add(new UnitPuppet(s.Id, GetNode<UnitPuppetNode>(s.Id), _serviceProvider)),
-            ProjectileSnapshot s =>
+            ProjectilePuppetSnapshot s =>
                 Add(new ProjectilePuppet(s.Id, GetNode<ProjectilePuppetNode>(s.Id), _camera.Required))
         };
     }

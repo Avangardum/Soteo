@@ -39,7 +39,7 @@ public sealed class SynchronizationServer : Node
     public override void _PhysicsProcess(float delta)
     {
         ImmutableList<EntitySnapshot> entitySnapshots = _entityManager.Entities.Values
-            .Select(it => it.CreateSnapshot())
+            .Select(it => it.CreateSnapshot().ToPuppet())
             .ToImmutableList();
         
         var shardSnapshot = new ShardSnapshot { Entities = entitySnapshots };

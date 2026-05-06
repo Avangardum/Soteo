@@ -39,7 +39,11 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
     public abstract EntitySnapshot CreateSnapshot();
 
     // Both
-    public abstract void ReplicateSnapshot(EntitySnapshot snapshot);
+    public virtual void ReplicateSnapshot(EntitySnapshot snapshot)
+    {
+        Position = snapshot.Position;
+        Azimuth = snapshot.Azimuth;
+    }
 
     // Both
     public void Remove()

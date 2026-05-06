@@ -5,7 +5,7 @@ using Soteo.Gameplay.Util;
 
 namespace Soteo.Gameplay.Entities;
 
-public sealed class ProjectilePuppet : ProjectileBase<ProjectilePuppetNode>
+public sealed class ProjectilePuppet : Entity<ProjectilePuppetNode>
 {
     public ProjectilePuppet(Guid id, ProjectilePuppetNode node, ICamera camera) :
         base(id, node, ClientDependency.From(camera)) { }
@@ -31,7 +31,7 @@ public sealed class ProjectilePuppet : ProjectileBase<ProjectilePuppetNode>
     }
     
     public override EntitySnapshot CreateSnapshot() => throw new InvalidOperationException();
-
+    
     protected override void OnZoomChanged()
     {
         UpdateNodePosition();

@@ -4,11 +4,10 @@ using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class Projectile : ProjectileBase<ProjectileNode>
+public abstract class Projectile : Entity<ProjectileNode>
 {
     private readonly IServiceProvider _serviceProvider;
     
