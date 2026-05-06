@@ -140,6 +140,7 @@ public sealed class InputHandler : Node2D
             .OrderByDescending(it => it.ZIndex)
             .ThenByDescending(it => it.Position.y)
             .Select(it => it.Unit)
+            .WhereNotNull()
             .ToImmutableList();
     }
 }
