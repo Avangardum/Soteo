@@ -10,8 +10,6 @@ public sealed class PlayerCharacter : Unit
 {
     public PlayerCharacter(Guid id, UnitNode node, IServiceProvider serviceProvider) : base(id, node, serviceProvider)
     {
-        DisplayName = id.ToString()[^12..];
-        
         SetAbility<BloodSacrificeAbility>(AbilitySlot.Class0, 1);
         SetAbility<HealAbility>(AbilitySlot.Class1, 1);
         SetAbility<ProjectileBurstAbility>(AbilitySlot.Class2, 1);
@@ -19,9 +17,4 @@ public sealed class PlayerCharacter : Unit
         SetAbility<RecallAbility>(AbilitySlot.Recall, 1);
         SetAbility<RangedAttackAbility>(AbilitySlot.Attack, 1);
     }
-    
-    public PlayerCharacter(UnitSnapshot snapshot, UnitNode node, IServiceProvider serviceProvider) :
-        this(snapshot.Id, node, serviceProvider) { }
-    
-    public string DisplayName { get; }
 }

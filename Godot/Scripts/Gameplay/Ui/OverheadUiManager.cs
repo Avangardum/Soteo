@@ -7,7 +7,6 @@ public sealed class OverheadUiManager : Control
 {
     private readonly ICamera _camera;
     private readonly IPalette _palette;
-    private readonly PackedScene _overheadUiScene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/OverheadUi.tscn");
     
     public OverheadUiManager(ICamera camera, IEntityManager entityManager, IPalette palette)
     {
@@ -23,7 +22,7 @@ public sealed class OverheadUiManager : Control
     
     private void OnEntityAdded(IEntity entity)
     {
-        if (entity is not Unit unit) return;
+        if (entity is not UnitPuppet unit) return;
         
         AddChild(new OverheadUi(unit, _camera, _palette));
     }

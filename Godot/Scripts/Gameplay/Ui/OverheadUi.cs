@@ -2,7 +2,6 @@ using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Enums;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Ui;
 
@@ -17,7 +16,7 @@ public sealed class OverheadUi : Control
     
     private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/OverheadUi.tscn");
 
-    private readonly Unit _unit;
+    private readonly UnitPuppet _unit;
     private readonly ICamera _camera;
     private readonly IPalette _palette;
     
@@ -31,7 +30,7 @@ public sealed class OverheadUi : Control
     
     private Vector2 _offset;
     
-    public OverheadUi(Unit unit, ICamera camera, IPalette palette)
+    public OverheadUi(UnitPuppet unit, ICamera camera, IPalette palette)
     {
         Name = $"{nameof(OverheadUi)} {unit.Id}";
         ProcessPriority = (int)ProcessPriorityEnum.OverheadUi;
@@ -53,10 +52,7 @@ public sealed class OverheadUi : Control
         
         unit.Removed += OnUnitRemoved;
         
-        if (unit is PlayerCharacter playerCharacter)
-        {
-            _playerCharacterNameLabel.Text = playerCharacter.DisplayName;
-        }
+        _playerCharacterNameLabel.Text = unit.Id.ToString()[^12..]; 
     }
     
     private Variant CurrentVariant
