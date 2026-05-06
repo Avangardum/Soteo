@@ -16,19 +16,24 @@ public sealed class ProjectilePuppet : ProjectileBase<ProjectilePuppetNode>
         set
         {
             base.Position = value;
-            Node?.Position = RoundVisualPositionToPixelPerfect
-            (
-                value,
-                Node.Properties.HalfPixelXVisualOffset,
-                Node.Properties.HalfPixelYVisualOffset
-            );
+            UpdateVisualsPosition();
         }
+    }
+    
+    private void UpdateVisualsPosition()
+    {
+        Node?.Position = RoundVisualPositionToPixelPerfect
+        (
+            Position,
+            Node.Properties.HalfPixelXVisualOffset,
+            Node.Properties.HalfPixelYVisualOffset
+        );
     }
     
     public override EntitySnapshot CreateSnapshot() => throw new InvalidOperationException();
 
     protected override void OnZoomChanged()
     {
-        // todo
+        UpdateVisualsPosition();
     }
 }
