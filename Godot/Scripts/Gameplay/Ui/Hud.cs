@@ -134,7 +134,7 @@ public sealed class Hud : Control, IHud
     
     private void ProcessStatuses(UnitPuppet unit)
     {
-        List<DeflatedStatusContext> contexts = unit.Statuses
+        List<PuppetStatusContext> contexts = unit.Statuses.Values
             .OrderBy(it => it.Ordinal)
             .Take(_statusIndicators.Count)
             .ToList();

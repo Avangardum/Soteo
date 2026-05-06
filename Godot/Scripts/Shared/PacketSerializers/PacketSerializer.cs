@@ -1,6 +1,8 @@
 ﻿using System.Buffers.Binary;
 using System.Collections.Immutable;
 using System.Text;
+using Soteo.Gameplay.Abilities;
+using Soteo.Gameplay.Statuses;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Extensions;
@@ -347,5 +349,11 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         return DeserializeList(deserializeValue, stream).ToImmutableDictionary(keySelector, it => it);
     }
     
-    // todo refactor parameter order
+    protected void SerializeAbility(Ability value, Stream stream) => SerializeInt(value.Id, stream);
+    
+    protected Ability DeserializeAbility(Stream stream) => Ability.All[DeserializeInt(stream)];
+    
+    protected void SerializeStatus(Status value, Stream stream) => SerializeInt(value.Id, stream);
+    
+    protected Status DeserializeStatus(Stream stream) => Status.All[DeserializeInt(stream)];
 }

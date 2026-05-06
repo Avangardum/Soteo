@@ -32,7 +32,8 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         }
     }
     
-    public IReadOnlyList<DeflatedStatusContext> Statuses { get; private set; } = [];
+    public IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses { get; private set; } =
+        ImmutableDictionary<Guid, PuppetStatusContext>.Empty;
     
     private void UpdateNodePosition()
     {
@@ -49,8 +50,12 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {
         base.ReplicateSnapshot(snapshot);
-        var s = (UnitSnapshot)snapshot;
-        Statuses = s.Statuses.Values.ToImmutableList();
+        var s = (UnitPuppetSnapshot)snapshot;
+        IsMoving = s.IsMoving;
+        StatsInternal = s.Stats.ToDictionary();
+        AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
+        AbilityUseProgress = s.AbilityUseProgress;
+        Statuses = s.Statuses;
         UpdateAnimation();
     }
     

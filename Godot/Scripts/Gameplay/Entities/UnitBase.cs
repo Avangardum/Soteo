@@ -49,17 +49,5 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : Node2D, IEnt
     public AbilityUseProgress? AbilityUseProgress { get; protected set; }
     public Faction Faction { get; }
     
-    public override void ReplicateSnapshot(EntitySnapshot snapshot)
-    {
-        var s = (UnitSnapshot)snapshot;
-        
-        Position = s.Position;
-        Azimuth = s.Azimuth;
-        IsMoving = s.IsMoving;
-        StatsInternal = s.Stats.ToDictionary();
-        AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
-        AbilityUseProgress = s.AbilityUseProgress;
-    }
-    
     public bool IsAlliedTo(UnitBase<TNode> other) => Faction != Faction.Neutral && other.Faction == Faction;
 }

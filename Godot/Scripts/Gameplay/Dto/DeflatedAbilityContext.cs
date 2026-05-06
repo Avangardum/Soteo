@@ -9,7 +9,7 @@ namespace Soteo.Gameplay.Dto;
 
 public sealed record DeflatedAbilityContext
 {
-    public required int AbilityId { get; init; }
+    public required Ability Ability { get; init; }
     public required int Level { get; init; }
     public required Guid UserId { get; init; }
     public required IReadOnlyDictionary<Stat, double> UserStats { get; init; }
@@ -23,7 +23,7 @@ public sealed record DeflatedAbilityContext
         var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
         return new AbilityContext
         {
-            Ability = Ability.All[AbilityId],
+            Ability = Ability,
             Level = Level,
             User = entityManager.GetEntity<Unit>(UserId).Required,
             UserStats = UserStats,

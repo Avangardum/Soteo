@@ -1,5 +1,5 @@
+using System.Collections.Immutable;
 using Soteo.Shared.Enums;
-using static Soteo.Shared.Maths;
 
 namespace Soteo.Gameplay.Dto.Snapshots;
 
@@ -10,43 +10,19 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, DeflatedStatusContext> Statuses { get; init; }
-    
-    public override UnitSnapshot Interpolate(UnitSnapshot to, double weight)
-    {
-        UnitSnapshot from = this;
-        return base.Interpolate(to, weight) with
-        {
-            AbilitySlotStates = InterpolateDictionary(from.AbilitySlotStates, to.AbilitySlotStates, weight, InterpolateAbilityState),
-            AbilityUseProgress = InterpolateNullable(from.AbilityUseProgress, to.AbilityUseProgress, weight,
-                InterpolateAbilityUseProgress),
-            Statuses = InterpolateDictionary(from.Statuses, to.Statuses, weight, InterpolateStatusContext)
-        };
-    }
-    
-    private AbilitySlotState InterpolateAbilityState(AbilitySlotState from, AbilitySlotState to, double weight) =>
-        to with { Cooldown = LerpDecrease(from.Cooldown, to.Cooldown, weight) };
-    
-    private DeflatedStatusContext InterpolateStatusContext
-    (
-        DeflatedStatusContext from,
-        DeflatedStatusContext to,
-        double weight
-    )
-    {
-        return to with { DisplayElapsedTime = LerpIncrease(from.DisplayElapsedTime, to.DisplayElapsedTime, weight) };
-    }
 
-    private AbilityUseProgress InterpolateAbilityUseProgress
-    (
-        AbilityUseProgress from,
-        AbilityUseProgress to,
-        double weight
-    )
+    public override EntitySnapshot ToPuppet()
     {
-        return to with
+        return new UnitPuppetSnapshot
         {
-            ElapsedTime = LerpIncrease(from.ElapsedTime, to.ElapsedTime, weight),
-            RemainingTime = LerpDecrease(from.RemainingTime, to.RemainingTime, weight)
+            Id = Id,
+            Position = Position,
+            Azimuth = Azimuth,
+            IsMoving = IsMoving,
+            Stats = Stats,
+            AbilitySlotStates = AbilitySlotStates,
+            AbilityUseProgress = AbilityUseProgress,
+            Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToPuppet()),
         };
     }
 }

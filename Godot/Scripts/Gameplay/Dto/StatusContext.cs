@@ -30,7 +30,7 @@ public sealed record StatusContext : IServiceProvider
         return new DeflatedStatusContext
         {
             Id = Id,
-            StatusId = Status.Id,
+            Status = Status,
             AbilityContext = AbilityContext?.Deflate(),
             UnitId = Unit.Id,
             SourceId = Source?.Id,

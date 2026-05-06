@@ -59,6 +59,10 @@ public abstract class Unit : UnitBase<UnitNode>
     {
         base.ReplicateSnapshot(snapshot);
         var s = (UnitSnapshot)snapshot;
+        IsMoving = s.IsMoving;
+        StatsInternal = s.Stats.ToDictionary();
+        AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
+        AbilityUseProgress = s.AbilityUseProgress;
         StatusesInternal = s.Statuses.ToDictionary(it => it.Key, it => it.Value.Inflate(_serviceProvider));
         _nextStatusOrdinal = Statuses.Values.Max(it => it.Ordinal) + 1;
     }

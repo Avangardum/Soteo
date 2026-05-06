@@ -9,7 +9,7 @@ namespace Soteo.Gameplay.Dto;
 public sealed record DeflatedStatusContext
 {
     public required Guid Id { get; init; }
-    public required int StatusId { get; init; }
+    public required Status Status { get; init; }
     public required DeflatedAbilityContext? AbilityContext { get; init; }
     public required Guid UnitId { get; init; }
     public required Guid? SourceId { get; init; }
@@ -19,24 +19,13 @@ public sealed record DeflatedStatusContext
     public required double TickInterval { get; init; }
     public required long Ordinal { get; init; }
     
-    public double DisplayNormalizedRemainingTime
-    {
-        get
-        {
-            if (RemainingTime == double.PositiveInfinity) return 1;
-            double totalDisplayTime = RemainingTime + DisplayElapsedTime;
-            if (totalDisplayTime == 0) return 0;
-            return RemainingTime / totalDisplayTime;
-        }
-    }
-    
     public StatusContext Inflate(IServiceProvider serviceProvider)
     {
         var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
         return new StatusContext
         {
             Id = Id,
-            Status = Status.All[StatusId],
+            Status = Status,
             AbilityContext = AbilityContext?.Inflate(serviceProvider),
             Unit = entityManager.GetEntity<Unit>(UnitId).Required,
             Source = SourceId == null ? null : entityManager.GetEntity<Unit>(SourceId.Value).Required,
@@ -46,6 +35,18 @@ public sealed record DeflatedStatusContext
             TickInterval = TickInterval,
             Ordinal = Ordinal,
             ServiceProvider = serviceProvider
+        };
+    }
+    
+    public PuppetStatusContext ToPuppet()
+    {
+        return new PuppetStatusContext
+        {
+            Id = Id,
+            Status = Status,
+            DisplayElapsedTime = DisplayElapsedTime,
+            RemainingTime = RemainingTime,
+            Ordinal = Ordinal
         };
     }
 }

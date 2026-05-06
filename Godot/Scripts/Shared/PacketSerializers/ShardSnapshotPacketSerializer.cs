@@ -27,6 +27,16 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeList(packet.Snapshot.Entities, SerializeEntity, stream);
     }
     
+    protected override ShardSnapshotPacket DeserializeInternal(Stream stream)
+    {
+        var message = base.DeserializeInternal(stream);
+        message.Tick = DeserializeLong(stream);
+        message.ServerLoad = DeserializeDouble(stream);
+        var entities = DeserializeList(DeserializeEntity, stream).ToImmutableList();
+        message.Snapshot = new ShardSnapshot { Entities = entities };
+        return message;
+    }
+    
     private void SerializeEntity(EntitySnapshot entity, Stream stream)
     {
         switch (entity)
@@ -37,13 +47,26 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             case ProjectileSnapshot projectile:
                 SerializeProjectile(projectile, stream);
                 break;
-            // case UnitPuppetSnapshot unitPuppet:
-            //     SerializeUnitPuppet(unitPuppet);
-            //     break;
+            case UnitPuppetSnapshot unitPuppet:
+                SerializeUnitPuppet(unitPuppet, stream);
+                break;
             case ProjectilePuppetSnapshot projectilePuppet:
                 SerializeProjectilePuppet(projectilePuppet, stream);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
+    }
+    
+    private EntitySnapshot DeserializeEntity(Stream stream)
+    {
+        return DeserializeEnum<EntityKind>(stream) switch
+        {
+            EntityKind.Unit => DeserializeUnit(stream),
+            EntityKind.Projectile => DeserializeProjectile(stream),
+            EntityKind.UnitPuppet => DeserializeUnitPuppet(stream),
+            EntityKind.ProjectilePuppet => DeserializeProjectilePuppet(stream)
+        };
     }
     
     private void SerializeBaseEntity(EntitySnapshot entity, Stream stream)
@@ -64,40 +87,6 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeIndexedDictionary(unit.Statuses, SerializeStatusContext, stream);
     }
     
-    private void SerializeProjectile(ProjectileSnapshot projectile, Stream stream)
-    {
-        SerializeEnum(EntityKind.Projectile, stream);
-        SerializeBaseEntity(projectile, stream);
-        SerializeDouble(projectile.Speed, stream);
-        SerializeAbilityContext(projectile.AbilityContext, stream);
-    }
-    
-    private void SerializeProjectilePuppet(ProjectilePuppetSnapshot projectilePuppet, Stream stream)
-    {
-        SerializeEnum(EntityKind.ProjectilePuppet, stream);
-        SerializeBaseEntity(projectilePuppet, stream);
-    }
-
-    protected override ShardSnapshotPacket DeserializeInternal(Stream stream)
-    {
-        var message = base.DeserializeInternal(stream);
-        message.Tick = DeserializeLong(stream);
-        message.ServerLoad = DeserializeDouble(stream);
-        var entities = DeserializeList(DeserializeEntity, stream).ToImmutableList();
-        message.Snapshot = new ShardSnapshot { Entities = entities };
-        return message;
-    }
-    
-    private EntitySnapshot DeserializeEntity(Stream stream)
-    {
-        return DeserializeEnum<EntityKind>(stream) switch
-        {
-            EntityKind.Unit => DeserializeUnit(stream),
-            EntityKind.Projectile => DeserializeProjectile(stream),
-            EntityKind.ProjectilePuppet => DeserializeProjectilePuppet(stream)
-        };
-    }
-    
     private UnitSnapshot DeserializeUnit(Stream stream)
     {
         return new UnitSnapshot
@@ -107,10 +96,46 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Azimuth = DeserializeDouble(stream),
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
-            AbilitySlotStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
+            AbilitySlotStates =
+                DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializeStatusContext, it => it.Id, stream)
         };
+    }
+    
+    private void SerializeUnitPuppet(UnitPuppetSnapshot unitPuppet, Stream stream)
+    {
+        SerializeEnum(EntityKind.UnitPuppet, stream);
+        SerializeBaseEntity(unitPuppet, stream);
+        SerializeBool(unitPuppet.IsMoving, stream);
+        SerializeDictionary(unitPuppet.Stats, SerializeEnum, SerializeDouble, stream);
+        SerializeDictionary(unitPuppet.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
+        SerializeNullableClass(unitPuppet.AbilityUseProgress, SerializeAbilityUseProgress, stream);
+        SerializeIndexedDictionary(unitPuppet.Statuses, SerializePuppetStatusContext, stream);
+    }
+    
+    private UnitPuppetSnapshot DeserializeUnitPuppet(Stream stream)
+    {
+        return new UnitPuppetSnapshot
+        {
+            Id = DeserializeGuid(stream),
+            Position = DeserializeVector2(stream),
+            Azimuth = DeserializeDouble(stream),
+            IsMoving = DeserializeBool(stream),
+            Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
+            AbilitySlotStates =
+                DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
+            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
+            Statuses = DeserializeIndexedDictionary(DeserializePuppetStatusContext, it => it.Id, stream)
+        };
+    }
+    
+    private void SerializeProjectile(ProjectileSnapshot projectile, Stream stream)
+    {
+        SerializeEnum(EntityKind.Projectile, stream);
+        SerializeBaseEntity(projectile, stream);
+        SerializeDouble(projectile.Speed, stream);
+        SerializeAbilityContext(projectile.AbilityContext, stream);
     }
     
     private ProjectileSnapshot DeserializeProjectile(Stream stream)
@@ -123,6 +148,12 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Speed = DeserializeDouble(stream),
             AbilityContext = DeserializeAbilityContext(stream)
         };
+    }
+    
+    private void SerializeProjectilePuppet(ProjectilePuppetSnapshot projectilePuppet, Stream stream)
+    {
+        SerializeEnum(EntityKind.ProjectilePuppet, stream);
+        SerializeBaseEntity(projectilePuppet, stream);
     }
     
     private ProjectilePuppetSnapshot DeserializeProjectilePuppet(Stream stream)
@@ -156,7 +187,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     
     private void SerializeAbilityContext(DeflatedAbilityContext context, Stream stream)
     {
-        SerializeInt(context.AbilityId, stream);
+        SerializeAbility(context.Ability, stream);
         SerializeInt(context.Level, stream);
         SerializeGuid(context.UserId, stream);
         SerializeDictionary(context.UserStats, SerializeEnum, SerializeDouble, stream);
@@ -170,7 +201,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         return new DeflatedAbilityContext
         {
-            AbilityId = DeserializeInt(stream),
+            Ability = DeserializeAbility(stream),
             Level = DeserializeInt(stream),
             UserId = DeserializeGuid(stream),
             UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
@@ -201,7 +232,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     private void SerializeStatusContext(DeflatedStatusContext value, Stream stream)
     {
         SerializeGuid(value.Id, stream);
-        SerializeInt(value.StatusId, stream);
+        SerializeStatus(value.Status, stream);
         SerializeNullableClass(value.AbilityContext, SerializeAbilityContext, stream);
         SerializeGuid(value.UnitId, stream);
         SerializeNullableStruct(value.SourceId, SerializeGuid, stream);
@@ -217,7 +248,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return new DeflatedStatusContext
         {
             Id = DeserializeGuid(stream),
-            StatusId = DeserializeInt(stream),
+            Status = DeserializeStatus(stream),
             AbilityContext = DeserializeNullableClass(DeserializeAbilityContext, stream),
             UnitId = DeserializeGuid(stream),
             SourceId = DeserializeNullableStruct(DeserializeGuid, stream),
@@ -225,6 +256,27 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
             TickInterval = DeserializeDouble(stream),
+            Ordinal = DeserializeLong(stream)
+        };
+    }
+    
+    private void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
+    {
+        SerializeGuid(value.Id, stream);
+        SerializeStatus(value.Status, stream);
+        SerializeDouble(value.DisplayElapsedTime, stream);
+        SerializeDouble(value.RemainingTime, stream);
+        SerializeLong(value.Ordinal, stream);
+    }
+    
+    private PuppetStatusContext DeserializePuppetStatusContext(Stream stream)
+    {
+        return new PuppetStatusContext
+        {
+            Id = DeserializeGuid(stream),
+            Status = DeserializeStatus(stream),
+            DisplayElapsedTime = DeserializeDouble(stream),
+            RemainingTime = DeserializeDouble(stream),
             Ordinal = DeserializeLong(stream)
         };
     }

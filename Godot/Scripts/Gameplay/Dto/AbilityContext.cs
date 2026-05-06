@@ -25,7 +25,7 @@ public sealed record AbilityContext : IServiceProvider
     {
         return new DeflatedAbilityContext
         {
-            AbilityId = Ability.Id,
+            Ability = Ability,
             Level = Level,
             UserId = User.Id,
             UserStats = UserStats,
