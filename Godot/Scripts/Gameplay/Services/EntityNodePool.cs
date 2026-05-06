@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Interfaces;
 
@@ -5,67 +6,26 @@ namespace Soteo.Gameplay.Services;
 
 public sealed class EntityNodePool : IEntityNodePool
 {
-    private static readonly PackedScene UnitScene =
-        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Unit.tscn");
+    private static readonly ImmutableDictionary<Type, PackedScene> Scenes = new Dictionary<Type, string>
+    {
+        [typeof(UnitNode)] = "res://Scenes/Entities/Unit.tscn",
+        [typeof(ProjectileNode)] = "res://Scenes/Entities/Projectile.tscn",
+        [typeof(ProjectilePuppetNode)] = "res://Scenes/Entities/ProjectilePuppet.tscn",
+    }.ToImmutableDictionary(it => it.Key, it => ResourceLoader.Load<PackedScene>(it.Value));
     
-    private static readonly PackedScene ProjectileScene =
-        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Projectile.tscn");
-    
-    private static readonly PackedScene ProjectilePuppetScene =
-        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/ProjectilePuppet.tscn");
-    
-    private const int PreloadedUnitCount = 1000;
-    private const int PreloadedProjectileCount = 1000;
-    
-    private readonly Stack<UnitNode> _unitNodes = new(PreloadedUnitCount);
-    private readonly Stack<ProjectileNode> _projectileNodes = new(PreloadedProjectileCount);
-    private readonly Stack<ProjectilePuppetNode> _projectilePuppetNodes = new();
+    private readonly ImmutableDictionary<Type, Stack<IEntityNode>> _stacks =
+        Scenes.ToImmutableDictionary(it => it.Key, _ => new Stack<IEntityNode>());
 
-    public EntityNodePool()
+    public T GetNode<T>() where T : Node2D, IEntityNode
     {
-        for (int i = 0; i < PreloadedUnitCount; i++)
-            _unitNodes.Push(UnitScene.Instance<UnitNode>());
-        
-        for (int i = 0; i < PreloadedProjectileCount; i++)
-            _projectileNodes.Push(ProjectileScene.Instance<ProjectileNode>());
+        Stack<IEntityNode> stack = _stacks[typeof(T)];
+        if (stack.Count > 0)
+            return (T)stack.Pop();
+        return Scenes[typeof(T)].Instance<T>();
     }
     
-    public UnitNode GetUnitNode()
-    {
-        if (_unitNodes.Count > 0)
-            return _unitNodes.Pop();
-        return UnitScene.Instance<UnitNode>();
-    }
-
-    public ProjectileNode GetProjectileNode()
-    {
-        if (_projectileNodes.Count > 0)
-            return _projectileNodes.Pop();
-        return ProjectileScene.Instance<ProjectileNode>();
-    }
-    
-    public ProjectilePuppetNode GetProjectilePuppetNode()
-    {
-        if (_projectilePuppetNodes.Count > 0)
-            return _projectilePuppetNodes.Pop();
-        return ProjectilePuppetScene.Instance<ProjectilePuppetNode>();
-    }
-
     public void ReturnNode(IEntityNode node)
     {
-        switch (node)
-        {
-            case UnitNode unit:
-                _unitNodes.Push(unit);
-                break;
-            case ProjectileNode projectile:
-                _projectileNodes.Push(projectile);
-                break;
-            case ProjectilePuppetNode projectilePuppet:
-                _projectilePuppetNodes.Push(projectilePuppet);
-                break;
-            default:
-                throw new ArgumentException($"Unknown node type {node.GetType()}");
-        }
+        _stacks[node.GetType()].Push(node);
     }
 }

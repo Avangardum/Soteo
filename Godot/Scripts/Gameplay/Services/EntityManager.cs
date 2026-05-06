@@ -62,18 +62,19 @@ public sealed class EntityManager : Node, IEntityManager
     {
         return snapshot switch
         {
-            UnitSnapshot s => Add(new PlayerCharacter(s, GetUnitNode(snapshot.Id), _serviceProvider)),
-            ProjectileSnapshot s => Add(new ProjectilePuppet(s.Id, GetProjectilePuppetNode(s.Id), _camera.Required))
+            UnitSnapshot s => Add(new PlayerCharacter(s, GetNode<UnitNode>(s.Id), _serviceProvider)),
+            ProjectileSnapshot s =>
+                Add(new ProjectilePuppet(s.Id, GetNode<ProjectilePuppetNode>(s.Id), _camera.Required))
         };
     }
     
     public PlayerCharacter SpawnPlayerCharacter(Guid id) =>
-        Add(new PlayerCharacter(id, GetUnitNode(id), _serviceProvider));
+        Add(new PlayerCharacter(id, GetNode<UnitNode>(id), _serviceProvider));
 
     public TargetedProjectile SpawnAttackProjectile(AbilityContext abilityContext, double speed)
     {
         var id = Guid.NewGuid();
-        return Add(new TargetedProjectile(id, abilityContext, speed, GetProjectileNode(id), _serviceProvider)
+        return Add(new TargetedProjectile(id, abilityContext, speed, GetNode<ProjectileNode>(id), _serviceProvider)
         {
             // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
             // of the projectile over the source
@@ -89,29 +90,10 @@ public sealed class EntityManager : Node, IEntityManager
         return entity;
     }
     
-    private UnitNode GetUnitNode(Guid id)
+    private T GetNode<T>(Guid id) where T : Node2D, IEntityNode
     {
-        UnitNode node = _entityNodePool.GetUnitNode();
-        node.Name = $"Unit {id}";
-        _shard.EntityRoot.AddChild(node);
-        _entityNodes[id] = node;
-        return node;
-    }
-    
-    private ProjectileNode GetProjectileNode(Guid id)
-    {
-        ProjectileNode node = _entityNodePool.GetProjectileNode();
-        node.Name = $"Projectile {id}";
-        _shard.EntityRoot.AddChild(node);
-        _entityNodes[id] = node;
-        return node;
-    }
-    
-    // todo refactor with generic type
-    private ProjectilePuppetNode GetProjectilePuppetNode(Guid id)
-    {
-        ProjectilePuppetNode node = _entityNodePool.GetProjectilePuppetNode();
-        node.Name = $"Projectile {id}";
+        T node = _entityNodePool.GetNode<T>();
+        node.Name = $"{typeof(T).Name.Replace("Puppet", "")} {id}";
         _shard.EntityRoot.AddChild(node);
         _entityNodes[id] = node;
         return node;
