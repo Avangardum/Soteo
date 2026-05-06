@@ -51,7 +51,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeBaseEntity(unit, stream);
         SerializeBool(unit.IsMoving, stream);
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeDouble, stream);
-        SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilityState, stream);
+        SerializeDictionary(unit.AbilityStates, SerializeEnum, SerializeAbilitySlotState, stream);
         SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
         SerializeIndexedDictionary(unit.Statuses, SerializeStatusContext, stream);
     }
@@ -92,7 +92,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Azimuth = DeserializeDouble(stream),
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
-            AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilityState, stream),
+            AbilityStates = DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializeStatusContext, it => it.Id, stream)
         };
@@ -110,7 +110,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         };
     }
 
-    private void SerializeAbilityState(AbilityState value, Stream stream)
+    private void SerializeAbilitySlotState(AbilitySlotState value, Stream stream)
     {
         SerializeInt(value.Ability.Id, stream);
         SerializeInt(value.Level, stream);
@@ -118,9 +118,9 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeDouble(value.MaxCooldown, stream);
     }
     
-    private AbilityState DeserializeAbilityState(Stream stream)
+    private AbilitySlotState DeserializeAbilitySlotState(Stream stream)
     {
-        return new AbilityState
+        return new AbilitySlotState
         {
             Ability = Ability.All[DeserializeInt(stream)],
             Level = DeserializeInt(stream),

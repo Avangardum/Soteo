@@ -18,7 +18,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         set
         {
             base.Position = value;
-            UpdateVisualsPosition();
+            UpdateNodePosition();
         }
     }
     
@@ -34,11 +34,14 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     
     public IReadOnlyList<DeflatedStatusContext> Statuses { get; private set; }
     
-    // todo no need for Node.Visuals now
-    private void UpdateVisualsPosition()
+    private void UpdateNodePosition()
     {
-        Node?.Visuals.Position = RoundVisualPositionToPixelPerfect(Position,
-            Node.Properties.HalfPixelXVisualOffset, Node.Properties.HalfPixelYVisualOffset) - Node.Position;
+        Node?.Position = RoundVisualPositionToPixelPerfect
+        (
+            Position,
+            Node.Properties.HalfPixelXVisualOffset,
+            Node.Properties.HalfPixelYVisualOffset
+        );
     }
 
     public override EntitySnapshot CreateSnapshot() => throw new InvalidOperationException();
@@ -53,14 +56,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     
     protected override void OnZoomChanged()
     {
-        UpdateVisualsPosition();
-    }
-    
-    // todo remove
-    public void PhysicsProcess(UnitPuppetNode node, double delta)
-    {
-        node.Position = Position;
-        UpdateVisualsPosition();
+        UpdateNodePosition();
     }
     
     private void UpdateAnimation()
@@ -70,7 +66,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         
         if (AbilityUseProgress != null)
         {
-            var ability = AbilityStates[AbilityUseProgress.Slot].Ability;
+            var ability = AbilitySlotStates[AbilityUseProgress.Slot].Ability;
             Node.Sprite.Animation = ability.Animation;
             if (ability.LoopAnimation)
             {

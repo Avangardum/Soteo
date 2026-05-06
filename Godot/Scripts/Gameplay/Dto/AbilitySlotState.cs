@@ -2,7 +2,7 @@ using Soteo.Gameplay.Abilities;
 
 namespace Soteo.Gameplay.Dto;
 
-public record AbilityState
+public record AbilitySlotState
 {
     public required Ability Ability { get; init; }
     public required int Level { get; init; }
@@ -12,6 +12,6 @@ public record AbilityState
     /// </summary>
     public double MaxCooldown { get; init; }
     
-    public static AbilityState New<T>(int level) where T : Ability =>
-        new AbilityState { Ability = Ability.Instance<T>(), Level = level };
+    public static AbilitySlotState New<T>(int level) where T : Ability =>
+        new AbilitySlotState { Ability = Ability.Instance<T>(), Level = level };
 }

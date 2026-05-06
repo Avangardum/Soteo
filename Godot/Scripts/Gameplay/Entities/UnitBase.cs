@@ -32,27 +32,19 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : Node2D, IEnt
     protected UnitBase(Guid id, TNode node, IServiceProvider serviceProvider) :
         base(id, node, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
     {
-        ServiceProvider = serviceProvider;
-        EntityManager = serviceProvider.GetRequiredService<IEntityManager>();
-        
         foreach (Stat stat in Stat.All)
             StatsInternal[stat] = StatConst[stat].Defalut;
         
         Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
     
-    // todo move to Unit
-    protected IServiceProvider ServiceProvider { get; }
-    protected IEntityManager EntityManager { get; }
-    
     protected bool IsMoving { get; set; }
     
     protected Dictionary<Stat, double> StatsInternal { get; set; } = [];
     public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
     
-    // todo rename to ability slot state
-    protected Dictionary<AbilitySlot, AbilityState> AbilityStatesInternal { get; set; } = [];
-    public IReadOnlyDictionary<AbilitySlot, AbilityState> AbilityStates => AbilityStatesInternal;
+    protected Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = [];
+    public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
     
     public AbilityUseProgress? AbilityUseProgress { get; protected set; }
     public Faction Faction { get; }
@@ -65,7 +57,7 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : Node2D, IEnt
         Azimuth = s.Azimuth;
         IsMoving = s.IsMoving;
         StatsInternal = s.Stats.ToDictionary();
-        AbilityStatesInternal = s.AbilityStates.ToDictionary();
+        AbilitySlotStatesInternal = s.AbilityStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
     }
     

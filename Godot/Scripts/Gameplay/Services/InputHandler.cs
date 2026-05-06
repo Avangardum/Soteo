@@ -89,7 +89,7 @@ public sealed class InputHandler : Node2D
     private void HandleUseAbility(AbilitySlot slot)
     {
         UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.UserId, out _);
-        if (user == null || !user.AbilityStates.TryGetValue(slot, out AbilityState? state)) return;
+        if (user == null || !user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
         IReadOnlyList<UnitPuppet> candidateTargetUnits =
             Input.IsActionPressed("alt") ? [user] : GetUnitsUnderMouse();
@@ -114,7 +114,7 @@ public sealed class InputHandler : Node2D
     {
         // This method only validates target to select a valid target in a crowd
         
-        AbilityState state = user.AbilityStates[command.Slot];
+        AbilitySlotState state = user.AbilitySlotStates[command.Slot];
         
         if (command.TargetUnitId != null)
         {

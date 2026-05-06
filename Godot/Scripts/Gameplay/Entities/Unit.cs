@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Dto;
@@ -14,9 +15,15 @@ namespace Soteo.Gameplay.Entities;
 
 public abstract class Unit : UnitBase<UnitNode>
 {
+    private IServiceProvider _serviceProvider;
+    private IEntityManager _entityManager;
     private long _nextStatusOrdinal;
     
-    protected Unit(Guid id, UnitNode node, IServiceProvider serviceProvider) : base(id, node, serviceProvider) { }
+    protected Unit(Guid id, UnitNode node, IServiceProvider serviceProvider) : base(id, node, serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+        _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
+    }
     
     private Queue<ICommand> Commands { get; } = [];
     
@@ -30,8 +37,7 @@ public abstract class Unit : UnitBase<UnitNode>
         }
     }
     
-    // todo private
-    protected Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
+    private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
     
     public override EntitySnapshot CreateSnapshot()
@@ -43,7 +49,7 @@ public abstract class Unit : UnitBase<UnitNode>
             Azimuth = Azimuth,
             IsMoving = IsMoving,
             Stats = Stats.ToImmutableDictionary(),
-            AbilityStates = AbilityStatesInternal.ToImmutableDictionary(),
+            AbilityStates = AbilitySlotStatesInternal.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress,
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.Deflate())
         };
@@ -53,7 +59,7 @@ public abstract class Unit : UnitBase<UnitNode>
     {
         base.ReplicateSnapshot(snapshot);
         var s = (UnitSnapshot)snapshot;
-        StatusesInternal = s.Statuses.ToDictionary(it => it.Key, it => it.Value.Inflate(ServiceProvider));
+        StatusesInternal = s.Statuses.ToDictionary(it => it.Key, it => it.Value.Inflate(_serviceProvider));
         _nextStatusOrdinal = Statuses.Values.Max(it => it.Ordinal) + 1;
     }
 
@@ -69,11 +75,11 @@ public abstract class Unit : UnitBase<UnitNode>
     
     private void DecreaseCooldowns(double delta)
     {
-        foreach (AbilitySlot slot in AbilityStatesInternal.Keys.ToList())
+        foreach (AbilitySlot slot in AbilitySlotStatesInternal.Keys.ToList())
         {
-            AbilityStatesInternal[slot] = AbilityStatesInternal[slot] with
+            AbilitySlotStatesInternal[slot] = AbilitySlotStatesInternal[slot] with
             {
-                Cooldown = Math.Max(AbilityStatesInternal[slot].Cooldown - delta, 0)
+                Cooldown = Math.Max(AbilitySlotStatesInternal[slot].Cooldown - delta, 0)
             };
         }
     }
@@ -296,7 +302,7 @@ public abstract class Unit : UnitBase<UnitNode>
 
     private void UseAbility(UseAbilityCommand command, ref double remainingDeltaTime, UnitNode node)
     {
-        if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
+        if (!AbilitySlotStatesInternal.TryGetValue(command.Slot, out AbilitySlotState? state))
         {
             Commands.Dequeue();
             AbilityUseProgress = null;
@@ -346,7 +352,7 @@ public abstract class Unit : UnitBase<UnitNode>
     
     private AbilityContext GetAbilityContext(UseAbilityCommand command)
     {
-        if (!AbilityStates.TryGetValue(command.Slot, out AbilityState? state))
+        if (!AbilitySlotStates.TryGetValue(command.Slot, out AbilitySlotState? state))
             throw new ArgumentException($"Unit {Id} doesn't have an ability in slot {command.Slot}");
         return new AbilityContext
         {
@@ -354,10 +360,10 @@ public abstract class Unit : UnitBase<UnitNode>
             Level = state.Level,
             User = this,
             UserStats = Stats.ToImmutableDictionary(),
-            ServiceProvider = ServiceProvider,
+            ServiceProvider = _serviceProvider,
             TargetPosition = command.TargetPosition,
             TargetUnit = command.TargetUnitId == null ? null :
-                EntityManager.GetEntity(command.TargetUnitId.Value) as Unit,
+                _entityManager.GetEntity(command.TargetUnitId.Value) as Unit,
             TargetDirection = command.TargetDirection,
             TargetShardId = command.TargetShardId
         };
@@ -367,7 +373,7 @@ public abstract class Unit : UnitBase<UnitNode>
     {
         context.Ability.TakeEffect(context);
         double cooldown = context.Ability.Cooldown(context);
-        AbilityStatesInternal[command.Slot] = AbilityStatesInternal[command.Slot] with
+        AbilitySlotStatesInternal[command.Slot] = AbilitySlotStatesInternal[command.Slot] with
         {
             Cooldown = cooldown,
             MaxCooldown = cooldown
@@ -497,10 +503,10 @@ public abstract class Unit : UnitBase<UnitNode>
     
     protected void SetAbility(Ability ability, AbilitySlot slot, int level)
     {
-        if (AbilityStates.ContainsKey(slot))
+        if (AbilitySlotStates.ContainsKey(slot))
             throw new InvalidOperationException($"Slot {slot} already has an ability");
         
-        AbilityStatesInternal[slot] = new AbilityState { Ability = ability, Level = level };
+        AbilitySlotStatesInternal[slot] = new AbilitySlotState { Ability = ability, Level = level };
         if (ability.PassiveStatus != null)
         {
             AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand(slot));
@@ -525,7 +531,7 @@ public abstract class Unit : UnitBase<UnitNode>
             RemainingTime = time,
             TickInterval = tickInterval,
             Ordinal = _nextStatusOrdinal++,
-            ServiceProvider = ServiceProvider
+            ServiceProvider = _serviceProvider
         };
         
         List<StatusContext> duplicates = Statuses.Values.Where(it => it.Status == status).ToList();

@@ -106,14 +106,14 @@ public sealed class Hud : Control, IHud
         for (var slot = AbilitySlot.Class0; slot <= AbilitySlot.ClassLast; slot++)
         {
             AbilityButton button = _abilityButtons[slot - AbilitySlot.Class0];
-            if (!SelectedUnit.Required.AbilityStates.ContainsKey(slot))
+            if (!SelectedUnit.Required.AbilitySlotStates.ContainsKey(slot))
             {
                 button.Visible = false;
                 continue;
             }
             
             button.Visible = true;
-            AbilityState state = SelectedUnit.AbilityStates[slot];
+            AbilitySlotState state = SelectedUnit.AbilitySlotStates[slot];
             
             button.CooldownIndicator.Value = state.Cooldown;
             button.CooldownIndicator.MaxValue = state.MaxCooldown == 0 ? 1 : state.MaxCooldown;

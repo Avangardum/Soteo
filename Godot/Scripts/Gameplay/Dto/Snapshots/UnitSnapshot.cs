@@ -7,7 +7,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
 {
     public required bool IsMoving { get; init; }
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
-    public required IReadOnlyDictionary<AbilitySlot, AbilityState> AbilityStates { get; init; }
+    public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilityStates { get; init; }
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, DeflatedStatusContext> Statuses { get; init; }
     
@@ -23,7 +23,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
         };
     }
     
-    private AbilityState InterpolateAbilityState(AbilityState from, AbilityState to, double weight) =>
+    private AbilitySlotState InterpolateAbilityState(AbilitySlotState from, AbilitySlotState to, double weight) =>
         to with { Cooldown = LerpDecrease(from.Cooldown, to.Cooldown, weight) };
     
     private DeflatedStatusContext InterpolateStatusContext

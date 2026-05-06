@@ -16,11 +16,11 @@ public sealed class ProjectilePuppet : ProjectileBase<ProjectilePuppetNode>
         set
         {
             base.Position = value;
-            UpdateVisualsPosition();
+            UpdateNodePosition();
         }
     }
     
-    private void UpdateVisualsPosition()
+    private void UpdateNodePosition()
     {
         Node?.Position = RoundVisualPositionToPixelPerfect
         (
@@ -34,6 +34,6 @@ public sealed class ProjectilePuppet : ProjectileBase<ProjectilePuppetNode>
 
     protected override void OnZoomChanged()
     {
-        UpdateVisualsPosition();
+        UpdateNodePosition();
     }
 }
