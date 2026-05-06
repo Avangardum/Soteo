@@ -25,7 +25,7 @@ public sealed class Hud : Control, IHud
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPalette _palette;
     
-    public Unit? SelectedUnit { get; set; }
+    public UnitPuppet? SelectedUnit { get; set; }
 
     public Hud(IEntityLocator entityLocator, ICurrentUserIdRepository currentUserIdRepository, IPalette palette)
     {
@@ -69,7 +69,7 @@ public sealed class Hud : Control, IHud
 
     public override void _Process(float delta)
     {
-        SelectedUnit ??= _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepository.UserId, out _);
+        SelectedUnit ??= _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepository.UserId, out _);
         if (SelectedUnit == null)
         {
             Visible = false;
@@ -106,7 +106,7 @@ public sealed class Hud : Control, IHud
         for (var slot = AbilitySlot.Class0; slot <= AbilitySlot.ClassLast; slot++)
         {
             AbilityButton button = _abilityButtons[slot - AbilitySlot.Class0];
-            if (!SelectedUnit!.AbilityStates.ContainsKey(slot))
+            if (!SelectedUnit.Required.AbilityStates.ContainsKey(slot))
             {
                 button.Visible = false;
                 continue;
@@ -114,7 +114,6 @@ public sealed class Hud : Control, IHud
             
             button.Visible = true;
             AbilityState state = SelectedUnit.AbilityStates[slot];
-            AbilityContext context = SelectedUnit.GetAbilityContext(new UseAbilityCommand(slot));
             
             button.CooldownIndicator.Value = state.Cooldown;
             button.CooldownIndicator.MaxValue = state.MaxCooldown == 0 ? 1 : state.MaxCooldown;
@@ -123,17 +122,19 @@ public sealed class Hud : Control, IHud
                 SelectedUnit.AbilityUseProgress.NormalizedProgress;
             button.UseProgressIndicator.MaxValue = 1;
             
-            button.HealthCostLabel.Text = Maths.CeilToInt(state.Ability.HealthCost(context)).ToString();
-            button.HealthCostLabel.Visible = state.Ability.HealthCost(context) > 0;
+            double healthCost = state.Ability.StaticHealthCost[state.Level];
+            button.HealthCostLabel.Text = Maths.CeilToInt(healthCost).ToString();
+            button.HealthCostLabel.Visible = healthCost > 0;
             
-            button.ManaCostLabel.Text = Maths.CeilToInt(state.Ability.ManaCost(context)).ToString();
-            button.ManaCostLabel.Visible = state.Ability.ManaCost(context) > 0;
+            double manaCost = state.Ability.StaticManaCost[state.Level];
+            button.ManaCostLabel.Text = Maths.CeilToInt(manaCost).ToString();
+            button.ManaCostLabel.Visible = manaCost > 0;
         }
     }
     
-    private void ProcessStatuses(Unit unit)
+    private void ProcessStatuses(UnitPuppet unit)
     {
-        List<StatusContext> contexts = unit.Statuses.Values
+        List<DeflatedStatusContext> contexts = unit.Statuses
             .OrderBy(it => it.Ordinal)
             .Take(_statusIndicators.Count)
             .ToList();

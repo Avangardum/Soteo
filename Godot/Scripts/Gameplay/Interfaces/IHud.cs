@@ -4,5 +4,5 @@ namespace Soteo.Gameplay.Interfaces;
 
 public interface IHud
 {
-    Unit? SelectedUnit { get; set; }
+    UnitPuppet? SelectedUnit { get; set; }
 }

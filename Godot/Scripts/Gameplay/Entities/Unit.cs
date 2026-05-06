@@ -1,6 +1,4 @@
 using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Dto;
@@ -9,109 +7,33 @@ using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Statuses;
-using Soteo.Gameplay.Util;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class Unit : Entity<UnitNode>
+public abstract class Unit : UnitBase<UnitNode>
 {
-    // Both
-    private readonly IServiceProvider _serviceProvider;
-    // Both
-    private readonly IEntityManager _entityManager;
-    
-    // Both
-    private bool _isMoving;
-    // Server
     private long _nextStatusOrdinal;
     
-    protected Unit(Guid id, UnitNode node, IServiceProvider serviceProvider) :
-        base(id, node, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
-    {
-        _serviceProvider = serviceProvider;
-        _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
-        
-        foreach (Stat stat in Stat.All)
-            StatsInternal[stat] = StatConst[stat].Defalut;
-        
-        Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
-    }
+    protected Unit(Guid id, UnitNode node, IServiceProvider serviceProvider) : base(id, node, serviceProvider) { }
     
-    // Server
-    public static readonly IReadOnlyDictionary<Stat, (double Min, double Defalut, double Max)> StatConst =
-        new Dictionary<Stat, (double, double, double)>
-        {
-            [Stat.MaxHealth] = (0, 1000, 10_000),
-            [Stat.CurrentHealth] = (0, 1000, 10_000),
-            [Stat.HealthRegen] = (double.NegativeInfinity, 2, double.PositiveInfinity),
-            [Stat.ManaRegen] = (double.NegativeInfinity, 2, double.PositiveInfinity),
-            [Stat.MaxMana] = (0, 1000, 10_000),
-            [Stat.CurrentMana] = (0, 1000, 10_000),
-            [Stat.MoveSpeed] = (5, 50, 500),
-            [Stat.TurnSpeed] = (36, 360, 3600),
-            [Stat.AttackDamage] = (0, 50, double.PositiveInfinity),
-            [Stat.AttackSpeed] = (100, 1000, 10_000),
-            [Stat.AttackUseTimeFraction] = (0, 0.5, 1),
-            [Stat.AttackRange] = (10, 100, double.PositiveInfinity),
-            [Stat.AttackProjectileSpeed] = (50, 500, 5000)
-        }.ToImmutableDictionary();
-    
-    // Server
     private Queue<ICommand> Commands { get; } = [];
     
-    // Both
-    private Dictionary<Stat, double> StatsInternal { get; set; } = [];
-    public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
-    
-    // Both
-    protected Dictionary<AbilitySlot, AbilityState> AbilityStatesInternal { get; set; } = [];
-    public IReadOnlyDictionary<AbilitySlot, AbilityState> AbilityStates => AbilityStatesInternal;
-    
-    // Both
-    protected Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
-    public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
-    
-    // Both
-    public AbilityUseProgress? AbilityUseProgress { get; private set; }
-    // Both
-    public Faction Faction { get; }
-
-    // Both
     public override Vector2 Position
     {
         get => base.Position;
         set
         {
             base.Position = value;
-            if (IsRemoved) return;
-            if (IsServer) Node.Position = Position;
-            else UpdateVisualsPosition();
+            Node?.Position = Position;
         }
     }
     
-    // Client
-    private void UpdateVisualsPosition()
-    {
-        if (IsRemoved || IsServer) return;
-        Node.Visuals.Position = RoundVisualPositionToPixelPerfect(Position,
-            Node.Properties.HalfPixelXVisualOffset, Node.Properties.HalfPixelYVisualOffset) - Node.Position;
-    }
+    // todo private
+    protected Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
+    public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
     
-    // Both
-    public override double Azimuth
-    {
-        get => base.Azimuth;
-        set
-        {
-            base.Azimuth = value;
-            if (!IsRemoved && !IsServer)
-                Node.AzimuthIndicator.CalculatePoints(Azimuth, Camera.Required.TrueZoom);
-        }
-    }
-    
-    // Server
     public override EntitySnapshot CreateSnapshot()
     {
         return new UnitSnapshot
@@ -119,7 +41,7 @@ public abstract class Unit : Entity<UnitNode>
             Id = Id,
             Position = Position,
             Azimuth = Azimuth,
-            IsMoving = _isMoving,
+            IsMoving = IsMoving,
             Stats = Stats.ToImmutableDictionary(),
             AbilityStates = AbilityStatesInternal.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress,
@@ -127,33 +49,17 @@ public abstract class Unit : Entity<UnitNode>
         };
     }
 
-    // Both
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {
+        base.ReplicateSnapshot(snapshot);
         var s = (UnitSnapshot)snapshot;
-        
-        Position = s.Position;
-        Azimuth = s.Azimuth;
-        _isMoving = s.IsMoving;
-        StatsInternal = s.Stats.ToDictionary();
-        AbilityStatesInternal = s.AbilityStates.ToDictionary();
-        AbilityUseProgress = s.AbilityUseProgress;
-        StatusesInternal = s.Statuses.ToDictionary(it => it.Key, it => it.Value.Inflate(_serviceProvider));
+        StatusesInternal = s.Statuses.ToDictionary(it => it.Key, it => it.Value.Inflate(ServiceProvider));
         _nextStatusOrdinal = Statuses.Values.Max(it => it.Ordinal) + 1;
-        
-        UpdateAnimation();
     }
 
-    // Client
-    protected override void OnZoomChanged()
+    public virtual void PhysicsProcess(UnitNode node, double delta)
     {
-        UpdateVisualsPosition();
-    }
-
-    // Server
-    public virtual void _PhysicsProcessServer(UnitNode node, double delta)
-    {
-        _isMoving = false;
+        IsMoving = false;
         UpdateStats();
         DecreaseCooldowns(delta);
         ApplyRegen(delta);
@@ -161,7 +67,6 @@ public abstract class Unit : Entity<UnitNode>
         ExecuteCommands(node, delta);
     }
     
-    // Server
     private void DecreaseCooldowns(double delta)
     {
         foreach (AbilitySlot slot in AbilityStatesInternal.Keys.ToList())
@@ -173,14 +78,12 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    // Server
     private void ApplyRegen(double delta)
     {
         ChangeStat(Stat.CurrentHealth, Stats[Stat.HealthRegen] * delta);
         ChangeStat(Stat.CurrentMana, Stats[Stat.ManaRegen] * delta);
     }
     
-    // Server
     private void ProcessStatuses(double delta)
     {
         List<StatusContext> contexts = Statuses.Values.ToList();
@@ -202,7 +105,6 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    // Server
     private double ProcessStatusTickCountdown(StatusContext context, double delta)
     {
         if (context.TickInterval == 0) return 0;
@@ -215,7 +117,6 @@ public abstract class Unit : Entity<UnitNode>
         return countdown;
     }
     
-    // Server
     private void UpdateStats()
     {
         Dictionary<Stat, Dictionary<StatModifierKind, List<StatModifier>>> modifiers = [];
@@ -241,7 +142,6 @@ public abstract class Unit : Entity<UnitNode>
         UpdateResourceStat(Stat.CurrentMana, Stat.MaxMana, oldMaxMana);
     }
 
-    // Server
     private double CalculateStatValue
     (
         Stat stat,
@@ -272,7 +172,6 @@ public abstract class Unit : Entity<UnitNode>
         return Maths.Clamp((StatConst[stat].Defalut + addTotal) * multiplyTotal, maxFloor, minCeiling);
     }
     
-    // Server
     private double ResolveNonOverlappingStatLimits
     (
         IReadOnlyList<StatModifier> floorModifiers,
@@ -300,21 +199,12 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    // Server
     private void UpdateResourceStat(Stat stat, Stat maxStat, double oldMax)
     {
         double normalized = Stats[stat] / oldMax;
         StatsInternal[stat] = Stats[maxStat] * normalized;
     }
     
-    // Client
-    public virtual void _PhysicsProcessClient(UnitNode node, double delta)
-    {
-        node.Position = Position;
-        UpdateVisualsPosition();
-    }
-
-    // Server
     private void ExecuteCommands(UnitNode node, double deltaTime)
     {
         double remainingDeltaTime = deltaTime;
@@ -338,19 +228,16 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    // Server
     private void LookAtPosition(Vector2 position, ref double remainingDeltaTime)
     {
         LookInDirection(position - Position, ref remainingDeltaTime);
     }
     
-    // Server
     private void LookInDirection(Vector2 direction, ref double remainingDeltaTime)
     {
         LookAtAzimuth(Maths.DirectionToAzimuth(direction), ref remainingDeltaTime);
     }
     
-    // Server
     private void LookAtAzimuth(double azimuth, ref double remainingDeltaTime)
     {
         if (remainingDeltaTime == 0 || Stats[Stat.TurnSpeed] == 0) return;
@@ -371,7 +258,6 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    // Server
     private void MoveToPosition(Vector2 position, ref double remainingDeltaTime, UnitNode node)
     {
         LookAtPosition(position, ref remainingDeltaTime);
@@ -398,10 +284,9 @@ public abstract class Unit : Entity<UnitNode>
             MoveAndCollide(movement, node);
             remainingDeltaTime = 0;
         }
-        _isMoving = true;
+        IsMoving = true;
     }
     
-    // Server
     private KinematicCollision2D MoveAndCollide(Vector2 movement, UnitNode node)
     {
         KinematicCollision2D collision = node.MoveAndCollide(movement);
@@ -409,7 +294,6 @@ public abstract class Unit : Entity<UnitNode>
         return collision;
     }
 
-    // Server
     private void UseAbility(UseAbilityCommand command, ref double remainingDeltaTime, UnitNode node)
     {
         if (!AbilityStatesInternal.TryGetValue(command.Slot, out AbilityState? state))
@@ -460,7 +344,25 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    // Server
+    private AbilityContext GetAbilityContext(UseAbilityCommand command)
+    {
+        if (!AbilityStates.TryGetValue(command.Slot, out AbilityState? state))
+            throw new ArgumentException($"Unit {Id} doesn't have an ability in slot {command.Slot}");
+        return new AbilityContext
+        {
+            Ability = state.Ability,
+            Level = state.Level,
+            User = this,
+            UserStats = Stats.ToImmutableDictionary(),
+            ServiceProvider = ServiceProvider,
+            TargetPosition = command.TargetPosition,
+            TargetUnit = command.TargetUnitId == null ? null :
+                EntityManager.GetEntity(command.TargetUnitId.Value) as Unit,
+            TargetDirection = command.TargetDirection,
+            TargetShardId = command.TargetShardId
+        };
+    }
+    
     private void TriggerAbilityEffect(AbilityContext context, UseAbilityCommand command)
     {
         context.Ability.TakeEffect(context);
@@ -475,7 +377,6 @@ public abstract class Unit : Entity<UnitNode>
             Commands.Dequeue();
     }
     
-    // Server
     private void WaitForAbilityCooldown(AbilityContext context, ref double remainingDeltaTime)
     {
         Vector2? targetPosition = context.TargetPosition ?? context.TargetUnit?.Position;
@@ -484,27 +385,6 @@ public abstract class Unit : Entity<UnitNode>
         remainingDeltaTime = 0;
     }
     
-    // Both
-    public AbilityContext GetAbilityContext(UseAbilityCommand command)
-    {
-        if (!AbilityStates.TryGetValue(command.Slot, out AbilityState? state))
-            throw new ArgumentException($"Unit {Id} doesn't have an ability in slot {command.Slot}");
-        return new AbilityContext
-        {
-            Ability = state.Ability,
-            Level = state.Level,
-            User = this,
-            UserStats = Stats.ToImmutableDictionary(),
-            ServiceProvider = _serviceProvider,
-            TargetPosition = command.TargetPosition,
-            TargetUnit = command.TargetUnitId == null ? null :
-                _entityManager.GetEntity(command.TargetUnitId.Value) as Unit,
-            TargetDirection = command.TargetDirection,
-            TargetShardId = command.TargetShardId
-        };
-    }
-    
-    // Server
     /// <summary>
     /// Validate an ability and if validation fails, try to make it pass
     /// </summary>
@@ -544,43 +424,6 @@ public abstract class Unit : Entity<UnitNode>
         return abilityValidationResult;
     }
     
-    // Client
-    private void UpdateAnimation()
-    {
-        if (IsRemoved) return;
-        Node.Sprite.FlipH = Azimuth >= 180;
-        
-        if (AbilityUseProgress != null)
-        {
-            var ability = AbilityStates[AbilityUseProgress.Slot].Ability;
-            Node.Sprite.Animation = ability.Animation;
-            if (ability.LoopAnimation)
-            {
-                Node.Sprite.Animation = ability.Animation;
-                Node.Sprite.SpeedScale = 1;
-            }
-            else
-            {
-                int frameCount = Node.Sprite.Frames.GetFrameCount(ability.Animation);
-                double progress = AbilityUseProgress.NormalizedProgress;
-                Node.Sprite.Frame = Mathf.Min(Maths.FloorToInt(frameCount * progress), frameCount - 1);
-                Node.Sprite.SpeedScale = 0;
-            }
-        }
-        else if (_isMoving)
-        {
-            Node.Sprite.Animation = "Walk Right";
-            const double referenceMoveSpeed = 35;
-            Node.Sprite.SpeedScale = (float)(Stats[Stat.MoveSpeed] / referenceMoveSpeed);
-        }
-        else
-        {
-            Node.Sprite.Animation = "Idle Right";
-            Node.Sprite.SpeedScale = 1;
-        }
-    }
-
-    // Server
     public void SetCommand(ICommand command)
     {
         Commands.Clear();
@@ -589,58 +432,45 @@ public abstract class Unit : Entity<UnitNode>
             AbilityUseProgress = null;
     }
     
-    // Server
     public void CancelCommands()
     {
         Commands.Clear();
         AbilityUseProgress = null;
     }
     
-    // Both
-    public bool IsAlliedTo(Unit other) => Faction != Faction.Neutral && other.Faction == Faction;
-    
-    // Server
     public void SpendHealth(double amount, Ability? ability)
     {
         ChangeStat(Stat.CurrentHealth, -amount);
     }
     
-    // Server
     public void SpendMana(double amount, Ability? ability)
     {
         ChangeStat(Stat.CurrentMana, -amount);
     }
     
-    // Server
     public void TakeDamage(double amount, Unit? source, Ability? ability)
     {
         ChangeStat(Stat.CurrentHealth, -amount);
     }
     
-    // Server
     public void TakeDamage(double amount, StatusContext context) =>
         TakeDamage(amount, context.Source, context.AbilityContext?.Ability);
     
-    // Server
     public void TakeDamage(double amount, AbilityContext context) =>
         TakeDamage(amount, context.User, context.Ability);
     
-    // Server
     public void RestoreHealth(double amount, Unit? source, Ability? ability)
     {
         ChangeStat(Stat.CurrentHealth, amount);
     }
     
-    // Server
     public void RestoreMana(double amount, Unit? source, Ability? ability)
     {
         ChangeStat(Stat.CurrentMana, amount);
     }
     
-    // Server
     protected void ChangeStat(Stat stat, double delta) => SetStat(stat, Stats[stat] + delta);
 
-    // Server
     protected void SetStat(Stat stat, double value)
     {
         if (!stat.IsVolatile)
@@ -655,7 +485,6 @@ public abstract class Unit : Entity<UnitNode>
         StatsInternal[stat] = Maths.Clamp(value, min, max);
     }
     
-    // Server
     public void DealAttackDamageTo(Unit target, Ability ability)
     {
         target.TakeDamage(Stats[Stat.AttackDamage], this, ability);
@@ -663,11 +492,9 @@ public abstract class Unit : Entity<UnitNode>
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
     
-    // Server
     protected void SetAbility<T>(AbilitySlot slot, int level) where T : Ability =>
         SetAbility(Ability.Instance<T>(), slot, level);
     
-    // Server
     protected void SetAbility(Ability ability, AbilitySlot slot, int level)
     {
         if (AbilityStates.ContainsKey(slot))
@@ -681,7 +508,6 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    // Server
     public void AddStatus(Status status, double time, double tickInterval, AbilityContext? abilityContext, Unit? source)
     {
         if (time < 0) throw new ArgumentException();
@@ -699,7 +525,7 @@ public abstract class Unit : Entity<UnitNode>
             RemainingTime = time,
             TickInterval = tickInterval,
             Ordinal = _nextStatusOrdinal++,
-            ServiceProvider = _serviceProvider
+            ServiceProvider = ServiceProvider
         };
         
         List<StatusContext> duplicates = Statuses.Values.Where(it => it.Status == status).ToList();
@@ -734,27 +560,23 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    // Server
     public void AddStatus(Status status, double time, double tickInterval, StatusContext sourceStatusContext)
     {
         AddStatus(status, time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
     }
     
-    // Server
     public void AddStatus<T>(double time, double tickInterval, AbilityContext? abilityContext, Unit? source)
         where T : Status
     {
         AddStatus(Status.Instance<T>(), time, tickInterval, abilityContext, source);
     }
     
-    // Server
     public void AddStatus<T>(double time, double tickInterval, StatusContext sourceStatusContext)
         where T : Status
     {
         AddStatus<T>(time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
     }
 
-    // Server
     private void AddStatusWithoutDuplicateResolution(StatusContext context)
     {
         StatusesInternal[context.Id] = context;
@@ -762,7 +584,6 @@ public abstract class Unit : Entity<UnitNode>
             context.Status.Tick(context);
     }
     
-    // Server
     private void RefreshDuplicateStatuses(StatusContext reference, params IReadOnlyList<StatusContext> targets)
     {
         foreach (StatusContext target in targets)
@@ -777,7 +598,6 @@ public abstract class Unit : Entity<UnitNode>
         }
     }
     
-    // Server
     public void RemoveStatus(Guid id)
     {
         StatusesInternal.Remove(id);

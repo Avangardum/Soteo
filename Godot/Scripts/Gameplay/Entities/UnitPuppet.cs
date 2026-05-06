@@ -1,0 +1,100 @@
+using System.Collections.Immutable;
+using Soteo.Gameplay.Dto;
+using Soteo.Gameplay.Dto.Snapshots;
+using Soteo.Gameplay.EntityNodes;
+using Soteo.Shared;
+using Soteo.Shared.Enums;
+
+namespace Soteo.Gameplay.Entities;
+
+public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
+{
+    public UnitPuppet(Guid id, UnitPuppetNode node, IServiceProvider serviceProvider) :
+        base(id, node, serviceProvider) { }
+    
+    public override Vector2 Position
+    {
+        get => base.Position;
+        set
+        {
+            base.Position = value;
+            UpdateVisualsPosition();
+        }
+    }
+    
+    public override double Azimuth
+    {
+        get => base.Azimuth;
+        set
+        {
+            base.Azimuth = value;
+            Node?.AzimuthIndicator.CalculatePoints(Azimuth, Camera.Required.TrueZoom);
+        }
+    }
+    
+    public IReadOnlyList<DeflatedStatusContext> Statuses { get; private set; }
+    
+    // todo no need for Node.Visuals now
+    private void UpdateVisualsPosition()
+    {
+        Node?.Visuals.Position = RoundVisualPositionToPixelPerfect(Position,
+            Node.Properties.HalfPixelXVisualOffset, Node.Properties.HalfPixelYVisualOffset) - Node.Position;
+    }
+
+    public override EntitySnapshot CreateSnapshot() => throw new InvalidOperationException();
+
+    public override void ReplicateSnapshot(EntitySnapshot snapshot)
+    {
+        base.ReplicateSnapshot(snapshot);
+        var s = (UnitSnapshot)snapshot;
+        Statuses = s.Statuses.Values.ToImmutableList();
+        UpdateAnimation();
+    }
+    
+    protected override void OnZoomChanged()
+    {
+        UpdateVisualsPosition();
+    }
+    
+    // todo remove
+    public void PhysicsProcess(UnitPuppetNode node, double delta)
+    {
+        node.Position = Position;
+        UpdateVisualsPosition();
+    }
+    
+    private void UpdateAnimation()
+    {
+        if (IsRemoved) return;
+        Node.Sprite.FlipH = Azimuth >= 180;
+        
+        if (AbilityUseProgress != null)
+        {
+            var ability = AbilityStates[AbilityUseProgress.Slot].Ability;
+            Node.Sprite.Animation = ability.Animation;
+            if (ability.LoopAnimation)
+            {
+                Node.Sprite.Animation = ability.Animation;
+                Node.Sprite.SpeedScale = 1;
+            }
+            else
+            {
+                int frameCount = Node.Sprite.Frames.GetFrameCount(ability.Animation);
+                double progress = AbilityUseProgress.NormalizedProgress;
+                Node.Sprite.Frame = Mathf.Min(Maths.FloorToInt(frameCount * progress), frameCount - 1);
+                Node.Sprite.SpeedScale = 0;
+            }
+        }
+        else if (IsMoving)
+        {
+            Node.Sprite.Animation = "Walk Right";
+            const double referenceMoveSpeed = 35;
+            Node.Sprite.SpeedScale = (float)(Stats[Stat.MoveSpeed] / referenceMoveSpeed);
+        }
+        else
+        {
+            Node.Sprite.Animation = "Idle Right";
+            Node.Sprite.SpeedScale = 1;
+        }
+    }
+}

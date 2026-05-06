@@ -62,18 +62,18 @@ public sealed class InputHandler : Node2D
     
     private void HandleSelect()
     {
-        Unit? unit = GetUnitsUnderMouse().FirstOrDefault();
-        if (unit == null) return;
-        _hud.SelectedUnit = unit;
+        UnitPuppet? unit = GetUnitsUnderMouse().FirstOrDefault();
+        if (unit != null)
+            _hud.SelectedUnit = unit;
     }
     
     private void HandleInteract()
     {
-        PlayerCharacter? user = _entityLocator.FindEntity<PlayerCharacter>(_currentUserIdRepo.UserId, out _);
+        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.UserId, out _);
         if (user == null) return;
         
-        Unit? targetUnit = GetUnitsUnderMouse().FirstOrDefault(it =>
-            ValidateAbility(user, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
+        UnitPuppet? targetUnit = GetUnitsUnderMouse()
+            .FirstOrDefault(it => ValidateAbility(user, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
         
         if (targetUnit != null)
         {
@@ -88,12 +88,12 @@ public sealed class InputHandler : Node2D
 
     private void HandleUseAbility(AbilitySlot slot)
     {
-        Unit? user = _entityLocator.FindEntity<Unit>(_currentUserIdRepo.UserId, out _);
+        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.UserId, out _);
         if (user == null || !user.AbilityStates.TryGetValue(slot, out AbilityState? state)) return;
 
-        IReadOnlyList<Unit> candidateTargetUnits =
+        IReadOnlyList<UnitPuppet> candidateTargetUnits =
             Input.IsActionPressed("alt") ? [user] : GetUnitsUnderMouse();
-        Unit? targetUnit = candidateTargetUnits
+        UnitPuppet? targetUnit = candidateTargetUnits
             .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
         
         bool canTargetPosition = state.Ability.Targeting.HasFlag(CanTarget.Position);
@@ -103,26 +103,34 @@ public sealed class InputHandler : Node2D
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
     }
 
-    private AbilityValidationResult ValidateAbility(Unit user, AbilitySlot slot, Unit targetUnit) =>
+    private AbilityValidationResult ValidateAbility(UnitPuppet user, AbilitySlot slot, UnitPuppet targetUnit) =>
         ValidateAbility(user, new UseAbilityCommand(slot, TargetUnitId: targetUnit.Id));
     
     private AbilityValidationResult ValidateAbility
     (
-        Unit user,
+        UnitPuppet user,
         UseAbilityCommand command
     )
     {
-        AbilityContext context = user.GetAbilityContext(command);
-        AbilityValidationResult result = user.AbilityStates[command.Slot].Ability.Validate(context);
+        // This method only validates target to select a valid target in a crowd
         
-        // Out of range errors are automatically corrected by a server by moving the character
-        if (result is AbilityValidationResult.OutOfRange or AbilityValidationResult.OutOfAngularRange)
-            return AbilityValidationResult.Ok;
+        AbilityState state = user.AbilityStates[command.Slot];
         
-        return result;
+        if (command.TargetUnitId != null)
+        {
+            UnitPuppet? targetUnit = _entityLocator.FindEntity<UnitPuppet>(command.TargetUnitId.Value, out _);
+            if (targetUnit == null)
+                return AbilityValidationResult.InvalidTarget;
+            if (targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(CanTarget.Ally))
+                return AbilityValidationResult.InvalidTarget;
+            if (!targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(CanTarget.Enemy))
+                return AbilityValidationResult.InvalidTarget;
+        }
+        
+        return AbilityValidationResult.Ok;
     }
 
-    private IReadOnlyList<Unit> GetUnitsUnderMouse()
+    private IReadOnlyList<UnitPuppet> GetUnitsUnderMouse()
     {
         GdArray intersections = GetWorld2d().DirectSpaceState.IntersectPoint
         (
@@ -135,11 +143,11 @@ public sealed class InputHandler : Node2D
         return intersections
             .Cast<Dictionary>()
             .Select(it => (Area2D)it["collider"])
-            .Select(it => it.GetParent() as UnitNode)
+            .Select(it => it.GetParent() as UnitPuppetNode)
             .WhereNotNull()
             .OrderByDescending(it => it.ZIndex)
             .ThenByDescending(it => it.Position.y)
-            .Select(it => it.Unit)
+            .Select(it => it.UnitPuppet)
             .WhereNotNull()
             .ToImmutableList();
     }

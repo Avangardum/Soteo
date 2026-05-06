@@ -18,7 +18,18 @@ public sealed record DeflatedStatusContext
     public required double RemainingTime { get; init; }
     public required double TickInterval { get; init; }
     public required long Ordinal { get; init; }
-        
+    
+    public double DisplayNormalizedRemainingTime
+    {
+        get
+        {
+            if (RemainingTime == double.PositiveInfinity) return 1;
+            double totalDisplayTime = RemainingTime + DisplayElapsedTime;
+            if (totalDisplayTime == 0) return 0;
+            return RemainingTime / totalDisplayTime;
+        }
+    }
+    
     public StatusContext Inflate(IServiceProvider serviceProvider)
     {
         var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
