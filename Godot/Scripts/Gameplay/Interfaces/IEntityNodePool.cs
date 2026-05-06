@@ -6,5 +6,6 @@ public interface IEntityNodePool
 {
     UnitNode GetUnitNode();
     ProjectileNode GetProjectileNode();
+    ProjectilePuppetNode GetProjectilePuppetNode();
     void ReturnNode(IEntityNode node);
 }

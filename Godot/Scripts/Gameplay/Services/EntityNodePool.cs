@@ -11,11 +11,15 @@ public sealed class EntityNodePool : IEntityNodePool
     private static readonly PackedScene ProjectileScene =
         ResourceLoader.Load<PackedScene>("res://Scenes/Entities/Projectile.tscn");
     
+    private static readonly PackedScene ProjectilePuppetScene =
+        ResourceLoader.Load<PackedScene>("res://Scenes/Entities/ProjectilePuppet.tscn");
+    
     private const int PreloadedUnitCount = 1000;
     private const int PreloadedProjectileCount = 1000;
     
     private readonly Stack<UnitNode> _unitNodes = new(PreloadedUnitCount);
     private readonly Stack<ProjectileNode> _projectileNodes = new(PreloadedProjectileCount);
+    private readonly Stack<ProjectilePuppetNode> _projectilePuppetNodes = new();
 
     public EntityNodePool()
     {
@@ -39,6 +43,13 @@ public sealed class EntityNodePool : IEntityNodePool
             return _projectileNodes.Pop();
         return ProjectileScene.Instance<ProjectileNode>();
     }
+    
+    public ProjectilePuppetNode GetProjectilePuppetNode()
+    {
+        if (_projectilePuppetNodes.Count > 0)
+            return _projectilePuppetNodes.Pop();
+        return ProjectilePuppetScene.Instance<ProjectilePuppetNode>();
+    }
 
     public void ReturnNode(IEntityNode node)
     {
@@ -49,6 +60,9 @@ public sealed class EntityNodePool : IEntityNodePool
                 break;
             case ProjectileNode projectile:
                 _projectileNodes.Push(projectile);
+                break;
+            case ProjectilePuppetNode projectilePuppet:
+                _projectilePuppetNodes.Push(projectilePuppet);
                 break;
             default:
                 throw new ArgumentException($"Unknown node type {node.GetType()}");

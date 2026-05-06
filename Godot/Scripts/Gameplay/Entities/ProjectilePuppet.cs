@@ -5,9 +5,9 @@ using Soteo.Gameplay.Util;
 
 namespace Soteo.Gameplay.Entities;
 
-public sealed class ProjectilePuppet : ProjectileBase<ProjectileNode>
+public sealed class ProjectilePuppet : ProjectileBase<ProjectilePuppetNode>
 {
-    public ProjectilePuppet(Guid id, ProjectileNode node, ICamera camera) :
+    public ProjectilePuppet(Guid id, ProjectilePuppetNode node, ICamera camera) :
         base(id, node, ClientDependency.From(camera)) { }
     
     public override Vector2 Position

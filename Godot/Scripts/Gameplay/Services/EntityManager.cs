@@ -63,7 +63,7 @@ public sealed class EntityManager : Node, IEntityManager
         return snapshot switch
         {
             UnitSnapshot s => Add(new PlayerCharacter(s, GetUnitNode(snapshot.Id), _serviceProvider)),
-            ProjectileSnapshot s => Add(new ProjectilePuppet(s.Id, GetProjectileNode(s.Id), _camera.Required))
+            ProjectileSnapshot s => Add(new ProjectilePuppet(s.Id, GetProjectilePuppetNode(s.Id), _camera.Required))
         };
     }
     
@@ -101,6 +101,16 @@ public sealed class EntityManager : Node, IEntityManager
     private ProjectileNode GetProjectileNode(Guid id)
     {
         ProjectileNode node = _entityNodePool.GetProjectileNode();
+        node.Name = $"Projectile {id}";
+        _shard.EntityRoot.AddChild(node);
+        _entityNodes[id] = node;
+        return node;
+    }
+    
+    // todo refactor with generic type
+    private ProjectilePuppetNode GetProjectilePuppetNode(Guid id)
+    {
+        ProjectilePuppetNode node = _entityNodePool.GetProjectilePuppetNode();
         node.Name = $"Projectile {id}";
         _shard.EntityRoot.AddChild(node);
         _entityNodes[id] = node;

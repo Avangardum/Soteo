@@ -13,18 +13,11 @@ public sealed class ProjectileNode : Area2D, IEntityNode
     public IEntity? Entity
     {
         get => Projectile;
-        set => Projectile = value as Projectile; // todo strict cast
-    }
-    
-    public EntityProperties Properties { get; private set; } = null!;
-
-    public override void _Ready()
-    {
-        Properties = GetNode<EntityProperties>("Properties");
+        set => Projectile = (Projectile?)value;
     }
 
     public override void _PhysicsProcess(float delta)
     {
-        if (IsServer) Projectile?.PhysicsProcess(this, delta);
+        Projectile?.PhysicsProcess(this, delta);
     }
 }
