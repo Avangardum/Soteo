@@ -11,6 +11,7 @@ namespace Soteo.Gameplay.Entities;
 
 public abstract class Projectile : Entity<ProjectileNode>
 {
+    // Server
     private readonly IServiceProvider _serviceProvider;
     
     protected Projectile
@@ -27,6 +28,7 @@ public abstract class Projectile : Entity<ProjectileNode>
         _serviceProvider = serviceProvider;
     }
 
+    // Both
     public override Vector2 Position
     {
         get;
@@ -50,9 +52,12 @@ public abstract class Projectile : Entity<ProjectileNode>
         }
     }
     
+    // Server
     protected AbilityContext AbilityContext { get; private set; }
+    // Server
     protected double Speed { get; private set; }
     
+    // Server
     public override EntitySnapshot CreateSnapshot()
     {
         return new ProjectileSnapshot
@@ -64,7 +69,8 @@ public abstract class Projectile : Entity<ProjectileNode>
             Speed = Speed
         };
     }
-
+    
+    // Both
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {
         var s = (ProjectileSnapshot)snapshot;
@@ -74,8 +80,10 @@ public abstract class Projectile : Entity<ProjectileNode>
         Speed = s.Speed;
     }
     
+    // Server
     public virtual void _PhysicsProcessServer(ProjectileNode node, double delta) { }
 
+    // Client
     protected override void OnZoomChanged()
     {
         // todo

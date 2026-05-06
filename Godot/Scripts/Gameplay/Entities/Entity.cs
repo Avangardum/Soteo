@@ -19,19 +19,29 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
         Camera.Value?.ZoomChanged += OnZoomChanged;
     }
 
+    // Both
     public event Action Removed = delegate {};
 
+    // Client
     protected ClientDependency<ICamera> Camera { get; }
+    // Both
     [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
+    // Both
     protected TNode? Node { get; private set; }
+    // Both
     public Guid Id { get; }
+    // Both
     public abstract Vector2 Position { get; set; }
+    // Both
     public virtual double Azimuth { get; set => field = Maths.PosMod(value, 360); }
 
+    // Server
     public abstract EntitySnapshot CreateSnapshot();
 
+    // Both
     public abstract void ReplicateSnapshot(EntitySnapshot snapshot);
 
+    // Both
     public void Remove()
     {
         if (IsRemoved) return;
@@ -42,8 +52,10 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
         Removed();
     }
     
+    // Client
     protected abstract void OnZoomChanged();
     
+    // Client
     /// <summary>
     /// Round a visual position value to a value that will allow pixel perfect rendering without artifacts due to
     /// the sprite's pixels having noninteger position, therefore rendering between screen pixels
