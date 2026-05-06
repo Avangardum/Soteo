@@ -23,9 +23,9 @@ public sealed class TargetedProjectile : Projectile
         this(snapshot.Id, null!, snapshot.Speed, node, serviceProvider) { }
 
     // Server
-    public override void _PhysicsProcessServer(ProjectileNode node, double delta)
+    public override void PhysicsProcess(ProjectileNode node, double delta)
     {
-        base._PhysicsProcessServer(node, delta);
+        base.PhysicsProcess(node, delta);
         
         if (_didHit)
         {

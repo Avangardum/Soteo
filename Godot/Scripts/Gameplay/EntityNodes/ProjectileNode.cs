@@ -25,6 +25,6 @@ public sealed class ProjectileNode : Area2D, IEntityNode
 
     public override void _PhysicsProcess(float delta)
     {
-        if (IsServer) Projectile?._PhysicsProcessServer(this, delta);
+        if (IsServer) Projectile?.PhysicsProcess(this, delta);
     }
 }

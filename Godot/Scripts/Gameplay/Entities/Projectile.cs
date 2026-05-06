@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Dto.Snapshots;
@@ -9,9 +8,8 @@ using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class Projectile : Entity<ProjectileNode>
+public abstract class Projectile : ProjectileBase<ProjectileNode>
 {
-    // Server
     private readonly IServiceProvider _serviceProvider;
     
     protected Projectile
@@ -28,36 +26,19 @@ public abstract class Projectile : Entity<ProjectileNode>
         _serviceProvider = serviceProvider;
     }
 
-    // Both
     public override Vector2 Position
     {
-        get;
+        get => base.Position;
         set
         {
-            field = value;
-            if (IsRemoved) return;
-            if (IsServer)
-            {
-                Node.Position = value;
-            }
-            else
-            {
-                Node.Position = RoundVisualPositionToPixelPerfect
-                (
-                    value,
-                    Node.Properties.HalfPixelXVisualOffset,
-                    Node.Properties.HalfPixelYVisualOffset
-                );
-            }
+            base.Position = value;
+            Node?.Position = value;
         }
     }
     
-    // Server
     protected AbilityContext AbilityContext { get; private set; }
-    // Server
     protected double Speed { get; private set; }
     
-    // Server
     public override EntitySnapshot CreateSnapshot()
     {
         return new ProjectileSnapshot
@@ -69,23 +50,14 @@ public abstract class Projectile : Entity<ProjectileNode>
             Speed = Speed
         };
     }
-    
-    // Both
+
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {
+        base.ReplicateSnapshot(snapshot);
         var s = (ProjectileSnapshot)snapshot;
-        Position = s.Position;
-        Azimuth = s.Azimuth;
         AbilityContext = s.AbilityContext.Inflate(_serviceProvider);
         Speed = s.Speed;
     }
-    
-    // Server
-    public virtual void _PhysicsProcessServer(ProjectileNode node, double delta) { }
 
-    // Client
-    protected override void OnZoomChanged()
-    {
-        // todo
-    }
+    public virtual void PhysicsProcess(ProjectileNode node, double delta) { }
 }

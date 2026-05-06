@@ -31,7 +31,7 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
     // Both
     public Guid Id { get; }
     // Both
-    public abstract Vector2 Position { get; set; }
+    public virtual Vector2 Position { get; set; }
     // Both
     public virtual double Azimuth { get; set => field = Maths.PosMod(value, 360); }
 
@@ -53,7 +53,7 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
     }
     
     // Client
-    protected abstract void OnZoomChanged();
+    protected virtual void OnZoomChanged() { }
     
     // Client
     /// <summary>

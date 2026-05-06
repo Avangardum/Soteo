@@ -81,10 +81,10 @@ public abstract class Unit : Entity<UnitNode>
     // Both
     public override Vector2 Position
     {
-        get;
+        get => base.Position;
         set
         {
-            field = value;
+            base.Position = value;
             if (IsRemoved) return;
             if (IsServer) Node.Position = Position;
             else UpdateVisualsPosition();
