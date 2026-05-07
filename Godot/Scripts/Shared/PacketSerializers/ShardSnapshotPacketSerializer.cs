@@ -1,9 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Gameplay;
-using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Dto.Snapshots;
-using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Packets;
 

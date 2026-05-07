@@ -21,5 +21,5 @@ public static class DictionaryDelta
 public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
 {
     public IReadOnlyDictionary<TKey, TValue> Changes { get; init; } = ImmutableDictionary<TKey, TValue>.Empty;
-    public IList<TKey> RemovedKeys { get; init; } = [];
+    public IReadOnlyList<TKey> RemovedKeys { get; init; } = [];
 }
