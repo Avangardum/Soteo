@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Text;
 using Soteo.Gameplay.Abilities;
+using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Statuses;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Exceptions;
@@ -356,4 +357,61 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
     protected void SerializeStatus(Status value, Stream stream) => SerializeInt(value.Id, stream);
     
     protected Status DeserializeStatus(Stream stream) => Status.All[DeserializeInt(stream)];
+    
+    protected void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
+    {
+        SerializeGuid(value.Id, stream);
+        SerializeStatus(value.Status, stream);
+        SerializeDouble(value.DisplayElapsedTime, stream);
+        SerializeDouble(value.RemainingTime, stream);
+        SerializeLong(value.Ordinal, stream);
+    }
+    
+    protected PuppetStatusContext DeserializePuppetStatusContext(Stream stream)
+    {
+        return new PuppetStatusContext
+        {
+            Id = DeserializeGuid(stream),
+            Status = DeserializeStatus(stream),
+            DisplayElapsedTime = DeserializeDouble(stream),
+            RemainingTime = DeserializeDouble(stream),
+            Ordinal = DeserializeLong(stream)
+        };
+    }
+    
+    protected void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream)
+    {
+        SerializeEnum(value.Slot, stream);
+        SerializeDouble(value.ElapsedTime, stream);
+        SerializeDouble(value.RemainingTime, stream);
+    }
+    
+    protected AbilityUseProgress DeserializeAbilityUseProgress(Stream stream)
+    {
+        return new AbilityUseProgress
+        {
+            Slot = DeserializeEnum<AbilitySlot>(stream),
+            ElapsedTime = DeserializeDouble(stream),
+            RemainingTime = DeserializeDouble(stream)
+        };
+    }
+    
+    protected void SerializeAbilitySlotState(AbilitySlotState value, Stream stream)
+    {
+        SerializeInt(value.Ability.Id, stream);
+        SerializeInt(value.Level, stream);
+        SerializeDouble(value.Cooldown, stream);
+        SerializeDouble(value.MaxCooldown, stream);
+    }
+    
+    protected AbilitySlotState DeserializeAbilitySlotState(Stream stream)
+    {
+        return new AbilitySlotState
+        {
+            Ability = Ability.All[DeserializeInt(stream)],
+            Level = DeserializeInt(stream),
+            Cooldown = DeserializeDouble(stream),
+            MaxCooldown = DeserializeDouble(stream)
+        };
+    }
 }

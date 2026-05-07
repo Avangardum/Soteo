@@ -165,25 +165,6 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Azimuth = DeserializeDouble(stream)
         };
     }
-
-    private void SerializeAbilitySlotState(AbilitySlotState value, Stream stream)
-    {
-        SerializeInt(value.Ability.Id, stream);
-        SerializeInt(value.Level, stream);
-        SerializeDouble(value.Cooldown, stream);
-        SerializeDouble(value.MaxCooldown, stream);
-    }
-    
-    private AbilitySlotState DeserializeAbilitySlotState(Stream stream)
-    {
-        return new AbilitySlotState
-        {
-            Ability = Ability.All[DeserializeInt(stream)],
-            Level = DeserializeInt(stream),
-            Cooldown = DeserializeDouble(stream),
-            MaxCooldown = DeserializeDouble(stream)
-        };
-    }
     
     private void SerializeAbilityContext(DeflatedAbilityContext context, Stream stream)
     {
@@ -209,23 +190,6 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             TargetUnitId = DeserializeNullableStruct(DeserializeGuid, stream),
             TargetDirection = DeserializeNullableStruct(DeserializeVector2, stream),
             TargetShardId = DeserializeNullableStruct(DeserializeGuid, stream)
-        };
-    }
-    
-    private void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream)
-    {
-        SerializeEnum(value.Slot, stream);
-        SerializeDouble(value.ElapsedTime, stream);
-        SerializeDouble(value.RemainingTime, stream);
-    }
-    
-    private AbilityUseProgress DeserializeAbilityUseProgress(Stream stream)
-    {
-        return new AbilityUseProgress
-        {
-            Slot = DeserializeEnum<AbilitySlot>(stream),
-            ElapsedTime = DeserializeDouble(stream),
-            RemainingTime = DeserializeDouble(stream)
         };
     }
     
@@ -256,27 +220,6 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
             TickInterval = DeserializeDouble(stream),
-            Ordinal = DeserializeLong(stream)
-        };
-    }
-    
-    private void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
-    {
-        SerializeGuid(value.Id, stream);
-        SerializeStatus(value.Status, stream);
-        SerializeDouble(value.DisplayElapsedTime, stream);
-        SerializeDouble(value.RemainingTime, stream);
-        SerializeLong(value.Ordinal, stream);
-    }
-    
-    private PuppetStatusContext DeserializePuppetStatusContext(Stream stream)
-    {
-        return new PuppetStatusContext
-        {
-            Id = DeserializeGuid(stream),
-            Status = DeserializeStatus(stream),
-            DisplayElapsedTime = DeserializeDouble(stream),
-            RemainingTime = DeserializeDouble(stream),
             Ordinal = DeserializeLong(stream)
         };
     }
