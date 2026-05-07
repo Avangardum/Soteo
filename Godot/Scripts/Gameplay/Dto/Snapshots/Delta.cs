@@ -1,8 +1,15 @@
 namespace Soteo.Gameplay.Dto.Snapshots;
 
+public static class Delta
+{
+    public static Delta<T> Between<T>(T from, T to) => Equals(from, to) ? Delta<T>.Unchanged : to;
+}
+
 public readonly record struct Delta<T>
 {
-    private Delta(T newValue)
+    public static readonly Delta<T> Unchanged = default;
+    
+    public Delta(T newValue)
     {
         HasChanged = true;
         NewValue = newValue;
