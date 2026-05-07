@@ -41,7 +41,7 @@ public sealed class EntityManager : Node, IEntityManager
     public void ReplicateSnapshotEntities(ShardSnapshot snapshot)
     {
         List<Guid> ids = [];
-        foreach (EntitySnapshot entitySnapshot in snapshot.Entities)
+        foreach (EntitySnapshot entitySnapshot in snapshot.Entities.Values)
         {
             ids.Add(entitySnapshot.Id);
             if (GetEntity(entitySnapshot.Id) == null) SpawnEntityFromSnapshot(entitySnapshot);
@@ -50,7 +50,7 @@ public sealed class EntityManager : Node, IEntityManager
         {
             _entities[id].Remove();
         }
-        foreach (EntitySnapshot entitySnapshot in snapshot.Entities)
+        foreach (EntitySnapshot entitySnapshot in snapshot.Entities.Values)
         {
             // Entity snapshots are replicated only after all entities are spawned so that references between entities
             // can be replicated correctly.

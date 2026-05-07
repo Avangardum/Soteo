@@ -10,4 +10,5 @@ public interface ISynchronizationClient
     IReadOnlyList<double> ServerLoadHistory { get; }
     
     void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet);
+    void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet);
 }

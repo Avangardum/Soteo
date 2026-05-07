@@ -3,7 +3,7 @@ using static Soteo.Shared.Maths;
 
 namespace Soteo.Gameplay.Dto.Snapshots;
 
-public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
+public record UnitPuppetSnapshot : PuppetEntitySnapshot<UnitPuppetSnapshot>
 {
     public required bool IsMoving { get; init; }
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
@@ -47,6 +47,38 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
         {
             ElapsedTime = LerpIncrease(from.ElapsedTime, to.ElapsedTime, weight),
             RemainingTime = LerpDecrease(from.RemainingTime, to.RemainingTime, weight)
+        };
+    }
+
+    public override EntitySnapshotDelta DeltaFrom(UnitPuppetSnapshot? from)
+    {
+        if (from == null)
+        {
+            return new UnitPuppetSnapshotDelta
+            {
+                Id = Id,
+                Position = Position,
+                Azimuth = Azimuth,
+                IsMoving = IsMoving,
+                Stats = DictionaryDelta.FromNewDictionary(Stats),
+                AbilitySlotStates = DictionaryDelta.FromNewDictionary(AbilitySlotStates),
+                AbilityUseProgress = AbilityUseProgress,
+                Statuses = DictionaryDelta.FromNewDictionary(Statuses)
+            };
+        }
+        
+        if (from.Id != Id) throw new InvalidOperationException();
+        
+        return new UnitPuppetSnapshotDelta
+        {
+            Id = Id,
+            Position = Delta.Between(from.Position, Position),
+            Azimuth = Delta.Between(from.Azimuth, Azimuth),
+            IsMoving = Delta.Between(from.IsMoving, IsMoving),
+            Stats = DictionaryDelta.Between(from.Stats, Stats),
+            AbilitySlotStates = DictionaryDelta.Between(from.AbilitySlotStates, AbilitySlotStates),
+            AbilityUseProgress = Delta.Between(from.AbilityUseProgress, AbilityUseProgress),
+            Statuses = DictionaryDelta.Between(from.Statuses, Statuses)
         };
     }
 }

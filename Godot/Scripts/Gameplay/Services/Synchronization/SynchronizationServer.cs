@@ -14,6 +14,7 @@ public sealed class SynchronizationServer : Node
     
     private long _tick;
     private double _tickInterval;
+    private ShardSnapshot? _prevShardSnapshot;
     
     public SynchronizationServer(IEntityManager entityManager, IPacketSender packetSender)
     {
@@ -38,14 +39,28 @@ public sealed class SynchronizationServer : Node
 
     public override void _PhysicsProcess(float delta)
     {
-        ImmutableList<EntitySnapshot> entitySnapshots = _entityManager.Entities.Values
-            .Select(it => it.CreateSnapshot().ToPuppet())
-            .ToImmutableList();
+        ImmutableDictionary<Guid, EntitySnapshot> entitySnapshots = _entityManager.Entities.Values
+            .ToImmutableDictionary(it => it.Id, it => it.CreateSnapshot().ToPuppet());
         
         var shardSnapshot = new ShardSnapshot { Entities = entitySnapshots };
+        ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
+            ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
+        _prevShardSnapshot = shardSnapshot;
         double serverLoad = FrameStopwatch.Instance.ElapsedSincePhysicsProcess / _tickInterval;
-        var packet = new ShardSnapshotPacket { Tick = _tick, ServerLoad = serverLoad, Snapshot = shardSnapshot };
-        _packetSender.BroadcastUnreliable(packet);
+        var shardSnapshotPacket =
+            new ShardSnapshotPacket { Tick = _tick, ServerLoad = serverLoad, Snapshot = shardSnapshot };
+        _packetSender.BroadcastReliable(shardSnapshotPacket);
+        
+        if (shardSnapshotDelta != null)
+        {
+            var shardSnapshotDeltaPacket = new ShardSnapshotDeltaPacket
+            {
+                Tick = _tick,
+                ServerLoad = serverLoad,
+                SnapshotDelta = shardSnapshotDelta
+            };
+            _packetSender.BroadcastReliable(shardSnapshotDeltaPacket);
+        }
         
         _tick++;
     }

@@ -148,7 +148,12 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         
         if (packet.Tick > _lastSnapshotTick) _lastSnapshotTick = packet.Tick;
     }
-    
+
+    public void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet)
+    {
+        
+    }
+
     private void ReplicateSnapshot(ShardSnapshot snapshot)
     {
         _entityManager.ReplicateSnapshotEntities(snapshot);

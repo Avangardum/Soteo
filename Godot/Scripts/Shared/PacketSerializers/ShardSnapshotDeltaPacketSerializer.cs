@@ -18,7 +18,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
         base.SerializeInternal(packet, stream);
         SerializeLong(packet.Tick, stream);
         SerializeDouble(packet.ServerLoad, stream);
-        SerializeShard(packet.SnapshotDelta, stream);
+        SerializeDictionaryDelta(packet.SnapshotDelta.Entities, SerializeGuid, SerializeEntityDelta, stream);
     }
 
     protected override ShardSnapshotDeltaPacket DeserializeInternal(Stream stream)
@@ -26,21 +26,10 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
         var packet = base.DeserializeInternal(stream);
         packet.Tick = DeserializeLong(stream);
         packet.ServerLoad = DeserializeDouble(stream);
-        packet.SnapshotDelta = DeserializeShard(stream);
+        DictionaryDelta<Guid, EntitySnapshotDelta> entities =
+            DeserializeDictionaryDelta(DeserializeGuid, DeserializeEntityDelta, stream);
+        packet.SnapshotDelta = new ShardSnapshotDelta { Entities = entities };
         return packet;
-    }
-
-    private void SerializeShard(ShardSnapshotDelta delta, Stream stream)
-    {
-        SerializeList(delta.Entities, SerializeEntityDelta, stream);
-    }
-
-    private ShardSnapshotDelta DeserializeShard(Stream stream)
-    {
-        return new ShardSnapshotDelta
-        {
-            Entities = DeserializeList(DeserializeEntityDelta, stream)
-        };
     }
 
     private void SerializeEntityDelta(EntitySnapshotDelta entity, Stream stream)

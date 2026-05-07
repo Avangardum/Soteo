@@ -4,7 +4,7 @@ using Soteo.Shared.Enums;
 
 namespace Soteo.Shared.Packets;
 
-[PacketType(PacketType.ShardSnapshot)]
+[PacketType(PacketType.ShardSnapshotDelta)]
 public sealed record ShardSnapshotDeltaPacket : Packet
 {
     public long Tick { get; set; }

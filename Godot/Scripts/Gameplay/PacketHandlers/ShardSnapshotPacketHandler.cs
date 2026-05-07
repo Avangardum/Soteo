@@ -3,11 +3,11 @@ using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.PacketHandlers;
 
-public sealed class ShardSnapshotPacketHandler(ISynchronizationClient receiver) :
+public sealed class ShardSnapshotPacketHandler(ISynchronizationClient synchronizationClient) :
     PacketHandler<ShardSnapshotPacket>
 {
     protected override void Handle(ShardSnapshotPacket packet, Guid senderId)
     {
-        receiver.ReceiveShardSnapshotPacket(packet);
+        synchronizationClient.ReceiveShardSnapshotPacket(packet);
     }
 }

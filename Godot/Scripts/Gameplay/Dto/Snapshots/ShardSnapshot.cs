@@ -4,18 +4,19 @@ namespace Soteo.Gameplay.Dto.Snapshots;
 
 public sealed record ShardSnapshot
 {
-    public required IReadOnlyList<EntitySnapshot> Entities { get; init; }
+    public required IReadOnlyDictionary<Guid, EntitySnapshot> Entities { get; init; }
     
     public ShardSnapshot Interpolate(ShardSnapshot to, double weight)
     {
         ShardSnapshot from = this;
-        ImmutableDictionary<Guid, EntitySnapshot> fromEntities = from.Entities.ToImmutableDictionary(it => it.Id);
         
         return new ShardSnapshot
         {
-            Entities = to.Entities
-                .Select(t => fromEntities.TryGetValue(t.Id, out EntitySnapshot? f) ? f.Interpolate(t, weight) : t)
-                .ToImmutableList()
+            Entities = to.Entities.ToImmutableDictionary
+            (
+                t => t.Key,
+                t => from.Entities.TryGetValue(t.Key, out EntitySnapshot? f) ? f.Interpolate(t.Value, weight) : t.Value
+            )
         };
     }
 }
