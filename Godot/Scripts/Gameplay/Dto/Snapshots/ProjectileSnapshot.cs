@@ -14,4 +14,7 @@ public sealed record ProjectileSnapshot : EntitySnapshot<ProjectileSnapshot>
             Azimuth = Azimuth
         };
     }
+    
+    public override EntitySnapshotDelta DeltaFrom(ProjectileSnapshot? from) =>
+        throw new NotSupportedException();
 }

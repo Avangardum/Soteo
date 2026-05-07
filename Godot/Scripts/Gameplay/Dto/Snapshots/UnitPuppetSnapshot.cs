@@ -3,7 +3,7 @@ using static Soteo.Shared.Maths;
 
 namespace Soteo.Gameplay.Dto.Snapshots;
 
-public record UnitPuppetSnapshot : PuppetEntitySnapshot<UnitPuppetSnapshot>
+public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
 {
     public required bool IsMoving { get; init; }
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
@@ -67,7 +67,7 @@ public record UnitPuppetSnapshot : PuppetEntitySnapshot<UnitPuppetSnapshot>
             };
         }
         
-        if (from.Id != Id) throw new InvalidOperationException();
+        if (from.Id != Id) throw new ArgumentException();
         
         return new UnitPuppetSnapshotDelta
         {

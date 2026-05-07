@@ -13,8 +13,8 @@ public sealed record ShardSnapshotDelta
         {
             Entities = new DictionaryDelta<Guid, EntitySnapshotDelta>
             {
-                Changes = to.Entities
-                    .Select(it => ((IPuppetEntitySnapshot)it.Value).DeltaFrom((IPuppetEntitySnapshot?)from.Entities.GetOrDefault(it.Key)))
+                Changes = to.Entities.Values
+                    .Select(it => it.DeltaFrom(from.Entities.GetOrDefault(it.Id)))
                     .Where(it => it.HasChanged)
                     .ToImmutableDictionary(it => it.Id, it => it),
                 RemovedKeys = from.Entities.Keys.Except(to.Entities.Keys).ToImmutableList()

@@ -18,7 +18,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
         base.SerializeInternal(packet, stream);
         SerializeLong(packet.Tick, stream);
         SerializeDouble(packet.ServerLoad, stream);
-        SerializeDictionaryDelta(packet.SnapshotDelta.Entities, SerializeGuid, SerializeEntityDelta, stream);
+        SerializeIndexedDictionaryDelta(packet.SnapshotDelta.Entities, SerializeGuid, SerializeEntityDelta, stream);
     }
 
     protected override ShardSnapshotDeltaPacket DeserializeInternal(Stream stream)
@@ -27,7 +27,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
         packet.Tick = DeserializeLong(stream);
         packet.ServerLoad = DeserializeDouble(stream);
         DictionaryDelta<Guid, EntitySnapshotDelta> entities =
-            DeserializeDictionaryDelta(DeserializeGuid, DeserializeEntityDelta, stream);
+            DeserializeIndexedDictionaryDelta(DeserializeGuid, DeserializeEntityDelta, it => it.Id, stream);
         packet.SnapshotDelta = new ShardSnapshotDelta { Entities = entities };
         return packet;
     }
@@ -152,7 +152,32 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
     ) where TKey : notnull
     {
         var changes = DeserializeDictionary(deserializeKey, deserializeValue, stream);
-        var removedKeys = DeserializeList(deserializeKey, stream).ToImmutableList();
+        var removedKeys = DeserializeList(deserializeKey, stream);
+        return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
+    }
+    
+    private void SerializeIndexedDictionaryDelta<TKey, TValue>
+    (
+        DictionaryDelta<TKey, TValue> delta,
+        Serializer<TKey> serializeKey,
+        Serializer<TValue> serializeValue,
+        Stream stream
+    ) where TKey : notnull
+    {
+        SerializeIndexedDictionary(delta.Changes, serializeValue, stream);
+        SerializeList(delta.RemovedKeys, serializeKey, stream);
+    }
+    
+    private DictionaryDelta<TKey, TValue> DeserializeIndexedDictionaryDelta<TKey, TValue>
+    (
+        Deserializer<TKey> deserializeKey,
+        Deserializer<TValue> deserializeValue,
+        Func<TValue, TKey> keySelector,
+        Stream stream
+    ) where TKey : notnull
+    {
+        var changes = DeserializeIndexedDictionary(deserializeValue, keySelector, stream);
+        var removedKeys = DeserializeList(deserializeKey, stream);
         return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
     }
 }

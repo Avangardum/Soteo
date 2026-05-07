@@ -1,6 +1,6 @@
 namespace Soteo.Gameplay.Dto.Snapshots;
 
-public sealed record ProjectilePuppetSnapshot : PuppetEntitySnapshot<ProjectilePuppetSnapshot>
+public sealed record ProjectilePuppetSnapshot : EntitySnapshot<ProjectilePuppetSnapshot>
 {
     public override EntitySnapshotDelta DeltaFrom(ProjectilePuppetSnapshot? from)
     {

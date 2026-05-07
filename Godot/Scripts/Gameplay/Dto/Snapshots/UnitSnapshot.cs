@@ -25,4 +25,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToPuppet()),
         };
     }
+
+    public override EntitySnapshotDelta DeltaFrom(UnitSnapshot? from) =>
+        throw new NotSupportedException();
 }

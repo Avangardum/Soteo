@@ -12,6 +12,8 @@ public abstract record EntitySnapshot
     public abstract EntitySnapshot Interpolate(EntitySnapshot to, double weight);
     
     public virtual EntitySnapshot ToPuppet() => this;
+    
+    public abstract EntitySnapshotDelta DeltaFrom(EntitySnapshot? from);
 }
 
 public abstract record EntitySnapshot<T> : EntitySnapshot where T : EntitySnapshot<T>
@@ -28,4 +30,8 @@ public abstract record EntitySnapshot<T> : EntitySnapshot where T : EntitySnapsh
     }
 
     public sealed override EntitySnapshot Interpolate(EntitySnapshot to, double weight) => Interpolate((T)to, weight);
+    
+    public abstract EntitySnapshotDelta DeltaFrom(T? from);
+
+    public sealed override EntitySnapshotDelta DeltaFrom(EntitySnapshot? from) => DeltaFrom((T?)from);
 }
