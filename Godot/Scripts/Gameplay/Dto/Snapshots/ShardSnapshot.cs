@@ -4,7 +4,7 @@ namespace Soteo.Gameplay.Dto.Snapshots;
 
 public sealed record ShardSnapshot
 {
-    public required ImmutableList<EntitySnapshot> Entities { get; init; }
+    public required IReadOnlyList<EntitySnapshot> Entities { get; init; }
     
     public ShardSnapshot Interpolate(ShardSnapshot to, double weight)
     {

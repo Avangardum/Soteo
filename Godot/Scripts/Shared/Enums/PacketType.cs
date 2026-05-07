@@ -18,5 +18,6 @@ public enum PacketType : byte
     UseAbility,
     Stop,
     // Shard Server --> Client
-    ShardSnapshot
+    ShardSnapshot,
+    ShardSnapshotDelta,
 }
