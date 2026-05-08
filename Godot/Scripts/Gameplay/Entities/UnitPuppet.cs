@@ -67,11 +67,6 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
             IsMoving = d.IsMoving.NewValue;
         d.Stats.MutateDictionary(StatsInternal, interpolationWeight, Maths.Lerp);
         d.AbilitySlotStates.MutateDictionary(AbilitySlotStatesInternal, interpolationWeight, AbilitySlotState.Interpolate);
-        // if (d.AbilityUseProgress.HasChanged)
-        // {
-        //     AbilityUseProgress = Maths.InterpolateNullable(
-        //         AbilityUseProgress, d.AbilityUseProgress.NewValue, interpolationWeight, AbilityUseProgress.Lerp);
-        // }
         d.AbilityUseProgress.MutateValue
         (
             () => AbilityUseProgress,

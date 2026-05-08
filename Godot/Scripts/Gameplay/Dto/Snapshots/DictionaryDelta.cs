@@ -33,18 +33,18 @@ public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
     
     public bool HasChanged => Changes.Count > 0 || RemovedKeys.Count > 0;
     
-     public void MutateDictionary
-     (
-         IDictionary<TKey, TValue> dictionary,
-         double interpolationWeight,
-         Func<TValue, TValue, double, TValue> interpolateValue
-     )
-     {
-         foreach ((TKey key, TValue newValue) in Changes)
-             dictionary[key] = dictionary.TryGetValue(key, out TValue? oldValue) ?
-                 interpolateValue(oldValue, newValue, interpolationWeight) : newValue;
-     
-         foreach (TKey key in RemovedKeys)
-             dictionary.Remove(key);
-     }
+    public void MutateDictionary
+    (
+        IDictionary<TKey, TValue> dictionary,
+        double interpolationWeight,
+        Func<TValue, TValue, double, TValue> interpolateValue
+    )
+    {
+        foreach ((TKey key, TValue newValue) in Changes)
+            dictionary[key] = dictionary.TryGetValue(key, out TValue? oldValue) ?
+                interpolateValue(oldValue, newValue, interpolationWeight) : newValue;
+    
+        foreach (TKey key in RemovedKeys)
+            dictionary.Remove(key);
+    }
 }
