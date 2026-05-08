@@ -78,7 +78,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     {
         if (State != StateEnum.Synchronized && !TrySynchronize()) return;
         
-        if (_syncData.DeltaRingEarliestValidTick > Maths.CeilToInt(_syncData.Tick!.Value))
+        if (_syncData.DeltaRingEarliestValidTick > Maths.CeilToLong(_syncData.Tick!.Value))
         {
             State = StateEnum.Desynchronized;
             return;
