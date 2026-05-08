@@ -131,6 +131,30 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         return true;
     }
 
+    private void ReplicateSnapshot(ShardSnapshot snapshot)
+    {
+        _entityManager.ReplicateSnapshotEntities(snapshot);
+    }
+
+    private void WriteDeltaToLastSnapshotTickHistory()
+    {
+        double deltaToLastSnapshotTick = _lastSnapshotTick - _tick;
+        if (deltaToLastSnapshotTick < _deltaToLastSnapshotTickHistoryRing.RingGet((long)_second))
+            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, deltaToLastSnapshotTick);
+    }
+
+    private void TryFastForward()
+    {
+        if (_deltaToLastSnapshotTickHistoryRing.All(it => it > _deltaToLastSnapshotTickMinValueToFastForward))
+        {
+            double minDelta = _deltaToLastSnapshotTickHistoryRing.Min();
+            double fastForwardTicks = minDelta - _deltaToLastSnapshotTickMinSafeValue;
+            _tick += fastForwardTicks;
+            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, _lastSnapshotTick - _tick);
+            FastForwardCount++;
+        }
+    }
+    
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet)
     {
         _snapshotRing.RingSet(packet.Tick, packet.Snapshot);
@@ -152,29 +176,5 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     public void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet)
     {
         
-    }
-
-    private void ReplicateSnapshot(ShardSnapshot snapshot)
-    {
-        _entityManager.ReplicateSnapshotEntities(snapshot);
-    }
-
-    private void WriteDeltaToLastSnapshotTickHistory()
-    {
-        double deltaToLastSnapshotTick = (_lastSnapshotTick - _tick);
-        if (deltaToLastSnapshotTick < _deltaToLastSnapshotTickHistoryRing.RingGet((long)_second))
-            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, deltaToLastSnapshotTick);
-    }
-
-    private void TryFastForward()
-    {
-        if (_deltaToLastSnapshotTickHistoryRing.All(it => it > _deltaToLastSnapshotTickMinValueToFastForward))
-        {
-            double minDelta = _deltaToLastSnapshotTickHistoryRing.Min();
-            double fastForwardTicks = minDelta - _deltaToLastSnapshotTickMinSafeValue;
-            _tick += fastForwardTicks;
-            _deltaToLastSnapshotTickHistoryRing.RingSet((long)_second, _lastSnapshotTick - _tick);
-            FastForwardCount++;
-        }
     }
 }
