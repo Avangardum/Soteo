@@ -132,6 +132,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
             services.AddSingleton<ICampaignServerCommunicator>(_ => _jsmqCommunicator.Required);
             services.AddSingleton<IPacketSender>(_ => _jsmqCommunicator.Required);
             services.AddSingleton<INetworkDebugger>(_ => _jsmqCommunicator.Required);
+            services.AddSingleton<IConnectionNotifier>(_ => _jsmqCommunicator.Required);
         }
         else
         {
@@ -140,6 +141,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
                 _webSocketCampaignServerCommunicator.Required, _webRtcGameplayCommunicator.Required));
             services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
             services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
+            services.AddSingleton<IConnectionNotifier>(_ => _webRtcGameplayCommunicator.Required);
         }
     }
     

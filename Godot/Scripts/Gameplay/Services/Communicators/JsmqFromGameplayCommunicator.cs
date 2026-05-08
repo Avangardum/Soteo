@@ -10,7 +10,7 @@ namespace Soteo.Gameplay.Services.Communicators;
 /// <summary>
 /// Communicator using the JavaScript message queue instead of WebSockets / WebRTC. Used for singleplayer in browser.
 /// </summary>
-public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunicator, IPacketSender, INetworkDebugger
+public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunicator, IPacketSender, INetworkDebugger, IConnectionNotifier
 {
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPacketSerializer _packetSerializer;
@@ -18,6 +18,10 @@ public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunic
     private readonly IShardLoader _shardLoader;
     
     public event Action ConnectionEstablished = delegate {};
+    public event Action<Guid> PeerConnected = delegate { };
+    public event Action<Guid> PeerDisconnected = delegate { };
+
+    private readonly HashSet<Guid> _connectedPeers = [];
     
     public JsmqFromGameplayCommunicator
     (
@@ -58,8 +62,12 @@ public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunic
         _currentUserIdRepository.UserId = Const.SingleplayerPlayerId;
         SendReliable(new CampaignServerHandshakePacket { Token = "player" }, CampaignServerId );
         ConnectionEstablished();
+        
         if (!IsServer)
         {
+            // Normally shard snapshot would be sent automatically on connection, but when using JSMQ, connection
+            // is not detected until a packet is sent, so it's requested manually.
+            SendReliable(new ShardSnapshotRequestPacket(), Const.TestShardId);
             SendReliable(new SpawnCharacterPacket { PeerId = Const.TestShardId }, CampaignServerId);
             _shardLoader.LoadShard();
         }
@@ -79,6 +87,8 @@ public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunic
             if (base64 == null) return;
             byte[] bytes = Convert.FromBase64String(base64);
             var senderId = new Guid(bytes.AsSpan()[..Const.BytesInGuid].ToArray());
+            if (_connectedPeers.Add(senderId))
+                PeerConnected(senderId);
             Packet packet = _packetSerializer.Deserialize(bytes.AsSpan()[Const.BytesInGuid..]);
             _packetHandler.HandleAsync(packet, senderId).CollectException();
         }

@@ -17,16 +17,23 @@ public sealed class SynchronizationServer : Node, ISynchronizationServer
     private ShardSnapshot? _prevShardSnapshot;
     private readonly HashSet<Guid> _snapshotRequesters = [];
     
-    public SynchronizationServer(IEntityManager entityManager, IPacketSender packetSender)
+    public SynchronizationServer(IEntityManager entityManager, IPacketSender packetSender, IConnectionNotifier connectionNotifier)
     {
         Name = nameof(SynchronizationServer);
-        
+
         _entityManager = entityManager;
         _packetSender = packetSender;
-        
+        connectionNotifier.PeerConnected += OnPeerConnected;
+
         _tickInterval = 1.0 / (int)ProjectSettings.GetSetting("physics/common/physics_fps");
     }
-    
+
+    private void OnPeerConnected(Guid peerId)
+    {
+        if (peerId != CampaignServerId)
+            _snapshotRequesters.Add(peerId);
+    }
+
     public override void _Ready()
     {
         if (!IsServer)

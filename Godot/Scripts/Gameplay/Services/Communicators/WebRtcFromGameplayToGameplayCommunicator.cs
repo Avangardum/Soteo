@@ -14,7 +14,7 @@ namespace Soteo.Gameplay.Services.Communicators;
 /// Communicates between clients and shard servers
 /// </summary>
 public sealed class WebRtcFromGameplayToGameplayCommunicator :
-    Node, IPacketSender, IWebrtcPacketReceiver, INetworkDebugger
+    Node, IPacketSender, IWebrtcPacketReceiver, INetworkDebugger, IConnectionNotifier
 {
     private record PeerConnectionAndChannels
     (
@@ -38,6 +38,10 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
         _peerConnectionsAndChannels = [];
     private readonly System.Collections.Generic.Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
+    private readonly HashSet<Guid> _connectedPeers = [];
+
+    public event Action<Guid> PeerConnected = delegate { };
+    public event Action<Guid> PeerDisconnected = delegate { };
     
     private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
     
@@ -104,14 +108,20 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
              (WebRTCPeerConnection connection, WebRTCDataChannel reliableChannel, WebRTCDataChannel unreliableChannel)
         ) in _peerConnectionsAndChannels.ToDictionary())
         {
-            if (connection.GetConnectionState() == WebRTCPeerConnection.ConnectionState.Closed)
+            connection.Poll();
+
+            var state = connection.GetConnectionState();
+            if (state == WebRTCPeerConnection.ConnectionState.Closed)
             {
                 _peerConnectionsAndChannels.Remove(peerId);
                 _ping.Remove(peerId);
+                if (_connectedPeers.Remove(peerId))
+                    PeerDisconnected(peerId);
                 continue;
             }
-            
-            connection.Poll();
+            if (state == WebRTCPeerConnection.ConnectionState.Connected && _connectedPeers.Add(peerId))
+                PeerConnected(peerId);
+
             HandlePackets(reliableChannel, peerId, delta);
             HandlePackets(unreliableChannel, peerId, delta);
         }
