@@ -9,6 +9,5 @@ namespace Soteo.Shared.Packets;
 public sealed record ShardSnapshotPacket : Packet
 {
     public long Tick { get; set; }
-    public double ServerLoad { get; set; }
     public ShardSnapshot Snapshot { get; set; } = null!;
 }

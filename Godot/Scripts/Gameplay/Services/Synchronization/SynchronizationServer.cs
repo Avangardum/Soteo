@@ -48,7 +48,7 @@ public sealed class SynchronizationServer : Node
         _prevShardSnapshot = shardSnapshot;
         double serverLoad = FrameStopwatch.Instance.ElapsedSincePhysicsProcess / _tickInterval;
         var shardSnapshotPacket =
-            new ShardSnapshotPacket { Tick = _tick, ServerLoad = serverLoad, Snapshot = shardSnapshot };
+            new ShardSnapshotPacket { Tick = _tick, Snapshot = shardSnapshot };
         _packetSender.BroadcastReliable(shardSnapshotPacket);
         
         if (shardSnapshotDelta != null)

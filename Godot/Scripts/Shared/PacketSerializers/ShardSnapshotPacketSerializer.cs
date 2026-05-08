@@ -20,7 +20,6 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         base.SerializeInternal(packet, stream);
         SerializeLong(packet.Tick, stream);
-        SerializeDouble(packet.ServerLoad, stream);
         SerializeIndexedDictionary(packet.Snapshot.Entities, SerializeEntity, stream);
     }
     
@@ -28,7 +27,6 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         var message = base.DeserializeInternal(stream);
         message.Tick = DeserializeLong(stream);
-        message.ServerLoad = DeserializeDouble(stream);
         ImmutableDictionary<Guid, EntitySnapshot> entities =
             DeserializeIndexedDictionary(DeserializeEntity, it => it.Id, stream);
         message.Snapshot = new ShardSnapshot { Entities = entities };

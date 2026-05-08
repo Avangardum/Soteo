@@ -193,6 +193,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         if (State == StateEnum.Desynchronized) return;
         
         _syncData.DeltaRing.RingSet(packet.Tick, packet.SnapshotDelta);
+        _syncData.ServerLoadHistoryRing.RingSet(packet.Tick, packet.ServerLoad);
         _syncData.ApproxServerTick = packet.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
         _syncData.LastDeltaTick = packet.Tick;
     }
