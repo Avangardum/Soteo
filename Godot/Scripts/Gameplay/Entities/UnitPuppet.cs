@@ -63,9 +63,8 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     {
         base.ApplyDelta(delta, interpolationWeight);
         var d = (UnitPuppetSnapshotDelta)delta;
-        if (d.IsMoving.HasChanged)
-            IsMoving = d.IsMoving.NewValue;
-        d.Stats.MutateDictionary(StatsInternal, interpolationWeight, Maths.Lerp);
+        d.IsMoving.MutateValue(() => IsMoving, it => IsMoving = it, interpolationWeight, Maths.DontInterpolate);
+        d.Stats.MutateDictionary(StatsInternal, interpolationWeight, Maths.DontInterpolate);
         d.AbilitySlotStates.MutateDictionary(AbilitySlotStatesInternal, interpolationWeight, AbilitySlotState.Interpolate);
         d.AbilityUseProgress.MutateValue
         (

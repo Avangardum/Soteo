@@ -112,11 +112,11 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         long lastFullDeltaTick = Maths.FloorToLong(_syncData.Tick!.Value);
         
         for (long t = firstFullDeltaTick; t <= lastFullDeltaTick; t++)
-            ApplyDelta(_syncData.DeltaRing[t].Required, 1);
+            ApplyDelta(_syncData.DeltaRing.RingGet(t).Required, 1);
 
         if (_syncData.Tick % 1 > 0)
         {
-            ShardSnapshotDelta partialDelta = _syncData.DeltaRing[lastFullDeltaTick + 1].Required;
+            ShardSnapshotDelta partialDelta = _syncData.DeltaRing.RingGet(lastFullDeltaTick + 1).Required;
             if ((long)prevTick < (long)_syncData.Tick)
             {
                 ApplyDelta(partialDelta, _syncData.Tick.Value % 1);
@@ -183,13 +183,17 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet)
     {
         if (State != StateEnum.Desynchronized) return;
+        
         _syncData.LastSnapshotPacket = packet;
         State = StateEnum.Synchronizing;
     }
 
     public void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet)
     {
+        if (State == StateEnum.Desynchronized) return;
+        
         _syncData.DeltaRing.RingSet(packet.Tick, packet.SnapshotDelta);
         _syncData.ApproxServerTick = packet.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
+        _syncData.LastDeltaTick = packet.Tick;
     }
 }

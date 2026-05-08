@@ -69,7 +69,7 @@ public sealed class EntityManager : Node, IEntityManager
         }
         foreach (Guid id in delta.Entities.RemovedKeys)
         {
-            _entities[id].Remove();
+            _entities.GetOrDefault(id)?.Remove();
         }
     }
 

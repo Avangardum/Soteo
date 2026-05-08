@@ -117,17 +117,19 @@ public static class Maths
         });
     }
     
+    public static double Lerp(double from, double to, double weight) =>
+        from + weight * (to - from);
+    
+    public static double InverseLerp(double from, double to, double value) =>
+        to == from ? 0.5f : (value - from) / (to - from);
+    
     public static double LerpDecrease(double from, double to, double weight) =>
         from > to ? Lerp(from, to, weight) : to;
     
     public static double LerpIncrease(double from, double to, double weight) =>
         from < to ? Lerp(from, to, weight) : to;
     
-    public static double Lerp(double from, double to, double weight) =>
-        from + weight * (to - from);
-    
-    public static double InverseLerp(double from, double to, double value) =>
-        to == from ? 0.5f : (value - from) / (to - from);
+    public static T DontInterpolate<T>(T from, T to, double weight) => to;
     
     public static int PosMod(long value, int modulo) =>
         (int)(value >= 0 ? value % modulo : value % modulo + modulo);
