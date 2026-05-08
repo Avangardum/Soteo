@@ -37,6 +37,11 @@ public static class DictionaryExtensions
             new CovariantReadOnlyDictionaryWrapper<TKey, TValue>(self);
     }
     
+    extension<TKey, TValue> (IReadOnlyDictionary<TKey, TValue> self) where TValue : struct
+    {
+        public TValue? GetOrNull(TKey key) => self.TryGetValue(key, out TValue value) ? value : null; 
+    }
+    
     extension<TKey, TValue> (ICovariantReadOnlyDictionary<TKey, TValue> self) where TValue : notnull
     {
         public bool TryGetValue(TKey key, [NotNullWhen(true)] out TValue? value)

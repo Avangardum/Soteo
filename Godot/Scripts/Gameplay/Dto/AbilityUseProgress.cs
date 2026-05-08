@@ -1,3 +1,4 @@
+using Soteo.Shared;
 using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Dto;
@@ -17,6 +18,15 @@ public sealed record AbilityUseProgress
         {
             ElapsedTime = ElapsedTime + time,
             RemainingTime = RemainingTime - time
+        };
+    }
+    
+    public static AbilityUseProgress Interpolate(AbilityUseProgress from, AbilityUseProgress to, double weight)
+    {
+        return to with
+        {
+            ElapsedTime = Maths.LerpIncrease(from.ElapsedTime, to.ElapsedTime, weight),
+            RemainingTime = Maths.LerpDecrease(from.RemainingTime, to.RemainingTime, weight),
         };
     }
 }

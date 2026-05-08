@@ -1,4 +1,5 @@
 using Soteo.Gameplay.Statuses;
+using Soteo.Shared;
 
 namespace Soteo.Gameplay.Dto;
 
@@ -19,5 +20,14 @@ public record PuppetStatusContext
             if (totalDisplayTime == 0) return 0;
             return RemainingTime / totalDisplayTime;
         }
+    }
+    
+    public static PuppetStatusContext Interpolate(PuppetStatusContext from, PuppetStatusContext to, double weight)
+    {
+        return to with
+        {
+            DisplayElapsedTime = Maths.LerpIncrease(from.DisplayElapsedTime, to.DisplayElapsedTime, weight),
+            RemainingTime = Maths.LerpDecrease(from.RemainingTime, to.RemainingTime, weight),
+        };
     }
 }

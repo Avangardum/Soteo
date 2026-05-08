@@ -1,4 +1,5 @@
 using Soteo.Gameplay.Abilities;
+using Soteo.Shared;
 
 namespace Soteo.Gameplay.Dto;
 
@@ -14,4 +15,7 @@ public record AbilitySlotState
     
     public static AbilitySlotState New<T>(int level) where T : Ability =>
         new AbilitySlotState { Ability = Ability.Instance<T>(), Level = level };
+    
+    public static AbilitySlotState Interpolate(AbilitySlotState from, AbilitySlotState to, double weight) =>
+        to with { Cooldown = Maths.LerpDecrease(from.Cooldown, to.Cooldown, weight) };
 }

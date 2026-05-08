@@ -17,7 +17,7 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
         return base.Interpolate(to, weight) with
         {
             AbilitySlotStates = InterpolateDictionary(from.AbilitySlotStates, to.AbilitySlotStates, weight, InterpolateAbilityState),
-            AbilityUseProgress = InterpolateNullable(from.AbilityUseProgress, to.AbilityUseProgress, weight,
+            AbilityUseProgress = InterpolateNullableClass(from.AbilityUseProgress, to.AbilityUseProgress, weight,
                 InterpolateAbilityUseProgress),
             Statuses = InterpolateDictionary(from.Statuses, to.Statuses, weight, InterpolateStatusContext)
         };

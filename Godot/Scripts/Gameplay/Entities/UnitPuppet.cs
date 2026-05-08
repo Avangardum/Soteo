@@ -32,8 +32,8 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         }
     }
     
-    public IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses { get; private set; } =
-        ImmutableDictionary<Guid, PuppetStatusContext>.Empty;
+    private Dictionary<Guid, PuppetStatusContext> StatusesInternal { get; set; } = [];
+    public IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses => StatusesInternal;
     
     private void UpdateNodePosition()
     {
@@ -55,10 +55,34 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         StatsInternal = s.Stats.ToDictionary();
         AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
-        Statuses = s.Statuses;
+        StatusesInternal = s.Statuses.ToDictionary();
         UpdateAnimation();
     }
-    
+
+    public override void ReplicateSnapshotDelta(EntitySnapshotDelta delta, double interpolationWeight)
+    {
+        base.ReplicateSnapshotDelta(delta, interpolationWeight);
+        var d = (UnitPuppetSnapshotDelta)delta;
+        if (d.IsMoving.HasChanged)
+            IsMoving = d.IsMoving.NewValue;
+        d.Stats.MutateDictionary(StatsInternal, interpolationWeight, Maths.Lerp);
+        d.AbilitySlotStates.MutateDictionary(AbilitySlotStatesInternal, interpolationWeight, AbilitySlotState.Interpolate);
+        // if (d.AbilityUseProgress.HasChanged)
+        // {
+        //     AbilityUseProgress = Maths.InterpolateNullable(
+        //         AbilityUseProgress, d.AbilityUseProgress.NewValue, interpolationWeight, AbilityUseProgress.Lerp);
+        // }
+        d.AbilityUseProgress.MutateValue
+        (
+            () => AbilityUseProgress,
+            it => AbilityUseProgress = it,
+            interpolationWeight,
+            Maths.InterpolateNullableClass<AbilityUseProgress>(AbilityUseProgress.Interpolate)
+        );
+        d.Statuses.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
+        UpdateAnimation();
+    }
+
     protected override void OnZoomChanged()
     {
         UpdateNodePosition();

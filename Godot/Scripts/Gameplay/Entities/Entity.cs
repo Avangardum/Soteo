@@ -44,6 +44,12 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
         Position = snapshot.Position;
         Azimuth = snapshot.Azimuth;
     }
+    
+    public virtual void ReplicateSnapshotDelta(EntitySnapshotDelta delta, double interpolationWeight)
+    {
+        delta.Position.MutateValue(() => Position, it => Position = it, interpolationWeight, VectorExtensions.Lerp);
+        delta.Azimuth.MutateValue(() => Azimuth, it => Azimuth = it, interpolationWeight, Maths.ModularLerp(360));
+    }
 
     // Both
     public void Remove()

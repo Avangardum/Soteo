@@ -21,6 +21,9 @@ public static class Maths
     /// </summary>
     public static double ModularLerp(double from, double to, double weight, double modulo) =>
         PosMod(from + ModularDelta(from, to, modulo) * weight, modulo);
+    
+    public static Func<double, double, double, double> ModularLerp(double modulo) =>
+        (from, to, weight) => ModularLerp(from, to, weight, modulo);
 
     /// <summary>
     /// Linear interpolation, but for modular arithmetics with possible wrapping around zero and only moving in positive
@@ -60,30 +63,42 @@ public static class Maths
         return delta;
     }
     
-    public static T? InterpolateNullable<T>(T? from, T? to, Func<T, T, T> interpolate) where T : struct
+    public static T? InterpolateNullableStruct<T>(T? from, T? to, Func<T, T, T> interpolate) where T : struct
     {
         if (from == null || to == null) return to;
         return interpolate(from.Value, to.Value);
     }
     
-    public static T? InterpolateNullable<T>(T? from, T? to, double weight, Func<T, T, double, T> interpolate)
+    public static T? InterpolateNullableStruct<T>(T? from, T? to, double weight, Func<T, T, double, T> interpolate)
         where T : struct
     {
         if (from == null || to == null) return to;
         return interpolate(from.Value, to.Value, weight);
     }
+    
+    public static Func<T?, T?, double, T?> InterpolateNullableStruct<T>(Func<T, T, double, T> interpolate)
+        where T : struct
+    {
+        return (from, to, weight) => InterpolateNullableStruct(from, to, weight, interpolate);
+    }
 
-    public static T? InterpolateNullable<T>(T? from, T? to, Func<T, T, T> interpolate) where T : class
+    public static T? InterpolateNullableClass<T>(T? from, T? to, Func<T, T, T> interpolate) where T : class
     {
         if (from == null || to == null) return to;
         return interpolate(from, to);
     }
     
-    public static T? InterpolateNullable<T>(T? from, T? to, double weight, Func<T, T, double, T> interpolate)
+    public static T? InterpolateNullableClass<T>(T? from, T? to, double weight, Func<T, T, double, T> interpolate)
         where T : class
     {
         if (from == null || to == null) return to;
         return interpolate(from, to, weight);
+    }
+    
+    public static Func<T?, T?, double, T?> InterpolateNullableClass<T>(Func<T, T, double, T> interpolate)
+        where T : class
+    {
+        return (from, to, weight) => InterpolateNullableClass(from, to, weight, interpolate);
     }
     
     public static IReadOnlyDictionary<TKey, TValue> InterpolateDictionary<TKey, TValue>
