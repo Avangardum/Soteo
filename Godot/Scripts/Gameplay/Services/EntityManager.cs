@@ -44,7 +44,8 @@ public sealed class EntityManager : Node, IEntityManager
         foreach (EntitySnapshot entitySnapshot in snapshot.Entities.Values)
         {
             ids.Add(entitySnapshot.Id);
-            if (GetEntity(entitySnapshot.Id) == null) SpawnEntityFromSnapshot(entitySnapshot);
+            if (GetEntity(entitySnapshot.Id) == null)
+                SpawnEntityFromSnapshot(entitySnapshot);
         }
         foreach (Guid id in _entities.Keys.Except(ids).ToArray())
         {
@@ -54,10 +55,24 @@ public sealed class EntityManager : Node, IEntityManager
         {
             // Entity snapshots are replicated only after all entities are spawned so that references between entities
             // can be replicated correctly.
-            GetEntity(entitySnapshot.Id)!.ReplicateSnapshot(entitySnapshot);
+            GetEntity(entitySnapshot.Id).Required.ReplicateSnapshot(entitySnapshot);
         }
     }
-    
+
+    public void ApplyDelta(ShardSnapshotDelta delta, double lerpWeight)
+    {
+        foreach (EntitySnapshotDelta entityDelta in delta.Entities.Changes.Values)
+        {
+            if (!_entities.TryGetValue(entityDelta.Id, out IEntity? entity))
+                entity = SpawnEntityFromDelta(entityDelta);
+            entity.ApplyDelta(entityDelta, lerpWeight);
+        }
+        foreach (Guid id in delta.Entities.RemovedKeys)
+        {
+            _entities[id].Remove();
+        }
+    }
+
     private IEntity SpawnEntityFromSnapshot(EntitySnapshot snapshot)
     {
         return snapshot switch
@@ -65,6 +80,16 @@ public sealed class EntityManager : Node, IEntityManager
             UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, GetNode<UnitPuppetNode>(s.Id), _serviceProvider)),
             ProjectilePuppetSnapshot s =>
                 Add(new ProjectilePuppet(s.Id, GetNode<ProjectilePuppetNode>(s.Id), _camera.Required))
+        };
+    }
+    
+    private IEntity SpawnEntityFromDelta(EntitySnapshotDelta delta)
+    {
+        return delta switch
+        {
+            UnitPuppetSnapshotDelta d => Add(new UnitPuppet(d.Id, GetNode<UnitPuppetNode>(d.Id), _serviceProvider)),
+            ProjectilePuppetSnapshotDelta d =>
+                Add(new ProjectilePuppet(d.Id, GetNode<ProjectilePuppetNode>(d.Id), _camera.Required)),
         };
     }
     

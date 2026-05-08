@@ -158,11 +158,35 @@ public static class Maths
         return Math.Min(Math.Max(value, min), max);
     }
     
-    public static int FloorToInt(double value) => (int)Math.Floor(value);
+    public static double Floor(double value) => Math.Floor(value);
     
-    public static int CeilToInt(double value) => (int)Math.Ceiling(value);
+    public static double Ceil(double value) => Math.Ceiling(value);
     
-    public static int RoundToInt(double value) => (int)Math.Round(value);
+    public static double Round(double value) => Math.Round(value);
+    
+    public static int FloorToInt(double value) => (int)Floor(value);
+    
+    public static int CeilToInt(double value) => (int)Ceil(value);
+    
+    public static int RoundToInt(double value) => (int)Round(value);
+    
+    public static long FloorToLong(double value) => (long)Floor(value);
+    
+    public static long CeilToLong(double value) => (long)Ceil(value);
+    
+    public static long RoundToLong(double value) => (long)Round(value);
+    
+    public static double NextInteger(double value) => value % 1 == 0 ? value + 1 : Ceil(value);
+    
+    public static double PrevInteger(double value) => value % 1 == 0 ? value - 1 : Floor(value);
+    
+    public static int NextIntegerToInt(double value) => (int)NextInteger(value);
+    
+    public static int PrevIntegerToInt(double value) => (int)PrevInteger(value);
+    
+    public static long NextIntegerToLong(double value) => (long)NextInteger(value);
+    
+    public static long PrevIntegerToLong(double value) => (long)PrevInteger(value);
     
     public static double Rad2Deg(double radians) => radians * 180 / Math.PI;
     

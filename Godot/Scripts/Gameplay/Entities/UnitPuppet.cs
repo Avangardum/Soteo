@@ -59,9 +59,9 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         UpdateAnimation();
     }
 
-    public override void ReplicateSnapshotDelta(EntitySnapshotDelta delta, double interpolationWeight)
+    public override void ApplyDelta(EntitySnapshotDelta delta, double interpolationWeight)
     {
-        base.ReplicateSnapshotDelta(delta, interpolationWeight);
+        base.ApplyDelta(delta, interpolationWeight);
         var d = (UnitPuppetSnapshotDelta)delta;
         if (d.IsMoving.HasChanged)
             IsMoving = d.IsMoving.NewValue;

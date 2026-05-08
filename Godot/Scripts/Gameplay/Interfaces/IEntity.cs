@@ -12,5 +12,6 @@ public interface IEntity
     
     EntitySnapshot CreateSnapshot();
     void ReplicateSnapshot(EntitySnapshot snapshot);
+    void ApplyDelta(EntitySnapshotDelta delta, double interpolationWeight);
     void Remove();
 }
