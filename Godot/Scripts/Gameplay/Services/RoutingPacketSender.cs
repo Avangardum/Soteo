@@ -6,23 +6,29 @@ namespace Soteo.Gameplay.Services;
 public sealed class RoutingPacketSender
 (
     ICampaignServerCommunicator campaignSender,
-    IPacketSender clientShardServerSender
+    IPacketSender gameplaySender
 ) : IPacketSender
 {
     public void SendReliable(Packet packet, Guid receiverId)
     {
         if (receiverId == CampaignServerId) campaignSender.SendPacket(packet);
-        else clientShardServerSender.SendReliable(packet, receiverId);
+        else gameplaySender.SendReliable(packet, receiverId);
     }
 
     public void SendUnreliable(Packet packet, Guid receiverId)
     {
         if (receiverId == CampaignServerId)
             throw new InvalidOperationException("Campaign server doesn't support unreliable messages");
-        clientShardServerSender.SendUnreliable(packet, receiverId);
+        gameplaySender.SendUnreliable(packet, receiverId);
     }
 
-    public void BroadcastReliable(Packet packet) => clientShardServerSender.BroadcastReliable(packet);
+    public void SendReliable(Packet packet, IEnumerable<Guid> receiverIds) =>
+        gameplaySender.SendReliable(packet, receiverIds);
 
-    public void BroadcastUnreliable(Packet packet) => clientShardServerSender.BroadcastUnreliable(packet);
+    public void SendUnreliable(Packet packet, IEnumerable<Guid> receiverIds) =>
+        gameplaySender.SendUnreliable(packet, receiverIds);
+
+    public void BroadcastReliable(Packet packet) => gameplaySender.BroadcastReliable(packet);
+
+    public void BroadcastUnreliable(Packet packet) => gameplaySender.BroadcastUnreliable(packet);
 }

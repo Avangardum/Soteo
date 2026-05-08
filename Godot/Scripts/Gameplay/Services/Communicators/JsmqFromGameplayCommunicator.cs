@@ -93,6 +93,15 @@ public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunic
 
     public void SendUnreliable(Packet packet, Guid receiverId) => SendReliable(packet, receiverId);
 
+    public void SendReliable(Packet packet, IEnumerable<Guid> receiverIds)
+    {
+        foreach (Guid receiverId in receiverIds)
+            SendReliable(packet, receiverId);
+    }
+
+    public void SendUnreliable(Packet packet, IEnumerable<Guid> receiverIds) =>
+        SendReliable(packet, receiverIds);
+
     public void BroadcastReliable(Packet packet)
     {
         if (!IsServer) throw new InvalidOperationException();

@@ -277,28 +277,34 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     public void SendReliable(Packet packet, Guid receiverId) =>
         Send(_packetSerializer.Serialize(packet), receiverId, it => it.ReliableChannel);
-    
+
     public void SendUnreliable(Packet packet, Guid receiverId) =>
         Send(_packetSerializer.Serialize(packet), receiverId, it => it.UnreliableChannel);
-    
+
+    public void SendReliable(Packet packet, IEnumerable<Guid> receiverIds) =>
+        SendToMany(packet, receiverIds, it => it.ReliableChannel);
+
+    public void SendUnreliable(Packet packet, IEnumerable<Guid> receiverIds) =>
+        SendToMany(packet, receiverIds, it => it.UnreliableChannel);
+
     public void BroadcastReliable(Packet packet) =>
-        Broadcast(packet, it => it.ReliableChannel);
-    
+        SendToMany(packet, _peerConnectionsAndChannels.Keys, it => it.ReliableChannel);
+
     public void BroadcastUnreliable(Packet packet) =>
-        Broadcast(packet, it => it.UnreliableChannel);
-    
-    private void Broadcast(Packet packet, Func<PeerConnectionAndChannels, WebRTCDataChannel> channelSelector)
+        SendToMany(packet, _peerConnectionsAndChannels.Keys, it => it.UnreliableChannel);
+
+    private void SendToMany(Packet packet, IEnumerable<Guid> receiverIds, Func<PeerConnectionAndChannels, WebRTCDataChannel> channelSelector)
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
         if (bytes.Length <= MaxChunkSize)
         {
-            foreach (Guid receiverId in _peerConnectionsAndChannels.Keys)
+            foreach (Guid receiverId in receiverIds)
                 SendWithoutChunking(bytes, receiverId, channelSelector);
         }
         else
         {
             byte[][] chunks = SplitIntoChunks(bytes);
-            foreach (Guid receiverId in _peerConnectionsAndChannels.Keys)
+            foreach (Guid receiverId in receiverIds)
                 foreach (byte[] chunk in chunks)
                     SendWithoutChunking(chunk, receiverId, channelSelector);
         }

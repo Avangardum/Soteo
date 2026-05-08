@@ -43,16 +43,24 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     private readonly IEntityManager _entityManager;
     private readonly IShard _shard;
     private readonly INetworkDebugger _networkDebugger;
-    
+    private readonly IPacketSender _packetSender;
+
     private SynchronizationData _syncData = new();
-    
-    public SynchronizationClient(IEntityManager entityManager, IShard shard, INetworkDebugger networkDebugger)
+
+    public SynchronizationClient
+    (
+        IEntityManager entityManager,
+        IShard shard,
+        INetworkDebugger networkDebugger,
+        IPacketSender packetSender
+    )
     {
         Name = nameof(SynchronizationClient);
-        
+
         _entityManager = entityManager;
         _shard = shard;
         _networkDebugger = networkDebugger;
+        _packetSender = packetSender;
     }
     
     private StateEnum State
@@ -62,7 +70,10 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         {
             field = value;
             if (value == StateEnum.Desynchronized)
+            {
                 _syncData = new SynchronizationData();
+                RequestSnapshot();
+            }
         }
     }
     
@@ -131,6 +142,9 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     
     private void ApplyDelta(ShardSnapshotDelta delta, double interpolationWeight) =>
         _entityManager.ApplyDelta(delta, interpolationWeight);
+
+    private void RequestSnapshot() =>
+        _packetSender.SendReliable(new ShardSnapshotRequestPacket(), _shard.Id);
 
     private bool TrySynchronize()
     {

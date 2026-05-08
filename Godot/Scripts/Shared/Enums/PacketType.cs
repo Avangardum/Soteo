@@ -17,6 +17,7 @@ public enum PacketType : byte
     Move,
     UseAbility,
     Stop,
+    ShardSnapshotRequest,
     // Shard Server --> Client
     ShardSnapshot,
     ShardSnapshotDelta,
