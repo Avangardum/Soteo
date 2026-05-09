@@ -147,7 +147,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private void RegisterServerServices(IServiceCollection services)
     {
-        
+        services.AddShardScopedNode<ISynchronizationServer, SynchronizationServer>();
     }
     
     private void RegisterClientServices(IServiceCollection services)
