@@ -47,8 +47,10 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
     
     public virtual void ApplyDelta(EntitySnapshotDelta delta, double interpolationWeight)
     {
-        delta.Position.MutateValue(() => Position, it => Position = it, interpolationWeight, VectorExtensions.Lerp);
-        delta.Azimuth.MutateValue(() => Azimuth, it => Azimuth = it, interpolationWeight, Maths.ModularLerp(360));
+        if (delta.Position.HasChanged)
+            Position = Position.Lerp(delta.Position.NewValue, interpolationWeight);
+        if (delta.Azimuth.HasChanged)
+            Azimuth = Maths.ModularLerp(Azimuth, delta.Azimuth.NewValue, interpolationWeight, 360);
     }
 
     // Both

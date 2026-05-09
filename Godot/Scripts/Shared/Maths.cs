@@ -22,9 +22,6 @@ public static class Maths
     public static double ModularLerp(double from, double to, double weight, double modulo) =>
         PosMod(from + ModularDelta(from, to, modulo) * weight, modulo);
     
-    public static Func<double, double, double, double> ModularLerp(double modulo) =>
-        (from, to, weight) => ModularLerp(from, to, weight, modulo);
-
     /// <summary>
     /// Linear interpolation, but for modular arithmetics with possible wrapping around zero and only moving in positive
     /// direction. Useful for animations.<br />
@@ -76,12 +73,6 @@ public static class Maths
         return interpolate(from.Value, to.Value, weight);
     }
     
-    public static Func<T?, T?, double, T?> InterpolateNullableStruct<T>(Func<T, T, double, T> interpolate)
-        where T : struct
-    {
-        return (from, to, weight) => InterpolateNullableStruct(from, to, weight, interpolate);
-    }
-
     public static T? InterpolateNullableClass<T>(T? from, T? to, Func<T, T, T> interpolate) where T : class
     {
         if (from == null || to == null) return to;
@@ -93,12 +84,6 @@ public static class Maths
     {
         if (from == null || to == null) return to;
         return interpolate(from, to, weight);
-    }
-    
-    public static Func<T?, T?, double, T?> InterpolateNullableClass<T>(Func<T, T, double, T> interpolate)
-        where T : class
-    {
-        return (from, to, weight) => InterpolateNullableClass(from, to, weight, interpolate);
     }
     
     public static IReadOnlyDictionary<TKey, TValue> InterpolateDictionary<TKey, TValue>
@@ -128,8 +113,6 @@ public static class Maths
     
     public static double LerpIncrease(double from, double to, double weight) =>
         from < to ? Lerp(from, to, weight) : to;
-    
-    public static T DontInterpolate<T>(T from, T to, double weight) => to;
     
     public static int PosMod(long value, int modulo) =>
         (int)(value >= 0 ? value % modulo : value % modulo + modulo);

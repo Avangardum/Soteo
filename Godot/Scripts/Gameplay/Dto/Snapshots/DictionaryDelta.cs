@@ -37,13 +37,26 @@ public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
     (
         IDictionary<TKey, TValue> dictionary,
         double interpolationWeight,
-        Func<TValue, TValue, double, TValue> interpolateValue
+        Func<TValue, TValue, double, TValue>? interpolateValue
     )
     {
         foreach ((TKey key, TValue newValue) in Changes)
-            dictionary[key] = dictionary.TryGetValue(key, out TValue? oldValue) ?
-                interpolateValue(oldValue, newValue, interpolationWeight) : newValue;
-    
+        {
+            if 
+            (
+                interpolationWeight == 1 ||
+                interpolateValue == null ||
+                !dictionary.TryGetValue(key, out TValue oldValue)
+            )
+            {
+                dictionary[key] = newValue;
+            }
+            else
+            {
+                dictionary[key] = interpolateValue(oldValue, newValue, interpolationWeight);
+            }
+        }
+
         foreach (TKey key in RemovedKeys)
             dictionary.Remove(key);
     }

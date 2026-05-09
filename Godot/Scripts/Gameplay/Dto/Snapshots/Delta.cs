@@ -19,16 +19,4 @@ public readonly record struct Delta<T>
     public T NewValue => HasChanged ? field : throw new InvalidOperationException("Value has not changed");
 
     public static implicit operator Delta<T>(T newValue) => new(newValue);
-    
-    public void MutateValue
-    (
-        Func<T> get,
-        Action<T> set,
-        double interpolationWeight,
-        Func<T, T, double, T> interpolateValue
-    )
-    {
-        if (!HasChanged) return;
-        set(interpolateValue(get(), NewValue, interpolationWeight));
-    }
 }
