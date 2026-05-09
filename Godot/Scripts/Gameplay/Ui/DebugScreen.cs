@@ -14,7 +14,7 @@ public sealed class DebugScreen : Control
     private readonly double[] _entityCountRing = new double[10 * Const.TicksPerSecond];
     private readonly double[] _unrolledEntityCountRing = new double[10 * Const.TicksPerSecond];
     private int _ringNextIndex;
-    private bool _shouldProcess;
+    private int _pendingProcessCount;
     
     private readonly INetworkDebugger _networkDebugger;
     private readonly IShardServiceProviderSource _shardServiceProviderSource;
@@ -44,26 +44,27 @@ public sealed class DebugScreen : Control
     
     public override void _PhysicsProcess(float delta)
     {
-        _shouldProcess = true;
+        _pendingProcessCount++;
     }
 
     public override void _Process(float delta)
     {
-        if (!_shouldProcess) return;
-        _shouldProcess = false;
-        
-        IServiceProvider? shardServiceProvider = _shardServiceProviderSource.ShardServiceProviders
-            .GetOrDefault(Const.TestShardId);
-        var synchronizationClient = shardServiceProvider?.GetRequiredService<ISynchronizationClient>();
-        var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
-        
-        _ringNextIndex = (_ringNextIndex + 1) % _fpsRing.Length;
-        ProcessFpsGraph(delta);
-        ProcessEntityCountGraph(entityManager);
-        if (synchronizationClient != null)
-            _serverLoadGraph.SetData(synchronizationClient.ServerLoadHistory, "N2", 0, 1);
-        
-        UpdateText(delta, synchronizationClient, entityManager);
+        while (_pendingProcessCount > 0)
+        {
+            _pendingProcessCount--;
+            IServiceProvider? shardServiceProvider = _shardServiceProviderSource.ShardServiceProviders
+                .GetOrDefault(Const.TestShardId);
+            var synchronizationClient = shardServiceProvider?.GetRequiredService<ISynchronizationClient>();
+            var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
+
+            _ringNextIndex = (_ringNextIndex + 1) % _fpsRing.Length;
+            ProcessFpsGraph(delta);
+            ProcessEntityCountGraph(entityManager);
+            if (synchronizationClient != null)
+                _serverLoadGraph.SetData(synchronizationClient.ServerLoadHistory, "N2", 0, 1);
+
+            UpdateText(delta, synchronizationClient, entityManager);
+        }
     }
 
     private void ProcessFpsGraph(double delta)
