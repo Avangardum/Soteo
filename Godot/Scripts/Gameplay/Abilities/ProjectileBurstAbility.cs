@@ -17,7 +17,7 @@ public sealed class ProjectileBurstAbility : Ability
     {
         base.TakeEffect(context);
         var entityManager = context.GetRequiredService<IEntityManager>();
-        for (double azimuth = 0; azimuth <= 360; azimuth += 1)
+        for (double azimuth = 0; azimuth < 360; azimuth += 1)
         {
             Vector2 target = context.User.Position + Maths.AzimuthToDirection(azimuth) * 1000;
             double speed = 150 + 15 * Math.Sin(Maths.Deg2Rad(azimuth) * 20);

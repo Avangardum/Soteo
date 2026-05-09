@@ -23,6 +23,8 @@ margin_right = -132.0
 grow_horizontal = 2
 text = "fps"
 
+[node name="FpsGraph" parent="." instance=ExtResource( 2 )]
+
 [node name="ServerLoadLabel" type="Label" parent="."]
 anchor_left = 1.0
 anchor_right = 1.0
@@ -32,8 +34,19 @@ margin_right = -132.0
 grow_horizontal = 2
 text = "server load"
 
-[node name="FpsGraph" parent="." instance=ExtResource( 2 )]
-
 [node name="ServerLoadGraph" parent="." instance=ExtResource( 2 )]
 margin_top = 150.0
 margin_bottom = 225.0
+
+[node name="EntityCountLabel" type="Label" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -187.0
+margin_top = 250.0
+margin_right = -77.0
+grow_horizontal = 2
+text = "entities"
+
+[node name="EntityCountGraph" parent="." instance=ExtResource( 2 )]
+margin_top = 275.0
+margin_bottom = 350.0

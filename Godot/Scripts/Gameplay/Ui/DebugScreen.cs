@@ -7,14 +7,14 @@ namespace Soteo.Gameplay.Ui;
 
 public sealed class DebugScreen : Control
 {
-    private const double UpdateInterval = 0.2;
     private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/DebugScreen.tscn"); 
     
-    private double _timeSinceUpdate;
-    private readonly double[] _fpsRing = new double[1000];
-    private readonly double[] _unrolledFpsRing = new double[1000];
-    private int _fpsRingNextIndex;
-    private double _fpsSamplingCountdown;
+    private readonly double[] _fpsRing = new double[10 * Const.TicksPerSecond];
+    private readonly double[] _unrolledFpsRing = new double[10 * Const.TicksPerSecond];
+    private readonly double[] _entityCountRing = new double[10 * Const.TicksPerSecond];
+    private readonly double[] _unrolledEntityCountRing = new double[10 * Const.TicksPerSecond];
+    private int _ringNextIndex;
+    private bool _shouldProcess;
     
     private readonly INetworkDebugger _networkDebugger;
     private readonly IShardServiceProviderSource _shardServiceProviderSource;
@@ -22,6 +22,7 @@ public sealed class DebugScreen : Control
     private readonly Label _label;
     private readonly Graph _fpsGraph;
     private readonly Graph _serverLoadGraph;
+    private readonly Graph _entityCountGraph;
     
     public DebugScreen(INetworkDebugger networkDebugger, IShardServiceProviderSource shardServiceProviderSource)
     {
@@ -38,51 +39,59 @@ public sealed class DebugScreen : Control
         _label = GetNode<Label>("Label");
         _fpsGraph = GetNode<Graph>("FpsGraph");
         _serverLoadGraph = GetNode<Graph>("ServerLoadGraph");
+        _entityCountGraph = GetNode<Graph>("EntityCountGraph");
     }
     
+    public override void _PhysicsProcess(float delta)
+    {
+        _shouldProcess = true;
+    }
+
     public override void _Process(float delta)
     {
-        ISynchronizationClient? synchronizationClient = _shardServiceProviderSource.ShardServiceProviders
-            .GetOrDefault(Const.TestShardId)
-            ?.GetRequiredService<ISynchronizationClient>();
+        if (!_shouldProcess) return;
+        _shouldProcess = false;
         
+        IServiceProvider? shardServiceProvider = _shardServiceProviderSource.ShardServiceProviders
+            .GetOrDefault(Const.TestShardId);
+        var synchronizationClient = shardServiceProvider?.GetRequiredService<ISynchronizationClient>();
+        var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
+        
+        _ringNextIndex = (_ringNextIndex + 1) % _fpsRing.Length;
         ProcessFpsGraph(delta);
+        ProcessEntityCountGraph(entityManager);
         if (synchronizationClient != null)
             _serverLoadGraph.SetData(synchronizationClient.ServerLoadHistory, "N2", 0, 1);
         
-        _timeSinceUpdate += delta;
-        if (_timeSinceUpdate >= UpdateInterval)
-        {
-            UpdateText(synchronizationClient);
-            _timeSinceUpdate = 0;
-        }
+        UpdateText(delta, synchronizationClient, entityManager);
     }
-    
+
     private void ProcessFpsGraph(double delta)
     {
-        const double fpsSamplingInterval = 0.02;
-        _fpsSamplingCountdown -= delta;
-        while (_fpsSamplingCountdown <= 0)
-        {
-            _fpsSamplingCountdown += fpsSamplingInterval;
-            _fpsRing[_fpsRingNextIndex] = Engine.GetFramesPerSecond();
-            _fpsRingNextIndex = (_fpsRingNextIndex + 1) % _fpsRing.Length;
-        }
-        _fpsRing.UnrollRingTo(_unrolledFpsRing, _fpsRingNextIndex);
+        _fpsRing[_ringNextIndex] = 1 / delta;
+        _fpsRing.UnrollRingTo(_unrolledFpsRing, _ringNextIndex + 1);
         _fpsGraph.SetData(_unrolledFpsRing, "N0", 0);
     }
     
-    private void UpdateText(ISynchronizationClient? synchronizationClient)
+    private void ProcessEntityCountGraph(IEntityManager? entityManager)
+    {
+        _entityCountRing[_ringNextIndex] = entityManager?.Entities.Count ?? 0;
+        _entityCountRing.UnrollRingTo(_unrolledEntityCountRing, _ringNextIndex + 1);
+        _entityCountGraph.SetData(_unrolledEntityCountRing, "N0", 0);
+    }
+    
+    private void UpdateText(double delta, ISynchronizationClient? synchronizationClient, IEntityManager? entityManager)
     {
         _label.Text =
             $"""
-             fps: {Engine.GetFramesPerSecond():N0}
+             fps: {1 / delta :N0}
              ping: {ToMillisecondsString(_networkDebugger.Ping(Const.TestShardId))}
              sync latency: {ToMillisecondsString(synchronizationClient?.Latency)}
-             wait frames: {synchronizationClient?.WaitFrameCount ?? 0}
-             fast-forwards: {synchronizationClient?.FastForwardCount ?? 0}
+             wait frames: {synchronizationClient?.WaitFrameCount ?? 0 :N0}
+             fast-forwards: {synchronizationClient?.FastForwardCount ?? 0 :N0}
              bytes sent: {_networkDebugger.BytesSent:N0}
              bytes received: {_networkDebugger.BytesReceived:N0}
+             entities: {entityManager?.Entities.Count ?? 0 :N0}
              """;
     }
     
