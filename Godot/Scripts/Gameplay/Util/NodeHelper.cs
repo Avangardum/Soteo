@@ -22,14 +22,12 @@ public static class NodeHelper
     public static Vector2 RoundPositionToPixelPerfect
     (
         Vector2 value,
-        ICamera? camera,
+        ICamera camera,
         bool isCamera,
         bool halfPixelXOffset,
         bool halfPixelYOffset
     )
     {
-        if (camera == null) return value;
-        
         // If zoom is even, an entity with the half-world-pixel offset would have this offset equal to an integer
         // number of screen pixels, so it's already pixel perfect, no adjustment is applied. For camera, however,
         // odd viewport size without zoom causes a half-pixel offset between world pixel grid and screen pixel grid,
