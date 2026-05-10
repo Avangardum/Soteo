@@ -19,6 +19,7 @@ margin_left = 50.0
 margin_top = 10.0
 margin_right = -50.0
 margin_bottom = -10.0
+mouse_filter = 2
 
 [node name="Line2D" type="Line2D" parent="."]
 width = 2.0

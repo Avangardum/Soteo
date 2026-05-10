@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Themes/OverheadUI.tres" type="Theme" id=1]
 [ext_resource path="res://Textures/White.png" type="Texture" id=2]
+[ext_resource path="res://Scripts/Shared/Proxy.gd" type="Script" id=3]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.145098, 0.145098, 0.164706, 1 )
@@ -16,16 +17,19 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 mouse_filter = 2
 theme = ExtResource( 1 )
+script = ExtResource( 3 )
 
 [node name="PlayerCharacter" type="PanelContainer" parent="."]
 visible = false
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 custom_styles/panel = SubResource( 1 )
 
 [node name="MarginContainer" type="MarginContainer" parent="PlayerCharacter"]
 margin_right = 131.0
 margin_bottom = 31.0
+mouse_filter = 2
 custom_constants/margin_right = 2
 custom_constants/margin_left = 2
 custom_constants/margin_bottom = 2
@@ -101,11 +105,13 @@ nine_patch_stretch = true
 visible = false
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 2
 custom_styles/panel = SubResource( 2 )
 
 [node name="MarginContainer" type="MarginContainer" parent="TinyHealth"]
 margin_right = 27.0
 margin_bottom = 6.0
+mouse_filter = 2
 custom_constants/margin_right = 1
 custom_constants/margin_top = 1
 custom_constants/margin_left = 1
