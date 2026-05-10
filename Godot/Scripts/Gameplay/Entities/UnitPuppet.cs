@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.EntityNodes;
+using Soteo.Gameplay.Util;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
 
@@ -37,9 +38,11 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     
     private void UpdateNodePosition()
     {
-        Node?.Position = RoundVisualPositionToPixelPerfect
+        Node?.Position = NodeHelper.RoundPositionToPixelPerfect
         (
             Position,
+            Camera.Value,
+            isCamera: false,
             Node.Properties.HalfPixelXVisualOffset,
             Node.Properties.HalfPixelYVisualOffset
         );

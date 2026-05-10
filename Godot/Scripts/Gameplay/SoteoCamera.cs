@@ -1,4 +1,5 @@
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Util;
 using Soteo.Shared;
 
 namespace Soteo.Gameplay;
@@ -73,6 +74,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
         }
         
         EnforceLimit();
+        RoundPositionToPixelPerfect();
         
         _prevGlobalMousePos = globalMousePos;
         _wasDraggingInPrevFrame = isDragging;
@@ -119,6 +121,15 @@ public sealed class SoteoCamera : Camera2D, ICamera
         position.y = (float)Maths.Clamp(position.y, minY, maxY);
         
         Position = position;
+    }
+    
+    private void RoundPositionToPixelPerfect()
+    {
+        Vector2 viewportSize = GetViewport().GetVisibleRect().Size;
+        bool halfPixelXOffset = viewportSize.x % 2 == 1;
+        bool halfPixelYOffset = viewportSize.y % 2 == 1;
+        Position = NodeHelper.RoundPositionToPixelPerfect(
+            Position, this, isCamera: true, halfPixelXOffset, halfPixelYOffset);
     }
 
     public override void _UnhandledInput(InputEvent e)

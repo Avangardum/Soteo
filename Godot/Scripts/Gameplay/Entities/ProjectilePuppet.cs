@@ -22,9 +22,11 @@ public sealed class ProjectilePuppet : Entity<ProjectilePuppetNode>
     
     private void UpdateNodePosition()
     {
-        Node?.Position = RoundVisualPositionToPixelPerfect
+        Node?.Position = NodeHelper.RoundPositionToPixelPerfect
         (
             Position,
+            Camera.Value,
+            isCamera: false,
             Node.Properties.HalfPixelXVisualOffset,
             Node.Properties.HalfPixelYVisualOffset
         );
