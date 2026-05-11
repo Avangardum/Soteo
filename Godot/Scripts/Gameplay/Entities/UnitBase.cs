@@ -11,7 +11,7 @@ namespace Soteo.Gameplay.Entities;
 
 public abstract class UnitBase<TNode> : Entity<TNode> where TNode : Node2D, IEntityNode
 {
-    public static readonly IReadOnlyDictionary<Stat, (double Min, double Defalut, double Max)> StatConst =
+    public static readonly IReadOnlyDictionary<Stat, (double Min, double Default, double Max)> StatConst =
         new Dictionary<Stat, (double, double, double)>
         {
             [Stat.MaxHealth] = (0, 1000, 10_000),
@@ -33,7 +33,7 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : Node2D, IEnt
         base(id, node, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
     {
         foreach (Stat stat in Stat.All)
-            StatsInternal[stat] = StatConst[stat].Defalut;
+            StatsInternal[stat] = StatConst[stat].Default;
         
         Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }

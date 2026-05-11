@@ -64,7 +64,7 @@ public abstract class Unit : UnitBase<UnitNode>
         AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
         StatusesInternal = s.Statuses.ToDictionary(it => it.Key, it => it.Value.Inflate(_serviceProvider));
-        _nextStatusOrdinal = Statuses.Values.Max(it => it.Ordinal) + 1;
+        _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
     }
 
     public virtual void PhysicsProcess(UnitNode node, double delta)
@@ -179,7 +179,7 @@ public abstract class Unit : UnitBase<UnitNode>
             
         double addTotal = modifiers[StatModifierKind.Add].Sum(it => it.Value);
         double multiplyTotal = modifiers[StatModifierKind.Multiply].Product(it => it.Value);
-        return Maths.Clamp((StatConst[stat].Defalut + addTotal) * multiplyTotal, maxFloor, minCeiling);
+        return Maths.Clamp((StatConst[stat].Default + addTotal) * multiplyTotal, maxFloor, minCeiling);
     }
     
     private double ResolveNonOverlappingStatLimits
@@ -590,7 +590,7 @@ public abstract class Unit : UnitBase<UnitNode>
     private void AddStatusWithoutDuplicateResolution(StatusContext context)
     {
         StatusesInternal[context.Id] = context;
-        if (context.TickInterval == 0)
+        if (context.TickInterval != 0)
             context.Status.Tick(context);
     }
     
