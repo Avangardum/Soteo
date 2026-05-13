@@ -37,9 +37,9 @@ See Architecture.md files in subfolders to learn about specific components.
 - [x] Show statuses in HUD
 - [x] Stop command
 - [x] Switch to double
-- [ ] Status / abililty icons
-- [ ] Death
+- [x] Status / abililty icons
 - [ ] Status / ability tooltips
+- [ ] Death
 - [ ] Tell apart factions at low health
 - [ ] Cluster startup / shutdown
 - [ ] Stress test / optimization
