@@ -157,6 +157,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddSingleton<IHud>(_ => _hud.Required);
         services.AddSingleton<IEntityLocator, EntityLocator>();
         services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
+        services.AddSingletonNode<ITooltip>("Ui/TooltipLayer/Tooltip");
     }
     
     public void LoadShard()

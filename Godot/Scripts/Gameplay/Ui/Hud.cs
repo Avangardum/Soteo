@@ -24,14 +24,22 @@ public sealed class Hud : Control, IHud
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPalette _palette;
+    private readonly ITooltip _tooltip;
     
     public UnitPuppet? SelectedUnit { get; set; }
 
-    public Hud(IEntityLocator entityLocator, ICurrentUserIdRepository currentUserIdRepository, IPalette palette)
+    public Hud
+    (
+        IEntityLocator entityLocator,
+        ICurrentUserIdRepository currentUserIdRepository,
+        IPalette palette,
+        ITooltip tooltip
+    )
     {
         _entityLocator = entityLocator;
         _currentUserIdRepository = currentUserIdRepository;
         _palette = palette;
+        _tooltip = tooltip;
         
         Name = nameof(Hud);
         AnchorBottom = 1;
@@ -52,19 +60,38 @@ public sealed class Hud : Control, IHud
 
         for (int i = 0; i < _abilityButtons.Count; i++)
         {
-            _abilityButtons[i].Connect("button_down", this, nameof(OnButtonDown), [i]);
-            _abilityButtons[i].Connect("button_up", this, nameof(OnButtonUp), [i]);
+            _abilityButtons[i].Connect("button_down", this, nameof(OnAbilityButtonDown), [i]);
+            _abilityButtons[i].Connect("button_up", this, nameof(OnAbilityButtonUp), [i]);
+            _abilityButtons[i].Connect("mouse_entered", this, nameof(OnMouseEnteredAbilityButton), [i]);
+            _abilityButtons[i].Connect("mouse_exited", this, nameof(OnMouseExitedAbilityButton), [i]);
         }
     }
 
-    public void OnButtonDown(int buttonIndex)
+    public void OnAbilityButtonDown(int buttonIndex)
     {
         Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = true });
     }
     
-    public void OnButtonUp(int buttonIndex)
+    public void OnAbilityButtonUp(int buttonIndex)
     {
         Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
+    }
+    
+    public void OnMouseEnteredAbilityButton(int buttonIndex)
+    {
+        if (SelectedUnit == null) return;
+        AbilitySlot slot = AbilitySlot.Class0 + (byte)buttonIndex;
+        if (!SelectedUnit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
+        
+        _tooltip.Visible = true;
+        _tooltip.RectGlobalPosition = _abilityButtons[buttonIndex].RectGlobalPosition +
+            new Vector2(_abilityButtons[buttonIndex].RectSize.x / 2, 0);
+        _tooltip.Header = state.Ability.Name;
+    }
+    
+    public void OnMouseExitedAbilityButton(int buttonIndex)
+    {
+        _tooltip.Visible = false;
     }
 
     public override void _Process(float delta)

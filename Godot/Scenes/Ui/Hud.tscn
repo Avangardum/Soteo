@@ -30,55 +30,55 @@ mouse_filter = 2
 
 [node name="Statuses" type="HBoxContainer" parent="VBoxContainer"]
 margin_right = 510.0
-margin_bottom = 40.0
+margin_bottom = 38.0
 mouse_filter = 2
 
 [node name="0" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
 
 [node name="1" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 44.0
-margin_right = 84.0
+margin_left = 42.0
+margin_right = 80.0
 
 [node name="2" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 88.0
-margin_right = 128.0
+margin_left = 84.0
+margin_right = 122.0
 
 [node name="3" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 132.0
-margin_right = 172.0
+margin_left = 126.0
+margin_right = 164.0
 
 [node name="4" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 176.0
-margin_right = 216.0
+margin_left = 168.0
+margin_right = 206.0
 
 [node name="5" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 220.0
-margin_right = 260.0
+margin_left = 210.0
+margin_right = 248.0
 
 [node name="6" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 264.0
-margin_right = 304.0
+margin_left = 252.0
+margin_right = 290.0
 
 [node name="7" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 308.0
-margin_right = 348.0
+margin_left = 294.0
+margin_right = 332.0
 
 [node name="8" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 352.0
-margin_right = 392.0
+margin_left = 336.0
+margin_right = 374.0
 
 [node name="9" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 396.0
-margin_right = 436.0
+margin_left = 378.0
+margin_right = 416.0
 
 [node name="10" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 440.0
-margin_right = 480.0
+margin_left = 420.0
+margin_right = 458.0
 
 [node name="UnitPanel" type="PanelContainer" parent="VBoxContainer"]
-margin_top = 44.0
+margin_top = 42.0
 margin_right = 510.0
-margin_bottom = 192.0
+margin_bottom = 190.0
 grow_horizontal = 2
 grow_vertical = 0
 rect_min_size = Vector2( 400, 0 )

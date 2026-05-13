@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Text.RegularExpressions;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Statuses;
@@ -24,6 +25,9 @@ public abstract class Ability
     }
     
     public int Id => All.IndexOf(this);
+    
+    public virtual string Name =>
+        GetType().Name.Replace("Ability", "").PassTo(it => Regex.Replace(it, "(?<=.)[A-Z]", " $0"));
     
     public virtual int MaxLevel => 1;
     public virtual Status? PassiveStatus => null;

@@ -1,0 +1,67 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Fonts/Forum/Forum-Regular.ttf" type="DynamicFontData" id=1]
+[ext_resource path="res://Scripts/Gameplay/Ui/Tooltip.cs" type="Script" id=2]
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0.145098, 0.145098, 0.164706, 1 )
+
+[sub_resource type="DynamicFont" id=2]
+size = 32
+font_data = ExtResource( 1 )
+
+[node name="Tooltip" type="Control"]
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource( 2 )
+
+[node name="Panel" type="Panel" parent="."]
+margin_top = -10.0
+margin_right = 40.0
+margin_bottom = 30.0
+rect_rotation = -135.0
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+margin_left = -205.0
+margin_top = -438.0
+margin_right = 205.0
+margin_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+custom_styles/panel = SubResource( 1 )
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+margin_right = 410.0
+margin_bottom = 418.0
+custom_constants/margin_right = 5
+custom_constants/margin_top = 5
+custom_constants/margin_left = 5
+custom_constants/margin_bottom = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 405.0
+margin_bottom = 413.0
+
+[node name="Header" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer"]
+margin_right = 400.0
+margin_bottom = 36.0
+custom_fonts/font = SubResource( 2 )
+text = "Lorem ipsum"
+
+[node name="HSeparator" type="HSeparator" parent="PanelContainer/MarginContainer/VBoxContainer"]
+margin_top = 40.0
+margin_right = 400.0
+margin_bottom = 44.0
+
+[node name="Body" type="RichTextLabel" parent="PanelContainer/MarginContainer/VBoxContainer"]
+margin_top = 48.0
+margin_right = 400.0
+margin_bottom = 408.0
+rect_min_size = Vector2( 400, 0 )
+text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Pater meus coquit fercula omnino infernalia. Bene, haec est fere vulgaris formula, quia multae variationes sunt. Sumit iusculum, non calefacit — calefacere non est res patris mei. Sumit iusculum, in sartagine infundit, et frigere incipit. Addit ingentem quantitatem ceparum, allii, piperis nigri et rubri, farinam ad viscositatem, et pastam lycopersici super. Omnia frigit donec fumigare incipiant. Deinde ab igne tollit et in maeniano refrigerari sinit. Tum intus affert, liberaliter maione perfundit, et edere incipit. Directe ex sartagine edit, cochleari radens. Edit et submissa voce murmurat, \"o, mehercule.\" Sudor reapse in frontem eius erumpit. Interdum mihi aliquid offert, sed recuso. Supervacuum est dicere, monstruosum poplitum quem postea producit? Foetor tam magnus est ut charta parietum a parietibus detrahatur."
+fit_content_height = true
