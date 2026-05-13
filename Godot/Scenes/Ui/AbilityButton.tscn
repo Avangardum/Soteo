@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Textures/White.png" type="Texture" id=1]
-[ext_resource path="res://Textures/icon.png" type="Texture" id=2]
+[ext_resource path="res://Textures/Icons/Placeholder.png" type="Texture" id=2]
 [ext_resource path="res://Scripts/Gameplay/Ui/AbilityButton.cs" type="Script" id=3]
 
 [sub_resource type="CanvasItemMaterial" id=1]

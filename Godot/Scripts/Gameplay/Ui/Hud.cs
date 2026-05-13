@@ -19,7 +19,7 @@ public sealed class Hud : Control, IHud
     private readonly Label _healthLabel;
     private readonly Label _manaLabel;
     private readonly ImmutableList<AbilityButton> _abilityButtons;
-    private readonly ImmutableList<TextureProgress> _statusIndicators;
+    private readonly ImmutableList<StatusIndicator> _statusIndicators;
     
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
@@ -47,7 +47,7 @@ public sealed class Hud : Control, IHud
             .Cast<AbilityButton>()
             .ToImmutableList();
         _statusIndicators = GetNode("VBoxContainer/Statuses").GetChildren()
-            .Cast<TextureProgress>()
+            .Cast<StatusIndicator>()
             .ToImmutableList();
 
         for (int i = 0; i < _abilityButtons.Count; i++)
@@ -115,6 +115,8 @@ public sealed class Hud : Control, IHud
             button.Visible = true;
             AbilitySlotState state = SelectedUnit.AbilitySlotStates[slot];
             
+            button.IconRect.Texture = state.Ability.Icon;
+            
             button.CooldownIndicator.Value = state.Cooldown;
             button.CooldownIndicator.MaxValue = state.MaxCooldown == 0 ? 1 : state.MaxCooldown;
 
@@ -142,6 +144,7 @@ public sealed class Hud : Control, IHud
         for (; i < contexts.Count; i++)
         {
             _statusIndicators[i].Visible = true;
+            _statusIndicators[i].IconRect.Texture = contexts[i].Status.ResolveIcon(contexts[i]);
             _statusIndicators[i].Value = contexts[i].DisplayNormalizedRemainingTime;
         }
         for (; i < _statusIndicators.Count; i++)

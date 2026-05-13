@@ -29,8 +29,16 @@ public abstract class Ability
     public virtual Status? PassiveStatus => null;
     public virtual double PassiveTickInterval => 0;
     public virtual CanTarget Targeting => CanTarget.Passive;
+    
     public virtual string Animation => "Attack Right";
     public virtual bool LoopAnimation => false;
+    
+    /// <summary>
+    /// Path to the ability icon relative to res://Textures/Icons, without an extension
+    /// </summary>
+    public virtual string IconPath => "Placeholder";
+    
+    public Texture Icon => ResourceLoader.Load<Texture>($"res://Textures/Icons/{IconPath}.png");
     
     // Static values define what is shown in ability description. They are constant and independent of context.
     public virtual Scalable<double> StaticHealthCost => 0;

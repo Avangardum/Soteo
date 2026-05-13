@@ -44,6 +44,7 @@ public sealed record DeflatedStatusContext
         {
             Id = Id,
             Status = Status,
+            Ability = AbilityContext?.Ability,
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
             Ordinal = Ordinal

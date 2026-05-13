@@ -362,6 +362,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
     {
         SerializeGuid(value.Id, stream);
         SerializeStatus(value.Status, stream);
+        SerializeNullableClass(value.Ability, SerializeAbility, stream);
         SerializeDouble(value.DisplayElapsedTime, stream);
         SerializeDouble(value.RemainingTime, stream);
         SerializeLong(value.Ordinal, stream);
@@ -373,6 +374,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         {
             Id = DeserializeGuid(stream),
             Status = DeserializeStatus(stream),
+            Ability = DeserializeNullableClass(DeserializeAbility, stream),
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
             Ordinal = DeserializeLong(stream)

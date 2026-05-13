@@ -3,6 +3,7 @@ using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Util;
+using Soteo.Shared;
 
 namespace Soteo.Gameplay.Statuses;
 
@@ -23,6 +24,18 @@ public abstract class Status
     public int Id => All.IndexOf(this);
     
     public abstract DuplicateStatusResolution DuplicateResolution { get; }
+    
+    /// <summary>
+    /// Path to the status icon relative to res://Textures/Icons, without an extension.
+    /// If null, uses the same icon as the ability that caused the status.
+    /// </summary>
+    public virtual string? IconPath => null;
+    
+    public Texture? Icon =>
+        IconPath == null ? null : ResourceLoader.Load<Texture>($"res://Textures/Icons/{IconPath}.png");
+    
+    public Texture ResolveIcon(PuppetStatusContext context) =>
+        Icon ?? context.Ability?.Icon ?? Const.PlaceholderIcon;
     
     public virtual IReadOnlyList<StatModifier> StatModifiers(StatusContext context) => [];
     
