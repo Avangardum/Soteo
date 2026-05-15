@@ -22,7 +22,7 @@ public sealed class Tooltip : Control, ITooltip
     public void Show(Vector2 position, string header, string body)
     {
         Visible = true;
-        RectPosition = position;
+        RectGlobalPosition = position;
         _headerLabel.Text = header;
         _bodyLabel.BbcodeText = body;
         _headerLabel.Visible = header != "";
