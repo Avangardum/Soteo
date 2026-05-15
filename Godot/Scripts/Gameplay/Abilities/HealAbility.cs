@@ -8,7 +8,7 @@ public sealed class HealAbility : Ability
 {
     public override int MaxLevel => 4;
     public override Scalable<double> StaticManaCost => [100, 120, 160, 180];
-    private Scalable<double> Heal => [200, 300, 400, 500];
+    public Scalable<double> Heal => [200, 300, 400, 500];
     public override Scalable<double> StaticCooldown => [15, 13, 11, 9];
     public override Scalable<double> StaticUseTime => 0.5;
     public override Scalable<double> StaticRange => 300;

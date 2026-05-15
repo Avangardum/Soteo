@@ -8,5 +8,14 @@ public static class StringExtensions
     {
         public string ReplaceRegex(string pattern, string replacement) =>
             Regex.Replace(self, pattern, replacement);
+        
+        public string ReplaceRegex(string pattern, MatchEvaluator evaluator) =>
+            Regex.Replace(self, pattern, evaluator);
+        
+        public string PascalCaseToCapitalizedText() =>
+            self.ReplaceRegex("(?<=.)[A-Z]", " $0");
+        
+        public string PascalCaseToSnakeCase() =>
+            self.ReplaceRegex("(?<=.)[A-Z]", "_$0").ToLower();
     }
 }

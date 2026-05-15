@@ -1,12 +1,11 @@
 using System.Collections.Immutable;
-using System.Text.RegularExpressions;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Enums;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Statuses;
 using Soteo.Gameplay.Util;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Abilities;
 
@@ -27,7 +26,7 @@ public abstract class Ability
     public int Id => All.IndexOf(this);
     
     public virtual string Name =>
-        GetType().Name.ReplaceRegex("Ability$", "").ReplaceRegex("(?<=.)[A-Z]", " $0");
+        GetType().Name.ReplaceRegex("Ability$", "").PascalCaseToCapitalizedText();
     
     public virtual int MaxLevel => 1;
     public virtual Status? PassiveStatus => null;
@@ -169,5 +168,52 @@ public abstract class Ability
         }
         
         return AbilityValidationResult.Ok;
+    }
+    
+    public string Description(ILocalizer localizer)
+    {
+        string formatKey = GetType().Name.PascalCaseToSnakeCase().ToUpper() + "_DESCRIPTION";
+        string format = localizer.GetString(formatKey);
+        
+        return format
+            .PassTo(FillDescriptionProperties)
+            .PassTo(it => FillDescriptionPluralization(it, localizer));
+    }
+    
+    private string FillDescriptionProperties(string value)
+    {
+        // example: {Name}
+        const string propertyRegex = @"\{([A-Za-z0-9_]+)\}";
+        
+        return value.ReplaceRegex
+        (
+            propertyRegex,
+            match =>
+            {
+                string propertyName = match.Groups[1].Value;
+                return GetType().GetProperty(propertyName)?.GetValue(this).ToString() ??
+                    throw new InvalidOperationException($"Property {GetType().Name}.{propertyName} not found");
+            }
+        );
+    }
+    
+    private string FillDescriptionPluralization(string value, ILocalizer localizer)
+    {
+        // example: {Duration|second|seconds}
+        const string pluralisationRegex = @"\{([A-Za-z0-9_]+)(?:\|([^\{\}\|]+))+\}";
+        
+        return value.ReplaceRegex
+        (
+            pluralisationRegex,
+            match =>
+            {
+                string propertyName = match.Groups[1].Value;
+                object propertyValue = GetType().GetProperty(propertyName)?.GetValue(this) ??
+                    throw new InvalidOperationException($"Property {GetType().Name}.{propertyName} not found.");
+                double? doubleValue = propertyValue is IConvertible ? Convert.ToDouble(propertyValue) : null;
+                int pluralizationIndex = localizer.GetPluralisationIndex(doubleValue);
+                return match.Groups[2].Captures[pluralizationIndex].Value;
+            }
+        );
     }
 }

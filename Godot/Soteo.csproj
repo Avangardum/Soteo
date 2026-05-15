@@ -21,6 +21,8 @@
     </ItemGroup>
     
     <ItemGroup>
+      <Content Include="Localization\English.csv" />
+      <Content Include="Localization\Russian.csv" />
       <Content Include="Web.html" />
     </ItemGroup>
     

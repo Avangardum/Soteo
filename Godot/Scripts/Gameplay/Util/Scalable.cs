@@ -36,4 +36,6 @@ public sealed class Scalable<T> : IEnumerable<T>
     }
     
     public static implicit operator Scalable<T>(T value) => [value];
+
+    public override string ToString() => string.Join(" / ", this);
 }

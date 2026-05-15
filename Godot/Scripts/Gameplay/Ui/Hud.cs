@@ -25,6 +25,7 @@ public sealed class Hud : Control, IHud
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPalette _palette;
     private readonly ITooltip _tooltip;
+    private readonly ILocalizer _localizer;
     
     public UnitPuppet? SelectedUnit { get; set; }
 
@@ -33,13 +34,15 @@ public sealed class Hud : Control, IHud
         IEntityLocator entityLocator,
         ICurrentUserIdRepository currentUserIdRepository,
         IPalette palette,
-        ITooltip tooltip
+        ITooltip tooltip,
+        ILocalizer localizer
     )
     {
         _entityLocator = entityLocator;
         _currentUserIdRepository = currentUserIdRepository;
         _palette = palette;
         _tooltip = tooltip;
+        _localizer = localizer;
         
         Name = nameof(Hud);
         AnchorBottom = 1;
@@ -87,6 +90,7 @@ public sealed class Hud : Control, IHud
         _tooltip.RectGlobalPosition = _abilityButtons[buttonIndex].RectGlobalPosition +
             new Vector2(_abilityButtons[buttonIndex].RectSize.x / 2, 0);
         _tooltip.Header = state.Ability.Name;
+        _tooltip.Body = state.Ability.Description(_localizer);
     }
     
     public void OnMouseExitedAbilityButton(int buttonIndex)

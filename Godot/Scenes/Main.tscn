@@ -30,6 +30,7 @@ layer = 2
 layer = 3
 
 [node name="Tooltip" parent="Ui/TooltipLayer" instance=ExtResource( 1 )]
+visible = false
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 scroll_ignore_camera_zoom = true

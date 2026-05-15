@@ -151,6 +151,10 @@ stop={
 2d_physics/layer_1="Default"
 2d_physics/layer_9="ClickArea"
 
+[locale]
+
+translations=PoolStringArray( "res://Localization/English.en.translation", "res://Localization/Russian.ru.translation" )
+
 [mono]
 
 project/assembly_name="Soteo"

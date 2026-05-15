@@ -1,0 +1,3 @@
+;en
+HEAL_ABILITY_DESCRIPTION;"Restores {Heal} health. That's exactly {Heal} {Heal|point|points} of health.
+That's it."
