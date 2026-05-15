@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Immutable;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using Soteo.Shared;
 
@@ -9,7 +10,7 @@ public abstract class Scalable
 {
     public static Scalable<T> Create<T>(params ReadOnlySpan<T> values) where T : notnull => new(values);
     
-    public abstract string ToBbcode(int? highlightLevel = null);
+    public abstract string ToBbcode(int? highlightLevel = null, string? format = null);
 }
 
 /// <summary>
@@ -41,6 +42,12 @@ public sealed class Scalable<T> : Scalable, IEnumerable<T> where T : notnull
 
     public override string ToString() => string.Join(" / ", this);
 
-    public override string ToBbcode(int? highlightLevel = null) =>
-        string.Join(" / ", this.Select((v, i) => i + 1 == highlightLevel ? $"[b]{v}[/b]" : v.ToString()));
+    public override string ToBbcode(int? highlightLevel = null, string? format = null)
+    {
+        return string.Join(" / ",
+            this.Select((v, i) => i + 1 == highlightLevel ? $"[b]{Format(v, format)}[/b]" : Format(v, format)));
+    }
+    
+    private string Format(T value, string? format) =>
+        value is IFormattable f && format != null ? f.ToString(format, CultureInfo.CurrentCulture) : value.ToString();
 }

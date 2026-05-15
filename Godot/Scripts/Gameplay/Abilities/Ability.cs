@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
@@ -182,8 +183,8 @@ public abstract class Ability
     
     private string FillDescriptionProperties(string value, int? level)
     {
-        // example: {Name}
-        const string propertyRegex = @"\{([A-Za-z0-9_]+)\}";
+        // example: {Duration:N2}
+        const string propertyRegex = @"\{([A-Za-z0-9_]+)(?:\:([^\{\}\|\:]+))?\}";
         
         return value.ReplaceRegex
         (
@@ -191,11 +192,13 @@ public abstract class Ability
             match =>
             {
                 string propertyName = match.Groups[1].Value;
+                string? format = match.Groups[2].NullableValue;
                 object? propertyValue = GetType().GetProperty(propertyName)?.GetValue(this);
                 return propertyValue switch
                 {
                     null => "ERROR",
-                    Scalable s => s.ToBbcode(level),
+                    Scalable s => s.ToBbcode(level, format),
+                    IFormattable f => f.ToString(format, CultureInfo.CurrentCulture),
                     _ => propertyValue.ToString()
                 };
             }
