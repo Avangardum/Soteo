@@ -94,7 +94,7 @@ public sealed class Hud : Control, IHud
         Vector2 position = _abilityButtons[buttonIndex].RectGlobalPosition +
             new Vector2(_abilityButtons[buttonIndex].RectSize.x / 2, 0);
         string header = state.Ability.Name;
-        string body = state.Ability.Description(_localizer);
+        string body = state.Ability.Description(_localizer, state.Level);
         _tooltip.Show(position, header, body);
     }
     

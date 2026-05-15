@@ -170,17 +170,17 @@ public abstract class Ability
         return AbilityValidationResult.Ok;
     }
     
-    public string Description(ILocalizer localizer)
+    public string Description(ILocalizer localizer, int? level = null)
     {
         string formatKey = GetType().Name.PascalCaseToSnakeCase().ToUpper() + "_DESCRIPTION";
         string format = localizer.GetString(formatKey);
         
         return format
-            .PassTo(FillDescriptionProperties)
+            .PassTo(it => FillDescriptionProperties(it, level))
             .PassTo(it => FillDescriptionPluralization(it, localizer));
     }
     
-    private string FillDescriptionProperties(string value)
+    private string FillDescriptionProperties(string value, int? level)
     {
         // example: {Name}
         const string propertyRegex = @"\{([A-Za-z0-9_]+)\}";
@@ -191,8 +191,13 @@ public abstract class Ability
             match =>
             {
                 string propertyName = match.Groups[1].Value;
-                return GetType().GetProperty(propertyName)?.GetValue(this).ToString() ??
-                    throw new InvalidOperationException($"Property {GetType().Name}.{propertyName} not found");
+                object? propertyValue = GetType().GetProperty(propertyName)?.GetValue(this);
+                return propertyValue switch
+                {
+                    null => "ERROR",
+                    Scalable s => s.ToBbcode(level),
+                    _ => propertyValue.ToString()
+                };
             }
         );
     }
@@ -208,8 +213,7 @@ public abstract class Ability
             match =>
             {
                 string propertyName = match.Groups[1].Value;
-                object propertyValue = GetType().GetProperty(propertyName)?.GetValue(this) ??
-                    throw new InvalidOperationException($"Property {GetType().Name}.{propertyName} not found.");
+                object? propertyValue = GetType().GetProperty(propertyName)?.GetValue(this);
                 double? doubleValue = propertyValue is IConvertible ? Convert.ToDouble(propertyValue) : null;
                 int pluralizationIndex = localizer.GetPluralisationIndex(doubleValue);
                 return match.Groups[2].Captures[pluralizationIndex].Value;

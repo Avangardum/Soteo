@@ -5,16 +5,18 @@ using Soteo.Shared;
 
 namespace Soteo.Gameplay.Util;
 
-public static class Scalable
+public abstract class Scalable
 {
-    public static Scalable<T> Create<T>(params ReadOnlySpan<T> values) => new(values);
+    public static Scalable<T> Create<T>(params ReadOnlySpan<T> values) where T : notnull => new(values);
+    
+    public abstract string ToBbcode(int? highlightLevel = null);
 }
 
 /// <summary>
 /// Value that scales with level
 /// </summary>
 [CollectionBuilder(typeof(Scalable), nameof(Scalable.Create))]
-public sealed class Scalable<T> : IEnumerable<T>
+public sealed class Scalable<T> : Scalable, IEnumerable<T> where T : notnull
 {
     private readonly ImmutableArray<T> _values;
     
@@ -38,4 +40,7 @@ public sealed class Scalable<T> : IEnumerable<T>
     public static implicit operator Scalable<T>(T value) => [value];
 
     public override string ToString() => string.Join(" / ", this);
+
+    public override string ToBbcode(int? highlightLevel = null) =>
+        string.Join(" / ", this.Select((v, i) => i + 1 == highlightLevel ? $"[b]{v}[/b]" : v.ToString()));
 }
