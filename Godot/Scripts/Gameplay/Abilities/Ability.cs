@@ -178,7 +178,8 @@ public abstract class Ability
         
         return format
             .PassTo(it => FillDescriptionProperties(it, level))
-            .PassTo(it => FillDescriptionPluralization(it, localizer));
+            .PassTo(it => FillDescriptionPluralization(it, localizer)) +
+            DescriptionFooter(level);
     }
     
     private string FillDescriptionProperties(string value, int? level)
@@ -223,5 +224,19 @@ public abstract class Ability
                 return match.Groups[2].Captures[pluralizationIndex].Value;
             }
         );
+    }
+    
+    private string DescriptionFooter(int? level)
+    {
+        List<string> parts = [];
+        if (StaticHealthCost.Any(it => it > 0))
+            parts.Add("[img]res://Textures/Icons/BbCode/Health.png[/img] " + StaticHealthCost.ToBbcode(level));
+        if (StaticManaCost.Any(it => it > 0))
+            parts.Add("[img]res://Textures/Icons/BbCode/Mana.png[/img] " + StaticManaCost.ToBbcode(level));
+        if (StaticCooldown.Any(it => it > 0))
+            parts.Add("[img]res://Textures/Icons/BbCode/Cooldown.png[/img] " + StaticCooldown.ToBbcode(level));
+        if (StaticRange.Any(it => it > 0))
+            parts.Add("[img]res://Textures/Icons/BbCode/Range.png[/img] " + StaticRange.ToBbcode(level));
+        return parts.Count == 0 ? "" : "\n" + string.Join("\n", parts);
     }
 }
