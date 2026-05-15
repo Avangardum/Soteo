@@ -218,6 +218,7 @@ public abstract class Ability
                 string propertyName = match.Groups[1].Value;
                 object? propertyValue = GetType().GetProperty(propertyName)?.GetValue(this);
                 double? doubleValue = propertyValue is IConvertible ? Convert.ToDouble(propertyValue) : null;
+                if (doubleValue == null) return "ERROR";
                 int pluralizationIndex = localizer.GetPluralisationIndex(doubleValue);
                 return match.Groups[2].Captures[pluralizationIndex].Value;
             }
