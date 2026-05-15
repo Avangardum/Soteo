@@ -16,6 +16,6 @@ public static class StringExtensions
             self.ReplaceRegex("(?<=.)[A-Z]", " $0");
         
         public string PascalCaseToSnakeCase() =>
-            self.ReplaceRegex("(?<=.)[A-Z]", "_$0").ToLower();
+            self.ReplaceRegex("(?<=.)[A-Z]", "_$0").ToLowerInvariant();
     }
 }

@@ -1,12 +1,11 @@
 using System.Collections.Immutable;
-using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Statuses;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Ui;
 
@@ -66,7 +65,13 @@ public sealed class Hud : Control, IHud
             _abilityButtons[i].Connect("button_down", this, nameof(OnAbilityButtonDown), [i]);
             _abilityButtons[i].Connect("button_up", this, nameof(OnAbilityButtonUp), [i]);
             _abilityButtons[i].Connect("mouse_entered", this, nameof(OnMouseEnteredAbilityButton), [i]);
-            _abilityButtons[i].Connect("mouse_exited", this, nameof(OnMouseExitedAbilityButton), [i]);
+            _abilityButtons[i].Connect("mouse_exited", this, nameof(OnMouseExitedTooltipableControl));
+        }
+        
+        for (int i = 0; i < _statusIndicators.Count; i++)
+        {
+            _statusIndicators[i].Connect("mouse_entered", this, nameof(OnMouseEnteredStatusIndicator), [i]);
+            _statusIndicators[i].Connect("mouse_exited", this, nameof(OnMouseExitedTooltipableControl));
         }
     }
 
@@ -86,16 +91,30 @@ public sealed class Hud : Control, IHud
         AbilitySlot slot = AbilitySlot.Class0 + (byte)buttonIndex;
         if (!SelectedUnit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
         
-        _tooltip.Visible = true;
-        _tooltip.RectGlobalPosition = _abilityButtons[buttonIndex].RectGlobalPosition +
+        Vector2 position = _abilityButtons[buttonIndex].RectGlobalPosition +
             new Vector2(_abilityButtons[buttonIndex].RectSize.x / 2, 0);
-        _tooltip.Header = state.Ability.Name;
-        _tooltip.Body = state.Ability.Description(_localizer);
+        string header = state.Ability.Name;
+        string body = state.Ability.Description(_localizer);
+        _tooltip.Show(position, header, body);
     }
     
-    public void OnMouseExitedAbilityButton(int buttonIndex)
+    public void OnMouseEnteredStatusIndicator(int indicatorIndex)
     {
-        _tooltip.Visible = false;
+        if (SelectedUnit == null) return;
+        ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(SelectedUnit);
+        if (indicatorIndex >= contexts.Count) return;
+        Status status = contexts[indicatorIndex].Status;
+        
+        Vector2 position = _statusIndicators[indicatorIndex].RectGlobalPosition +
+            new Vector2(_statusIndicators[indicatorIndex].RectSize.x / 2, 0);
+        string header = "";
+        string body = status.Description(_localizer);
+        _tooltip.Show(position, header, body);
+    }
+    
+    public void OnMouseExitedTooltipableControl()
+    {
+        _tooltip.Hide();
     }
 
     public override void _Process(float delta)
@@ -167,10 +186,7 @@ public sealed class Hud : Control, IHud
     
     private void ProcessStatuses(UnitPuppet unit)
     {
-        List<PuppetStatusContext> contexts = unit.Statuses.Values
-            .OrderBy(it => it.Ordinal)
-            .Take(_statusIndicators.Count)
-            .ToList();
+        ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(unit);
         int i = 0;
         for (; i < contexts.Count; i++)
         {
@@ -182,5 +198,14 @@ public sealed class Hud : Control, IHud
         {
             _statusIndicators[i].Visible = false;
         }
+    }
+    
+    private ImmutableList<PuppetStatusContext> GetVisibleStatusContexts(UnitPuppet unit)
+    {
+        return unit.Statuses.Values
+            .Where(it => it.Status.HudVisible)
+            .OrderBy(it => it.Ordinal)
+            .Take(_statusIndicators.Count)
+            .ToImmutableList();
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Enums;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
 using Soteo.Shared;
 
@@ -34,6 +35,8 @@ public abstract class Status
     public Texture? Icon =>
         IconPath == null ? null : ResourceLoader.Load<Texture>($"res://Textures/Icons/{IconPath}.png");
     
+    public virtual bool HudVisible => true;
+    
     public Texture ResolveIcon(PuppetStatusContext context) =>
         Icon ?? context.Ability?.Icon ?? Const.PlaceholderIcon;
     
@@ -42,4 +45,7 @@ public abstract class Status
     public virtual void Tick(StatusContext context) { }
     
     public virtual void OnDealAttackDamage(StatusContext context, Unit target, double damage) { }
+    
+    public string Description(ILocalizer localizer) =>
+        localizer.GetString(GetType().Name.PascalCaseToSnakeCase().ToUpperInvariant() + "_DESCRIPTION");
 }

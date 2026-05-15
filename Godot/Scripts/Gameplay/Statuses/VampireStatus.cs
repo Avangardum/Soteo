@@ -11,6 +11,8 @@ public sealed class VampireStatus : Status
 {
     public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Replace;
 
+    public override bool HudVisible => false;
+
     public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
     [
         new(Stat.HealthRegen, StatModifierKind.Set, 0)

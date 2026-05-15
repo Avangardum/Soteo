@@ -17,8 +17,8 @@ script = ExtResource( 2 )
 
 [node name="Panel" type="Panel" parent="."]
 margin_top = -10.0
-margin_right = 40.0
-margin_bottom = 30.0
+margin_right = 15.0
+margin_bottom = 5.0
 rect_rotation = -135.0
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
