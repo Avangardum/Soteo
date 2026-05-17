@@ -41,6 +41,8 @@ See Architecture.md files in subfolders to learn about specific components.
 - [x] Status / ability tooltips
 - [ ] Death
 - [ ] Tell apart factions at low health
+- [x] Style convention
+- [ ] Testing
 - [ ] Cluster startup / shutdown
 - [ ] Stress test / optimization
 - [ ] Manual character creation and spawning
