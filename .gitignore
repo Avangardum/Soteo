@@ -438,7 +438,10 @@ export_presets.cfg
 .mono/
 
 # Rider
-
 data_source_mapping.xml
 dataSources.xml
 sqldialects.xml
+
+# Claude
+CLAUDE.md
+.claude
