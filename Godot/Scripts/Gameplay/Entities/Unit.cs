@@ -72,6 +72,8 @@ public abstract class Unit : UnitBase<UnitNode>
 
     public virtual void PhysicsProcess(UnitNode node, double delta)
     {
+        if (IsDead) return;
+        
         IsMoving = false;
         UpdateStats();
         DecreaseCooldowns(delta);
@@ -93,8 +95,8 @@ public abstract class Unit : UnitBase<UnitNode>
     
     private void ApplyRegen(double delta)
     {
-        ChangeStat(Stat.CurrentHealth, Stats[Stat.HealthRegen] * delta);
-        ChangeStat(Stat.CurrentMana, Stats[Stat.ManaRegen] * delta);
+        ChangeResourceStat(Stat.CurrentHealth, Stats[Stat.HealthRegen] * delta);
+        ChangeResourceStat(Stat.CurrentMana, Stats[Stat.ManaRegen] * delta);
     }
     
     private void ProcessStatuses(double delta)
@@ -134,7 +136,7 @@ public abstract class Unit : UnitBase<UnitNode>
     {
         Dictionary<Stat, Dictionary<StatModifierKind, List<StatModifier>>> modifiers = [];
         
-        foreach (Stat stat in Stat.AllNonVolatile)
+        foreach (Stat stat in Stat.AllComputed)
         {
             if (!modifiers.ContainsKey(stat))
                 modifiers[stat] = [];
@@ -148,7 +150,7 @@ public abstract class Unit : UnitBase<UnitNode>
         double oldMaxHealth = Stats[Stat.MaxHealth];
         double oldMaxMana = Stats[Stat.MaxMana];
         
-        foreach (Stat stat in Stat.AllNonVolatile)
+        foreach (Stat stat in Stat.AllComputed)
             StatsInternal[stat] = CalculateStatValue(stat, modifiers[stat]);
         
         UpdateResourceStat(Stat.CurrentHealth, Stat.MaxHealth, oldMaxHealth);
@@ -215,7 +217,7 @@ public abstract class Unit : UnitBase<UnitNode>
     private void UpdateResourceStat(Stat stat, Stat maxStat, double oldMax)
     {
         double normalized = Stats[stat] / oldMax;
-        StatsInternal[stat] = Stats[maxStat] * normalized;
+        SetResourceStat(stat, Stats[maxStat] * normalized);
     }
     
     private void ExecuteCommands(UnitNode node, double deltaTime)
@@ -453,17 +455,17 @@ public abstract class Unit : UnitBase<UnitNode>
     
     public void SpendHealth(double amount, Ability? ability)
     {
-        ChangeStat(Stat.CurrentHealth, -amount);
+        ChangeResourceStat(Stat.CurrentHealth, -amount);
     }
     
     public void SpendMana(double amount, Ability? ability)
     {
-        ChangeStat(Stat.CurrentMana, -amount);
+        ChangeResourceStat(Stat.CurrentMana, -amount);
     }
     
     public void TakeDamage(double amount, Unit? source, Ability? ability)
     {
-        ChangeStat(Stat.CurrentHealth, -amount);
+        ChangeResourceStat(Stat.CurrentHealth, -amount);
     }
     
     public void TakeDamage(double amount, StatusContext context) =>
@@ -474,20 +476,22 @@ public abstract class Unit : UnitBase<UnitNode>
     
     public void RestoreHealth(double amount, Unit? source, Ability? ability)
     {
-        ChangeStat(Stat.CurrentHealth, amount);
+        ChangeResourceStat(Stat.CurrentHealth, amount);
     }
     
     public void RestoreMana(double amount, Unit? source, Ability? ability)
     {
-        ChangeStat(Stat.CurrentMana, amount);
+        ChangeResourceStat(Stat.CurrentMana, amount);
     }
     
-    protected void ChangeStat(Stat stat, double delta) => SetStat(stat, Stats[stat] + delta);
+    protected void ChangeResourceStat(Stat stat, double delta) => SetResourceStat(stat, Stats[stat] + delta);
 
-    protected void SetStat(Stat stat, double value)
+    protected void SetResourceStat(Stat stat, double value)
     {
-        if (!stat.IsVolatile)
-            throw new ArgumentException($"{nameof(SetStat)} can only be used with volatile stats");
+        if (!stat.IsResource)
+            throw new ArgumentException($"{nameof(SetResourceStat)} can only be used with resource stats");
+        if (IsDead) return;
+        
         double min = 0;
         double max = stat switch
         {
@@ -496,6 +500,9 @@ public abstract class Unit : UnitBase<UnitNode>
             _ => double.PositiveInfinity
         };
         StatsInternal[stat] = Maths.Clamp(value, min, max);
+        
+        if (stat == Stat.CurrentHealth && value == 0)
+            Die();
     }
     
     public void DealAttackDamageTo(Unit target, Ability ability)
@@ -525,6 +532,7 @@ public abstract class Unit : UnitBase<UnitNode>
     {
         if (time < 0) throw new ArgumentException();
         if (tickInterval < 0) throw new ArgumentException();
+        if (IsDead) return;
         
         StatusContext context = new StatusContext
         {
@@ -613,6 +621,14 @@ public abstract class Unit : UnitBase<UnitNode>
     
     public void RemoveStatus(Guid id)
     {
+        if (IsDead) return;
         StatusesInternal.Remove(id);
+    }
+    
+    public void Die()
+    {
+        if (IsDead) return;
+        IsDead = true;
+        Remove();
     }
 }

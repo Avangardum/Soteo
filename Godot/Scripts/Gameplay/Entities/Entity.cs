@@ -62,6 +62,7 @@ public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
         Node.Entity = null;
         Node = null;
         Removed();
+        // Node is removed by EntityManager
     }
     
     // Client

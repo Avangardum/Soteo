@@ -41,27 +41,26 @@ public enum Stat : byte
 public static class StatExtensions
 {
     private static readonly ImmutableList<Stat> _all;
-    private static readonly ImmutableList<Stat> _allVolatile;
-    private static readonly ImmutableList<Stat> _allNonVolatile;
+    private static readonly ImmutableList<Stat> _allResource;
+    private static readonly ImmutableList<Stat> _allComputed;
     
     static StatExtensions()
     {
         _all = Enum.GetValues<Stat>().ToImmutableList();
-        _allVolatile = _all.Where(it => it.IsVolatile).ToImmutableList();
-        _allNonVolatile = _all.Where(it => !it.IsVolatile).ToImmutableList();
+        _allResource = _all.Where(it => it.IsResource).ToImmutableList();
+        _allComputed = _all.Where(it => !it.IsResource).ToImmutableList();
     }
     
     extension (Stat self)
     {
         public static ImmutableList<Stat> All => _all;
-        public static ImmutableList<Stat> AllVolatile => _allVolatile;
-        public static ImmutableList<Stat> AllNonVolatile => _allNonVolatile;
+        public static ImmutableList<Stat> AllResource => _allResource;
+        public static ImmutableList<Stat> AllComputed => _allComputed;
         
         /// <summary>
-        /// Volatile stats are independent values and can change freely for any reason.<br />
-        /// Non-volatile stats cannot be changed directly, instead they are derived from
-        /// default values, class, level and statuses.
+        /// Resource stats are independent values and can change freely for any reason.<br />
+        /// Other stats are computed and cannot be changed directly.
         /// </summary>
-        public bool IsVolatile => self is Stat.CurrentHealth or Stat.CurrentMana;
+        public bool IsResource => self is Stat.CurrentHealth or Stat.CurrentMana;
     }
 }

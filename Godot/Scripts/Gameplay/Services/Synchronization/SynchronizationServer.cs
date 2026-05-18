@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Soteo.Gameplay.Dto.Snapshots;
+using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Nodes.Autoloads;
@@ -11,23 +12,49 @@ public sealed class SynchronizationServer : Node, ISynchronizationServer
 {
     private readonly IEntityManager _entityManager;
     private readonly IPacketSender _packetSender;
+    private readonly IConnectionNotifier _connectionNotifier;
 
     private long _tick;
     private double _tickInterval;
     private ShardSnapshot? _prevShardSnapshot;
     private readonly HashSet<Guid> _snapshotRequesters = [];
+    private readonly List<EntitySnapshot> _entitySnapshots = [];
     
-    public SynchronizationServer(IEntityManager entityManager, IPacketSender packetSender, IConnectionNotifier connectionNotifier)
+    public SynchronizationServer
+    (
+        IEntityManager entityManager,
+        IPacketSender packetSender,
+        IConnectionNotifier connectionNotifier
+    )
     {
         Name = nameof(SynchronizationServer);
 
         _entityManager = entityManager;
         _packetSender = packetSender;
+        _connectionNotifier = connectionNotifier;
+        
+        entityManager.EntityRemoved += OnEntityRemoved;
         connectionNotifier.PeerConnected += OnPeerConnected;
 
         _tickInterval = 1.0 / (int)ProjectSettings.GetSetting("physics/common/physics_fps");
     }
 
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        
+        _entityManager.EntityRemoved -= OnEntityRemoved;
+        _connectionNotifier.PeerConnected -= OnPeerConnected;
+    }
+
+    private void OnEntityRemoved(IEntity entity)
+    {
+        // A final snapshot is sent when a unit dies to notify clients that it's removed due to its death and
+        // not for another reason like recall.
+        if (entity is Unit { IsDead: true })
+            _entitySnapshots.Add(entity.CreateSnapshot().ToPuppet());
+    }
+    
     private void OnPeerConnected(Guid peerId)
     {
         if (peerId != CampaignServerId)
@@ -47,10 +74,12 @@ public sealed class SynchronizationServer : Node, ISynchronizationServer
 
     public override void _PhysicsProcess(float delta)
     {
-        ImmutableDictionary<Guid, EntitySnapshot> entitySnapshots = _entityManager.Entities.Values
-            .ToImmutableDictionary(it => it.Id, it => it.CreateSnapshot().ToPuppet());
+        foreach (IEntity entity in _entityManager.Entities.Values)
+            _entitySnapshots.Add(entity.CreateSnapshot().ToPuppet());
         
-        var shardSnapshot = new ShardSnapshot { Entities = entitySnapshots };
+        var shardSnapshot = new ShardSnapshot { Entities = _entitySnapshots.ToImmutableDictionary(it => it.Id) };
+        _entitySnapshots.Clear();
+        
         ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
             ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
         _prevShardSnapshot = shardSnapshot;
