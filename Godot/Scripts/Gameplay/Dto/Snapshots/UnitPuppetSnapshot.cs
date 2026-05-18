@@ -5,6 +5,7 @@ namespace Soteo.Gameplay.Dto.Snapshots;
 
 public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
 {
+    public required bool IsDead { get; init; }
     public required bool IsMoving { get; init; }
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
     public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
@@ -59,6 +60,7 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
                 Id = Id,
                 Position = Position,
                 Azimuth = Azimuth,
+                IsDead = IsDead,
                 IsMoving = IsMoving,
                 Stats = DictionaryDelta.FromNewDictionary(Stats),
                 AbilitySlotStates = DictionaryDelta.FromNewDictionary(AbilitySlotStates),
@@ -74,6 +76,7 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
             Id = Id,
             Position = Delta.Between(from.Position, Position),
             Azimuth = Delta.Between(from.Azimuth, Azimuth),
+            IsDead = Delta.Between(from.IsDead, IsDead),
             IsMoving = Delta.Between(from.IsMoving, IsMoving),
             Stats = DictionaryDelta.Between(from.Stats, Stats),
             AbilitySlotStates = DictionaryDelta.Between(from.AbilitySlotStates, AbilitySlotStates),

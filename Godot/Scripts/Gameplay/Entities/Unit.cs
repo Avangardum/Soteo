@@ -17,6 +17,7 @@ public abstract class Unit : UnitBase<UnitNode>
 {
     private IServiceProvider _serviceProvider;
     private IEntityManager _entityManager;
+    
     private long _nextStatusOrdinal;
     
     protected Unit(Guid id, UnitNode node, IServiceProvider serviceProvider) : base(id, node, serviceProvider)
@@ -47,6 +48,7 @@ public abstract class Unit : UnitBase<UnitNode>
             Id = Id,
             Position = Position,
             Azimuth = Azimuth,
+            IsDead = IsDead,
             IsMoving = IsMoving,
             Stats = Stats.ToImmutableDictionary(),
             AbilitySlotStates = AbilitySlotStatesInternal.ToImmutableDictionary(),
@@ -59,6 +61,7 @@ public abstract class Unit : UnitBase<UnitNode>
     {
         base.ReplicateSnapshot(snapshot);
         var s = (UnitSnapshot)snapshot;
+        IsDead = s.IsDead;
         IsMoving = s.IsMoving;
         StatsInternal = s.Stats.ToDictionary();
         AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();

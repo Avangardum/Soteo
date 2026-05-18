@@ -54,6 +54,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     {
         base.ReplicateSnapshot(snapshot);
         var s = (UnitPuppetSnapshot)snapshot;
+        IsDead = s.IsDead;
         IsMoving = s.IsMoving;
         StatsInternal = s.Stats.ToDictionary();
         AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
@@ -66,6 +67,8 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     {
         base.ApplyDelta(delta, interpolationWeight);
         var d = (UnitPuppetSnapshotDelta)delta;
+        if (d.IsDead.HasChanged)
+            IsDead = d.IsDead.NewValue;
         if (d.IsMoving.HasChanged)
             IsMoving = d.IsMoving.NewValue;
         d.Stats.MutateDictionary(StatsInternal, interpolationWeight, null);

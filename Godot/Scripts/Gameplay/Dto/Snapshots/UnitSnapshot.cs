@@ -5,6 +5,7 @@ namespace Soteo.Gameplay.Dto.Snapshots;
 
 public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
 {
+    public required bool IsDead { get; init; }
     public required bool IsMoving { get; init; }
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
     public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
@@ -18,6 +19,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
             Id = Id,
             Position = Position,
             Azimuth = Azimuth,
+            IsDead = IsDead,
             IsMoving = IsMoving,
             Stats = Stats,
             AbilitySlotStates = AbilitySlotStates,

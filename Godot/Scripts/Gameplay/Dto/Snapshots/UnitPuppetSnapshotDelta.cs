@@ -4,18 +4,19 @@ namespace Soteo.Gameplay.Dto.Snapshots;
 
 public sealed record UnitPuppetSnapshotDelta : EntitySnapshotDelta
 {
-    public Delta<bool> IsMoving { get; init; }
-    public DictionaryDelta<Stat, double> Stats { get; init; } = new();
-    public DictionaryDelta<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; } = new();
-    public Delta<AbilityUseProgress?> AbilityUseProgress { get; init; }
-    public DictionaryDelta<Guid, PuppetStatusContext> Statuses { get; init; } = new();
+    public required Delta<bool> IsDead { get; init; }
+    public required Delta<bool> IsMoving { get; init; }
+    public required DictionaryDelta<Stat, double> Stats { get; init; }
+    public required DictionaryDelta<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
+    public required Delta<AbilityUseProgress?> AbilityUseProgress { get; init; }
+    public required DictionaryDelta<Guid, PuppetStatusContext> Statuses { get; init; }
 
     public override bool HasChanged
     {
         get
         {
-            return base.HasChanged || IsMoving.HasChanged || Stats.HasChanged || AbilitySlotStates.HasChanged ||
-                AbilityUseProgress.HasChanged || Statuses.HasChanged;
+            return base.HasChanged || IsDead.HasChanged || IsMoving.HasChanged || Stats.HasChanged ||
+                AbilitySlotStates.HasChanged || AbilityUseProgress.HasChanged || Statuses.HasChanged;
         }
     }
 }

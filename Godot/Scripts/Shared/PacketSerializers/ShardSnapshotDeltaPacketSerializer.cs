@@ -67,6 +67,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
     {
         SerializeEnum(EntityKind.UnitPuppet, stream);
         SerializeBaseEntityDelta(delta, stream);
+        SerializeDelta(delta.IsDead, SerializeBool, stream);
         SerializeDelta(delta.IsMoving, SerializeBool, stream);
         SerializeDictionaryDelta(delta.Stats, SerializeEnum, SerializeDouble, stream);
         SerializeDictionaryDelta(delta.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
@@ -81,6 +82,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
             Id = DeserializeGuid(stream),
             Position = DeserializeDelta(DeserializeVector2, stream),
             Azimuth = DeserializeDelta(DeserializeDouble, stream),
+            IsDead = DeserializeDelta(DeserializeBool, stream),
             IsMoving = DeserializeDelta(DeserializeBool, stream),
             Stats = DeserializeDictionaryDelta(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilitySlotStates =

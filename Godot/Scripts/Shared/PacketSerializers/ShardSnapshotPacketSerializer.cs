@@ -76,6 +76,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         SerializeEnum(EntityKind.Unit, stream);
         SerializeBaseEntity(unit, stream);
+        SerializeBool(unit.IsDead, stream);
         SerializeBool(unit.IsMoving, stream);
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeDouble, stream);
         SerializeDictionary(unit.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
@@ -90,6 +91,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Id = DeserializeGuid(stream),
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream),
+            IsDead = DeserializeBool(stream),
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilitySlotStates =
@@ -103,6 +105,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         SerializeEnum(EntityKind.UnitPuppet, stream);
         SerializeBaseEntity(unitPuppet, stream);
+        SerializeBool(unitPuppet.IsDead, stream);
         SerializeBool(unitPuppet.IsMoving, stream);
         SerializeDictionary(unitPuppet.Stats, SerializeEnum, SerializeDouble, stream);
         SerializeDictionary(unitPuppet.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
@@ -117,6 +120,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Id = DeserializeGuid(stream),
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream),
+            IsDead = DeserializeBool(stream),
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilitySlotStates =

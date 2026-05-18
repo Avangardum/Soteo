@@ -38,6 +38,7 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : Node2D, IEnt
         Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
     
+    protected bool IsDead { get; set; }
     protected bool IsMoving { get; set; }
     
     protected Dictionary<Stat, double> StatsInternal { get; set; } = [];
