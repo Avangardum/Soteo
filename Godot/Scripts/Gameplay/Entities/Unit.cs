@@ -15,8 +15,8 @@ namespace Soteo.Gameplay.Entities;
 
 public abstract class Unit : UnitBase<UnitNode>
 {
-    private IServiceProvider _serviceProvider;
-    private IEntityManager _entityManager;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly IEntityManager _entityManager;
     
     private long _nextStatusOrdinal;
     
@@ -501,7 +501,7 @@ public abstract class Unit : UnitBase<UnitNode>
         };
         StatsInternal[stat] = Maths.Clamp(value, min, max);
         
-        if (stat == Stat.CurrentHealth && value == 0)
+        if (stat == Stat.CurrentHealth && Stats[Stat.CurrentHealth] == 0)
             Die();
     }
     
