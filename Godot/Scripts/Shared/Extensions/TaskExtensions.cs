@@ -8,9 +8,9 @@ public static class TaskExtensions
     {
         /// <summary>
         /// Executes the action after the task is completed. Unlike ContinueWith, respects SynchronizationContext.
-        /// If the task throws, exception is propagated to the action. If the action discards the task, the other
-        /// overload that takes Action without arguments and throws when the task throws should be used to avoid
-        /// losing exceptions.
+        /// If the task throws, the failed task is still passed to the action. If the action ignores the task,
+        /// the other overload that takes Action without arguments and throws when the task throws should be used to
+        /// avoid losing exceptions.
         /// </summary>
         public async Task ContinueWithinContext(Action<Task> action)
         {
