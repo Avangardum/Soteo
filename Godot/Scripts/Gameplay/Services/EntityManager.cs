@@ -129,10 +129,16 @@ public sealed class EntityManager : Node, IEntityManager
         IEntityNode node = _entityNodes[entity.Id];
         
         if (node is IDeferredRemovalEntityNode deferred)
-            deferred.WaitUntilCanRemoveAsync().ContinueWithinContext(_ => RemoveEntityNode(deferred));
+        {
+            deferred.WaitUntilCanRemoveAsync()
+                .ContinueWithinContext(() => RemoveEntityNode(deferred))
+                .CollectException();
+        }
         else
+        {
             RemoveEntityNode(node);
-        
+        }
+
         _entityNodes.Remove(entity.Id);
         _entities.Remove(entity.Id);
         EntityRemoved(entity);
