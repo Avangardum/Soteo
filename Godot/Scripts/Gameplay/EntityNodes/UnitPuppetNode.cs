@@ -1,13 +1,34 @@
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Shared;
 
 namespace Soteo.Gameplay.EntityNodes;
 
-public sealed class UnitPuppetNode : Node2D, IEntityNode
+public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode
 {
+    private double? _removalCountdown;
+    private TaskCompletionSource _waitUntilCanRemoveSource = new();
+    
     public Node2D Node => this;
     
-    public UnitPuppet? UnitPuppet { get; set; }
+    public UnitPuppet? UnitPuppet
+    {
+        get;
+        set
+        {
+            field = value;
+            
+            if (value != null)
+            {
+                _removalCountdown = null;
+                _waitUntilCanRemoveSource = new TaskCompletionSource();
+            }
+            else
+            {
+                _removalCountdown = 5;
+            }
+        }
+    }
     
     public IEntity? Entity
     {
@@ -27,4 +48,16 @@ public sealed class UnitPuppetNode : Node2D, IEntityNode
         
         Sprite.Playing = true;
     }
+
+    public override void _Process(float delta)
+    {
+        _removalCountdown -= delta;
+        if (_removalCountdown <= 0)
+        {
+            _removalCountdown = null;
+            _waitUntilCanRemoveSource.SetResult();
+        }
+    }
+
+    public async Task WaitUntilCanRemoveAsync() => await _waitUntilCanRemoveSource.Task;
 }

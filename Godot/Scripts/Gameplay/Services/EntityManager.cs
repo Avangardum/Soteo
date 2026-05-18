@@ -127,10 +127,20 @@ public sealed class EntityManager : Node, IEntityManager
     private void OnEntityRemoved(IEntity entity)
     {
         IEntityNode node = _entityNodes[entity.Id];
-        _shard.EntityRoot.RemoveChild(node.Node);
-        _entityNodePool.ReturnNode(node);
+        
+        if (node is IDeferredRemovalEntityNode deferred)
+            deferred.WaitUntilCanRemoveAsync().ContinueWithinContext(_ => RemoveEntityNode(deferred));
+        else
+            RemoveEntityNode(node);
+        
         _entityNodes.Remove(entity.Id);
         _entities.Remove(entity.Id);
         EntityRemoved(entity);
+    }
+    
+    private void RemoveEntityNode(IEntityNode node)
+    {
+        _shard.EntityRoot.RemoveChild(node.Node);
+        _entityNodePool.ReturnNode(node);
     }
 }
