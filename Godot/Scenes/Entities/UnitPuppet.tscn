@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=2]
+[gd_scene load_steps=59 format=2]
 
 [ext_resource path="res://Scripts/Gameplay/EntityNodes/UnitPuppetNode.cs" type="Script" id=1]
 [ext_resource path="res://Textures/Cute Fantasy Free/Player/Player.png" type="Texture" id=2]
@@ -52,6 +52,22 @@ region = Rect2( 64, 256, 32, 32 )
 [sub_resource type="AtlasTexture" id=35]
 atlas = ExtResource( 2 )
 region = Rect2( 96, 256, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=69]
+atlas = ExtResource( 2 )
+region = Rect2( 0, 288, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=70]
+atlas = ExtResource( 2 )
+region = Rect2( 32, 288, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=71]
+atlas = ExtResource( 2 )
+region = Rect2( 64, 288, 32, 32 )
+
+[sub_resource type="AtlasTexture" id=72]
+atlas = ExtResource( 2 )
+region = Rect2( 96, 288, 32, 32 )
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 2 )
@@ -214,6 +230,11 @@ animations = [ {
 "name": "Attack Up",
 "speed": 5.0
 }, {
+"frames": [ SubResource( 69 ), SubResource( 70 ), SubResource( 71 ), SubResource( 72 ) ],
+"loop": false,
+"name": "Death",
+"speed": 5.0
+}, {
 "frames": [ SubResource( 1 ), SubResource( 2 ), SubResource( 3 ), SubResource( 4 ), SubResource( 5 ), SubResource( 6 ) ],
 "loop": true,
 "name": "Idle Down",
@@ -261,7 +282,7 @@ HalfPixelXVisualOffset = true
 [node name="AnimatedSprite" type="AnimatedSprite" parent="Visuals"]
 position = Vector2( 0.5, -7 )
 frames = SubResource( 7 )
-animation = "Idle Right"
+animation = "Death"
 
 [node name="AzimuthIndicator" type="Line2D" parent="Visuals"]
 position = Vector2( 0, -1 )

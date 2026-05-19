@@ -11,8 +11,21 @@ namespace Soteo.Gameplay.Entities;
 public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
 {
     public UnitPuppet(Guid id, UnitPuppetNode node, IServiceProvider serviceProvider) :
-        base(id, node, serviceProvider) { }
-    
+        base(id, node, serviceProvider)
+    {
+        node.Visible = true;
+    }
+
+    public override bool IsDead
+    {
+        get => base.IsDead;
+        protected set
+        {
+            base.IsDead = value;
+            Node?.AzimuthIndicator.Visible = !value;
+        }
+    }
+
     public override Vector2 Position
     {
         get => base.Position;
@@ -86,6 +99,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     protected override void OnZoomChanged()
     {
         UpdateNodePosition();
+        Node?.AzimuthIndicator.CalculatePoints(Azimuth, Camera.Required.TrueZoom);
     }
     
     private void UpdateAnimation()
@@ -94,7 +108,12 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         
         Node.Sprite.FlipH = Azimuth >= 180;
         
-        if (AbilityUseProgress != null)
+        if (IsDead)
+        {
+            Node.Sprite.Animation = "Death";
+            Node.Sprite.SpeedScale = 1;
+        }
+        else if (AbilityUseProgress != null)
         {
             var ability = AbilitySlotStates[AbilityUseProgress.Slot].Ability;
             Node.Sprite.Animation = ability.Animation;
