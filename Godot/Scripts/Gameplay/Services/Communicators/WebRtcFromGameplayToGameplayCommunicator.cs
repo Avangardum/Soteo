@@ -38,7 +38,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
         _peerConnectionsAndChannels = [];
     private readonly System.Collections.Generic.Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
-    private readonly HashSet<Guid> _connectedPeers = [];
+    private readonly HashSet<Guid> _connectedPeerIds = [];
 
     public event Action<Guid> PeerConnected = delegate { };
     public event Action<Guid> PeerDisconnected = delegate { };
@@ -102,29 +102,36 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         if (_didPollThisFrame) return;
         _didPollThisFrame = true;
         
-        foreach 
-        ((
-             Guid peerId, 
-             (WebRTCPeerConnection connection, WebRTCDataChannel reliableChannel, WebRTCDataChannel unreliableChannel)
-        ) in _peerConnectionsAndChannels.ToDictionary())
+        foreach
+        (
+            (Guid peerId, PeerConnectionAndChannels? peerConnectionAndChannels) in
+                _peerConnectionsAndChannels.ToDictionary()
+        )
         {
-            connection.Poll();
+            peerConnectionAndChannels.Connection.Poll();
 
-            var state = connection.GetConnectionState();
+            WebRTCPeerConnection.ConnectionState state = peerConnectionAndChannels.Connection.GetConnectionState();
             if (state == WebRTCPeerConnection.ConnectionState.Closed)
             {
-                _peerConnectionsAndChannels.Remove(peerId);
-                _ping.Remove(peerId);
-                if (_connectedPeers.Remove(peerId))
-                    PeerDisconnected(peerId);
+                OnPeerDisconnected(peerId);
                 continue;
             }
-            if (state == WebRTCPeerConnection.ConnectionState.Connected && _connectedPeers.Add(peerId))
+            if (state == WebRTCPeerConnection.ConnectionState.Connected && _connectedPeerIds.Add(peerId))
+            {
                 PeerConnected(peerId);
+            }
 
-            HandlePackets(reliableChannel, peerId, delta);
-            HandlePackets(unreliableChannel, peerId, delta);
+            HandlePackets(peerConnectionAndChannels.ReliableChannel, peerId, delta);
+            HandlePackets(peerConnectionAndChannels.UnreliableChannel, peerId, delta);
         }
+    }
+    
+    private void OnPeerDisconnected(Guid peerId)
+    {
+        _peerConnectionsAndChannels.Remove(peerId);
+        _ping.Remove(peerId);
+        if (_connectedPeerIds.Remove(peerId))
+            PeerDisconnected(peerId);
     }
     
     private void ProcessPing(double delta)
@@ -241,7 +248,10 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private WebRTCPeerConnection CreateConnection(Guid peerId)
     {
         if (_peerConnectionsAndChannels.TryGetValue(peerId, out PeerConnectionAndChannels existing))
+        {
             existing.Connection.Close();
+            OnPeerDisconnected(peerId);
+        }
 
         var connection = new WebRTCPeerConnection();
         byte[] peerIdBytes = peerId.ToByteArray();
