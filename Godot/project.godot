@@ -27,8 +27,8 @@ config/icon="res://Textures/icon.png"
 [autoload]
 
 FrameStopwatch="*res://Scripts/Shared/Nodes/Autoloads/FrameStopwatch.cs"
-AsyncExceptionCollector="*res://Scripts/Shared/Nodes/Autoloads/AsyncExceptionCollector.cs"
 AppDomainValidator="*res://Scripts/Shared/Nodes/Autoloads/AppDomainValidator.cs"
+AsyncExceptionCollectorNode="*res://Scripts/Shared/Nodes/Autoloads/AsyncExceptionCollectorNode.cs"
 
 [gdnative]
 

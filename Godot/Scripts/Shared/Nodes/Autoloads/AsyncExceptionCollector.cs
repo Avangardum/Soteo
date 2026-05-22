@@ -3,14 +3,14 @@ using System.Runtime.ExceptionServices;
 
 namespace Soteo.Shared.Nodes.Autoloads;
 
-public sealed class AsyncExceptionCollector : Node
+public static class AsyncExceptionCollector
 {
-    private static readonly ConcurrentQueue<Exception> Exceptions = [];
+    private static readonly Queue<Exception> Exceptions = [];
 
-    public override void _Process(float delta)
+    public static void Process()
     {
-        if (Exceptions.TryDequeue(out var e))
-            ExceptionDispatchInfo.Capture(e).Throw();
+        if (Exceptions.Count > 0)
+            ExceptionDispatchInfo.Capture(Exceptions.Dequeue()).Throw();
     }
     
     public static void Collect(Exception e) => Exceptions.Enqueue(e);
