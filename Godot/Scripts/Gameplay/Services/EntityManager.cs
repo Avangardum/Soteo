@@ -5,11 +5,10 @@ using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Services;
 
-public sealed class EntityManager : Node, IEntityManager
+public sealed class EntityManager : IEntityManager
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IShard _shard;
@@ -21,8 +20,6 @@ public sealed class EntityManager : Node, IEntityManager
     
     public EntityManager(IServiceProvider serviceProvider)
     {
-        Name = nameof(EntityManager);
-        
         _serviceProvider = serviceProvider;
         _shard = serviceProvider.GetRequiredService<IShard>();
         _entityNodePool = serviceProvider.GetRequiredService<IEntityNodePool>();

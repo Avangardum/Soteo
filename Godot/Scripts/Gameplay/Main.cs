@@ -123,7 +123,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         services.AddScoped<IShard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
-        services.AddShardScopedNode<IEntityManager, EntityManager>();
+        services.AddScoped<IEntityManager, EntityManager>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
         
@@ -186,8 +186,6 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private void CreateShardNodes(Shard shard, IServiceProvider serviceProvider)
     {
-        shard.AddChild(ActivatorUtilities.CreateInstance<EntityManager>(serviceProvider));
-        
         if (IsServer)
         {
             shard.AddChild(ActivatorUtilities.CreateInstance<SynchronizationServer>(serviceProvider));
