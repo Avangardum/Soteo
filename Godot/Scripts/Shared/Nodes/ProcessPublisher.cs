@@ -65,8 +65,13 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
     
     private sealed record Subscriptions(List<Action<double>> Process, List<Action<double>> PhysicsProcess);
     
-    private sealed class ProcessListener(Subscriptions subscriptions) : Node
+    private sealed class ProcessListener(Subscriptions subscriptions, ProcessPriorityEnum priority) : Node
     {
+        public override void _Ready()
+        {
+            ProcessPriority = (int)priority;
+        }
+
         public override void _Process(float delta)
         {
             foreach (Action<double> sub in subscriptions.Process.ToList())
