@@ -54,7 +54,7 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
         {
             var subscriptions = new Subscriptions([], []);
             _subscriptionsByPriority[priority] = subscriptions;
-            var processListener = new ProcessListener(subscriptions);
+            var processListener = new ProcessListener(subscriptions, priority);
             AddChild(processListener);
         }
         
