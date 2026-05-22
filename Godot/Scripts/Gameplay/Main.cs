@@ -11,6 +11,7 @@ using Soteo.Gameplay.Util;
 using Soteo.Shared;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
+using Soteo.Shared.Nodes;
 using Soteo.Shared.PacketSerializers;
 
 namespace Soteo.Gameplay;
@@ -27,6 +28,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     private WebSocketFromGameplayToCampaignServerCommunicator? _webSocketCampaignServerCommunicator;
     private WebRtcFromGameplayToGameplayCommunicator? _webRtcGameplayCommunicator;
     private JsmqFromGameplayCommunicator? _jsmqCommunicator;
+    private ProcessPublisher? _processPublisher;
     
     private PackedScene? _shardScene;
     private IServiceProvider? _rootServiceProvider;
@@ -68,6 +70,9 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private void CreateNodes()
     {
+        _processPublisher = new ProcessPublisher();
+        AddChild(_processPublisher);
+        
         if (UseJsmq)
         {
             _jsmqCommunicator = ActivatorUtilities.CreateInstance<JsmqFromGameplayCommunicator>(_rootServiceProvider.Required);
@@ -120,6 +125,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddSingleton<IEntityNodePool>(new EntityNodePool());
         services.AddSingleton<IChunkCollector, ChunkCollector>();
+        services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         
         services.AddScoped<IShard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
@@ -147,7 +153,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private void RegisterServerServices(IServiceCollection services)
     {
-        services.AddShardScopedNode<ISynchronizationServer, SynchronizationServer>();
+        services.AddScoped<ISynchronizationServer, SynchronizationServer>();
     }
     
     private void RegisterClientServices(IServiceCollection services)
@@ -181,19 +187,14 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         scope.ServiceProvider.GetRequiredService<IShard>();
         _newScopeShard = null;
         CreateShardNodes(shard, scope.ServiceProvider);
+        scope.ServiceProvider.GetService<ISynchronizationServer>();
         _shardServiceScopes[shardId] = scope;
     }
     
     private void CreateShardNodes(Shard shard, IServiceProvider serviceProvider)
     {
-        if (IsServer)
-        {
-            shard.AddChild(ActivatorUtilities.CreateInstance<SynchronizationServer>(serviceProvider));
-        }
-        else
-        {
-            shard.AddChild(ActivatorUtilities.CreateInstance<SynchronizationClient>(serviceProvider));
-            shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
-        }
+        if (IsServer) return;
+        shard.AddChild(ActivatorUtilities.CreateInstance<SynchronizationClient>(serviceProvider));
+        shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
     }
 }

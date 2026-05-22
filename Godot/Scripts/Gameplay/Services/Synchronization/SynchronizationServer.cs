@@ -3,12 +3,13 @@ using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes.Autoloads;
 using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Services.Synchronization;
 
-public sealed class SynchronizationServer : Node, ISynchronizationServer
+public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 {
     private readonly IEntityManager _entityManager;
     private readonly IPacketSender _packetSender;
@@ -19,32 +20,33 @@ public sealed class SynchronizationServer : Node, ISynchronizationServer
     private ShardSnapshot? _prevShardSnapshot;
     private readonly HashSet<Guid> _snapshotRequesters = [];
     private readonly List<EntitySnapshot> _entitySnapshots = [];
+    private readonly IDisposable _processSubscription;
     
     public SynchronizationServer
     (
         IEntityManager entityManager,
         IPacketSender packetSender,
-        IConnectionNotifier connectionNotifier
+        IConnectionNotifier connectionNotifier,
+        IProcessPublisher processPublisher
     )
     {
-        Name = nameof(SynchronizationServer);
-
         _entityManager = entityManager;
         _packetSender = packetSender;
         _connectionNotifier = connectionNotifier;
         
         entityManager.EntityRemoved += OnEntityRemoved;
         connectionNotifier.PeerConnected += OnPeerConnected;
+        _processSubscription =
+            processPublisher.SubscribeToPhysicsProcess(PhysicsProcess, ProcessPriorityEnum.SynchronizationServer);
 
         _tickInterval = 1.0 / (int)ProjectSettings.GetSetting("physics/common/physics_fps");
     }
 
-    protected override void Dispose(bool disposing)
+    public void Dispose()
     {
-        base.Dispose(disposing);
-        
         _entityManager.EntityRemoved -= OnEntityRemoved;
         _connectionNotifier.PeerConnected -= OnPeerConnected;
+        _processSubscription.Dispose();
     }
 
     private void OnEntityRemoved(IEntity entity)
@@ -61,12 +63,7 @@ public sealed class SynchronizationServer : Node, ISynchronizationServer
             _snapshotRequesters.Add(peerId);
     }
 
-    public override void _Ready()
-    {
-        ProcessPriority = (int)ProcessPriorityEnum.SynchronizationServer;
-    }
-
-    public override void _PhysicsProcess(float delta)
+    private void PhysicsProcess(double delta)
     {
         foreach (IEntity entity in _entityManager.Entities.Values)
             _entitySnapshots.Add(entity.CreateSnapshot().ToPuppet());

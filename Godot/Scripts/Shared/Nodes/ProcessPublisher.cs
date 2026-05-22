@@ -6,7 +6,12 @@ namespace Soteo.Shared.Nodes;
 public sealed class ProcessPublisher : Node, IProcessPublisher
 {
     private readonly Dictionary<ProcessPriorityEnum, Subscriptions> _subscriptionsByPriority = [];
-    
+
+    public override void _Ready()
+    {
+        Name = nameof(ProcessPublisher);
+    }
+
     public IDisposable SubscribeToProcess
     (
         Action<double> subscription,
@@ -70,6 +75,7 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
         public override void _Ready()
         {
             ProcessPriority = (int)priority;
+            Name = nameof(ProcessListener) + " " + priority;
         }
 
         public override void _Process(float delta)
