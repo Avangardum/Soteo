@@ -19,10 +19,10 @@ public sealed class Tooltip : Control, ITooltip
         _bodyDefaultMinWidth = _bodyLabel.RectMinSize.x;
     }
 
-    public void Show(GdVector2 position, string header, string body)
+    public void Show(Vector2 position, string header, string body)
     {
         Visible = true;
-        RectGlobalPosition = position;
+        RectGlobalPosition = position.ToGd();
         _headerLabel.Text = header;
         _bodyLabel.BbcodeText = body;
         _headerLabel.Visible = header != "";

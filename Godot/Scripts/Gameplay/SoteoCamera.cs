@@ -20,6 +20,12 @@ public sealed class SoteoCamera : Camera2D, ICamera
     
     public event Action ZoomChanged = delegate {};
 
+    public new Vector2 Position
+    {
+        get => base.Position.ToSys();
+        set => base.Position = value.ToGd();
+    }
+
     /// <inheritdoc/>
     public double TrueZoom
     {
@@ -29,7 +35,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
             if (value == TrueZoom) return;
             GdVector2 mousePosBefore = GetGlobalMousePosition();
             Zoom = GdVector2.One / value;
-            Position += mousePosBefore - GetGlobalMousePosition();
+            base.Position += mousePosBefore - GetGlobalMousePosition();
             ZoomChanged();
         }
     }
@@ -85,7 +91,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
         // Moving camera doesn't update GetGlobalMousePosition() immediately, so we track it manually
         
         GdVector2 deltaPos = _prevGlobalMousePos - globalMousePos;
-        Position += deltaPos;
+        base.Position += deltaPos;
         globalMousePos += deltaPos;
     }
     
@@ -98,7 +104,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
             viewportMousePos.x > viewportSize.x - _scrollZoneThickness ? 1 : 0;
         int yDirection = viewportMousePos.y < _scrollZoneThickness ? -1 :
             viewportMousePos.y > viewportSize.y - _scrollZoneThickness ? 1 : 0;
-        Position += new GdVector2(xDirection, yDirection) * delta * _scrollSpeed / TrueZoom;
+        base.Position += new GdVector2(xDirection, yDirection) * delta * _scrollSpeed / TrueZoom;
     }
     
     private void EnforceLimit()
@@ -108,7 +114,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
         // implemented instead.
         
         GdVector2 viewportHalfSizeInWorldSpace = GetViewport().GetVisibleRect().Size / TrueZoom / 2;
-        GdVector2 position = Position;
+        GdVector2 position = base.Position;
         
         double minX = -_limit + viewportHalfSizeInWorldSpace.x;
         double maxX = _limit - viewportHalfSizeInWorldSpace.x;
@@ -120,7 +126,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
         if (minY > maxY) minY = maxY = 0;
         position.y = (float)Maths.Clamp(position.y, minY, maxY);
         
-        Position = position;
+        base.Position = position;
     }
     
     private void RoundPositionToPixelPerfect()

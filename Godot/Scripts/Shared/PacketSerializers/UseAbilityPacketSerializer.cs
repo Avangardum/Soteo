@@ -25,9 +25,9 @@ public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPack
         var slot = DeserializeEnum<AbilitySlot>(stream);
         var repeat = DeserializeBool(stream);
         
-        GdVector2? targetPosition = DeserializeNullableStruct(DeserializeVector2, stream);
+        Vector2? targetPosition = DeserializeNullableStruct(DeserializeVector2, stream);
         Guid? targetUnitId = DeserializeNullableStruct(DeserializeGuid, stream);
-        GdVector2? targetDirection = DeserializeNullableStruct(DeserializeVector2, stream);
+        Vector2? targetDirection = DeserializeNullableStruct(DeserializeVector2, stream);
         Guid? targetShardId = DeserializeNullableStruct(DeserializeGuid, stream);
         
         packet.Command =

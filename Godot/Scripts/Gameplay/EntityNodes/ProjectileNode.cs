@@ -16,6 +16,12 @@ public sealed class ProjectileNode : Area2D, IProjectileNode
         set => Projectile = (Projectile?)value;
     }
 
+    public new Vector2 Position
+    {
+        get => base.Position.ToSys();
+        set => base.Position = value.ToGd();
+    }
+
     public override void _PhysicsProcess(float delta)
     {
         Projectile?.PhysicsProcess(this, delta);

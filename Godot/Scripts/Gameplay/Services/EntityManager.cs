@@ -104,7 +104,7 @@ public sealed class EntityManager : IEntityManager
         {
             // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
             // of the projectile over the source
-            Position = abilityContext.User.Position + GdVector2.Up
+            Position = abilityContext.User.Position - Vector2.UnitY
         });
     }
 

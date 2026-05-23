@@ -14,9 +14,9 @@ public sealed record AbilityContext : IServiceProvider
     /// </summary>
     public required IReadOnlyDictionary<Stat, double> UserStats { get; init; }
     public required IServiceProvider ServiceProvider { get; init; }
-    public GdVector2? TargetPosition { get; init; }
+    public Vector2? TargetPosition { get; init; }
     public Unit? TargetUnit { get; init; }
-    public GdVector2? TargetDirection { get; init; }
+    public Vector2? TargetDirection { get; init; }
     public Guid? TargetShardId { get; init; }
     
     public object? GetService(Type serviceType) => ServiceProvider.GetService(serviceType);

@@ -33,7 +33,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         }
     }
 
-    public override GdVector2 Position
+    public override Vector2 Position
     {
         get => base.Position;
         set

@@ -82,7 +82,11 @@ public sealed class InputHandler : Node2D
         }
         else
         {
-            _packetSender.SendReliable(new MovePacket { Position = GetGlobalMousePosition() }, Const.TestShardId);
+            _packetSender.SendReliable
+            (
+                new MovePacket { Position = GetGlobalMousePosition().ToSys() },
+                Const.TestShardId
+            );
         }
     }
 
@@ -97,7 +101,7 @@ public sealed class InputHandler : Node2D
             .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
         
         bool canTargetPosition = state.Ability.Targeting.HasFlag(CanTarget.Position);
-        GdVector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition() : null;
+        Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition().ToSys() : null;
         var command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id);
         if (targetUnit == null && ValidateAbility(user, command) != AbilityValidationResult.Ok) return;
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
@@ -146,7 +150,7 @@ public sealed class InputHandler : Node2D
             .Select(it => it.GetParent() as UnitPuppetNode)
             .WhereNotNull()
             .OrderByDescending(it => it.ZIndex)
-            .ThenByDescending(it => it.Position.y)
+            .ThenByDescending(it => it.Position.Y)
             .Select(it => it.UnitPuppet)
             .WhereNotNull()
             .ToImmutableList();

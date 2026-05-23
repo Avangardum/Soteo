@@ -4,7 +4,7 @@ public interface ICamera
 {
     event Action ZoomChanged;
     
-    GdVector2 Position { get; }
+    Vector2 Position { get; }
     
     /// <summary>
     /// True zoom is a numeric value representing coefficient of enlargement of zoomed in objects.

@@ -6,7 +6,7 @@ namespace Soteo.Gameplay.Dto.Snapshots;
 public abstract record EntitySnapshot
 {
     public required Guid Id { get; init; }
-    public required GdVector2 Position { get; init; }
+    public required Vector2 Position { get; init; }
     public required double Azimuth { get; init; }
     
     public abstract EntitySnapshot Interpolate(EntitySnapshot to, double weight);

@@ -5,13 +5,13 @@ namespace Soteo.Shared;
 
 public static class Maths
 {
-    public static double DirectionToAzimuth(GdVector2 direction) =>
-        Rad2Deg(Mathf.PosMod(Mathf.Atan2(direction.y, direction.x) + Mathf.Pi / 2, 2 * Mathf.Pi));
+    public static double DirectionToAzimuth(Vector2 direction) =>
+        Rad2Deg(Mathf.PosMod(Mathf.Atan2(direction.Y, direction.X) + Mathf.Pi / 2, 2 * Mathf.Pi));
     
-    public static GdVector2 AzimuthToDirection(double azimuth)
+    public static Vector2 AzimuthToDirection(double azimuth)
     {
         double atan2 = Deg2Rad(azimuth) - Mathf.Pi / 2;
-        return GdVector2.New(Math.Cos(atan2), Math.Sin(atan2));
+        return Vector2.New(Math.Cos(atan2), Math.Sin(atan2));
     }
     
     /// <summary>
@@ -103,6 +103,9 @@ public static class Maths
     }
     
     public static double Lerp(double from, double to, double weight) =>
+        from + weight * (to - from);
+    
+    public static float Lerp(float from, float to, float weight) =>
         from + weight * (to - from);
     
     public static double InverseLerp(double from, double to, double value) =>

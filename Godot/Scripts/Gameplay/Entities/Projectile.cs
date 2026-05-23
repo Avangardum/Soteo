@@ -25,7 +25,7 @@ public abstract class Projectile : Entity<IProjectileNode>
         _serviceProvider = serviceProvider;
     }
 
-    public override GdVector2 Position
+    public override Vector2 Position
     {
         get => base.Position;
         set

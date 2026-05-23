@@ -173,12 +173,12 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     {
         string mapPath = "res://Scenes/Maps/Test.tscn";
         Guid shardId = Const.TestShardId;
-        GdVector2 position = new GdVector2(0, 0);
+        Vector2 position = new Vector2(0, 0);
 
         var shard = _shardScene.Required.Instance<ShardNode>();
         shard.Id = shardId;
         shard.Name = shardId.ToString();
-        shard.Position = position;
+        shard.Position = position.ToGd();
         _shardRoot.Required.AddChild(shard);
         
         var map = ResourceLoader.Load<PackedScene>(mapPath).Instance<Node2D>();

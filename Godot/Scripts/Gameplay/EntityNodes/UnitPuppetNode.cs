@@ -46,6 +46,12 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
         set => UnitPuppet = (UnitPuppet?)value;
     }
     
+    public new Vector2 Position
+    {
+        get => base.Position.ToSys();
+        set => base.Position = value.ToGd();
+    }
+    
     public override void _Ready()
     {
         _sprite = GetNode<AnimatedSprite>("Visuals/AnimatedSprite");
