@@ -13,7 +13,7 @@ public sealed class AzimuthIndicator : Line2D
     private const double LineWidth = 2;
     private const double ZoomFactor = 0.1;
     
-    private readonly Vector2[] _points = new Vector2[SectorCount + 2 - 2 * (ArrowHalfWidthSectors - 1)];
+    private readonly GdVector2[] _points = new GdVector2[SectorCount + 2 - 2 * (ArrowHalfWidthSectors - 1)];
 
     public void CalculatePoints(double azimuth, double zoom)
     {
@@ -21,7 +21,7 @@ public sealed class AzimuthIndicator : Line2D
         
         const double sectorAngle = 2 * Math.PI / SectorCount;
         double forwardAngle = Maths.Deg2Rad(azimuth) - Math.PI / 2;
-        var arrowTip = Vector2.New
+        var arrowTip = GdVector2.New
         (
             EllipseWidth * Math.Cos(forwardAngle),
             EllipseHeight * Math.Sin(forwardAngle)
@@ -30,7 +30,7 @@ public sealed class AzimuthIndicator : Line2D
         for (int i = 1; i <= _points.Length - 2; i++)
         {
             double angle = forwardAngle + sectorAngle * (i + ArrowHalfWidthSectors - 1);
-            _points[i] = Vector2.New(EllipseWidth * Math.Cos(angle), EllipseHeight * Math.Sin(angle));
+            _points[i] = GdVector2.New(EllipseWidth * Math.Cos(angle), EllipseHeight * Math.Sin(angle));
         }
         _points[^2] = _points[0];
         _points[^1] = _points[1];

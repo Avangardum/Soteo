@@ -15,7 +15,7 @@ public sealed class UnitNode : KinematicBody2D, IUnitNode
         set => Unit = (Unit?)value;
     }
 
-    public void MoveAndCollide(Vector2 movement) => base.MoveAndCollide(movement);
+    public void MoveAndCollide(GdVector2 movement) => base.MoveAndCollide(movement);
 
     public override void _PhysicsProcess(float delta)
     {

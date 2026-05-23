@@ -97,7 +97,7 @@ public sealed class InputHandler : Node2D
             .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
         
         bool canTargetPosition = state.Ability.Targeting.HasFlag(CanTarget.Position);
-        Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition() : null;
+        GdVector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition() : null;
         var command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id);
         if (targetUnit == null && ValidateAbility(user, command) != AbilityValidationResult.Ok) return;
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);

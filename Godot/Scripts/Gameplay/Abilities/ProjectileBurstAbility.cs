@@ -19,7 +19,7 @@ public sealed class ProjectileBurstAbility : Ability
         var entityManager = context.GetRequiredService<IEntityManager>();
         for (double azimuth = 0; azimuth < 360; azimuth += 1)
         {
-            Vector2 target = context.User.Position + Maths.AzimuthToDirection(azimuth) * 1000;
+            GdVector2 target = context.User.Position + Maths.AzimuthToDirection(azimuth) * 1000;
             double speed = 150 + 15 * Math.Sin(Maths.Deg2Rad(azimuth) * 20);
             entityManager.SpawnAttackProjectile(context with { TargetPosition = target }, speed);
         }

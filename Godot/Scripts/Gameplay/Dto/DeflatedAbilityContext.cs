@@ -13,9 +13,9 @@ public sealed record DeflatedAbilityContext
     public required int Level { get; init; }
     public required Guid UserId { get; init; }
     public required IReadOnlyDictionary<Stat, double> UserStats { get; init; }
-    public Vector2? TargetPosition { get; init; }
+    public GdVector2? TargetPosition { get; init; }
     public Guid? TargetUnitId { get; init; }
-    public Vector2? TargetDirection { get; init; }
+    public GdVector2? TargetDirection { get; init; }
     public Guid? TargetShardId { get; init; }
     
     public AbilityContext Inflate(IServiceProvider serviceProvider)

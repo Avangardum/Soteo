@@ -7,7 +7,7 @@ public interface IEntity
     event Action Removed;
     
     Guid Id { get; }
-    Vector2 Position { get; set; }
+    GdVector2 Position { get; set; }
     double Azimuth { get; set; }
     
     EntitySnapshot CreateSnapshot();

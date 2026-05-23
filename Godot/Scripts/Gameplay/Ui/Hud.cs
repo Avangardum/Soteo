@@ -91,8 +91,8 @@ public sealed class Hud : Control, IHud
         AbilitySlot slot = AbilitySlot.Class0 + (byte)buttonIndex;
         if (!SelectedUnit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
         
-        Vector2 position = _abilityButtons[buttonIndex].RectGlobalPosition +
-            new Vector2(_abilityButtons[buttonIndex].RectSize.x / 2, 0);
+        GdVector2 position = _abilityButtons[buttonIndex].RectGlobalPosition +
+                             new GdVector2(_abilityButtons[buttonIndex].RectSize.x / 2, 0);
         string header = state.Ability.Name;
         string body = state.Ability.Description(_localizer, state.Level);
         _tooltip.Show(position, header, body);
@@ -105,8 +105,8 @@ public sealed class Hud : Control, IHud
         if (indicatorIndex >= contexts.Count) return;
         Status status = contexts[indicatorIndex].Status;
         
-        Vector2 position = _statusIndicators[indicatorIndex].RectGlobalPosition +
-            new Vector2(_statusIndicators[indicatorIndex].RectSize.x / 2, 0);
+        GdVector2 position = _statusIndicators[indicatorIndex].RectGlobalPosition +
+                             new GdVector2(_statusIndicators[indicatorIndex].RectSize.x / 2, 0);
         string header = "";
         string body = status.Description(_localizer);
         _tooltip.Show(position, header, body);

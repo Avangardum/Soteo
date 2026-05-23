@@ -15,7 +15,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
     [Export] private double _scrollZoneThickness;
     [Export] private double _limit;
     
-    private Vector2 _prevGlobalMousePos;
+    private GdVector2 _prevGlobalMousePos;
     private bool _wasDraggingInPrevFrame;
     
     public event Action ZoomChanged = delegate {};
@@ -27,8 +27,8 @@ public sealed class SoteoCamera : Camera2D, ICamera
         private set
         {
             if (value == TrueZoom) return;
-            Vector2 mousePosBefore = GetGlobalMousePosition();
-            Zoom = Vector2.One / value;
+            GdVector2 mousePosBefore = GetGlobalMousePosition();
+            Zoom = GdVector2.One / value;
             Position += mousePosBefore - GetGlobalMousePosition();
             ZoomChanged();
         }
@@ -58,7 +58,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
 
     public override void _Process(float delta)
     {
-        Vector2 globalMousePos = GetGlobalMousePosition();
+        GdVector2 globalMousePos = GetGlobalMousePosition();
         bool isDragging = Input.IsActionPressed("drag_camera");
         
         if (isDragging)
@@ -80,11 +80,11 @@ public sealed class SoteoCamera : Camera2D, ICamera
         _wasDraggingInPrevFrame = isDragging;
     }
     
-    private void Drag(ref Vector2 globalMousePos)
+    private void Drag(ref GdVector2 globalMousePos)
     {
         // Moving camera doesn't update GetGlobalMousePosition() immediately, so we track it manually
         
-        Vector2 deltaPos = _prevGlobalMousePos - globalMousePos;
+        GdVector2 deltaPos = _prevGlobalMousePos - globalMousePos;
         Position += deltaPos;
         globalMousePos += deltaPos;
     }
@@ -92,13 +92,13 @@ public sealed class SoteoCamera : Camera2D, ICamera
     private void Scroll(double delta)
     {
         if (OS.GetCmdlineArgs().Contains("--no-scroll")) return;
-        Vector2 viewportMousePos = GetViewport().GetMousePosition();
-        Vector2 viewportSize = GetViewport().GetVisibleRect().Size;
+        GdVector2 viewportMousePos = GetViewport().GetMousePosition();
+        GdVector2 viewportSize = GetViewport().GetVisibleRect().Size;
         int xDirection = viewportMousePos.x < _scrollZoneThickness ? -1 :
             viewportMousePos.x > viewportSize.x - _scrollZoneThickness ? 1 : 0;
         int yDirection = viewportMousePos.y < _scrollZoneThickness ? -1 :
             viewportMousePos.y > viewportSize.y - _scrollZoneThickness ? 1 : 0;
-        Position += new Vector2(xDirection, yDirection) * delta * _scrollSpeed / TrueZoom;
+        Position += new GdVector2(xDirection, yDirection) * delta * _scrollSpeed / TrueZoom;
     }
     
     private void EnforceLimit()
@@ -107,8 +107,8 @@ public sealed class SoteoCamera : Camera2D, ICamera
         // which breaks stuff dependent on camera position, so they are not used and a custom alternative is
         // implemented instead.
         
-        Vector2 viewportHalfSizeInWorldSpace = GetViewport().GetVisibleRect().Size / TrueZoom / 2;
-        Vector2 position = Position;
+        GdVector2 viewportHalfSizeInWorldSpace = GetViewport().GetVisibleRect().Size / TrueZoom / 2;
+        GdVector2 position = Position;
         
         double minX = -_limit + viewportHalfSizeInWorldSpace.x;
         double maxX = _limit - viewportHalfSizeInWorldSpace.x;
@@ -125,7 +125,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
     
     private void RoundPositionToPixelPerfect()
     {
-        Vector2 viewportSize = GetViewport().GetVisibleRect().Size;
+        GdVector2 viewportSize = GetViewport().GetVisibleRect().Size;
         bool halfPixelXOffset = viewportSize.x % 2 == 1;
         bool halfPixelYOffset = viewportSize.y % 2 == 1;
         Position = NodeHelper.RoundPositionToPixelPerfect(

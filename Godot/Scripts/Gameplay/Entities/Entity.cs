@@ -19,7 +19,7 @@ public abstract class Entity<TNode> : IEntity where TNode : class, IEntityNode
     [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
     protected TNode? Node { get; private set; }
     public Guid Id { get; }
-    public virtual Vector2 Position { get; set; }
+    public virtual GdVector2 Position { get; set; }
     public virtual double Azimuth { get; set => field = Maths.PosMod(value, 360); }
 
     public abstract EntitySnapshot CreateSnapshot();

@@ -21,7 +21,7 @@ public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>
         base.Remove();
     }
 
-    public override Vector2 Position
+    public override GdVector2 Position
     {
         get => base.Position;
         set

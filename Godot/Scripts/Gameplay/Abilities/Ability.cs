@@ -154,10 +154,10 @@ public abstract class Ability
     
     private AbilityValidationResult ValidateRange(AbilityContext context, bool strict)
     {
-        if ((context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition &&
+        if ((context.TargetPosition ?? context.TargetUnit?.Position) is GdVector2 targetPosition &&
             targetPosition != context.User.Position)
         {
-            Vector2 deltaPosition = targetPosition - context.User.Position;
+            GdVector2 deltaPosition = targetPosition - context.User.Position;
             double rangeMultiplier = strict ? 1 : 1.5f;
             if (deltaPosition.Length() > Range(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfRange;

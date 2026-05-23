@@ -28,7 +28,7 @@ public sealed class OverheadUi : Control
     private readonly Control _tinyHealthPanel;
     private readonly TextureProgress _tinyHealthBar;
     
-    private Vector2 _offset;
+    private GdVector2 _offset;
     
     public OverheadUi(UnitPuppet unit, ICamera camera, IPalette palette)
     {
@@ -71,12 +71,12 @@ public sealed class OverheadUi : Control
                 case Variant.PlayerCharacter:
                     _playerCharacterPanel.Visible = true;
                     _tinyHealthPanel.Visible = false;
-                    _offset = new Vector2(0, -22);
+                    _offset = new GdVector2(0, -22);
                     break;
                 case Variant.TinyHealth:
                     _playerCharacterPanel.Visible = false;
                     _tinyHealthPanel.Visible = true;
-                    _offset = new Vector2(0, -22);
+                    _offset = new GdVector2(0, -22);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);

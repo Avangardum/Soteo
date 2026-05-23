@@ -28,7 +28,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     
     private Queue<ICommand> Commands { get; } = [];
     
-    public override Vector2 Position
+    public override GdVector2 Position
     {
         get => base.Position;
         set
@@ -243,12 +243,12 @@ public abstract class Unit : UnitBase<IUnitNode>
         }
     }
     
-    private void LookAtPosition(Vector2 position, ref double remainingDeltaTime)
+    private void LookAtPosition(GdVector2 position, ref double remainingDeltaTime)
     {
         LookInDirection(position - Position, ref remainingDeltaTime);
     }
     
-    private void LookInDirection(Vector2 direction, ref double remainingDeltaTime)
+    private void LookInDirection(GdVector2 direction, ref double remainingDeltaTime)
     {
         LookAtAzimuth(Maths.DirectionToAzimuth(direction), ref remainingDeltaTime);
     }
@@ -273,19 +273,19 @@ public abstract class Unit : UnitBase<IUnitNode>
         }
     }
     
-    private void MoveToPosition(Vector2 position, ref double remainingDeltaTime, IUnitNode node)
+    private void MoveToPosition(GdVector2 position, ref double remainingDeltaTime, IUnitNode node)
     {
         LookAtPosition(position, ref remainingDeltaTime);
         if (remainingDeltaTime == 0 || Stats[Stat.MoveSpeed] == 0) return;
         
-        Vector2 desiredMovement = position - Position;
+        GdVector2 desiredMovement = position - Position;
         double desiredMovementLength = desiredMovement.Length();
         if (desiredMovementLength == 0)
         {
             if (Commands.PeekOrDefault() is MoveCommand) Commands.Dequeue();
             return;
         }
-        Vector2 normalizedDesiredMovement = desiredMovement / desiredMovementLength;
+        GdVector2 normalizedDesiredMovement = desiredMovement / desiredMovementLength;
         double timeToComplete = desiredMovementLength / Stats[Stat.MoveSpeed];
         if (timeToComplete <= remainingDeltaTime)
         {
@@ -295,14 +295,14 @@ public abstract class Unit : UnitBase<IUnitNode>
         }
         else
         {
-            Vector2 movement = normalizedDesiredMovement * Stats[Stat.MoveSpeed] * remainingDeltaTime;
+            GdVector2 movement = normalizedDesiredMovement * Stats[Stat.MoveSpeed] * remainingDeltaTime;
             MoveAndCollide(movement, node);
             remainingDeltaTime = 0;
         }
         IsMoving = true;
     }
     
-    private void MoveAndCollide(Vector2 movement, IUnitNode node)
+    private void MoveAndCollide(GdVector2 movement, IUnitNode node)
     {
         node.MoveAndCollide(movement);
         Position = node.Position;
@@ -393,7 +393,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     
     private void WaitForAbilityCooldown(AbilityContext context, ref double remainingDeltaTime)
     {
-        Vector2? targetPosition = context.TargetPosition ?? context.TargetUnit?.Position;
+        GdVector2? targetPosition = context.TargetPosition ?? context.TargetUnit?.Position;
         if (targetPosition != null)
             LookAtPosition(targetPosition.Value, ref remainingDeltaTime);
         remainingDeltaTime = 0;
@@ -411,7 +411,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         IUnitNode node
     )
     {
-        Vector2? targetPosition = context.TargetUnit?.Position ?? context.TargetPosition;
+        GdVector2? targetPosition = context.TargetUnit?.Position ?? context.TargetPosition;
         AbilityValidationResult abilityValidationResult;
         int iterations = 0;
         const int maxIterations = 5;

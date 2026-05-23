@@ -19,7 +19,7 @@ public sealed class Tooltip : Control, ITooltip
         _bodyDefaultMinWidth = _bodyLabel.RectMinSize.x;
     }
 
-    public void Show(Vector2 position, string header, string body)
+    public void Show(GdVector2 position, string header, string body)
     {
         Visible = true;
         RectGlobalPosition = position;
@@ -33,7 +33,7 @@ public sealed class Tooltip : Control, ITooltip
     
     private void UpdateBodyMinWidth()
     {
-        _bodyLabel.RectMinSize = new Vector2(_bodyDefaultMinWidth, 0);
+        _bodyLabel.RectMinSize = new GdVector2(_bodyDefaultMinWidth, 0);
         _bodyLabel.RectSize = _bodyLabel.RectSize with { x = _bodyDefaultMinWidth };
         
         string text = _bodyLabel.BbcodeText;
@@ -44,10 +44,10 @@ public sealed class Tooltip : Control, ITooltip
         const int step = 10; 
         while (_bodyLabel.GetContentHeight() == lineHeight && _bodyLabel.RectMinSize.x > step)
         {
-            _bodyLabel.RectMinSize -= new Vector2(step, 0);
+            _bodyLabel.RectMinSize -= new GdVector2(step, 0);
             _bodyLabel.RectSize = _bodyLabel.RectSize with { x = _bodyLabel.RectMinSize.x };
         }
-        _bodyLabel.RectMinSize += new Vector2(step, 0);
+        _bodyLabel.RectMinSize += new GdVector2(step, 0);
     }
     
     public new void Hide() => Visible = false;

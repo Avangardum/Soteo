@@ -33,9 +33,9 @@ public sealed class TargetedProjectile : Projectile
             return;
         }
         
-        Vector2 targetPosition =
+        GdVector2 targetPosition =
             AbilityContext.TargetUnit?.Position ?? AbilityContext.TargetPosition ?? Position;
-        Vector2 directionToTarget = targetPosition - Position;
+        GdVector2 directionToTarget = targetPosition - Position;
         double movementLength = Speed * delta;
         if (movementLength * movementLength < directionToTarget.LengthSquared())
         {
@@ -50,7 +50,7 @@ public sealed class TargetedProjectile : Projectile
             // target. If targeting a unit, offset it 1 pixel up so that when coming from above it doesn't flicker for 1
             // frame in front of the target.
             Position = AbilityContext.TargetUnit != null ?
-                AbilityContext.TargetUnit.Position + Vector2.Up :
+                AbilityContext.TargetUnit.Position + GdVector2.Up :
                 targetPosition;
         }
     }

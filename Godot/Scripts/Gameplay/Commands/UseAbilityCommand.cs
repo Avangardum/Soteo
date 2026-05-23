@@ -7,8 +7,8 @@ public sealed record UseAbilityCommand
 (
     AbilitySlot Slot,
     bool Repeat = false,
-    Vector2? TargetPosition = null,
+    GdVector2? TargetPosition = null,
     Guid? TargetUnitId = null,
-    Vector2? TargetDirection = null,
+    GdVector2? TargetDirection = null,
     Guid? TargetShardId = null
 ) : ICommand;

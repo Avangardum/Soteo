@@ -19,9 +19,9 @@ public static class NodeHelper
     /// for the camera when the viewport height is odd, since normal rounding would cause screen pixels to be between
     /// world pixels.
     /// </param>
-    public static Vector2 RoundPositionToPixelPerfect
+    public static GdVector2 RoundPositionToPixelPerfect
     (
-        Vector2 value,
+        GdVector2 value,
         ICamera camera,
         bool isCamera,
         bool halfPixelXOffset,
@@ -40,6 +40,6 @@ public static class NodeHelper
             Maths.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.x);
         double roundedY = halfPixelYOffset ? Maths.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.y) :
             Maths.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.y);
-        return Vector2.New(roundedX, roundedY);
+        return GdVector2.New(roundedX, roundedY);
     }
 }

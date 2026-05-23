@@ -149,13 +149,13 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer
         return BitConverter.ToDouble(buffer, 0);
     }
 
-    protected void SerializeVector2(Vector2 value, Stream stream)
+    protected void SerializeVector2(GdVector2 value, Stream stream)
     {
         SerializeFloat(value.x, stream);
         SerializeFloat(value.y, stream);
     }
 
-    protected Vector2 DeserializeVector2(Stream stream)
+    protected GdVector2 DeserializeVector2(Stream stream)
     {
         float x = DeserializeFloat(stream);
         float y = DeserializeFloat(stream);

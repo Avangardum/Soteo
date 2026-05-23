@@ -2,17 +2,17 @@ namespace Soteo.Shared.Extensions;
 
 public static class VectorExtensions
 {
-    extension (Vector2 self)
+    extension (GdVector2 self)
     {
-        public Vector2 Lerp(Vector2 to, float weight) =>
+        public GdVector2 Lerp(GdVector2 to, float weight) =>
             new(Mathf.Lerp(self.x, to.x, weight), Mathf.Lerp(self.y, to.y, weight));
         
-        public Vector2 Lerp(Vector2 to, double weight) => self.Lerp(to, (float)weight);
+        public GdVector2 Lerp(GdVector2 to, double weight) => self.Lerp(to, (float)weight);
 
-        public static Vector2 operator *(Vector2 a, double b) => a * (float)b;
+        public static GdVector2 operator *(GdVector2 a, double b) => a * (float)b;
         
-        public static Vector2 operator /(Vector2 a, double b) => a / (float)b;
+        public static GdVector2 operator /(GdVector2 a, double b) => a / (float)b;
         
-        public static Vector2 New(double x, double y) => new((float)x, (float)y);
+        public static GdVector2 New(double x, double y) => new((float)x, (float)y);
     }
 }

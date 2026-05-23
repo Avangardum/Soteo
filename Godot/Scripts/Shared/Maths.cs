@@ -5,13 +5,13 @@ namespace Soteo.Shared;
 
 public static class Maths
 {
-    public static double DirectionToAzimuth(Vector2 direction) =>
+    public static double DirectionToAzimuth(GdVector2 direction) =>
         Rad2Deg(Mathf.PosMod(Mathf.Atan2(direction.y, direction.x) + Mathf.Pi / 2, 2 * Mathf.Pi));
     
-    public static Vector2 AzimuthToDirection(double azimuth)
+    public static GdVector2 AzimuthToDirection(double azimuth)
     {
         double atan2 = Deg2Rad(azimuth) - Mathf.Pi / 2;
-        return Vector2.New(Math.Cos(atan2), Math.Sin(atan2));
+        return GdVector2.New(Math.Cos(atan2), Math.Sin(atan2));
     }
     
     /// <summary>
