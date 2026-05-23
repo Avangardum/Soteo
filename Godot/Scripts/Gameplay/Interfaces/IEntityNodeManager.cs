@@ -2,5 +2,6 @@ namespace Soteo.Gameplay.Interfaces;
 
 public interface IEntityNodeManager
 {
-    void RemoveEntityNode(IEntityNode node);
+    T AddNode<T>(Guid id) where T : class, IEntityNode;
+    void RemoveNode(Guid id);
 }

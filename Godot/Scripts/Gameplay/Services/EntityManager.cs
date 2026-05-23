@@ -17,7 +17,6 @@ public sealed class EntityManager : IEntityManager
     private readonly IEntityNodeManager _entityNodeManager; 
     
     private readonly Dictionary<Guid, IEntity> _entities = [];
-    private readonly Dictionary<Guid, IEntityNode> _entityNodes = [];
     
     public EntityManager(IServiceProvider serviceProvider)
     {
@@ -79,9 +78,9 @@ public sealed class EntityManager : IEntityManager
     {
         return snapshot switch
         {
-            UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, GetNode<UnitPuppetNode>(s.Id), _camera.Required)),
+            UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, AddNode<UnitPuppetNode>(s.Id), _camera.Required)),
             ProjectilePuppetSnapshot s =>
-                Add(new ProjectilePuppet(s.Id, GetNode<ProjectilePuppetNode>(s.Id), _camera.Required))
+                Add(new ProjectilePuppet(s.Id, AddNode<ProjectilePuppetNode>(s.Id), _camera.Required))
         };
     }
     
@@ -89,19 +88,19 @@ public sealed class EntityManager : IEntityManager
     {
         return delta switch
         {
-            UnitPuppetSnapshotDelta d => Add(new UnitPuppet(d.Id, GetNode<UnitPuppetNode>(d.Id), _camera.Required)),
+            UnitPuppetSnapshotDelta d => Add(new UnitPuppet(d.Id, AddNode<UnitPuppetNode>(d.Id), _camera.Required)),
             ProjectilePuppetSnapshotDelta d =>
-                Add(new ProjectilePuppet(d.Id, GetNode<ProjectilePuppetNode>(d.Id), _camera.Required)),
+                Add(new ProjectilePuppet(d.Id, AddNode<ProjectilePuppetNode>(d.Id), _camera.Required)),
         };
     }
     
     public PlayerCharacter SpawnPlayerCharacter(Guid id) =>
-        Add(new PlayerCharacter(id, GetNode<UnitNode>(id), _serviceProvider));
+        Add(new PlayerCharacter(id, AddNode<UnitNode>(id), _serviceProvider));
 
     public TargetedProjectile SpawnAttackProjectile(AbilityContext abilityContext, double speed)
     {
         var id = Guid.NewGuid();
-        return Add(new TargetedProjectile(id, abilityContext, speed, GetNode<ProjectileNode>(id), _serviceProvider)
+        return Add(new TargetedProjectile(id, abilityContext, speed, AddNode<ProjectileNode>(id), _serviceProvider)
         {
             // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
             // of the projectile over the source
@@ -117,31 +116,12 @@ public sealed class EntityManager : IEntityManager
         return entity;
     }
     
-    private T GetNode<T>(Guid id) where T : Node2D, IEntityNode
-    {
-        T node = _entityNodePool.GetNode<T>();
-        node.Name = $"{typeof(T).Name.Replace("Puppet", "")} {id}";
-        _shard.EntityRoot.AddChild(node);
-        _entityNodes[id] = node;
-        return node;
-    }
+    private T AddNode<T>(Guid id) where T : class, IEntityNode =>
+        _entityNodeManager.AddNode<T>(id);
 
     private void OnEntityRemoved(IEntity entity)
     {
-        IEntityNode node = _entityNodes[entity.Id];
-        
-        if (node is IDeferredRemovalEntityNode deferred)
-        {
-            deferred.WaitUntilCanRemoveAsync()
-                .ContinueWithinContext(() => _entityNodeManager.RemoveEntityNode(deferred))
-                .CollectException();
-        }
-        else
-        {
-            _entityNodeManager.RemoveEntityNode(node);
-        }
-
-        _entityNodes.Remove(entity.Id);
+        _entityNodeManager.RemoveNode(entity.Id);
         _entities.Remove(entity.Id);
         EntityRemoved(entity);
     }
