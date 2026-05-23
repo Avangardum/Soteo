@@ -11,7 +11,7 @@ namespace Soteo.Gameplay.Services;
 public sealed class EntityManager : IEntityManager
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IShard _shard;
+    private readonly IShardNode _shard;
     private readonly IEntityNodePool _entityNodePool;
     private readonly ClientDependency<ICamera> _camera;
     private readonly IEntityNodeManager _entityNodeManager; 
@@ -21,7 +21,7 @@ public sealed class EntityManager : IEntityManager
     public EntityManager(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _shard = serviceProvider.GetRequiredService<IShard>();
+        _shard = serviceProvider.GetRequiredService<IShardNode>();
         _entityNodePool = serviceProvider.GetRequiredService<IEntityNodePool>();
         _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
         _entityNodeManager = serviceProvider.GetRequiredService<IEntityNodeManager>();

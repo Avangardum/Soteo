@@ -32,7 +32,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private PackedScene? _shardScene;
     private IServiceProvider? _rootServiceProvider;
-    private Shard? _newScopeShard;
+    private ShardNode? _newScopeShard;
     private readonly Dictionary<Guid, IServiceScope> _shardServiceScopes = [];
     
     // Fields for running a shard server from the editor
@@ -127,8 +127,9 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddSingleton<IChunkCollector, ChunkCollector>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         
-        services.AddScoped<IShard>(
+        services.AddScoped<IShardNode>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
+        services.AddAlias<IShard, IShardNode>();
         services.AddScoped<IEntityManager, EntityManager>();
         services.AddScoped<IEntityNodeManager, EntityNodeManager>();
         
@@ -174,7 +175,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         Guid shardId = Const.TestShardId;
         Vector2 position = new Vector2(0, 0);
 
-        var shard = _shardScene.Required.Instance<Shard>();
+        var shard = _shardScene.Required.Instance<ShardNode>();
         shard.Id = shardId;
         shard.Name = shardId.ToString();
         shard.Position = position;
@@ -185,14 +186,14 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         var scope = _rootServiceProvider.Required.CreateScope();
         _newScopeShard = shard;
-        scope.ServiceProvider.GetRequiredService<IShard>();
+        scope.ServiceProvider.GetRequiredService<IShardNode>();
         _newScopeShard = null;
         CreateShardNodes(shard, scope.ServiceProvider);
         scope.ServiceProvider.GetService<ISynchronizationServer>();
         _shardServiceScopes[shardId] = scope;
     }
     
-    private void CreateShardNodes(Shard shard, IServiceProvider serviceProvider)
+    private void CreateShardNodes(ShardNode shard, IServiceProvider serviceProvider)
     {
         if (IsServer) return;
         shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
