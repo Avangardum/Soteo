@@ -63,6 +63,8 @@ public sealed class EntityManager : IEntityManager
             bool isNew = !_entities.TryGetValue(entityDelta.Id, out IEntity? entity);
             if (isNew)
                 entity = SpawnEntityFromDelta(entityDelta);
+            // Unlike in ReplicateSnapshotEntities, deltas are applied without waiting for all new entities to spawn,
+            // because deltas are only used for puppet entities that don't reference other entities.
             entity.Required.ApplyDelta(entityDelta, isNew ? 1 : lerpWeight);
         }
         foreach (Guid id in delta.Entities.RemovedKeys)
