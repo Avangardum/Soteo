@@ -14,6 +14,7 @@ public sealed class EntityManager : IEntityManager
     private readonly IShard _shard;
     private readonly IEntityNodePool _entityNodePool;
     private readonly ClientDependency<ICamera> _camera;
+    private readonly IEntityNodeManager _entityNodeManager; 
     
     private readonly Dictionary<Guid, IEntity> _entities = [];
     private readonly Dictionary<Guid, IEntityNode> _entityNodes = [];
@@ -24,6 +25,7 @@ public sealed class EntityManager : IEntityManager
         _shard = serviceProvider.GetRequiredService<IShard>();
         _entityNodePool = serviceProvider.GetRequiredService<IEntityNodePool>();
         _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
+        _entityNodeManager = serviceProvider.GetRequiredService<IEntityNodeManager>();
     }
     
     public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;
@@ -131,22 +133,16 @@ public sealed class EntityManager : IEntityManager
         if (node is IDeferredRemovalEntityNode deferred)
         {
             deferred.WaitUntilCanRemoveAsync()
-                .ContinueWithinContext(() => RemoveEntityNode(deferred))
+                .ContinueWithinContext(() => _entityNodeManager.RemoveEntityNode(deferred))
                 .CollectException();
         }
         else
         {
-            RemoveEntityNode(node);
+            _entityNodeManager.RemoveEntityNode(node);
         }
 
         _entityNodes.Remove(entity.Id);
         _entities.Remove(entity.Id);
         EntityRemoved(entity);
-    }
-    
-    private void RemoveEntityNode(IEntityNode node)
-    {
-        _shard.EntityRoot.RemoveChild(node.Node);
-        _entityNodePool.ReturnNode(node);
     }
 }

@@ -9,7 +9,7 @@ using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class UnitBase<TNode> : Entity<TNode> where TNode : Node2D, IEntityNode
+public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEntityNode
 {
     public static readonly IReadOnlyDictionary<Stat, (double Min, double Default, double Max)> StatConst =
         new Dictionary<Stat, (double, double, double)>

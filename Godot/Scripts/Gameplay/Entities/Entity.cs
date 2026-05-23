@@ -5,7 +5,7 @@ using Soteo.Shared;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class Entity<TNode> : IEntity where TNode : Node2D, IEntityNode
+public abstract class Entity<TNode> : IEntity where TNode : class, IEntityNode
 {
     protected Entity(Guid id, TNode node)
     {

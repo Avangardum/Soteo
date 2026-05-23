@@ -130,6 +130,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddScoped<IShard>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
         services.AddScoped<IEntityManager, EntityManager>();
+        services.AddScoped<IEntityNodeManager, EntityNodeManager>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
         
