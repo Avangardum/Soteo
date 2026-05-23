@@ -18,7 +18,7 @@ public abstract class Projectile : Entity<ProjectileNode>
         double speed,
         ProjectileNode node,
         IServiceProvider serviceProvider
-    ) : base(id, node, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
+    ) : base(id, node)
     {
         AbilityContext = abilityContext;
         Speed = speed;

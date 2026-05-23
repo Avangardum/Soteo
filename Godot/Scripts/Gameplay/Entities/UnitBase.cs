@@ -29,8 +29,7 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : Node2D, IEnt
             [Stat.AttackProjectileSpeed] = (50, 500, 5000)
         }.ToImmutableDictionary();
     
-    protected UnitBase(Guid id, TNode node, IServiceProvider serviceProvider) :
-        base(id, node, serviceProvider.GetRequiredService<ClientDependency<ICamera>>())
+    protected UnitBase(Guid id, TNode node) : base(id, node)
     {
         foreach (Stat stat in Stat.All)
             StatsInternal[stat] = StatConst[stat].Default;

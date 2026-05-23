@@ -20,7 +20,7 @@ public abstract class Unit : UnitBase<UnitNode>
     
     private long _nextStatusOrdinal;
     
-    protected Unit(Guid id, UnitNode node, IServiceProvider serviceProvider) : base(id, node, serviceProvider)
+    protected Unit(Guid id, UnitNode node, IServiceProvider serviceProvider) : base(id, node)
     {
         _serviceProvider = serviceProvider;
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();

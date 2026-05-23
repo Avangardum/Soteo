@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.EntityNodes;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
 using Soteo.Shared;
 using Soteo.Shared.Enums;
@@ -10,10 +11,19 @@ namespace Soteo.Gameplay.Entities;
 
 public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
 {
-    public UnitPuppet(Guid id, UnitPuppetNode node, IServiceProvider serviceProvider) :
-        base(id, node, serviceProvider)
+    private readonly ICamera _camera;
+    
+    public UnitPuppet(Guid id, UnitPuppetNode node, ICamera camera) : base(id, node)
     {
+        _camera = camera;
+        camera.ZoomChanged += OnZoomChanged;
         node.Visible = true;
+    }
+
+    public override void Remove()
+    {
+        base.Remove();
+        _camera.ZoomChanged -= OnZoomChanged;
     }
 
     public override bool IsDead
@@ -42,7 +52,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         set
         {
             base.Azimuth = value;
-            Node?.AzimuthIndicator.CalculatePoints(Azimuth, Camera.Required.TrueZoom);
+            Node?.AzimuthIndicator.CalculatePoints(Azimuth, _camera.TrueZoom);
         }
     }
     
@@ -54,7 +64,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         Node?.Position = NodeHelper.RoundPositionToPixelPerfect
         (
             Position,
-            Camera.Value,
+            _camera,
             isCamera: false,
             Node.Properties.HalfPixelXVisualOffset,
             Node.Properties.HalfPixelYVisualOffset
@@ -96,10 +106,10 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         UpdateAnimation();
     }
 
-    protected override void OnZoomChanged()
+    private void OnZoomChanged()
     {
         UpdateNodePosition();
-        Node?.AzimuthIndicator.CalculatePoints(Azimuth, Camera.Required.TrueZoom);
+        Node?.AzimuthIndicator.CalculatePoints(Azimuth, _camera.TrueZoom);
     }
     
     private void UpdateAnimation()

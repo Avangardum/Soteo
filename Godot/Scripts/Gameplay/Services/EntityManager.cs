@@ -77,7 +77,7 @@ public sealed class EntityManager : IEntityManager
     {
         return snapshot switch
         {
-            UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, GetNode<UnitPuppetNode>(s.Id), _serviceProvider)),
+            UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, GetNode<UnitPuppetNode>(s.Id), _camera.Required)),
             ProjectilePuppetSnapshot s =>
                 Add(new ProjectilePuppet(s.Id, GetNode<ProjectilePuppetNode>(s.Id), _camera.Required))
         };
@@ -87,7 +87,7 @@ public sealed class EntityManager : IEntityManager
     {
         return delta switch
         {
-            UnitPuppetSnapshotDelta d => Add(new UnitPuppet(d.Id, GetNode<UnitPuppetNode>(d.Id), _serviceProvider)),
+            UnitPuppetSnapshotDelta d => Add(new UnitPuppet(d.Id, GetNode<UnitPuppetNode>(d.Id), _camera.Required)),
             ProjectilePuppetSnapshotDelta d =>
                 Add(new ProjectilePuppet(d.Id, GetNode<ProjectilePuppetNode>(d.Id), _camera.Required)),
         };

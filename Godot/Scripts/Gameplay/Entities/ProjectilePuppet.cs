@@ -7,9 +7,20 @@ namespace Soteo.Gameplay.Entities;
 
 public sealed class ProjectilePuppet : Entity<ProjectilePuppetNode>
 {
-    public ProjectilePuppet(Guid id, ProjectilePuppetNode node, ICamera camera) :
-        base(id, node, ClientDependency.From(camera)) { }
-    
+    private readonly ICamera _camera;
+
+    public ProjectilePuppet(Guid id, ProjectilePuppetNode node, ICamera camera) : base(id, node)
+    {
+        _camera = camera;
+        camera.ZoomChanged += OnZoomChanged;
+    }
+
+    public override void Remove()
+    {
+        base.Remove();
+        _camera.ZoomChanged -= OnZoomChanged;
+    }
+
     public override Vector2 Position
     {
         get => base.Position;
@@ -25,7 +36,7 @@ public sealed class ProjectilePuppet : Entity<ProjectilePuppetNode>
         Node?.Position = NodeHelper.RoundPositionToPixelPerfect
         (
             Position,
-            Camera.Value,
+            _camera,
             isCamera: false,
             Node.Properties.HalfPixelXVisualOffset,
             Node.Properties.HalfPixelYVisualOffset
@@ -34,7 +45,7 @@ public sealed class ProjectilePuppet : Entity<ProjectilePuppetNode>
     
     public override EntitySnapshot CreateSnapshot() => throw new InvalidOperationException();
     
-    protected override void OnZoomChanged()
+    private void OnZoomChanged()
     {
         UpdateNodePosition();
     }
