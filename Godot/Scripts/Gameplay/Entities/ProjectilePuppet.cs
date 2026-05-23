@@ -5,11 +5,11 @@ using Soteo.Gameplay.Util;
 
 namespace Soteo.Gameplay.Entities;
 
-public sealed class ProjectilePuppet : Entity<ProjectilePuppetNode>
+public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>
 {
     private readonly ICamera _camera;
 
-    public ProjectilePuppet(Guid id, ProjectilePuppetNode node, ICamera camera) : base(id, node)
+    public ProjectilePuppet(Guid id, IProjectilePuppetNode node, ICamera camera) : base(id, node)
     {
         _camera = camera;
         camera.ZoomChanged += OnZoomChanged;
@@ -38,8 +38,8 @@ public sealed class ProjectilePuppet : Entity<ProjectilePuppetNode>
             Position,
             _camera,
             isCamera: false,
-            Node.Properties.HalfPixelXVisualOffset,
-            Node.Properties.HalfPixelYVisualOffset
+            Node.HalfPixelXVisualOffset,
+            Node.HalfPixelYVisualOffset
         );
     }
     

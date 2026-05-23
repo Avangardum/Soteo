@@ -7,7 +7,7 @@ using Soteo.Gameplay.Util;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class Projectile : Entity<ProjectileNode>
+public abstract class Projectile : Entity<IProjectileNode>
 {
     private readonly IServiceProvider _serviceProvider;
     
@@ -16,7 +16,7 @@ public abstract class Projectile : Entity<ProjectileNode>
         Guid id,
         AbilityContext abilityContext,
         double speed,
-        ProjectileNode node,
+        IProjectileNode node,
         IServiceProvider serviceProvider
     ) : base(id, node)
     {

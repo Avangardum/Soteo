@@ -9,25 +9,35 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
     private double? _removalCountdown;
     private TaskCompletionSource _waitUntilCanRemoveSource = new();
     
-    public Node2D Node => this;
+    private AnimatedSprite _sprite = null!;
+    private AzimuthIndicator _azimuthIndicator = null!;
+    private EntityProperties _properties = null!;
     
     public UnitPuppet? UnitPuppet
     {
         get;
         set
         {
+            if (field == value) return;
             field = value;
-            
+
             if (value != null)
-            {
-                _removalCountdown = null;
-                _waitUntilCanRemoveSource = new TaskCompletionSource();
-            }
+                OnAttached();
             else
-            {
-                _removalCountdown = 5;
-            }
+                OnDetached();
         }
+    }
+    
+    private void OnAttached()
+    {
+        _removalCountdown = null;
+        _waitUntilCanRemoveSource = new TaskCompletionSource();
+        _azimuthIndicator.Visible = true;
+    }
+    
+    private void OnDetached()
+    {
+        _removalCountdown = 5;
     }
     
     public IEntity? Entity
@@ -36,17 +46,13 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
         set => UnitPuppet = (UnitPuppet?)value;
     }
     
-    public AnimatedSprite Sprite { get; private set; } = null!;
-    public AzimuthIndicator AzimuthIndicator { get; private set; } = null!;
-    public EntityProperties Properties { get; private set; } = null!;
-    
     public override void _Ready()
     {
-        Sprite = GetNode<AnimatedSprite>("Visuals/AnimatedSprite");
-        AzimuthIndicator = GetNode<AzimuthIndicator>("Visuals/AzimuthIndicator");
-        Properties = GetNode<EntityProperties>("Properties");
+        _sprite = GetNode<AnimatedSprite>("Visuals/AnimatedSprite");
+        _azimuthIndicator = GetNode<AzimuthIndicator>("Visuals/AzimuthIndicator");
+        _properties = GetNode<EntityProperties>("Properties");
         
-        Sprite.Playing = true;
+        _sprite.Playing = true;
     }
 
     public override void _Process(float delta)
@@ -63,40 +69,39 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
 
     public bool IsAzimuthIndicatorVisible
     {
-        get => AzimuthIndicator.Visible;
-        set => AzimuthIndicator.Visible = value;
+        get => _azimuthIndicator.Visible;
+        set => _azimuthIndicator.Visible = value;
     }
 
-    public bool HalfPixelXVisualOffset => Properties.HalfPixelXVisualOffset;
-
-    public bool HalfPixelYVisualOffset => Properties.HalfPixelYVisualOffset;
+    public bool HalfPixelXVisualOffset => _properties.HalfPixelXVisualOffset;
+    public bool HalfPixelYVisualOffset => _properties.HalfPixelYVisualOffset;
 
     public bool FlipSpriteH
     {
-        get => Sprite.FlipH;
-        set => Sprite.FlipH = value;
+        get => _sprite.FlipH;
+        set => _sprite.FlipH = value;
     }
 
     public string Animation
     {
-        get => Sprite.Animation;
-        set => Sprite.Animation = value;
+        get => _sprite.Animation;
+        set => _sprite.Animation = value;
     }
 
     public double AnimationSpeedScale
     {
-        get => Sprite.SpeedScale;
-        set => Sprite.SpeedScale = (float)value;
+        get => _sprite.SpeedScale;
+        set => _sprite.SpeedScale = (float)value;
     }
 
     public int AnimationFrame
     {
-        get => Sprite.Frame;
-        set => Sprite.Frame = value;
+        get => _sprite.Frame;
+        set => _sprite.Frame = value;
     }
 
-    public int AnimationFrameCount => Sprite.Frames.GetFrameCount(Animation);
+    public int AnimationFrameCount => _sprite.Frames.GetFrameCount(Animation);
 
     public void CalculateAzimuthIndicatorPoints(double azimuth, double zoom) =>
-        AzimuthIndicator.CalculatePoints(azimuth, zoom);
+        _azimuthIndicator.CalculatePoints(azimuth, zoom);
 }

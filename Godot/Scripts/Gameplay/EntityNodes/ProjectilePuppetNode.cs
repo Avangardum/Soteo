@@ -3,10 +3,10 @@ using Soteo.Gameplay.Interfaces;
 
 namespace Soteo.Gameplay.EntityNodes;
 
-public sealed class ProjectilePuppetNode : Node2D, IEntityNode
+public sealed class ProjectilePuppetNode : Node2D, IProjectilePuppetNode
 {
-    public Node2D Node => this;
-
+    private EntityProperties _properties = null!;
+    
     public ProjectilePuppet? ProjectilePuppet { get; set; }
     
     public IEntity? Entity
@@ -15,10 +15,11 @@ public sealed class ProjectilePuppetNode : Node2D, IEntityNode
         set => ProjectilePuppet = (ProjectilePuppet?)value;
     }
     
-    public EntityProperties Properties { get; private set; } = null!;
+    public bool HalfPixelXVisualOffset => _properties.HalfPixelXVisualOffset;
+    public bool HalfPixelYVisualOffset => _properties.HalfPixelYVisualOffset;
 
     public override void _Ready()
     {
-        Properties = GetNode<EntityProperties>("Properties");
+        _properties = GetNode<EntityProperties>("Properties");
     }
 }

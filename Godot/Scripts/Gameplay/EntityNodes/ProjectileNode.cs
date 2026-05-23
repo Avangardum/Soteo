@@ -4,7 +4,7 @@ using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.EntityNodes;
 
-public sealed class ProjectileNode : Area2D, IEntityNode
+public sealed class ProjectileNode : Area2D, IProjectileNode
 {
     public Node2D Node => this;
     
