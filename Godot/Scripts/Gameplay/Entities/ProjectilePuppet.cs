@@ -17,8 +17,8 @@ public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>
 
     public override void Remove()
     {
-        base.Remove();
         _camera.ZoomChanged -= OnZoomChanged;
+        base.Remove();
     }
 
     public override Vector2 Position

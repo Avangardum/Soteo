@@ -18,6 +18,7 @@ public sealed class EntityNodeManager(IShard shard, IEntityNodePool pool) : IEnt
     public void RemoveNode(Guid id)
     {
         IEntityNode node = _nodes[id];
+        _nodes.Remove(id);
         
         if (node is IDeferredRemovalEntityNode deferred)
         {

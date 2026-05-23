@@ -19,8 +19,8 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
 
     public override void Remove()
     {
-        base.Remove();
         _camera.ZoomChanged -= OnZoomChanged;
+        base.Remove();
     }
 
     public override bool IsDead
