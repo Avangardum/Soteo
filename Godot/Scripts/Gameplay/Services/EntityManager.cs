@@ -60,9 +60,10 @@ public sealed class EntityManager : IEntityManager
     {
         foreach (EntitySnapshotDelta entityDelta in delta.Entities.Changes.Values)
         {
-            if (!_entities.TryGetValue(entityDelta.Id, out IEntity? entity))
+            bool isNew = !_entities.TryGetValue(entityDelta.Id, out IEntity? entity);
+            if (isNew)
                 entity = SpawnEntityFromDelta(entityDelta);
-            entity.ApplyDelta(entityDelta, lerpWeight);
+            entity.Required.ApplyDelta(entityDelta, isNew ? 1 : lerpWeight);
         }
         foreach (Guid id in delta.Entities.RemovedKeys)
         {
