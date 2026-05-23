@@ -1,10 +1,9 @@
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.EntityNodes;
 
-public sealed class UnitNode : KinematicBody2D, IEntityNode
+public sealed class UnitNode : KinematicBody2D, IUnitNode
 {
     public Node2D Node => this;
         
@@ -15,7 +14,9 @@ public sealed class UnitNode : KinematicBody2D, IEntityNode
         get => Unit;
         set => Unit = (Unit?)value;
     }
-    
+
+    public void MoveAndCollide(Vector2 movement) => base.MoveAndCollide(movement);
+
     public override void _PhysicsProcess(float delta)
     {
         Unit?.PhysicsProcess(this, delta);

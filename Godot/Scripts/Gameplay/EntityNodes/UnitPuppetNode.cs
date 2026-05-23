@@ -4,7 +4,7 @@ using Soteo.Shared;
 
 namespace Soteo.Gameplay.EntityNodes;
 
-public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode
+public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPuppetNode
 {
     private double? _removalCountdown;
     private TaskCompletionSource _waitUntilCanRemoveSource = new();
@@ -60,4 +60,43 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode
     }
 
     public async Task WaitUntilCanRemoveAsync() => await _waitUntilCanRemoveSource.Task;
+
+    public bool IsAzimuthIndicatorVisible
+    {
+        get => AzimuthIndicator.Visible;
+        set => AzimuthIndicator.Visible = value;
+    }
+
+    public bool HalfPixelXVisualOffset => Properties.HalfPixelXVisualOffset;
+
+    public bool HalfPixelYVisualOffset => Properties.HalfPixelYVisualOffset;
+
+    public bool FlipSpriteH
+    {
+        get => Sprite.FlipH;
+        set => Sprite.FlipH = value;
+    }
+
+    public string Animation
+    {
+        get => Sprite.Animation;
+        set => Sprite.Animation = value;
+    }
+
+    public double AnimationSpeedScale
+    {
+        get => Sprite.SpeedScale;
+        set => Sprite.SpeedScale = (float)value;
+    }
+
+    public int AnimationFrame
+    {
+        get => Sprite.Frame;
+        set => Sprite.Frame = value;
+    }
+
+    public int AnimationFrameCount => Sprite.Frames.GetFrameCount(Animation);
+
+    public void CalculateAzimuthIndicatorPoints(double azimuth, double zoom) =>
+        AzimuthIndicator.CalculatePoints(azimuth, zoom);
 }

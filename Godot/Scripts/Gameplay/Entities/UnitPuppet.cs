@@ -1,7 +1,5 @@
-using System.Collections.Immutable;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Dto.Snapshots;
-using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
 using Soteo.Shared;
@@ -9,15 +7,14 @@ using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Entities;
 
-public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
+public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
 {
     private readonly ICamera _camera;
     
-    public UnitPuppet(Guid id, UnitPuppetNode node, ICamera camera) : base(id, node)
+    public UnitPuppet(Guid id, IUnitPuppetNode node, ICamera camera) : base(id, node)
     {
         _camera = camera;
         camera.ZoomChanged += OnZoomChanged;
-        node.Visible = true;
     }
 
     public override void Remove()
@@ -32,7 +29,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         protected set
         {
             base.IsDead = value;
-            Node?.AzimuthIndicator.Visible = !value;
+            Node?.IsAzimuthIndicatorVisible = !value;
         }
     }
 
@@ -52,7 +49,7 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
         set
         {
             base.Azimuth = value;
-            Node?.AzimuthIndicator.CalculatePoints(Azimuth, _camera.TrueZoom);
+            Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.TrueZoom);
         }
     }
     
@@ -66,8 +63,8 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
             Position,
             _camera,
             isCamera: false,
-            Node.Properties.HalfPixelXVisualOffset,
-            Node.Properties.HalfPixelYVisualOffset
+            Node.HalfPixelXVisualOffset,
+            Node.HalfPixelYVisualOffset
         );
     }
 
@@ -109,47 +106,46 @@ public sealed class UnitPuppet : UnitBase<UnitPuppetNode>
     private void OnZoomChanged()
     {
         UpdateNodePosition();
-        Node?.AzimuthIndicator.CalculatePoints(Azimuth, _camera.TrueZoom);
+        Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.TrueZoom);
     }
     
     private void UpdateAnimation()
     {
         if (IsRemoved) return;
         
-        Node.Sprite.FlipH = Azimuth >= 180;
+        Node.FlipSpriteH = Azimuth >= 180;
         
         if (IsDead)
         {
-            Node.Sprite.Animation = "Death";
-            Node.Sprite.SpeedScale = 1;
+            Node.Animation = "Death";
+            Node.AnimationSpeedScale = 1;
         }
         else if (AbilityUseProgress != null)
         {
             var ability = AbilitySlotStates[AbilityUseProgress.Slot].Ability;
-            Node.Sprite.Animation = ability.Animation;
+            Node.Animation = ability.Animation;
             if (ability.LoopAnimation)
             {
-                Node.Sprite.Animation = ability.Animation;
-                Node.Sprite.SpeedScale = 1;
+                Node.AnimationSpeedScale = 1;
             }
             else
             {
-                int frameCount = Node.Sprite.Frames.GetFrameCount(ability.Animation);
+                int frameCount = Node.AnimationFrameCount;
                 double progress = AbilityUseProgress.NormalizedProgress;
-                Node.Sprite.Frame = Mathf.Min(Maths.FloorToInt(frameCount * progress), frameCount - 1);
-                Node.Sprite.SpeedScale = 0;
+                Node.AnimationFrame = Mathf.Min(Maths.FloorToInt(frameCount * progress), frameCount - 1);
+                Node.AnimationSpeedScale = 0;
             }
         }
         else if (IsMoving)
         {
-            Node.Sprite.Animation = "Walk Right";
+            Node.Animation = "Walk Right";
             const double referenceMoveSpeed = 35;
-            Node.Sprite.SpeedScale = (float)(Stats[Stat.MoveSpeed] / referenceMoveSpeed);
+            Node.AnimationSpeedScale = (float)(Stats[Stat.MoveSpeed] / referenceMoveSpeed);
         }
         else
         {
-            Node.Sprite.Animation = "Idle Right";
-            Node.Sprite.SpeedScale = 1;
+            Node.Animation = "Idle Right";
+            Node.AnimationSpeedScale = 1;
         }
     }
 }

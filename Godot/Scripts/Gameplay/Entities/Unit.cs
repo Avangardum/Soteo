@@ -13,14 +13,14 @@ using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class Unit : UnitBase<UnitNode>
+public abstract class Unit : UnitBase<IUnitNode>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
     
     private long _nextStatusOrdinal;
     
-    protected Unit(Guid id, UnitNode node, IServiceProvider serviceProvider) : base(id, node)
+    protected Unit(Guid id, IUnitNode node, IServiceProvider serviceProvider) : base(id, node)
     {
         _serviceProvider = serviceProvider;
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
@@ -70,7 +70,7 @@ public abstract class Unit : UnitBase<UnitNode>
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
     }
 
-    public virtual void PhysicsProcess(UnitNode node, double delta)
+    public virtual void PhysicsProcess(IUnitNode node, double delta)
     {
         if (IsDead) return;
         
@@ -220,7 +220,7 @@ public abstract class Unit : UnitBase<UnitNode>
         SetResourceStat(stat, Stats[maxStat] * normalized);
     }
     
-    private void ExecuteCommands(UnitNode node, double deltaTime)
+    private void ExecuteCommands(IUnitNode node, double deltaTime)
     {
         double remainingDeltaTime = deltaTime;
         int iterations = 0;
@@ -273,7 +273,7 @@ public abstract class Unit : UnitBase<UnitNode>
         }
     }
     
-    private void MoveToPosition(Vector2 position, ref double remainingDeltaTime, UnitNode node)
+    private void MoveToPosition(Vector2 position, ref double remainingDeltaTime, IUnitNode node)
     {
         LookAtPosition(position, ref remainingDeltaTime);
         if (remainingDeltaTime == 0 || Stats[Stat.MoveSpeed] == 0) return;
@@ -302,14 +302,13 @@ public abstract class Unit : UnitBase<UnitNode>
         IsMoving = true;
     }
     
-    private KinematicCollision2D MoveAndCollide(Vector2 movement, UnitNode node)
+    private void MoveAndCollide(Vector2 movement, IUnitNode node)
     {
-        KinematicCollision2D collision = node.MoveAndCollide(movement);
+        node.MoveAndCollide(movement);
         Position = node.Position;
-        return collision;
     }
 
-    private void UseAbility(UseAbilityCommand command, ref double remainingDeltaTime, UnitNode node)
+    private void UseAbility(UseAbilityCommand command, ref double remainingDeltaTime, IUnitNode node)
     {
         if (!AbilitySlotStatesInternal.TryGetValue(command.Slot, out AbilitySlotState? state))
         {
@@ -409,7 +408,7 @@ public abstract class Unit : UnitBase<UnitNode>
         AbilityContext context,
         UseAbilityCommand command,
         ref double remainingDeltaTime,
-        UnitNode node
+        IUnitNode node
     )
     {
         Vector2? targetPosition = context.TargetUnit?.Position ?? context.TargetPosition;
