@@ -158,7 +158,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private void RegisterClientServices(IServiceCollection services)
     {
-        services.AddShardScopedNode<ISynchronizationClient, SynchronizationClient>();
+        services.AddScoped<ISynchronizationClient, SynchronizationClient>();
         services.AddSingletonNode<ICamera>("Camera");
         services.AddSingleton<IHud>(_ => _hud.Required);
         services.AddSingleton<IEntityLocator, EntityLocator>();
@@ -194,7 +194,6 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     private void CreateShardNodes(Shard shard, IServiceProvider serviceProvider)
     {
         if (IsServer) return;
-        shard.AddChild(ActivatorUtilities.CreateInstance<SynchronizationClient>(serviceProvider));
         shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
     }
 }

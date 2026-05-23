@@ -1,11 +1,12 @@
 using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Services.Synchronization;
 
-public sealed class SynchronizationClient : Node, ISynchronizationClient
+public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
 {
     private enum StateEnum
     {
@@ -44,6 +45,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     private readonly IShard _shard;
     private readonly INetworkDebugger _networkDebugger;
     private readonly IPacketSender _packetSender;
+    private readonly IDisposable _processSubscription;
 
     private SynchronizationData _syncData = new();
 
@@ -52,15 +54,21 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
         IEntityManager entityManager,
         IShard shard,
         INetworkDebugger networkDebugger,
-        IPacketSender packetSender
+        IPacketSender packetSender,
+        IProcessPublisher processPublisher
     )
     {
-        Name = nameof(SynchronizationClient);
-
         _entityManager = entityManager;
         _shard = shard;
         _networkDebugger = networkDebugger;
         _packetSender = packetSender;
+        
+        _processSubscription = processPublisher.SubscribeToProcess(Process);
+    }
+    
+    public void Dispose()
+    {
+        _processSubscription.Dispose();
     }
     
     private StateEnum State
@@ -85,7 +93,7 @@ public sealed class SynchronizationClient : Node, ISynchronizationClient
     public int WaitFrameCount { get; private set; }
     public int FastForwardCount { get; private set; }
 
-    public override void _Process(float delta)
+    private void Process(double delta)
     {
         if (State != StateEnum.Synchronized && !TrySynchronize()) return;
         
