@@ -5,6 +5,7 @@ using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
+using Soteo.Util.Extensions;
 
 namespace Soteo.Gameplay.Services;
 

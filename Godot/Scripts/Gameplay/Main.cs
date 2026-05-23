@@ -13,6 +13,8 @@ using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes;
 using Soteo.Shared.PacketSerializers;
+using Soteo.Util;
+using Soteo.Util.Extensions;
 
 namespace Soteo.Gameplay;
 
@@ -52,6 +54,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
 
     public override void _Ready()
     {
+        MainConst.InitConst();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
@@ -60,7 +63,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
-        if (IsServer) LoadShard();
+        if (Const.IsServer) LoadShard();
     }
     
     private void GetNodes()
@@ -73,7 +76,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         _processPublisher = new ProcessPublisher();
         AddChild(_processPublisher);
         
-        if (UseJsmq)
+        if (Const.UseJsmq)
         {
             _jsmqCommunicator = ActivatorUtilities.CreateInstance<JsmqFromGameplayCommunicator>(_rootServiceProvider.Required);
             AddChild(_jsmqCommunicator);
@@ -88,7 +91,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
             AddChild(_webRtcGameplayCommunicator);
         }
         
-        if (IsServer)
+        if (Const.IsServer)
         {
             
         }
@@ -106,7 +109,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     private void RegisterServices(IServiceCollection services)
     {
         RegisterSharedServices(services);
-        if (IsServer)
+        if (Const.IsServer)
             RegisterServerServices(services);
         else
             RegisterClientServices(services);
@@ -135,7 +138,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
         
-        if (UseJsmq)
+        if (Const.UseJsmq)
         {
             services.AddSingleton<ICampaignServerCommunicator>(_ => _jsmqCommunicator.Required);
             services.AddSingleton<IPacketSender>(_ => _jsmqCommunicator.Required);
@@ -172,7 +175,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     public void LoadShard()
     {
         string mapPath = "res://Scenes/Maps/Test.tscn";
-        Guid shardId = Const.TestShardId;
+        Guid shardId = MainConst.TestShardId;
         Vector2 position = new Vector2(0, 0);
 
         var shard = _shardScene.Required.Instance<ShardNode>();
@@ -195,7 +198,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     
     private void CreateShardNodes(ShardNode shard, IServiceProvider serviceProvider)
     {
-        if (IsServer) return;
+        if (Const.IsServer) return;
         shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
     }
 }

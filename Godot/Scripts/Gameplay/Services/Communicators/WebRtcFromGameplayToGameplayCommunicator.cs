@@ -7,6 +7,7 @@ using Soteo.Shared.Exceptions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes.Autoloads;
 using Soteo.Shared.Packets;
+using Soteo.Util;
 
 namespace Soteo.Gameplay.Services.Communicators;
 
@@ -79,7 +80,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         // _Process would be delayed to the next physics frame otherwise.
         Poll(delta);
         
-        if (IsServer)
+        if (Const.IsServer)
         {
             while (_packetQueue.Count > 0)
             {
@@ -136,7 +137,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     private void ProcessPing(double delta)
     {
-        if (IsServer) return;
+        if (Const.IsServer) return;
         _timeSinceLastPing += delta;
         if (_timeSinceLastPing >= PingInterval)
         {
@@ -191,7 +192,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             }
             
             // Server defers packet handling to _PhysicsProcess to ensure that all game logic is executed in it only
-            if (IsServer)
+            if (Const.IsServer)
                 _packetQueue.Enqueue((packet, senderId));
             else
                 await _packetHandler.HandleAsync(packet, senderId);
@@ -206,7 +207,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         }
         catch (BadPacketException e)
         {
-            if (IsServer)
+            if (Const.IsServer)
                 SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
             else
                 AsyncExceptionCollector.Collect(e);
@@ -234,13 +235,13 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     private void OnCampaignServerConnectionEstablished()
     {
-        if (!IsServer)
-            ConnectToShardServer(Const.TestShardId);
+        if (!Const.IsServer)
+            ConnectToShardServer(MainConst.TestShardId);
     }
     
     public void ConnectToShardServer(Guid peerId)
     {
-        if (IsServer) throw new InvalidOperationException();
+        if (Const.IsServer) throw new InvalidOperationException();
         WebRTCPeerConnection connection = CreateConnection(peerId);
         connection.CreateOffer();
     }
@@ -386,8 +387,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     public void ReceiveWebrtcSdpPacket(WebrtcSdpPacket packet)
     {
-        string type = IsServer ? "offer" : "answer";
-        WebRTCPeerConnection? connection = IsServer ? CreateConnection(packet.PeerId) :
+        string type = Const.IsServer ? "offer" : "answer";
+        WebRTCPeerConnection? connection = Const.IsServer ? CreateConnection(packet.PeerId) :
             _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         connection?.SetRemoteDescription(type, packet.Sdp);
     }

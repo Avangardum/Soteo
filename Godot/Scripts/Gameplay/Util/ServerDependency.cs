@@ -1,3 +1,6 @@
+using Soteo.Util;
+using Soteo.Util.Extensions;
+
 namespace Soteo.Gameplay.Util;
 
 public static class ServerDependency
@@ -18,7 +21,7 @@ public class ServerDependency<T> where T : class
     {
         get
         {
-            if (!IsServer) return null;
+            if (!Const.IsServer) return null;
             return field ?? throw new InvalidOperationException($"Missing server dependency: {typeof(T)}");
         }
         private set;

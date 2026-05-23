@@ -10,6 +10,7 @@ using Soteo.Shared;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Packets;
+using Soteo.Util.Extensions;
 
 namespace Soteo.Gameplay.Services;
 
@@ -36,11 +37,6 @@ public sealed class InputHandler : Node2D
         Name = nameof(InputHandler);
     }
 
-    public override void _Ready()
-    {
-        if (IsServer) QueueFree();
-    }
-
     public override void _UnhandledInput(InputEvent e)
     {
         if (e.IsActionPressed("select"))
@@ -48,7 +44,7 @@ public sealed class InputHandler : Node2D
         if (e.IsActionPressed("interact"))
             HandleInteract();
         if (e.IsActionPressed("stop"))
-            _packetSender.SendReliable(new StopPacket(), Const.TestShardId);
+            _packetSender.SendReliable(new StopPacket(), MainConst.TestShardId);
         
         foreach (var slot in Enum.GetValues<AbilitySlot>().Distinct())
         {
@@ -78,14 +74,14 @@ public sealed class InputHandler : Node2D
         if (targetUnit != null)
         {
             var command  = new UseAbilityCommand(Slot: AbilitySlot.Attack, Repeat: true, TargetUnitId: targetUnit.Id);
-            _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
+            _packetSender.SendReliable(new UseAbilityPacket { Command = command }, MainConst.TestShardId);
         }
         else
         {
             _packetSender.SendReliable
             (
                 new MovePacket { Position = GetGlobalMousePosition().ToSys() },
-                Const.TestShardId
+                MainConst.TestShardId
             );
         }
     }
@@ -104,7 +100,7 @@ public sealed class InputHandler : Node2D
         Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition().ToSys() : null;
         var command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id);
         if (targetUnit == null && ValidateAbility(user, command) != AbilityValidationResult.Ok) return;
-        _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
+        _packetSender.SendReliable(new UseAbilityPacket { Command = command }, MainConst.TestShardId);
     }
 
     private AbilityValidationResult ValidateAbility(UnitPuppet user, AbilitySlot slot, UnitPuppet targetUnit) =>

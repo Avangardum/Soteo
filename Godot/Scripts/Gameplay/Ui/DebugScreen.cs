@@ -9,10 +9,10 @@ public sealed class DebugScreen : Control
 {
     private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/DebugScreen.tscn"); 
     
-    private readonly double[] _fpsRing = new double[10 * Const.TicksPerSecond];
-    private readonly double[] _unrolledFpsRing = new double[10 * Const.TicksPerSecond];
-    private readonly double[] _entityCountRing = new double[10 * Const.TicksPerSecond];
-    private readonly double[] _unrolledEntityCountRing = new double[10 * Const.TicksPerSecond];
+    private readonly double[] _fpsRing = new double[10 * MainConst.TicksPerSecond];
+    private readonly double[] _unrolledFpsRing = new double[10 * MainConst.TicksPerSecond];
+    private readonly double[] _entityCountRing = new double[10 * MainConst.TicksPerSecond];
+    private readonly double[] _unrolledEntityCountRing = new double[10 * MainConst.TicksPerSecond];
     private int _ringNextIndex;
     private int _pendingProcessCount;
     
@@ -53,7 +53,7 @@ public sealed class DebugScreen : Control
         {
             _pendingProcessCount--;
             IServiceProvider? shardServiceProvider = _shardServiceProviderSource.ShardServiceProviders
-                .GetOrDefault(Const.TestShardId);
+                .GetOrDefault(MainConst.TestShardId);
             var synchronizationClient = shardServiceProvider?.GetRequiredService<ISynchronizationClient>();
             var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
 
@@ -86,7 +86,7 @@ public sealed class DebugScreen : Control
         _label.Text =
             $"""
              fps: {1 / delta :N0}
-             ping: {ToMillisecondsString(_networkDebugger.Ping(Const.TestShardId))}
+             ping: {ToMillisecondsString(_networkDebugger.Ping(MainConst.TestShardId))}
              sync latency: {ToMillisecondsString(synchronizationClient?.Latency)}
              wait frames: {synchronizationClient?.WaitFrameCount ?? 0 :N0}
              fast-forwards: {synchronizationClient?.FastForwardCount ?? 0 :N0}

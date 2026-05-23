@@ -1,4 +1,5 @@
 using Soteo.Gameplay.Interfaces;
+using Soteo.Util;
 
 namespace Soteo.Gameplay.Services;
 
@@ -6,14 +7,14 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
 {
     public CurrentUserIdRepository()
     {
-        if (IsServer) UserId = GetLocalShardServerId();
+        if (Const.IsServer) UserId = GetLocalShardServerId();
     }
     
     public Guid UserId { get; set; }
     
     private Guid GetLocalShardServerId()
     {
-        if (!IsServer) throw new InvalidOperationException();
+        if (!Const.IsServer) throw new InvalidOperationException();
         if (Main.EditorIsServer) return Main.EditorLocalShardServerId;
         string[] args = OS.GetCmdlineArgs();
         int idIndex = args.IndexOf("--server") + 1;

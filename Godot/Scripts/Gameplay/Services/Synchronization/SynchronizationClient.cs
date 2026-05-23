@@ -3,6 +3,7 @@ using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
+using Soteo.Util.Extensions;
 
 namespace Soteo.Gameplay.Services.Synchronization;
 
@@ -21,8 +22,8 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         public double? ApproxServerTick { get; set; }
         public long? LastDeltaTick { get; set; }
         public ShardSnapshotPacket? LastSnapshotPacket { get; set; }
-        public ShardSnapshotDelta?[] DeltaRing { get; } = new ShardSnapshotDelta[10 * Const.TicksPerSecond];
-        public double[] ServerLoadHistoryRing { get; } = new double[10 * Const.TicksPerSecond];
+        public ShardSnapshotDelta?[] DeltaRing { get; } = new ShardSnapshotDelta[10 * MainConst.TicksPerSecond];
+        public double[] ServerLoadHistoryRing { get; } = new double[10 * MainConst.TicksPerSecond];
         
         // Stores minimal difference between _tick and _lastDeltaTick for every recent second. This number
         // shouldn't go below 0, or else synchronization will pause until the delta necessary to continue arrives.
@@ -31,15 +32,15 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         // values are above BufferTicksMinValueToFastForward, synchronization will fast-forward accordingly.
         public double[] BufferTicksHistoryRing { get; } = new double[5];
         
-        public double? Second => Tick / Const.TicksPerSecond;
+        public double? Second => Tick / MainConst.TicksPerSecond;
         
         public long? DeltaRingEarliestValidTick => LastDeltaTick - DeltaRing.Length + 1;
     }
     
-    private static readonly double BufferTicksMinSafeValue = 0.05f * Const.TicksPerSecond;
+    private static readonly double BufferTicksMinSafeValue = 0.05f * MainConst.TicksPerSecond;
     
     private static readonly double BufferTicksMinValueToFastForward =
-        BufferTicksMinSafeValue + 0.01f * Const.TicksPerSecond;
+        BufferTicksMinSafeValue + 0.01f * MainConst.TicksPerSecond;
     
     private readonly IEntityManager _entityManager;
     private readonly IShard _shard;
@@ -88,7 +89,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
     public IReadOnlyList<double> ServerLoadHistory =>
         _syncData.ServerLoadHistoryRing.UnrollRing((_syncData.LastDeltaTick ?? -1) + 1);
     
-    public double? Latency => (_syncData.ApproxServerTick - _syncData.Tick) / Const.TicksPerSecond;
+    public double? Latency => (_syncData.ApproxServerTick - _syncData.Tick) / MainConst.TicksPerSecond;
     
     public int WaitFrameCount { get; private set; }
     public int FastForwardCount { get; private set; }
@@ -103,10 +104,10 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
             return;
         }
         
-        _syncData.ApproxServerTick += delta * Const.TicksPerSecond;
+        _syncData.ApproxServerTick += delta * MainConst.TicksPerSecond;
         double prevTick = _syncData.Tick!.Value;
         double prevSecond = _syncData.Second!.Value;
-        _syncData.Tick += delta * Const.TicksPerSecond;
+        _syncData.Tick += delta * MainConst.TicksPerSecond;
         if ((long)_syncData.Second > (long)prevSecond)
             _syncData.BufferTicksHistoryRing.RingSet((long)_syncData.Second, double.PositiveInfinity);
         
@@ -216,7 +217,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         
         _syncData.DeltaRing.RingSet(packet.Tick, packet.SnapshotDelta);
         _syncData.ServerLoadHistoryRing.RingSet(packet.Tick, packet.ServerLoad);
-        _syncData.ApproxServerTick = packet.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
+        _syncData.ApproxServerTick = packet.Tick + _networkDebugger.Ping(_shard.Id) / 2 * MainConst.TicksPerSecond;
         _syncData.LastDeltaTick = packet.Tick;
     }
 }

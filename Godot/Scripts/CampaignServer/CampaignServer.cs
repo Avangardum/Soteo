@@ -3,8 +3,10 @@ using Soteo.CampaignServer.Communicators;
 using Soteo.CampaignServer.GameState.Repositories;
 using Soteo.CampaignServer.Interfaces;
 using Soteo.CampaignServer.PacketHandlers;
+using Soteo.Shared;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.PacketSerializers;
+using Soteo.Util;
 
 namespace Soteo.CampaignServer;
 
@@ -14,6 +16,7 @@ public sealed class CampaignServer : Node
     
     public override void _Ready()
     {
+        MainConst.InitConst();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         var serviceProvider = serviceCollection.BuildAutofacServiceProvider();
@@ -33,7 +36,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IPacketSender, ICommunicator>();
         
-        if (UseJsmq) services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
+        if (Const.UseJsmq) services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
         else services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
         
         foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);

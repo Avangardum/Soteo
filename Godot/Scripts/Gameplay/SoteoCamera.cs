@@ -135,7 +135,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
         bool halfPixelXOffset = viewportSize.x % 2 == 1;
         bool halfPixelYOffset = viewportSize.y % 2 == 1;
         Position = NodeHelper.RoundPositionToPixelPerfect(
-            Position, this, isCamera: true, halfPixelXOffset, halfPixelYOffset);
+            Position, TrueZoom, isCamera: true, halfPixelXOffset, halfPixelYOffset);
     }
 
     public override void _UnhandledInput(InputEvent e)

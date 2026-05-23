@@ -6,6 +6,7 @@ using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes.Autoloads;
 using Soteo.Shared.Packets;
+using Soteo.Util;
 
 namespace Soteo.Gameplay.Services.Synchronization;
 
@@ -59,7 +60,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     
     private void OnPeerConnected(Guid peerId)
     {
-        if (peerId != CampaignServerId)
+        if (peerId != Const.CampaignServerId)
             _snapshotRequesters.Add(peerId);
     }
 

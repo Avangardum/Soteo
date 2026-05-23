@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Scripts/Gameplay/EntityNodes/UnitNode.cs" type="Script" id=1]
 [ext_resource path="res://Textures/Cute Fantasy Free/Player/Player.png" type="Texture" id=2]
-[ext_resource path="res://Scripts/Gameplay/Entities/EntityProperties.cs" type="Script" id=3]
+[ext_resource path="res://Scripts/Gameplay/EntityNodes/EntityProperties.cs" type="Script" id=3]
 [ext_resource path="res://Scripts/Gameplay/AzimuthIndicator.cs" type="Script" id=4]
 
 [sub_resource type="AtlasTexture" id=24]

@@ -1,5 +1,6 @@
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Packets;
+using Soteo.Util;
 
 namespace Soteo.Gameplay.Services;
 
@@ -11,13 +12,13 @@ public sealed class RoutingPacketSender
 {
     public void SendReliable(Packet packet, Guid receiverId)
     {
-        if (receiverId == CampaignServerId) campaignSender.SendPacket(packet);
+        if (receiverId == Const.CampaignServerId) campaignSender.SendPacket(packet);
         else gameplaySender.SendReliable(packet, receiverId);
     }
 
     public void SendUnreliable(Packet packet, Guid receiverId)
     {
-        if (receiverId == CampaignServerId)
+        if (receiverId == Const.CampaignServerId)
             throw new InvalidOperationException("Campaign server doesn't support unreliable messages");
         gameplaySender.SendUnreliable(packet, receiverId);
     }

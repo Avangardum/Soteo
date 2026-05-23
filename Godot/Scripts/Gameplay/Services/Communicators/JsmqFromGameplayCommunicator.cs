@@ -4,6 +4,7 @@ using Soteo.Shared;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
+using Soteo.Util;
 
 namespace Soteo.Gameplay.Services.Communicators;
 
@@ -42,40 +43,40 @@ public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunic
     public override void _Ready()
     {
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        if (IsServer) ConnectAsShardServer();
+        if (Const.IsServer) ConnectAsShardServer();
     }
 
     public override void _Process(float delta)
     {
         // Client polls in _Process to minimize latency
-        if (!IsServer) Poll();
+        if (!Const.IsServer) Poll();
     }
 
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (IsServer) Poll();
+        if (Const.IsServer) Poll();
     }
 
     public void ConnectAsPlayer(string email, string password)
     {
-        _currentUserIdRepository.UserId = Const.SingleplayerPlayerId;
-        SendReliable(new CampaignServerHandshakePacket { Token = "player" }, CampaignServerId );
+        _currentUserIdRepository.UserId = MainConst.SingleplayerPlayerId;
+        SendReliable(new CampaignServerHandshakePacket { Token = "player" }, Const.CampaignServerId );
         ConnectionEstablished();
         
-        if (!IsServer)
+        if (!Const.IsServer)
         {
             // Normally shard snapshot would be sent automatically on connection, but when using JSMQ, connection
             // is not detected until a packet is sent, so it's requested manually.
-            SendReliable(new ShardSnapshotRequestPacket(), Const.TestShardId);
-            SendReliable(new SpawnCharacterPacket { PeerId = Const.TestShardId }, CampaignServerId);
+            SendReliable(new ShardSnapshotRequestPacket(), MainConst.TestShardId);
+            SendReliable(new SpawnCharacterPacket { PeerId = MainConst.TestShardId }, Const.CampaignServerId);
             _shardLoader.LoadShard();
         }
     }
 
     public void ConnectAsShardServer()
     {
-        SendReliable(new CampaignServerHandshakePacket { Token = "shard" }, CampaignServerId );
+        SendReliable(new CampaignServerHandshakePacket { Token = "shard" }, Const.CampaignServerId );
         ConnectionEstablished();
     }
     
@@ -114,13 +115,13 @@ public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunic
 
     public void BroadcastReliable(Packet packet)
     {
-        if (!IsServer) throw new InvalidOperationException();
-        SendReliable(packet, Const.SingleplayerPlayerId);
+        if (!Const.IsServer) throw new InvalidOperationException();
+        SendReliable(packet, MainConst.SingleplayerPlayerId);
     }
 
     public void BroadcastUnreliable(Packet packet) => BroadcastReliable(packet);
 
-    void ICampaignServerCommunicator.SendPacket(Packet packet) => SendReliable(packet, CampaignServerId);
+    void ICampaignServerCommunicator.SendPacket(Packet packet) => SendReliable(packet, Const.CampaignServerId);
 
     public long BytesSent => 0;
 

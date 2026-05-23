@@ -6,6 +6,7 @@ using Soteo.Shared;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
+using Soteo.Util;
 
 namespace Soteo.Gameplay.Services.Communicators;
 
@@ -57,19 +58,19 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         AddChild(_httpRequest);
         _httpRequest.Connect("request_completed", this, nameof(OnAuthRequestCompleted));
         
-        if (IsServer) ConnectAsShardServer();
+        if (Const.IsServer) ConnectAsShardServer();
     }
 
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (IsServer) _wsClient.Poll();
+        if (Const.IsServer) _wsClient.Poll();
     }
     
     public override void _Process(float delta)
     {
         // Client polls in _Process to minimize latency
-        if (!IsServer) _wsClient.Poll();
+        if (!Const.IsServer) _wsClient.Poll();
     }
 
     public void OnConnectionClosed(bool wasCleanClose)
@@ -90,9 +91,9 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         _token = "";
         ConnectionEstablished();
         
-        if (!IsServer)
+        if (!Const.IsServer)
         {
-            SendPacket(new SpawnCharacterPacket { PeerId = Const.TestShardId });
+            SendPacket(new SpawnCharacterPacket { PeerId = MainConst.TestShardId });
             _shardLoader.LoadShard();
         }
     }
@@ -101,7 +102,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
     {
         byte[] bytes = _wsClient.GetPeer(1).GetPacket();
         Packet packet = _packetSerializer.Deserialize(bytes);
-        _packetHandler.HandleAsync(packet, CampaignServerId).CollectException();
+        _packetHandler.HandleAsync(packet, Const.CampaignServerId).CollectException();
     }
     
     public void OnServerCloseRequest(int code, string reason)

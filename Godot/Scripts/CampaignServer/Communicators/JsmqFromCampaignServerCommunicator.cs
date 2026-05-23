@@ -3,6 +3,7 @@ using Soteo.CampaignServer.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
+using Soteo.Util;
 
 namespace Soteo.CampaignServer.Communicators;
 
@@ -20,7 +21,7 @@ public sealed class JsmqFromCampaignServerCommunicator
     {
         while (true)
         {
-            string? base64 = (string?)JavaScript.Eval($"""jsmq.receive("{CampaignServerId}")""");
+            string? base64 = (string?)JavaScript.Eval($"""jsmq.receive("{Const.CampaignServerId}")""");
             if (base64 == null) return;
             byte[] bytes = Convert.FromBase64String(base64);
             var senderId = new Guid(bytes.AsSpan()[..Const.BytesInGuid].ToArray());
@@ -45,7 +46,7 @@ public sealed class JsmqFromCampaignServerCommunicator
     
     public void SendTo(Packet packet, Guid receiverId)
     {
-        byte[] bytes = [..CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
+        byte[] bytes = [..Const.CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
         string base64 = Convert.ToBase64String(bytes);
         JavaScript.Eval($"""jsmq.send("{base64}", "{receiverId}");""");
     }
