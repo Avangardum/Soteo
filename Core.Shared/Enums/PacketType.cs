@@ -1,4 +1,4 @@
-namespace Soteo.Shared.Enums;
+namespace Soteo.Core.Shared.Enums;
 
 public enum PacketType : byte
 {

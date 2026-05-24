@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Abilities;
+namespace Soteo.Core.Gameplay.Abilities;
 
 public sealed class RangedAttackAbility : AttackAbility
 {

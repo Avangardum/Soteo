@@ -2,7 +2,7 @@ using System.Buffers.Binary;
 using System.Collections.Immutable;
 using System.Numerics;
 using System.Text;
-using Soteo.Shared.Exceptions;
+using Soteo.Core.Shared.Exceptions;
 using Soteo.Util;
 using Soteo.Util.Extensions;
 

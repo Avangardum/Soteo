@@ -1,10 +1,10 @@
-﻿using Soteo.Shared.Enums;
-using Soteo.Shared.Exceptions;
-using Soteo.Shared.Interfaces;
-using Soteo.Shared.Packets;
+﻿using Soteo.Core.Shared.Enums;
+using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.Packets;
 using static Soteo.Core.Shared.SerializationHelper;
 
-namespace Soteo.Shared.PacketSerializers;
+namespace Soteo.Core.Shared.PacketSerializers;
 
 public abstract class PacketSerializer<TPacket> : IPacketSerializer
     where TPacket : Packet, new()

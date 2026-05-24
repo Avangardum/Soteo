@@ -1,13 +1,11 @@
 using System.Collections.Immutable;
-using Soteo.CampaignServer;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.Enums;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.Util;
-using Soteo.Shared;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Shared;
 
-namespace Soteo.Gameplay.Statuses;
+namespace Soteo.Core.Gameplay.Statuses;
 
 public abstract class Status
 {

@@ -1,7 +1,4 @@
-using Soteo.Util;
-using Soteo.Util.Extensions;
-
-namespace Soteo.Gameplay.Util;
+namespace Soteo.Util;
 
 public static class ClientDependency
 {

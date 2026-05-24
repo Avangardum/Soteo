@@ -1,9 +1,9 @@
 using System.Numerics;
-using Soteo.Gameplay.Dto.Snapshots;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.Util;
+using Soteo.Core.Gameplay.Dto.Snapshots;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Util;
 
-namespace Soteo.Gameplay.Entities;
+namespace Soteo.Core.Gameplay.Entities;
 
 public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>
 {

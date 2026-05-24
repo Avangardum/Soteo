@@ -1,8 +1,8 @@
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Packets;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Shared.Packets;
 using Soteo.Util;
 
-namespace Soteo.Gameplay.Services;
+namespace Soteo.Core.Gameplay.Services;
 
 public sealed class RoutingPacketSender
 (

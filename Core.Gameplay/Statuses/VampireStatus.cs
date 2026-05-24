@@ -1,10 +1,9 @@
-using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.Enums;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Abilities;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Enums;
 
-namespace Soteo.Gameplay.Statuses;
+namespace Soteo.Core.Gameplay.Statuses;
 
 public sealed class VampireStatus : Status
 {

@@ -1,6 +1,7 @@
 using System.Collections;
+using Soteo.Util.Interfaces;
 
-namespace Soteo.Shared;
+namespace Soteo.Util;
 
 public class CovariantReadOnlyDictionaryWrapper<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> dictionary) :
     ICovariantReadOnlyDictionary<TKey, TValue>

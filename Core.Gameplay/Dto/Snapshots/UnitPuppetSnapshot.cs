@@ -1,7 +1,7 @@
-using Soteo.Shared.Enums;
-using static Soteo.Shared.Maths;
+using Soteo.Core.Gameplay.Enums;
+using static Soteo.Util.Maths;
 
-namespace Soteo.Gameplay.Dto.Snapshots;
+namespace Soteo.Core.Gameplay.Dto.Snapshots;
 
 public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
 {

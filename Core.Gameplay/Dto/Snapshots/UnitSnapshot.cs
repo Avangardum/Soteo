@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Enums;
 
-namespace Soteo.Gameplay.Dto.Snapshots;
+namespace Soteo.Core.Gameplay.Dto.Snapshots;
 
 public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
 {

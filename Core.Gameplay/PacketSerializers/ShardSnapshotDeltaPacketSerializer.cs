@@ -1,10 +1,11 @@
-using Soteo.Gameplay.Dto.Snapshots;
-using Soteo.Shared.Enums;
-using Soteo.Shared.Packets;
+using Soteo.Core.Gameplay.Dto.Snapshots;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Packets;
+using Soteo.Core.Shared.PacketSerializers;
 using static Soteo.Core.Shared.SerializationHelper;
 using static Soteo.Core.Gameplay.GameplaySerializationHelper; 
 
-namespace Soteo.Shared.PacketSerializers;
+namespace Soteo.Core.Gameplay.PacketSerializers;
 
 public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardSnapshotDeltaPacket>
 {

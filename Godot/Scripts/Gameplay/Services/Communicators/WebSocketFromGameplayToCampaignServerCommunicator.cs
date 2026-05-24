@@ -1,11 +1,12 @@
 using System.Text;
 using JWT.Builder;
-using Soteo.Gameplay.Enums;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.Packets;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Extensions;
-using Soteo.Shared.Interfaces;
-using Soteo.Shared.Packets;
 using Soteo.Util;
 
 namespace Soteo.Gameplay.Services.Communicators;

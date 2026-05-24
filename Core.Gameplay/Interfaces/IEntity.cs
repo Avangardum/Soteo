@@ -1,7 +1,7 @@
 using System.Numerics;
-using Soteo.Gameplay.Dto.Snapshots;
+using Soteo.Core.Gameplay.Dto.Snapshots;
 
-namespace Soteo.Gameplay.Interfaces;
+namespace Soteo.Core.Gameplay.Interfaces;
 
 public interface IEntity
 {

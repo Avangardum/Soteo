@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace Soteo.Gameplay.Dto.Snapshots;
+namespace Soteo.Core.Gameplay.Dto.Snapshots;
 
 public abstract record EntitySnapshotDelta
 {

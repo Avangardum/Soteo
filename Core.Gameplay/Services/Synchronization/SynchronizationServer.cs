@@ -1,15 +1,12 @@
 using System.Collections.Immutable;
+using Soteo.Core.Gameplay.Dto.Snapshots;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Gameplay.Dto.Snapshots;
-using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.Enums;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Interfaces;
-using Soteo.Shared.Nodes.Autoloads;
-using Soteo.Shared.Packets;
+using Soteo.Core.Gameplay.Packets;
 using Soteo.Util;
 
-namespace Soteo.Gameplay.Services.Synchronization;
+namespace Soteo.Core.Gameplay.Services.Synchronization;
 
 public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 {

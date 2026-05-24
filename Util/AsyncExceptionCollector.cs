@@ -1,6 +1,6 @@
 using System.Runtime.ExceptionServices;
 
-namespace Soteo.Shared.Nodes.Autoloads;
+namespace Soteo.Util;
 
 public static class AsyncExceptionCollector
 {

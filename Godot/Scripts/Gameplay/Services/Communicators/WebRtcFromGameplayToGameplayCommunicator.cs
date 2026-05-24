@@ -1,12 +1,13 @@
 using Godot.Collections;
-using Soteo.Gameplay.Enums;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Shared.Enums;
+using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.Packets;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Enums;
-using Soteo.Shared.Exceptions;
-using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes.Autoloads;
-using Soteo.Shared.Packets;
 using Soteo.Util;
 
 namespace Soteo.Gameplay.Services.Communicators;

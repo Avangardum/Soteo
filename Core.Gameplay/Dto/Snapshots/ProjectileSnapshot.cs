@@ -1,4 +1,4 @@
-namespace Soteo.Gameplay.Dto.Snapshots;
+namespace Soteo.Core.Gameplay.Dto.Snapshots;
 
 public sealed record ProjectileSnapshot : EntitySnapshot<ProjectileSnapshot>
 {

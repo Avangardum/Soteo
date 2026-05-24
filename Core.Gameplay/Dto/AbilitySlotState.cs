@@ -1,7 +1,7 @@
-using Soteo.Gameplay.Abilities;
-using Soteo.Shared;
+using Soteo.Core.Gameplay.Abilities;
+using Soteo.Util;
 
-namespace Soteo.Gameplay.Dto;
+namespace Soteo.Core.Gameplay.Dto;
 
 public record AbilitySlotState
 {

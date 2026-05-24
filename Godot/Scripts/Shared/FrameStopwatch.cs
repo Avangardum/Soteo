@@ -1,9 +1,8 @@
 using System.Diagnostics;
+using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Gameplay.Enums;
-using Soteo.Shared.Interfaces;
 
-namespace Soteo.Shared.Nodes.Autoloads;
+namespace Soteo.Shared;
 
 public sealed class FrameStopwatch : IFrameStopwatch
 {

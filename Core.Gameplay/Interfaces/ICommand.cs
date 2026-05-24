@@ -1,3 +1,3 @@
-namespace Soteo.Gameplay.Interfaces;
+namespace Soteo.Core.Gameplay.Interfaces;
 
 public interface ICommand;

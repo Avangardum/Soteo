@@ -1,4 +1,4 @@
-using Soteo.Gameplay.Entities;
+using Soteo.Core.Gameplay.Entities;
 
 namespace Soteo.Gameplay.Interfaces;
 

@@ -1,7 +1,7 @@
-using Soteo.CampaignServer.GameState.DataObjects;
-using Soteo.CampaignServer.Interfaces;
+using Soteo.Core.CampaignServer.GameState.DataObjects;
+using Soteo.Core.CampaignServer.Interfaces;
 
-namespace Soteo.CampaignServer.GameState.Repositories;
+namespace Soteo.Core.CampaignServer.GameState.Repositories;
 
 public sealed class CharacterRepository : Dictionary<Guid, Character>, ICharacterRepository
 {

@@ -1,6 +1,6 @@
-using Soteo.Shared.Packets;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.CampaignServer.Interfaces;
+namespace Soteo.Core.CampaignServer.Interfaces;
 
 public interface IPacketSender
 {

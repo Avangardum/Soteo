@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Exceptions;
-using Soteo.Shared.Packets;
+using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.CampaignServer.PacketHandlers;
+namespace Soteo.Core.Shared;
 
 public abstract class PacketHandler<T> : IPacketHandler where T : Packet
 {

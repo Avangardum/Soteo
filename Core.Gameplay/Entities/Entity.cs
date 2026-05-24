@@ -1,10 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using Soteo.Gameplay.Dto.Snapshots;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
+using Soteo.Core.Gameplay.Dto.Snapshots;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Util;
 
-namespace Soteo.Gameplay.Entities;
+namespace Soteo.Core.Gameplay.Entities;
 
 public abstract class Entity<TNode> : IEntity where TNode : class, IEntityNode
 {

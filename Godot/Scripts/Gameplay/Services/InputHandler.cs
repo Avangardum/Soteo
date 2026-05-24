@@ -1,15 +1,15 @@
 using System.Collections.Immutable;
 using Godot.Collections;
-using Soteo.Gameplay.Commands;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Entities;
+using Soteo.Core.Gameplay.Commands;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Gameplay.Packets;
 using Soteo.Gameplay.EntityNodes;
-using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
-using Soteo.Shared.Packets;
 using Soteo.Util;
 using Soteo.Util.Extensions;
 

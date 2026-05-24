@@ -1,3 +1,5 @@
+using Soteo.Core.Gameplay.Interfaces;
+
 namespace Soteo.Gameplay.Interfaces;
 
 public interface IEntityNodePool

@@ -1,7 +1,7 @@
 using System.Numerics;
-using static Soteo.Shared.Maths;
+using static Soteo.Util.Maths;
 
-namespace Soteo.Gameplay.Dto.Snapshots;
+namespace Soteo.Core.Gameplay.Dto.Snapshots;
 
 public abstract record EntitySnapshot
 {

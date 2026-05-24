@@ -1,7 +1,7 @@
-using Soteo.Gameplay.Statuses;
-using Soteo.Gameplay.Util;
+using Soteo.Core.Gameplay.Statuses;
+using Soteo.Util;
 
-namespace Soteo.Gameplay.Abilities;
+namespace Soteo.Core.Gameplay.Abilities;
 
 public sealed class VampireAbility : Ability
 {

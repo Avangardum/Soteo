@@ -1,4 +1,4 @@
-namespace Soteo.Gameplay.Enums;
+namespace Soteo.Core.Gameplay.Enums;
 
 /// <summary>
 /// What happens when a status is added to a unit that already has a status of this type

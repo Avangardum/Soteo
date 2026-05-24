@@ -1,5 +1,5 @@
-using Soteo.Shared.Packets;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.Shared.PacketSerializers;
+namespace Soteo.Core.Shared.PacketSerializers;
 
 public sealed class OkPacketSerializer : PacketSerializer<OkPacket>;

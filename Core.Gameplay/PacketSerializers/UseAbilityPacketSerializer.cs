@@ -1,10 +1,11 @@
 using System.Numerics;
-using Soteo.Gameplay.Commands;
-using Soteo.Shared.Enums;
-using Soteo.Shared.Packets;
+using Soteo.Core.Gameplay.Commands;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Packets;
+using Soteo.Core.Shared.PacketSerializers;
 using static Soteo.Core.Shared.SerializationHelper;
 
-namespace Soteo.Shared.PacketSerializers;
+namespace Soteo.Core.Gameplay.PacketSerializers;
 
 public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPacket>
 {

@@ -1,7 +1,6 @@
-using Soteo.Shared.Attributes;
-using Soteo.Shared.Packets;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.Shared.Interfaces;
+namespace Soteo.Core.Shared.Interfaces;
 
 /// <summary>
 /// Serializes and deserializes packets. Thread safe.

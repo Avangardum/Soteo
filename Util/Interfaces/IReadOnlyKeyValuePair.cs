@@ -1,4 +1,4 @@
-namespace Soteo.Shared;
+namespace Soteo.Util.Interfaces;
 
 public interface IReadOnlyKeyValuePair<out TKey, out TValue>
 {

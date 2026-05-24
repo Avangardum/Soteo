@@ -1,9 +1,8 @@
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Enums;
-using Soteo.Gameplay.Util;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Util;
 
-namespace Soteo.Gameplay.Abilities;
+namespace Soteo.Core.Gameplay.Abilities;
 
 public abstract class AttackAbility : Ability
 {

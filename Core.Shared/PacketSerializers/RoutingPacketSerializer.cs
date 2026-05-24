@@ -1,10 +1,9 @@
-using Soteo.CampaignServer;
-using Soteo.Shared.Enums;
-using Soteo.Shared.Exceptions;
-using Soteo.Shared.Interfaces;
-using Soteo.Shared.Packets;
+using Soteo.Core.Shared.Enums;
+using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.Shared.PacketSerializers;
+namespace Soteo.Core.Shared.PacketSerializers;
 
 public sealed class RoutingPacketSerializer : IPacketSerializer
 {

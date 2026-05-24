@@ -1,8 +1,8 @@
-using Soteo.Shared.Attributes;
-using Soteo.Shared.Enums;
+using Soteo.Core.Shared.Attributes;
+using Soteo.Core.Shared.Enums;
 using Soteo.Util.Extensions;
 
-namespace Soteo.Shared.Extensions;
+namespace Soteo.Core.Shared.Extensions;
 
 public static class ReflectionExtensions
 {

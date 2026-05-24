@@ -1,7 +1,8 @@
-using Soteo.CampaignServer.Interfaces;
-using Soteo.Shared.Packets;
+using Soteo.Core.CampaignServer.Interfaces;
+using Soteo.Core.Shared;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.CampaignServer.PacketHandlers;
+namespace Soteo.Core.CampaignServer.PacketHandlers;
 
 public sealed class CharacterRecalledPacketHandler(ICharacterRepository characterRepository) :
     PacketHandler<CharacterRecalledPacket>

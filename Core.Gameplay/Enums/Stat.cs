@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Soteo.Shared.Enums;
+namespace Soteo.Core.Gameplay.Enums;
 
 public enum Stat : byte
 {

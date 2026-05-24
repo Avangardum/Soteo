@@ -1,17 +1,17 @@
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.CampaignServer.Communicators;
-using Soteo.CampaignServer.GameState.Repositories;
-using Soteo.CampaignServer.Interfaces;
-using Soteo.CampaignServer.PacketHandlers;
 using Soteo.Core.CampaignServer;
+using Soteo.Core.CampaignServer.GameState.Repositories;
+using Soteo.Core.CampaignServer.Interfaces;
+using Soteo.Core.CampaignServer.PacketHandlers;
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.PacketSerializers;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Interfaces;
-using Soteo.Shared.PacketSerializers;
 using Soteo.Util;
-using IPacketSender = Soteo.CampaignServer.Interfaces.IPacketSender;
+using IPacketSender = Soteo.Core.CampaignServer.Interfaces.IPacketSender;
 
 namespace Soteo.CampaignServer;
 

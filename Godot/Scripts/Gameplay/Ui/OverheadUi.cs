@@ -1,7 +1,7 @@
-using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.Enums;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Ui;
 

@@ -1,7 +1,7 @@
-using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Statuses;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Abilities;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Statuses;
 using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Core.Gameplay;

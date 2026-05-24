@@ -1,6 +1,6 @@
-using Soteo.Gameplay.Enums;
+using Soteo.Core.Gameplay.Enums;
 
-namespace Soteo.Shared.Interfaces;
+namespace Soteo.Core.Gameplay.Interfaces;
 
 public interface IProcessPublisher
 {

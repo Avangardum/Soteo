@@ -1,14 +1,13 @@
 using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
-using Soteo.CampaignServer.GameState.DataObjects;
-using Soteo.CampaignServer.Interfaces;
+using Soteo.Core.CampaignServer.Interfaces;
+using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.Packets;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Exceptions;
-using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes.Autoloads;
-using Soteo.Shared.Packets;
 using Soteo.Util;
 
 namespace Soteo.CampaignServer.Communicators;

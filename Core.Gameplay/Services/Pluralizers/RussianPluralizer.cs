@@ -1,6 +1,6 @@
-using Soteo.Gameplay.Interfaces;
+using Soteo.Core.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Services.Pluralizers;
+namespace Soteo.Core.Gameplay.Services.Pluralizers;
 
 public sealed class RussianPluralizer : IPluralizer
 {

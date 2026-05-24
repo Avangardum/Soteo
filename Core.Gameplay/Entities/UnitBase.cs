@@ -1,13 +1,9 @@
 using System.Collections.Immutable;
-using Microsoft.Extensions.DependencyInjection;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Dto.Snapshots;
-using Soteo.Gameplay.Enums;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.Util;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Entities;
+namespace Soteo.Core.Gameplay.Entities;
 
 public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEntityNode
 {

@@ -1,7 +1,6 @@
-using Soteo.Gameplay.Enums;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Enums;
 
-namespace Soteo.Gameplay.Dto;
+namespace Soteo.Core.Gameplay.Dto;
 
 /// <param name="Priority">
 /// When modifiers contradict each other, the one with the highest priority wins.

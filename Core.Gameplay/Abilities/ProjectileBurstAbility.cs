@@ -1,12 +1,11 @@
 using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Enums;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.Util;
-using Soteo.Shared;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Util;
 
-namespace Soteo.Gameplay.Abilities;
+namespace Soteo.Core.Gameplay.Abilities;
 
 public sealed class ProjectileBurstAbility : Ability
 {

@@ -1,11 +1,11 @@
 using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Abilities;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Dto;
+namespace Soteo.Core.Gameplay.Dto;
 
 public sealed record DeflatedAbilityContext
 {

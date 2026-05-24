@@ -1,15 +1,13 @@
 using System.Collections.Immutable;
 using System.Reflection;
-using Soteo.CampaignServer.PacketHandlers;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Enums;
-using Soteo.Shared.Extensions;
-using Soteo.Shared.Interfaces;
-using Soteo.Shared.PacketSerializers;
+using Soteo.Core.Shared.Enums;
+using Soteo.Core.Shared.Extensions;
+using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.PacketSerializers;
 using Soteo.Util;
 using Soteo.Util.Extensions;
 
-namespace Soteo.CampaignServer;
+namespace Soteo.Core.Shared;
 
 public static class TypeLocator
 {
@@ -32,8 +30,7 @@ public static class TypeLocator
                     it.BaseType is { IsGenericType: true } &&
                     it.IsAssignableTo(typeof(IPacketSerializer))
             )
-            .ToImmutableDictionary
-            (
+            .ToImmutableDictionary<Type, PacketType, IPacketSerializer>(
                 it => it.GetPacketType(typeof(PacketSerializer<>)),
                 it => (IPacketSerializer)Activator.CreateInstance(it)
             );

@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.Statuses;
+using Soteo.Core.Gameplay.Abilities;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Statuses;
 
-namespace Soteo.Gameplay.Dto;
+namespace Soteo.Core.Gameplay.Dto;
 
 public sealed record StatusContext : IServiceProvider
 {

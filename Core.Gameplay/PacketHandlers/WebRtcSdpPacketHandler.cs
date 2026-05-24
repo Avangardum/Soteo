@@ -1,8 +1,8 @@
-using Soteo.CampaignServer.PacketHandlers;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Packets;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Shared;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.Gameplay.PacketHandlers;
+namespace Soteo.Core.Gameplay.PacketHandlers;
 
 public sealed class WebRtcSdpPacketHandler(IWebrtcPacketReceiver receiver) : PacketHandler<WebrtcSdpPacket>
 {

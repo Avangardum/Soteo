@@ -1,4 +1,4 @@
-namespace Soteo.Shared.Enums;
+namespace Soteo.Core.Gameplay.Enums;
 
 public enum AbilitySlot : byte
 {

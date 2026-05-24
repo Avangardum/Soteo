@@ -1,6 +1,6 @@
-using Soteo.Shared.Packets;
+using Soteo.Core.Gameplay.Packets;
 
-namespace Soteo.Gameplay.Interfaces;
+namespace Soteo.Core.Gameplay.Interfaces;
 
 public interface ISynchronizationClient
 {

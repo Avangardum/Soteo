@@ -1,8 +1,7 @@
 using System.Collections.Immutable;
 using System.Numerics;
-using Soteo.Util.Extensions;
 
-namespace Soteo.Shared;
+namespace Soteo.Util;
 
 public static class Maths
 {

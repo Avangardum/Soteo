@@ -1,5 +1,5 @@
+using Soteo.Core.Shared.Packets;
 using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Packets;
 
 namespace Soteo.Gameplay.Services.Communicators;
 

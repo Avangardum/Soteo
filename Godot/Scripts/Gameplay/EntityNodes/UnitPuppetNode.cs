@@ -1,6 +1,8 @@
-using Soteo.Gameplay.Entities;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
+using Soteo.Util;
 
 namespace Soteo.Gameplay.EntityNodes;
 

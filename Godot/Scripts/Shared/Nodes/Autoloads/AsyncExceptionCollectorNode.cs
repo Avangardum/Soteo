@@ -1,3 +1,5 @@
+using Soteo.Util;
+
 namespace Soteo.Shared.Nodes.Autoloads;
 
 public sealed class AsyncExceptionCollectorNode : Node

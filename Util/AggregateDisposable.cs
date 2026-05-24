@@ -1,4 +1,4 @@
-namespace Soteo.Shared;
+namespace Soteo.Util;
 
 public sealed class AggregateDisposable(params IEnumerable<IDisposable> inner) : IDisposable
 {

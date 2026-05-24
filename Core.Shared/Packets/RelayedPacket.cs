@@ -1,4 +1,4 @@
-namespace Soteo.Shared.Packets;
+namespace Soteo.Core.Shared.Packets;
 
 public abstract record RelayedPacket : Packet
 {

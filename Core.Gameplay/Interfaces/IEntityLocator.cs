@@ -1,4 +1,4 @@
-namespace Soteo.Gameplay.Interfaces;
+namespace Soteo.Core.Gameplay.Interfaces;
 
 /// <summary>
 /// Searches entities by id in all loaded shards

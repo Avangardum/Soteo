@@ -1,8 +1,8 @@
-using Soteo.CampaignServer.PacketHandlers;
-using Soteo.Shared.Exceptions;
-using Soteo.Shared.Packets;
+using Soteo.Core.Shared;
+using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.Gameplay.PacketHandlers;
+namespace Soteo.Core.Gameplay.PacketHandlers;
 
 public class BadInputPacketHandler : PacketHandler<BadInputPacket>
 {

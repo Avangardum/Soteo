@@ -1,7 +1,7 @@
-using Soteo.Shared.Attributes;
-using Soteo.Shared.Enums;
+using Soteo.Core.Shared.Attributes;
+using Soteo.Core.Shared.Enums;
 
-namespace Soteo.Shared.Packets;
+namespace Soteo.Core.Shared.Packets;
 
 [PacketType(PacketType.CharacterRecalled)]
 public sealed record CharacterRecalledPacket : Packet

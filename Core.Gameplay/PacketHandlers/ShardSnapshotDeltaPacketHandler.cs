@@ -1,8 +1,8 @@
-using Soteo.CampaignServer.PacketHandlers;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Packets;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Gameplay.Packets;
+using Soteo.Core.Shared;
 
-namespace Soteo.Gameplay.PacketHandlers;
+namespace Soteo.Core.Gameplay.PacketHandlers;
 
 public sealed class ShardSnapshotDeltaPacketHandler(ISynchronizationClient synchronizationClient) :
     PacketHandler<ShardSnapshotDeltaPacket>

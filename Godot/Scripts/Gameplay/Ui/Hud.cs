@@ -1,12 +1,12 @@
 using System.Collections.Immutable;
-using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.Enums;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Gameplay.Statuses;
 using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.Statuses;
 using Soteo.Shared;
-using Soteo.Shared.Enums;
+using Soteo.Util;
 using Soteo.Util.Extensions;
 
 namespace Soteo.Gameplay.Ui;

@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using Soteo.Shared;
+using Soteo.Util.Interfaces;
 
 namespace Soteo.Util.Extensions;
 

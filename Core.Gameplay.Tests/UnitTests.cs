@@ -2,14 +2,13 @@ using System.Reflection;
 using AwesomeAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using Soteo.CampaignServer;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.Enums;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.Statuses;
-using Soteo.Shared;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Gameplay.Statuses;
+using Soteo.Core.Shared;
+using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Tests;
 
@@ -24,7 +23,6 @@ public sealed class UnitTests
         public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context)
         {
             // todo use ElapsedTime
-            // todo consider changing return type to IEnumerable
             Stat stat = Maths.FloorToInt(context.DisplayElapsedTime) % 2 == 0 ? Stat.MoveSpeed : Stat.AttackSpeed;
             return [new StatModifier(stat, StatModifierKind.Add, BuffValue)];
         }

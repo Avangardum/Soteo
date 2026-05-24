@@ -1,7 +1,7 @@
-using Soteo.Shared;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Util;
 
-namespace Soteo.Gameplay.Dto;
+namespace Soteo.Core.Gameplay.Dto;
 
 public sealed record AbilityUseProgress
 {

@@ -1,8 +1,8 @@
 using System.Numerics;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Commands;
+namespace Soteo.Core.Gameplay.Commands;
 
 public sealed record UseAbilityCommand
 (

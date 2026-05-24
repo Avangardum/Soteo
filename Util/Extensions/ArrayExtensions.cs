@@ -1,5 +1,3 @@
-using Soteo.Shared;
-
 namespace Soteo.Util.Extensions;
 
 public static class ArrayExtensions

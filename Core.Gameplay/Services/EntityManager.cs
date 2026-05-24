@@ -1,12 +1,12 @@
 using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Dto.Snapshots;
-using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.Util;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Dto.Snapshots;
+using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Util;
 
-namespace Soteo.Gameplay.Services;
+namespace Soteo.Core.Gameplay.Services;
 
 public sealed class EntityManager : IEntityManager
 {

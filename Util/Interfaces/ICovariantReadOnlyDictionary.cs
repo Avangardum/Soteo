@@ -1,4 +1,4 @@
-namespace Soteo.Shared;
+namespace Soteo.Util.Interfaces;
 
 public interface ICovariantReadOnlyDictionary<TKey, out TValue> : IEnumerable<IReadOnlyKeyValuePair<TKey, TValue>>
 {

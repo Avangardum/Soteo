@@ -1,9 +1,8 @@
-using Soteo.CampaignServer.GameState.DataObjects;
-using Soteo.CampaignServer.Interfaces;
+using Soteo.Core.CampaignServer.Interfaces;
+using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.Packets;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
-using Soteo.Shared.Interfaces;
-using Soteo.Shared.Packets;
 using Soteo.Util;
 
 namespace Soteo.CampaignServer.Communicators;

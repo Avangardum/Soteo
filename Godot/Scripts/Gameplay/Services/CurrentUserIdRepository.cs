@@ -1,3 +1,4 @@
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Util;
 

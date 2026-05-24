@@ -1,6 +1,6 @@
-using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Dto;
-using Soteo.Gameplay.Statuses;
+using Soteo.Core.Gameplay.Abilities;
+using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Statuses;
 
 namespace Soteo.Shared.Extensions;
 

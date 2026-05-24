@@ -1,7 +1,6 @@
 using System.Numerics;
-using Soteo.Shared;
 
-namespace Soteo.Gameplay.Util;
+namespace Soteo.Util;
 
 public static class NodeHelper
 {

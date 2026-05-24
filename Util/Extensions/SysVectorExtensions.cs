@@ -1,5 +1,4 @@
 using System.Numerics;
-using Soteo.Shared;
 
 namespace Soteo.Util.Extensions;
 

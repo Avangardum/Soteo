@@ -1,7 +1,8 @@
 using System.Collections.Immutable;
 using Soteo.CampaignServer;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Shared;
 using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.Util;
 
 namespace Soteo.Gameplay.Services;
 

@@ -1,9 +1,10 @@
-using Soteo.CampaignServer.GameState.DataObjects;
-using Soteo.CampaignServer.Interfaces;
-using Soteo.Shared.Attributes;
-using Soteo.Shared.Packets;
+using Soteo.Core.CampaignServer.GameState.DataObjects;
+using Soteo.Core.CampaignServer.Interfaces;
+using Soteo.Core.Shared;
+using Soteo.Core.Shared.Attributes;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.CampaignServer.PacketHandlers;
+namespace Soteo.Core.CampaignServer.PacketHandlers;
 
 [AllowClientPackets]
 public sealed class SpawnCharacterPacketHandler

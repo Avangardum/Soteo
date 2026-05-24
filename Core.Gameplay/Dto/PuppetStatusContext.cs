@@ -1,8 +1,8 @@
-using Soteo.Gameplay.Abilities;
-using Soteo.Gameplay.Statuses;
-using Soteo.Shared;
+using Soteo.Core.Gameplay.Abilities;
+using Soteo.Core.Gameplay.Statuses;
+using Soteo.Util;
 
-namespace Soteo.Gameplay.Dto;
+namespace Soteo.Core.Gameplay.Dto;
 
 public record PuppetStatusContext
 {

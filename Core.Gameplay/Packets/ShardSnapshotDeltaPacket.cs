@@ -1,8 +1,9 @@
-using Soteo.Gameplay.Dto.Snapshots;
-using Soteo.Shared.Attributes;
-using Soteo.Shared.Enums;
+using Soteo.Core.Gameplay.Dto.Snapshots;
+using Soteo.Core.Shared.Attributes;
+using Soteo.Core.Shared.Enums;
+using Soteo.Core.Shared.Packets;
 
-namespace Soteo.Shared.Packets;
+namespace Soteo.Core.Gameplay.Packets;
 
 [PacketType(PacketType.ShardSnapshotDelta)]
 public sealed record ShardSnapshotDeltaPacket : Packet
