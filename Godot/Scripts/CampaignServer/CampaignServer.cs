@@ -16,7 +16,7 @@ public sealed class CampaignServer : Node
     
     public override void _Ready()
     {
-        MainConst.InitConst();
+        ConstInitializer.Init();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         var serviceProvider = serviceCollection.BuildAutofacServiceProvider();

@@ -56,7 +56,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
 
     public override void _Ready()
     {
-        MainConst.InitConst();
+        ConstInitializer.Init();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
@@ -178,7 +178,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     public void LoadShard()
     {
         string mapPath = "res://Scenes/Maps/Test.tscn";
-        Guid shardId = MainConst.TestShardId;
+        Guid shardId = Const.TestShardId;
         Vector2 position = new Vector2(0, 0);
 
         var shard = _shardScene.Required.Instance<ShardNode>();

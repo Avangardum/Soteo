@@ -93,7 +93,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         
         if (!Const.IsServer)
         {
-            SendPacket(new SpawnCharacterPacket { PeerId = MainConst.TestShardId });
+            SendPacket(new SpawnCharacterPacket { PeerId = Const.TestShardId });
             _shardLoader.LoadShard();
         }
     }

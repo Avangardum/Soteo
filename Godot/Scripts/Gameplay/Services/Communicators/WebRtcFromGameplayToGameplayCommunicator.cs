@@ -236,7 +236,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private void OnCampaignServerConnectionEstablished()
     {
         if (!Const.IsServer)
-            ConnectToShardServer(MainConst.TestShardId);
+            ConnectToShardServer(Const.TestShardId);
     }
     
     public void ConnectToShardServer(Guid peerId)

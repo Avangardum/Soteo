@@ -54,7 +54,7 @@ public sealed class DebugScreen : Control
         {
             _pendingProcessCount--;
             IServiceProvider? shardServiceProvider = _shardServiceProviderSource.ShardServiceProviders
-                .GetOrDefault(MainConst.TestShardId);
+                .GetOrDefault(Const.TestShardId);
             var synchronizationClient = shardServiceProvider?.GetRequiredService<ISynchronizationClient>();
             var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
 
@@ -87,7 +87,7 @@ public sealed class DebugScreen : Control
         _label.Text =
             $"""
              fps: {1 / delta :N0}
-             ping: {ToMillisecondsString(_networkDebugger.Ping(MainConst.TestShardId))}
+             ping: {ToMillisecondsString(_networkDebugger.Ping(Const.TestShardId))}
              sync latency: {ToMillisecondsString(synchronizationClient?.Latency)}
              wait frames: {synchronizationClient?.WaitFrameCount ?? 0 :N0}
              fast-forwards: {synchronizationClient?.FastForwardCount ?? 0 :N0}

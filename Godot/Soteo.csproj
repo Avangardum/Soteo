@@ -27,9 +27,4 @@
       <ProjectReference Include="..\Core.Gameplay\Core.Gameplay.csproj" />
     </ItemGroup>
     
-    <ItemGroup>
-      <Folder Include="Scripts\Gameplay\Util\" />
-      <Folder Include="Scripts\Shared\Interfaces\" />
-    </ItemGroup>
-    
 </Project>

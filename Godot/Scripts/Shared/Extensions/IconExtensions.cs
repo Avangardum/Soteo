@@ -4,12 +4,12 @@ using Soteo.Gameplay.Statuses;
 
 namespace Soteo.Shared.Extensions;
 
-public static class TempExtensions
+public static class IconExtensions
 {
     extension (Status self)
     {
         public Texture ResolveIcon(PuppetStatusContext context) =>
-            self.Icon ?? context.Ability?.Icon ?? MainConst.PlaceholderIcon;
+            self.Icon ?? context.Ability?.Icon ?? ResourceLoader.Load<Texture>("res://Textures/Icons/Placeholder.png");
         
         public Texture? Icon =>
             self.IconPath == null ? null : ResourceLoader.Load<Texture>($"res://Textures/Icons/{self.IconPath}.png");

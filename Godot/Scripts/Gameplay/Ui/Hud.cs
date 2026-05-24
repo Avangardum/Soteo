@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Soteo.Gameplay.Abilities;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Enums;
