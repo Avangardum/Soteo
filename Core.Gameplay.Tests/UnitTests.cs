@@ -21,11 +21,12 @@ public sealed class UnitTests
         
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
 
-        public override IEnumerable<StatModifier> StatModifiers(StatusContext context)
+        public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context)
         {
             // todo use ElapsedTime
+            // todo consider changing return type to IEnumerable
             Stat stat = Maths.FloorToInt(context.DisplayElapsedTime) % 2 == 0 ? Stat.MoveSpeed : Stat.AttackSpeed;
-            yield return new StatModifier(stat, StatModifierKind.Add, BuffValue);
+            return [new StatModifier(stat, StatModifierKind.Add, BuffValue)];
         }
     }
  

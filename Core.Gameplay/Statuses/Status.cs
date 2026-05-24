@@ -35,7 +35,7 @@ public abstract class Status
     
     public virtual bool HudVisible => true;
     
-    public virtual IEnumerable<StatModifier> StatModifiers(StatusContext context) => [];
+    public virtual IReadOnlyList<StatModifier> StatModifiers(StatusContext context) => [];
     
     public virtual void Tick(StatusContext context) { }
     
