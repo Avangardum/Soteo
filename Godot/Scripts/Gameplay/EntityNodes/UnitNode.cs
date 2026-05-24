@@ -25,6 +25,6 @@ public sealed class UnitNode : KinematicBody2D, IUnitNode
 
     public override void _PhysicsProcess(float delta)
     {
-        Unit?.PhysicsProcess(this, delta);
+        Unit?.PhysicsProcess(delta);
     }
 }

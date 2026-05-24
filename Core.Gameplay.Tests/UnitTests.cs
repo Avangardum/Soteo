@@ -55,7 +55,7 @@ public sealed class UnitTests
         sut.Stats[Stat.MoveSpeed].Should().Be(Unit.StatConst[Stat.MoveSpeed].Default + buffValue);
         sut.Stats[Stat.AttackSpeed].Should().Be(Unit.StatConst[Stat.AttackSpeed].Default);
         
-        sut.PhysicsProcess(node, 1.5);
+        Ticker.Tick(sut.PhysicsProcess).WithDefaultInterval().ForAtLeast(1.5);
         
         sut.Stats[Stat.MoveSpeed].Should().Be(Unit.StatConst[Stat.MoveSpeed].Default);
         sut.Stats[Stat.AttackSpeed].Should().Be(Unit.StatConst[Stat.AttackSpeed].Default + buffValue);

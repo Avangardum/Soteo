@@ -70,7 +70,7 @@ public class Unit : UnitBase<IUnitNode>
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
     }
 
-    public virtual void PhysicsProcess(IUnitNode node, double delta)
+    public virtual void PhysicsProcess(double delta)
     {
         if (IsDead) return;
         
@@ -79,7 +79,7 @@ public class Unit : UnitBase<IUnitNode>
         UpdateStats();
         DecreaseCooldowns(delta);
         ApplyRegen(delta);
-        ExecuteCommands(node, delta);
+        ExecuteCommands(Node.Required, delta);
     }
     
     private void DecreaseCooldowns(double delta)

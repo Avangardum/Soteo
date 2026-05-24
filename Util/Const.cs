@@ -10,7 +10,9 @@ public static class Const
     public static readonly LateInit<bool> IsServer = new();
     public static readonly LateInit<bool> IsSingleplayer = new();
     public static readonly LateInit<bool> IsWeb = new();
-    public static readonly LateInit<int> TicksPerSecond = new();
+    
+    public const int TicksPerSecond = 20;
+    public const double TickInterval = 1.0 / TicksPerSecond;
     
     public static bool UseJsmq => IsSingleplayer && IsWeb;
 }
