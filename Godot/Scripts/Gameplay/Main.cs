@@ -2,11 +2,11 @@ using System.Collections.Immutable;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.CampaignServer;
+using Soteo.CampaignServer.PacketHandlers;
 using Soteo.Core.Gameplay;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
 using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.PacketHandlers;
 using Soteo.Gameplay.Resources;
 using Soteo.Gameplay.Services;
 using Soteo.Gameplay.Services.Communicators;
@@ -21,6 +21,7 @@ using Soteo.Shared.Nodes.Autoloads;
 using Soteo.Shared.PacketSerializers;
 using Soteo.Util;
 using Soteo.Util.Extensions;
+using RoutingPacketHandler = Soteo.Gameplay.PacketHandlers.RoutingPacketHandler;
 
 namespace Soteo.Gameplay;
 
@@ -61,7 +62,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     public override void _Ready()
     {
         ConstInitializer.Init();
-        TypeLocator.Init(typeof(PacketHandler<>), typeof(RoutingPacketHandler), typeof(IPacketHandler), CoreGameplayAssembly.Value, CoreSharedAssembly.Value);
+        TypeLocator.Init(CoreGameplayAssembly.Value, CoreSharedAssembly.Value);
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();

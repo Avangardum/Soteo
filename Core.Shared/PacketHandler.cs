@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Shared.Exceptions;
 using Soteo.Shared.Packets;
 
-namespace Soteo.Gameplay.PacketHandlers;
+namespace Soteo.CampaignServer.PacketHandlers;
 
 public abstract class PacketHandler<T> : IPacketHandler where T : Packet
 {
@@ -14,4 +16,9 @@ public abstract class PacketHandler<T> : IPacketHandler where T : Packet
     }
     
     protected virtual void Handle(T packet, Guid senderId) {}
+    
+    protected void Validate([DoesNotReturnIf(false)] bool condition, string reason)
+    {
+        if (!condition) throw new BadPacketException(reason);
+    }
 }

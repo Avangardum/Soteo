@@ -1,5 +1,6 @@
 using Soteo.CampaignServer.GameState.DataObjects;
 using Soteo.CampaignServer.Interfaces;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Packets;
@@ -38,8 +39,7 @@ public sealed class JsmqFromCampaignServerCommunicator
             }
             else
             {
-                User sender = userRepo[senderId];
-                packetHandler.HandleAsync(packet, sender).CollectException();
+                packetHandler.HandleAsync(packet, senderId).CollectException();
             }
         }
     }

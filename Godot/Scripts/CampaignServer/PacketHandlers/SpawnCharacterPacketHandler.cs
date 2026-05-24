@@ -13,18 +13,22 @@ public sealed class SpawnCharacterPacketHandler
     IPacketSender packetSender
 ) : PacketHandler<SpawnCharacterPacket>
 {
-    protected override void Handle(SpawnCharacterPacket packet, User sender)
+    protected override void Handle(SpawnCharacterPacket packet, Guid senderId)
     {
         userRepo.TryGetValue(packet.PeerId, out User? receiver);
-        Validate(sender.IsPlayer && receiver is { IsShard: true },
-            "Spawn character packet should be sent from a player to a shard server");
-        if (!charRepo.TryGetValue(sender.Id, out Character? character))
+        User sender = userRepo[senderId];
+        Validate
+        (
+            sender.IsPlayer && receiver != null && receiver.IsShard,
+            "Spawn character packet should be sent from a player to a shard server"
+        );
+        if (!charRepo.TryGetValue(senderId, out Character? character))
         {
-            character = new Character { Id = sender.Id };
+            character = new Character { Id = senderId };
             charRepo.Add(character);
         }
         if (character.ShardId != Guid.Empty) return;
         character.ShardId = packet.PeerId;
-        packetSender.RelayFrom(packet, sender.Id);
+        packetSender.RelayFrom(packet, senderId);
     }
 }

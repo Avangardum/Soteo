@@ -9,11 +9,12 @@ namespace Soteo.CampaignServer.PacketHandlers;
 public sealed class WebrtcIceCandidatePacketHandler(IPacketSender packetSender, IUserRepository userRepo) :
     PacketHandler<WebrtcIceCandidatePacket>
 {
-    protected override void Handle(WebrtcIceCandidatePacket packet, User sender)
+    protected override void Handle(WebrtcIceCandidatePacket packet, Guid senderId)
     {
         if (!userRepo.TryGetValue(packet.PeerId, out User? receiver)) return;
+        User sender = userRepo[senderId];
         Validate(sender.IsPlayer && receiver.IsShard || sender.IsShard && receiver.IsPlayer,
             "WebRTC signaling can only happen between a player and a shard server");
-        packetSender.RelayFrom(packet, sender.Id);
+        packetSender.RelayFrom(packet, senderId);
     }
 }

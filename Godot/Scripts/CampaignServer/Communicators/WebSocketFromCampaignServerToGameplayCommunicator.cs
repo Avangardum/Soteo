@@ -3,6 +3,7 @@ using JWT.Builder;
 using JWT.Exceptions;
 using Soteo.CampaignServer.GameState.DataObjects;
 using Soteo.CampaignServer.Interfaces;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Interfaces;
@@ -143,8 +144,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : Object, 
     {
         try
         {
-            User sender = _userRepo[senderId];
-            await _packetHandler.HandleAsync(packet, sender);
+            await _packetHandler.HandleAsync(packet, senderId);
         }
         catch (BadPacketException e)
         {

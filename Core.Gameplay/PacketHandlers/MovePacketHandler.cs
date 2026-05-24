@@ -1,3 +1,4 @@
+using Soteo.CampaignServer.PacketHandlers;
 using Soteo.Gameplay.Commands;
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Interfaces;

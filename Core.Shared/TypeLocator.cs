@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
 using System.Reflection;
+using Soteo.CampaignServer.PacketHandlers;
+using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
@@ -18,8 +20,7 @@ public static class TypeLocator
     
     private static readonly LateInit<ImmutableDictionary<PacketType, Type>> LateInitPacketHandlerTypes = new();
 
-    // todo unify packet handler interface
-    public static void Init(Type packetHandlerGenericDefinition, Type routingPacketHandlerType, Type iPacketHandlerType, params IReadOnlyList<Assembly> assemblies)
+    public static void Init(params IReadOnlyList<Assembly> assemblies)
     {
         LateInitTypes.Value = assemblies.SelectMany(it => it.ExportedTypes).ToImmutableList();
         
@@ -28,7 +29,7 @@ public static class TypeLocator
             (
                 it => 
                     !it.IsAbstract &&
-                    it != typeof(RoutingPacketSerializer) &&
+                    it.BaseType is { IsGenericType: true } &&
                     it.IsAssignableTo(typeof(IPacketSerializer))
             )
             .ToImmutableDictionary
@@ -42,10 +43,10 @@ public static class TypeLocator
             (
                 it =>
                     !it.IsAbstract &&
-                    it != routingPacketHandlerType &&
-                    it.IsAssignableTo(iPacketHandlerType)
+                    it.BaseType is { IsGenericType: true } &&
+                    it.IsAssignableTo(typeof(IPacketHandler))
             )
-            .ToImmutableDictionary(it => it.GetPacketType(packetHandlerGenericDefinition));
+            .ToImmutableDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
     }
 
     public static ImmutableList<Type> Types => LateInitTypes;

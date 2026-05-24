@@ -1,3 +1,4 @@
+using Soteo.CampaignServer.PacketHandlers;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Packets;
 
