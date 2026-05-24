@@ -8,10 +8,10 @@ public sealed class EntityNodePool : IEntityNodePool
 {
     private static readonly ImmutableDictionary<Type, PackedScene> Scenes = new Dictionary<Type, string>
     {
-        [typeof(UnitNode)] = "res://Scenes/Entities/Unit.tscn",
-        [typeof(ProjectileNode)] = "res://Scenes/Entities/Projectile.tscn",
-        [typeof(UnitPuppetNode)] = "res://Scenes/Entities/UnitPuppet.tscn",
-        [typeof(ProjectilePuppetNode)] = "res://Scenes/Entities/ProjectilePuppet.tscn",
+        [typeof(IUnitNode)] = "res://Scenes/Entities/Unit.tscn",
+        [typeof(IProjectileNode)] = "res://Scenes/Entities/Projectile.tscn",
+        [typeof(IUnitPuppetNode)] = "res://Scenes/Entities/UnitPuppet.tscn",
+        [typeof(IProjectilePuppetNode)] = "res://Scenes/Entities/ProjectilePuppet.tscn",
     }.ToImmutableDictionary(it => it.Key, it => ResourceLoader.Load<PackedScene>(it.Value));
     
     private readonly ImmutableDictionary<Type, Stack<IEntityNode>> _stacks =
@@ -27,6 +27,14 @@ public sealed class EntityNodePool : IEntityNodePool
     
     public void ReturnNode(IEntityNode node)
     {
-        _stacks[node.GetType()].Push(node);
+        foreach ((Type type, Stack<IEntityNode> stack) in _stacks)
+        {
+            if (node.GetType().IsAssignableTo(type))
+            {
+                stack.Push(node);
+                return;
+            }
+        }
+        throw new ArgumentException($"Unknown entity node type {node.GetType()}");
     }
 }

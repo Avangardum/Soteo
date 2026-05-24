@@ -1,19 +1,16 @@
+using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.Entities;
-using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
-using Soteo.Util.Extensions;
 
 namespace Soteo.Gameplay.Services;
 
 public sealed class EntityManager : IEntityManager
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly IShardNode _shard;
-    private readonly IEntityNodePool _entityNodePool;
     private readonly ClientDependency<ICamera> _camera;
     private readonly IEntityNodeManager _entityNodeManager; 
     
@@ -22,8 +19,6 @@ public sealed class EntityManager : IEntityManager
     public EntityManager(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
-        _shard = serviceProvider.GetRequiredService<IShardNode>();
-        _entityNodePool = serviceProvider.GetRequiredService<IEntityNodePool>();
         _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
         _entityNodeManager = serviceProvider.GetRequiredService<IEntityNodeManager>();
     }
@@ -79,9 +74,9 @@ public sealed class EntityManager : IEntityManager
     {
         return snapshot switch
         {
-            UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, AddNode<UnitPuppetNode>(s.Id), _camera.Required)),
+            UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, AddNode<IUnitPuppetNode>(s.Id), _camera.Required)),
             ProjectilePuppetSnapshot s =>
-                Add(new ProjectilePuppet(s.Id, AddNode<ProjectilePuppetNode>(s.Id), _camera.Required))
+                Add(new ProjectilePuppet(s.Id, AddNode<IProjectilePuppetNode>(s.Id), _camera.Required))
         };
     }
     
@@ -89,19 +84,19 @@ public sealed class EntityManager : IEntityManager
     {
         return delta switch
         {
-            UnitPuppetSnapshotDelta d => Add(new UnitPuppet(d.Id, AddNode<UnitPuppetNode>(d.Id), _camera.Required)),
+            UnitPuppetSnapshotDelta d => Add(new UnitPuppet(d.Id, AddNode<IUnitPuppetNode>(d.Id), _camera.Required)),
             ProjectilePuppetSnapshotDelta d =>
-                Add(new ProjectilePuppet(d.Id, AddNode<ProjectilePuppetNode>(d.Id), _camera.Required)),
+                Add(new ProjectilePuppet(d.Id, AddNode<IProjectilePuppetNode>(d.Id), _camera.Required)),
         };
     }
     
     public PlayerCharacter SpawnPlayerCharacter(Guid id) =>
-        Add(new PlayerCharacter(id, AddNode<UnitNode>(id), _serviceProvider));
+        Add(new PlayerCharacter(id, AddNode<IUnitNode>(id), _serviceProvider));
 
     public TargetedProjectile SpawnAttackProjectile(AbilityContext abilityContext, double speed)
     {
         var id = Guid.NewGuid();
-        return Add(new TargetedProjectile(id, abilityContext, speed, AddNode<ProjectileNode>(id), _serviceProvider)
+        return Add(new TargetedProjectile(id, abilityContext, speed, AddNode<IProjectileNode>(id), _serviceProvider)
         {
             // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
             // of the projectile over the source
