@@ -7,7 +7,6 @@ namespace Soteo.Core.Gameplay.Entities;
 
 public sealed class TargetedProjectile : Projectile
 {
-    // Server
     private bool _didHit;
     
     public TargetedProjectile
@@ -22,10 +21,9 @@ public sealed class TargetedProjectile : Projectile
     public TargetedProjectile(ProjectileSnapshot snapshot, IProjectileNode node, IServiceProvider serviceProvider) :
         this(snapshot.Id, null!, snapshot.Speed, node, serviceProvider) { }
 
-    // Server
-    public override void PhysicsProcess(IProjectileNode node, double delta)
+    public override void Tick(double delta)
     {
-        base.PhysicsProcess(node, delta);
+        base.Tick(delta);
         
         if (_didHit)
         {

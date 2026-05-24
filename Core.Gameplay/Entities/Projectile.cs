@@ -56,5 +56,5 @@ public abstract class Projectile : Entity<IProjectileNode>
         Speed = s.Speed;
     }
 
-    public virtual void PhysicsProcess(IProjectileNode node, double delta) { }
+    public virtual void Tick(double delta) { }
 }

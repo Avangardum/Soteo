@@ -25,6 +25,6 @@ public sealed class ProjectileNode : Area2D, IProjectileNode
 
     public override void _PhysicsProcess(float delta)
     {
-        Projectile?.PhysicsProcess(this, delta);
+        Projectile?.Tick(delta);
     }
 }

@@ -69,7 +69,7 @@ public class Unit : UnitBase<IUnitNode>
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
     }
 
-    public virtual void PhysicsProcess(double delta)
+    public virtual void Tick(double delta)
     {
         if (IsDead) return;
         
