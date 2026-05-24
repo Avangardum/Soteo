@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Util", "..\Util\Util.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Shared", "..\Core.Shared\Core.Shared.csproj", "{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.CampaignServer", "..\Core.CampaignServer\Core.CampaignServer.csproj", "{219F1E6A-7251-441B-9027-79CB344F7501}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 	Debug|Any CPU = Debug|Any CPU
@@ -47,5 +49,11 @@ Global
 		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
 		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
 		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{219F1E6A-7251-441B-9027-79CB344F7501}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{219F1E6A-7251-441B-9027-79CB344F7501}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{219F1E6A-7251-441B-9027-79CB344F7501}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{219F1E6A-7251-441B-9027-79CB344F7501}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{219F1E6A-7251-441B-9027-79CB344F7501}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{219F1E6A-7251-441B-9027-79CB344F7501}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

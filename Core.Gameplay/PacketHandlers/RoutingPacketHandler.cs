@@ -26,7 +26,7 @@ public sealed class RoutingPacketHandler
             shardServiceProviderSource.ShardServiceProviders[senderId];
         if (serviceProvider == null) return;
 
-        if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type handlerType))
+        if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type? handlerType))
             throw new BadPacketException($"Packet of type {packet.Type} can't be handled");
         if (Const.IsServer && senderId != Const.CampaignServerId && !handlerType.HasAttribute<AllowClientPacketsAttribute>())
             throw new BadPacketException($"Clients are not allowed to send packets of type {packet.Type}");

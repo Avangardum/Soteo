@@ -5,6 +5,7 @@ using Soteo.Gameplay.Interfaces;
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Exceptions;
 using Soteo.Shared.Packets;
+using Soteo.Util.Extensions;
 
 namespace Soteo.CampaignServer.PacketHandlers;
 
@@ -12,7 +13,7 @@ public sealed class RoutingPacketHandler(IServiceProvider serviceProvider) : IPa
 {
     public async Task HandleAsync(Packet packet, Guid senderId)
     {
-        if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type handlerType))
+        if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type? handlerType))
             throw new BadPacketException($"Packet of type {packet.Type} can't be handled");
         User sender = serviceProvider.GetRequiredService<IUserRepository>()[senderId];
         if (sender.IsPlayer && !handlerType.HasAttribute<AllowClientPacketsAttribute>())
