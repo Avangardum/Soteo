@@ -12,10 +12,10 @@ public sealed class VampireStatus : Status
 
     public override bool HudVisible => false;
 
-    public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
-    [
-        new(Stat.HealthRegen, StatModifierKind.Set, 0)
-    ];
+    public override IEnumerable<StatModifier> StatModifiers(StatusContext context)
+    {
+        yield return new StatModifier(Stat.HealthRegen, StatModifierKind.Set, 0);
+    }
 
     public override void Tick(StatusContext context)
     {

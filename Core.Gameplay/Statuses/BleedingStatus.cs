@@ -11,10 +11,10 @@ public sealed class BleedingStatus : Status
     
     public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Refresh;
 
-    public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
-    [
-        new(Stat.MoveSpeed, StatModifierKind.Add, -20)
-    ];
+    public override IEnumerable<StatModifier> StatModifiers(StatusContext context)
+    {
+        yield return new StatModifier(Stat.MoveSpeed, StatModifierKind.Add, -20);
+    }
 
     public override void Tick(StatusContext context)
     {
