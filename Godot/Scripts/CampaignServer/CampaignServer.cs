@@ -4,6 +4,7 @@ using Soteo.CampaignServer.Communicators;
 using Soteo.CampaignServer.GameState.Repositories;
 using Soteo.CampaignServer.Interfaces;
 using Soteo.CampaignServer.PacketHandlers;
+using Soteo.Core.Shared;
 using Soteo.Shared;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.PacketSerializers;
@@ -18,7 +19,7 @@ public sealed class CampaignServer : Node
     public override void _Ready()
     {
         ConstInitializer.Init();
-        TypeLocator.Init(typeof(PacketHandler<>), typeof(RoutingPacketHandler), typeof(IPacketHandler), Assembly.Load("Soteo"), Assembly.Load("Core.Shared"));
+        TypeLocator.Init(typeof(PacketHandler<>), typeof(RoutingPacketHandler), typeof(IPacketHandler), MainAssembly.Value, CoreSharedAssembly.Value);
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         var serviceProvider = serviceCollection.BuildAutofacServiceProvider();
