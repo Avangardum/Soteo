@@ -48,7 +48,7 @@ public static class TypeLocator
             )
             .ToImmutableDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
     }
-
+    
     public static ImmutableList<Type> Types => LateInitTypes;
     
     public static ImmutableDictionary<PacketType, IPacketSerializer> PacketSerializers => LateInitPacketSerializers;

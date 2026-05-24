@@ -13,14 +13,14 @@ using Soteo.Shared.Enums;
 
 namespace Soteo.Gameplay.Entities;
 
-public abstract class Unit : UnitBase<IUnitNode>
+public class Unit : UnitBase<IUnitNode>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
     
     private long _nextStatusOrdinal;
-    
-    protected Unit(Guid id, IUnitNode node, IServiceProvider serviceProvider) : base(id, node)
+
+    public Unit(Guid id, IUnitNode node, IServiceProvider serviceProvider) : base(id, node)
     {
         _serviceProvider = serviceProvider;
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
@@ -75,10 +75,10 @@ public abstract class Unit : UnitBase<IUnitNode>
         if (IsDead) return;
         
         IsMoving = false;
+        ProcessStatuses(delta);
         UpdateStats();
         DecreaseCooldowns(delta);
         ApplyRegen(delta);
-        ProcessStatuses(delta);
         ExecuteCommands(node, delta);
     }
     
@@ -552,32 +552,35 @@ public abstract class Unit : UnitBase<IUnitNode>
         if (duplicates.Count == 0)
         {
             AddStatusWithoutDuplicateResolution(context);
-            return;
+        }
+        else
+        {
+            switch (status.DuplicateResolution)
+            {
+                case DuplicateStatusResolution.Stack:
+                    AddStatusWithoutDuplicateResolution(context);
+                    break;
+                case DuplicateStatusResolution.Refresh:
+                    RefreshDuplicateStatuses(context, duplicates.Single());
+                    break;
+                case DuplicateStatusResolution.StackAndRefresh:
+                    AddStatusWithoutDuplicateResolution(context);
+                    RefreshDuplicateStatuses(context, duplicates);
+                    break;
+                case DuplicateStatusResolution.Replace:
+                    RemoveStatus(duplicates.Single().Id);
+                    AddStatusWithoutDuplicateResolution(context);
+                    break;
+                case DuplicateStatusResolution.Discard:
+                    break;
+                case DuplicateStatusResolution.Throw:
+                    throw new InvalidOperationException($"{status} does not allow duplicates");
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
         
-        switch (status.DuplicateResolution)
-        {
-            case DuplicateStatusResolution.Stack:
-                AddStatusWithoutDuplicateResolution(context);
-                break;
-            case DuplicateStatusResolution.Refresh:
-                RefreshDuplicateStatuses(context, duplicates.Single());
-                break;
-            case DuplicateStatusResolution.StackAndRefresh:
-                AddStatusWithoutDuplicateResolution(context);
-                RefreshDuplicateStatuses(context, duplicates);
-                break;
-            case DuplicateStatusResolution.Replace:
-                RemoveStatus(duplicates.Single().Id);
-                AddStatusWithoutDuplicateResolution(context);
-                break;
-            case DuplicateStatusResolution.Discard:
-                break;
-            case DuplicateStatusResolution.Throw:
-                throw new InvalidOperationException($"{status} does not allow duplicates");
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        UpdateStats();
     }
     
     public void AddStatus(Status status, double time, double tickInterval, StatusContext sourceStatusContext)
@@ -622,6 +625,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     {
         if (IsDead) return;
         StatusesInternal.Remove(id);
+        UpdateStats();
     }
     
     public void Die()
