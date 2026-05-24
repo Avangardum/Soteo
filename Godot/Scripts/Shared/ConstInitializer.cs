@@ -10,7 +10,14 @@ public static class ConstInitializer
         Const.IsServer.Value = OS.GetCmdlineArgs().Contains("--server") || Main.EditorIsServer;
         Const.IsSingleplayer.Value = OS.GetCmdlineArgs().Contains("--singleplayer");
         Const.IsWeb.Value = OS.HasFeature("web");
-        ProjectSettings.SetSetting("physics/common/physics_fps", Const.TicksPerSecond);
-        GD.Print(ProjectSettings.GetSetting("physics/common/physics_fps"));
+        
+        int physicsFps = (int)ProjectSettings.GetSetting("physics/common/physics_fps");
+        if (physicsFps != Const.TicksPerSecond)
+        {
+            throw new Exception
+            (
+                $"Const.TicksPerSecond = {Const.TicksPerSecond}, physics/common/physics_fps = {physicsFps}"
+            );
+        }
     }
 }
