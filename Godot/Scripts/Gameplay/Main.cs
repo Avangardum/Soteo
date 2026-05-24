@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.PacketHandlers;
 using Soteo.Gameplay.Resources;
@@ -12,6 +13,7 @@ using Soteo.Shared;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Interfaces;
 using Soteo.Shared.Nodes;
+using Soteo.Shared.Nodes.Autoloads;
 using Soteo.Shared.PacketSerializers;
 using Soteo.Util;
 using Soteo.Util.Extensions;
@@ -129,6 +131,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddSingleton<IEntityNodePool>(new EntityNodePool());
         services.AddSingleton<IChunkCollector, ChunkCollector>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
+        services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
         
         services.AddScoped<IShardNode>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));

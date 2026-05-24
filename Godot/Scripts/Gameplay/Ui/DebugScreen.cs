@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Shared.Extensions;
+using Soteo.Util;
 
 namespace Soteo.Gameplay.Ui;
 
@@ -9,10 +10,10 @@ public sealed class DebugScreen : Control
 {
     private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/DebugScreen.tscn"); 
     
-    private readonly double[] _fpsRing = new double[10 * MainConst.TicksPerSecond];
-    private readonly double[] _unrolledFpsRing = new double[10 * MainConst.TicksPerSecond];
-    private readonly double[] _entityCountRing = new double[10 * MainConst.TicksPerSecond];
-    private readonly double[] _unrolledEntityCountRing = new double[10 * MainConst.TicksPerSecond];
+    private readonly double[] _fpsRing = new double[10 * Const.TicksPerSecond];
+    private readonly double[] _unrolledFpsRing = new double[10 * Const.TicksPerSecond];
+    private readonly double[] _entityCountRing = new double[10 * Const.TicksPerSecond];
+    private readonly double[] _unrolledEntityCountRing = new double[10 * Const.TicksPerSecond];
     private int _ringNextIndex;
     private int _pendingProcessCount;
     

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Gameplay.Entities;
 using Soteo.Gameplay.Enums;
@@ -15,9 +16,9 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     private readonly IEntityManager _entityManager;
     private readonly IPacketSender _packetSender;
     private readonly IConnectionNotifier _connectionNotifier;
+    private readonly IFrameStopwatch _frameStopwatch;
 
     private long _tick;
-    private double _tickInterval;
     private ShardSnapshot? _prevShardSnapshot;
     private readonly HashSet<Guid> _snapshotRequesters = [];
     private readonly List<EntitySnapshot> _entitySnapshots = [];
@@ -28,19 +29,19 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         IEntityManager entityManager,
         IPacketSender packetSender,
         IConnectionNotifier connectionNotifier,
-        IProcessPublisher processPublisher
+        IProcessPublisher processPublisher,
+        IFrameStopwatch frameStopwatch
     )
     {
         _entityManager = entityManager;
         _packetSender = packetSender;
         _connectionNotifier = connectionNotifier;
+        _frameStopwatch = frameStopwatch;
         
         entityManager.EntityRemoved += OnEntityRemoved;
         connectionNotifier.PeerConnected += OnPeerConnected;
         _processSubscription =
             processPublisher.SubscribeToPhysicsProcess(PhysicsProcess, ProcessPriorityEnum.SynchronizationServer);
-
-        _tickInterval = 1.0 / (int)ProjectSettings.GetSetting("physics/common/physics_fps");
     }
 
     public void Dispose()
@@ -75,7 +76,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
             ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
         _prevShardSnapshot = shardSnapshot;
-        double serverLoad = FrameStopwatch.Instance.ElapsedSincePhysicsProcess / _tickInterval;
+        double serverLoad = _frameStopwatch.ElapsedSincePhysicsProcess * Const.TicksPerSecond;
 
         if (_snapshotRequesters.Count > 0)
         {

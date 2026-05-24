@@ -26,7 +26,6 @@ config/icon="res://Textures/icon.png"
 
 [autoload]
 
-FrameStopwatch="*res://Scripts/Shared/Nodes/Autoloads/FrameStopwatch.cs"
 AppDomainValidator="*res://Scripts/Shared/Nodes/Autoloads/AppDomainValidator.cs"
 AsyncExceptionCollectorNode="*res://Scripts/Shared/Nodes/Autoloads/AsyncExceptionCollectorNode.cs"
 
