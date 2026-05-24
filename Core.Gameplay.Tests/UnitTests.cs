@@ -22,8 +22,7 @@ public sealed class UnitTests
 
         public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context)
         {
-            // todo use ElapsedTime
-            Stat stat = Maths.FloorToInt(context.DisplayElapsedTime) % 2 == 0 ? Stat.MoveSpeed : Stat.AttackSpeed;
+            Stat stat = Maths.FloorToInt(context.ElapsedTime) % 2 == 0 ? Stat.MoveSpeed : Stat.AttackSpeed;
             return [new StatModifier(stat, StatModifierKind.Add, BuffValue)];
         }
     }

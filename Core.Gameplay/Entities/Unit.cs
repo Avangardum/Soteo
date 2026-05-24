@@ -109,6 +109,7 @@ public class Unit : UnitBase<IUnitNode>
             context = context with
             {
                 TickCountdown = newTickCountdown,
+                ElapsedTime = context.ElapsedTime + limitedDelta,
                 DisplayElapsedTime = context.DisplayElapsedTime + limitedDelta,
                 RemainingTime = context.RemainingTime - limitedDelta
             };
@@ -540,6 +541,7 @@ public class Unit : UnitBase<IUnitNode>
             Unit = this,
             Source = source,
             TickCountdown = tickInterval,
+            ElapsedTime = 0,
             DisplayElapsedTime = 0,
             RemainingTime = time,
             TickInterval = tickInterval,

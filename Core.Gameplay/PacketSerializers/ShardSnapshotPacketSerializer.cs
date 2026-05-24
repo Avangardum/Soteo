@@ -204,6 +204,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeGuid(value.UnitId, stream);
         SerializeNullableStruct(value.SourceId, SerializeGuid, stream);
         SerializeDouble(value.TickCountdown, stream);
+        SerializeDouble(value.ElapsedTime, stream);
         SerializeDouble(value.DisplayElapsedTime, stream);
         SerializeDouble(value.RemainingTime, stream);
         SerializeDouble(value.TickInterval, stream);
@@ -220,6 +221,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             UnitId = DeserializeGuid(stream),
             SourceId = DeserializeNullableStruct(DeserializeGuid, stream),
             TickCountdown = DeserializeDouble(stream),
+            ElapsedTime = DeserializeDouble(stream),
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
             TickInterval = DeserializeDouble(stream),

@@ -13,6 +13,7 @@ public sealed record StatusContext : IServiceProvider
     public required Unit Unit { get; init; }
     public required Unit? Source { get; init; }
     public required double TickCountdown { get; init; }
+    public required double ElapsedTime { get; init; }
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
     public required double TickInterval { get; init; }
@@ -34,6 +35,7 @@ public sealed record StatusContext : IServiceProvider
             UnitId = Unit.Id,
             SourceId = Source?.Id,
             TickCountdown = TickCountdown,
+            ElapsedTime = ElapsedTime,
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
             TickInterval = TickInterval,

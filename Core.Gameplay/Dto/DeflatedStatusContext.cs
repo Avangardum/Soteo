@@ -13,6 +13,7 @@ public sealed record DeflatedStatusContext
     public required Guid UnitId { get; init; }
     public required Guid? SourceId { get; init; }
     public required double TickCountdown { get; init; }
+    public required double ElapsedTime { get; init; }
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
     public required double TickInterval { get; init; }
@@ -29,6 +30,7 @@ public sealed record DeflatedStatusContext
             Unit = entityManager.GetEntity<Unit>(UnitId).Required,
             Source = SourceId == null ? null : entityManager.GetEntity<Unit>(SourceId.Value).Required,
             TickCountdown = TickCountdown,
+            ElapsedTime = ElapsedTime,
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
             TickInterval = TickInterval,
@@ -44,6 +46,7 @@ public sealed record DeflatedStatusContext
             Id = Id,
             Status = Status,
             Ability = AbilityContext?.Ability,
+            ElapsedTime = ElapsedTime,
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
             Ordinal = Ordinal
