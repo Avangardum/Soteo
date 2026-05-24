@@ -1,5 +1,6 @@
 using Soteo.Shared.Attributes;
 using Soteo.Shared.Enums;
+using Soteo.Util.Extensions;
 
 namespace Soteo.Shared.Packets;
 

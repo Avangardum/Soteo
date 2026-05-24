@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.CampaignServer.Communicators;
 using Soteo.CampaignServer.GameState.Repositories;
@@ -17,6 +18,7 @@ public sealed class CampaignServer : Node
     public override void _Ready()
     {
         ConstInitializer.Init();
+        TypeLocator.Init(typeof(PacketHandler<>), typeof(RoutingPacketHandler), typeof(IPacketHandler), Assembly.Load("Soteo"), Assembly.Load("Core.Shared"));
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         var serviceProvider = serviceCollection.BuildAutofacServiceProvider();

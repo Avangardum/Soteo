@@ -3,6 +3,8 @@ using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Dto.Snapshots;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Packets;
+using static Soteo.Core.Shared.SerializationHelper;
+using static Soteo.Core.Gameplay.GameplaySerializationHelper;
 
 namespace Soteo.Shared.PacketSerializers;
 

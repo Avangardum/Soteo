@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.CampaignServer;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.Util;
 using Soteo.Shared.Attributes;
@@ -6,6 +7,7 @@ using Soteo.Shared.Exceptions;
 using Soteo.Shared.Extensions;
 using Soteo.Shared.Packets;
 using Soteo.Util;
+using Soteo.Util.Extensions;
 
 namespace Soteo.Gameplay.PacketHandlers;
 

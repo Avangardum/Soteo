@@ -1,4 +1,5 @@
 using Soteo.Shared.Packets;
+using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Shared.PacketSerializers;
 

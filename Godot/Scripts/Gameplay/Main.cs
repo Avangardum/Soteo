@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
+using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.CampaignServer;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Gameplay.PacketHandlers;
@@ -57,6 +59,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     public override void _Ready()
     {
         ConstInitializer.Init();
+        TypeLocator.Init(typeof(PacketHandler<>), typeof(RoutingPacketHandler), typeof(IPacketHandler), Assembly.Load("Core.Gameplay"), Assembly.Load("Core.Shared"));
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();

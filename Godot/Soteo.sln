@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Gameplay", "..\Core.Ga
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Util", "..\Util\Util.csproj", "{9101DF23-CB1E-471D-9A12-A1F3DF44032E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Shared", "..\Core.Shared\Core.Shared.csproj", "{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 	Debug|Any CPU = Debug|Any CPU
@@ -39,5 +41,11 @@ Global
 		{9101DF23-CB1E-471D-9A12-A1F3DF44032E}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
 		{9101DF23-CB1E-471D-9A12-A1F3DF44032E}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
 		{9101DF23-CB1E-471D-9A12-A1F3DF44032E}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

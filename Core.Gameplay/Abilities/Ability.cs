@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Numerics;
+using Soteo.CampaignServer;
 using Soteo.Gameplay.Dto;
 using Soteo.Gameplay.Enums;
 using Soteo.Gameplay.Interfaces;

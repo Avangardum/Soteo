@@ -1,8 +1,8 @@
 using System.Numerics;
 using Soteo.Gameplay.Commands;
-using Soteo.Gameplay.Enums;
 using Soteo.Shared.Enums;
 using Soteo.Shared.Packets;
+using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Shared.PacketSerializers;
 
