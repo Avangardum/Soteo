@@ -15,7 +15,7 @@ public abstract class Entity<TNode> : IEntity where TNode : class, IEntityNode
         node.Entity = this;
     }
 
-    public event Action Removed = delegate {};
+    public event Action Removed = delegate { };
 
     [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
     protected TNode? Node { get; private set; }

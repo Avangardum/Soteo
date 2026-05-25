@@ -29,7 +29,8 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         protected set
         {
             base.IsDead = value;
-            Node?.IsAzimuthIndicatorVisible = !value;
+            if (IsDead && Node != null)
+                Node.IsAzimuthIndicatorVisible = false;
         }
     }
 
@@ -68,7 +69,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         );
     }
 
-    public override EntitySnapshot CreateSnapshot() => throw new InvalidOperationException();
+    public override EntitySnapshot CreateSnapshot() => throw new NotSupportedException();
 
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {
@@ -92,12 +93,21 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         if (d.IsMoving.HasChanged)
             IsMoving = d.IsMoving.NewValue;
         d.Stats.MutateDictionary(StatsInternal, interpolationWeight, null);
-        d.AbilitySlotStates.MutateDictionary(
-            AbilitySlotStatesInternal, interpolationWeight, AbilitySlotState.Interpolate);
+        d.AbilitySlotStates.MutateDictionary
+        (
+            AbilitySlotStatesInternal,
+            interpolationWeight,
+            AbilitySlotState.Interpolate
+        );
         if (d.AbilityUseProgress.HasChanged)
         {
-            AbilityUseProgress = Maths.InterpolateNullableClass(
-                AbilityUseProgress, d.AbilityUseProgress.NewValue, interpolationWeight, AbilityUseProgress.Interpolate);
+            AbilityUseProgress = Maths.InterpolateNullableClass
+            (
+                AbilityUseProgress,
+                d.AbilityUseProgress.NewValue,
+                interpolationWeight,
+                AbilityUseProgress.Interpolate
+            );
         }
         d.Statuses.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
         UpdateAnimation();
@@ -109,7 +119,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.TrueZoom);
     }
     
-    private void UpdateAnimation()
+    private void UpdateAnimation() // todo rename animations and split the method
     {
         if (IsRemoved) return;
         

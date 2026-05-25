@@ -1,11 +1,10 @@
 using System.Numerics;
 using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Dto.Snapshots;
 using Soteo.Core.Gameplay.Interfaces;
 
 namespace Soteo.Core.Gameplay.Entities;
 
-public sealed class TargetedProjectile : Projectile
+public sealed class TargetedProjectile : Projectile // todo collapse into Projectile, refactor targeting
 {
     private bool _didHit;
     
@@ -17,9 +16,6 @@ public sealed class TargetedProjectile : Projectile
         IProjectileNode node,
         IServiceProvider serviceProvider
     ) : base(id, abilityContext, speed, node, serviceProvider) { }
-    
-    public TargetedProjectile(ProjectileSnapshot snapshot, IProjectileNode node, IServiceProvider serviceProvider) :
-        this(snapshot.Id, null!, snapshot.Speed, node, serviceProvider) { }
 
     public override void Tick(double delta)
     {

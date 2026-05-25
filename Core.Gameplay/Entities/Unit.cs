@@ -18,6 +18,7 @@ public class Unit : UnitBase<IUnitNode>
     private readonly IEntityManager _entityManager;
     
     private long _nextStatusOrdinal;
+    private readonly Queue<ICommand> _commands = [];
 
     public Unit(Guid id, IUnitNode node, IServiceProvider serviceProvider) : base(id, node)
     {
@@ -25,7 +26,8 @@ public class Unit : UnitBase<IUnitNode>
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
     }
     
-    private Queue<ICommand> Commands { get; } = [];
+    private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
+    public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
     
     public override Vector2 Position
     {
@@ -36,9 +38,6 @@ public class Unit : UnitBase<IUnitNode>
             Node?.Position = Position;
         }
     }
-    
-    private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
-    public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
     
     public override EntitySnapshot CreateSnapshot()
     {
@@ -71,7 +70,7 @@ public class Unit : UnitBase<IUnitNode>
 
     public virtual void Tick(double delta)
     {
-        if (IsDead) return;
+        if (IsRemoved) return;
         
         IsMoving = false;
         ProcessStatuses(delta);
@@ -100,7 +99,7 @@ public class Unit : UnitBase<IUnitNode>
     
     private void ProcessStatuses(double delta)
     {
-        List<StatusContext> contexts = Statuses.Values.ToList();
+        ImmutableList<StatusContext> contexts = Statuses.Values.ToImmutableList();
         for (int i = 0; i < contexts.Count; i++)
         {
             StatusContext context = contexts[i];
@@ -122,7 +121,7 @@ public class Unit : UnitBase<IUnitNode>
     
     private double ProcessStatusTickCountdown(StatusContext context, double delta)
     {
-        if (context.TickInterval == 0) return 0;
+        if (context.TickInterval == 0) return 0; // todo null
         double countdown = context.TickCountdown - delta;
         while (countdown <= 0)
         {
@@ -138,10 +137,11 @@ public class Unit : UnitBase<IUnitNode>
         
         foreach (Stat stat in Stat.AllComputed)
         {
-            if (!modifiers.ContainsKey(stat))
-                modifiers[stat] = [];
+            modifiers[stat] = [];
             foreach (StatModifierKind kind in Enum.GetValues<StatModifierKind>())
+            {
                 modifiers[stat][kind] = [];
+            }
         }
         
         foreach (StatModifier modifier in Statuses.Values.SelectMany(it => it.Status.StatModifiers(it)))
@@ -225,10 +225,10 @@ public class Unit : UnitBase<IUnitNode>
         double remainingDeltaTime = deltaTime;
         int iterations = 0;
         const int maxIterations = 5;
-        while (Commands.Count > 0 && remainingDeltaTime > 0 && iterations < maxIterations)
+        while (_commands.Count > 0 && remainingDeltaTime > 0 && iterations < maxIterations)
         {
             iterations++;
-            switch (Commands.Peek())
+            switch (_commands.Peek())
             {
                 case LookCommand command:
                     LookAtPosition(command.Position, ref remainingDeltaTime);
@@ -260,16 +260,17 @@ public class Unit : UnitBase<IUnitNode>
         double desiredDeltaAzimuth = Maths.ModularDelta(Azimuth, azimuth, 360);
         
         double timeToComplete = Math.Abs(desiredDeltaAzimuth) / Stats[Stat.TurnSpeed];
-        if (timeToComplete <= remainingDeltaTime)
+        if (remainingDeltaTime < timeToComplete)
         {
-            Azimuth += desiredDeltaAzimuth;
-            remainingDeltaTime -= timeToComplete;
-            if (Commands.PeekOrDefault() is LookCommand) Commands.Dequeue();
+            Azimuth += Maths.Sign(desiredDeltaAzimuth) * remainingDeltaTime * Stats[Stat.TurnSpeed];
+            remainingDeltaTime = 0;
         }
         else
         {
-            Azimuth += Math.Sign(desiredDeltaAzimuth) * remainingDeltaTime * Stats[Stat.TurnSpeed];
-            remainingDeltaTime = 0;
+            Azimuth = azimuth;
+            remainingDeltaTime -= timeToComplete;
+            if (_commands.PeekOrDefault() is LookCommand)
+                _commands.Dequeue();
         }
     }
     
@@ -282,22 +283,22 @@ public class Unit : UnitBase<IUnitNode>
         double desiredMovementLength = desiredMovement.Length();
         if (desiredMovementLength == 0)
         {
-            if (Commands.PeekOrDefault() is MoveCommand) Commands.Dequeue();
+            if (_commands.PeekOrDefault() is MoveCommand) _commands.Dequeue();
             return;
         }
         Vector2 normalizedDesiredMovement = desiredMovement / desiredMovementLength;
         double timeToComplete = desiredMovementLength / Stats[Stat.MoveSpeed];
-        if (timeToComplete <= remainingDeltaTime)
-        {
-            MoveAndCollide(desiredMovement, node);
-            remainingDeltaTime -= timeToComplete;
-            if (Commands.PeekOrDefault() is MoveCommand) Commands.Dequeue();
-        }
-        else
+        if (remainingDeltaTime < timeToComplete)
         {
             Vector2 movement = normalizedDesiredMovement * Stats[Stat.MoveSpeed] * remainingDeltaTime;
             MoveAndCollide(movement, node);
             remainingDeltaTime = 0;
+        }
+        else
+        {
+            MoveAndCollide(desiredMovement, node);
+            remainingDeltaTime -= timeToComplete;
+            if (_commands.PeekOrDefault() is MoveCommand) _commands.Dequeue();
         }
         IsMoving = true;
     }
@@ -312,7 +313,7 @@ public class Unit : UnitBase<IUnitNode>
     {
         if (!AbilitySlotStatesInternal.TryGetValue(command.Slot, out AbilitySlotState? state))
         {
-            Commands.Dequeue();
+            _commands.Dequeue();
             AbilityUseProgress = null;
             return;
         }
@@ -324,7 +325,7 @@ public class Unit : UnitBase<IUnitNode>
             if (command.Repeat)
                 WaitForAbilityCooldown(context, ref remainingDeltaTime);
             else
-                Commands.Dequeue();
+                _commands.Dequeue();
             AbilityUseProgress = null;
             return;
         }
@@ -371,7 +372,7 @@ public class Unit : UnitBase<IUnitNode>
             ServiceProvider = _serviceProvider,
             TargetPosition = command.TargetPosition,
             TargetUnit = command.TargetUnitId == null ? null :
-                _entityManager.GetEntity(command.TargetUnitId.Value) as Unit,
+                _entityManager.GetEntity(command.TargetUnitId.Value) as Unit, // todo if target unit is not found, ability should be canceled immediately, not treated as nothing-targeted
             TargetDirection = command.TargetDirection,
             TargetShardId = command.TargetShardId
         };
@@ -388,7 +389,7 @@ public class Unit : UnitBase<IUnitNode>
         };
         AbilityUseProgress = null;
         if (!command.Repeat)
-            Commands.Dequeue();
+            _commands.Dequeue();
     }
     
     private void WaitForAbilityCooldown(AbilityContext context, ref double remainingDeltaTime)
@@ -400,7 +401,7 @@ public class Unit : UnitBase<IUnitNode>
     }
     
     /// <summary>
-    /// Validate an ability and if validation fails, try to make it pass
+    /// Validate an ability and, if validation fails, try to make it pass
     /// </summary>
     private AbilityValidationResult ValidateAbilityWithCorrection
     (
@@ -430,8 +431,10 @@ public class Unit : UnitBase<IUnitNode>
                     LookAtPosition(targetPosition!.Value, ref remainingDeltaTime);
                     break;
                 default:
-                    if (command.Repeat) remainingDeltaTime = 0;
-                    else Commands.Dequeue();
+                    if (command.Repeat)
+                        remainingDeltaTime = 0;
+                    else
+                        _commands.Dequeue();
                     return abilityValidationResult;
             }
         } while (remainingDeltaTime > 0 && iterations < maxIterations);
@@ -440,15 +443,15 @@ public class Unit : UnitBase<IUnitNode>
     
     public void SetCommand(ICommand command)
     {
-        Commands.Clear();
-        Commands.Enqueue(command);
+        _commands.Clear();
+        _commands.Enqueue(command);
         if (command is not UseAbilityCommand useAbilityCommand || useAbilityCommand.Slot != AbilityUseProgress?.Slot)
             AbilityUseProgress = null;
     }
     
     public void CancelCommands()
     {
-        Commands.Clear();
+        _commands.Clear();
         AbilityUseProgress = null;
     }
     
@@ -483,13 +486,14 @@ public class Unit : UnitBase<IUnitNode>
         ChangeResourceStat(Stat.CurrentMana, amount);
     }
     
-    protected void ChangeResourceStat(Stat stat, double delta) => SetResourceStat(stat, Stats[stat] + delta);
+    protected void ChangeResourceStat(Stat stat, double delta) =>
+        SetResourceStat(stat, Stats[stat] + delta);
 
     protected void SetResourceStat(Stat stat, double value)
     {
         if (!stat.IsResource)
             throw new ArgumentException($"{nameof(SetResourceStat)} can only be used with resource stats");
-        if (IsDead) return;
+        if (IsRemoved) return;
         
         double min = 0;
         double max = stat switch
@@ -507,7 +511,7 @@ public class Unit : UnitBase<IUnitNode>
     public void DealAttackDamageTo(Unit target, Ability ability)
     {
         target.TakeDamage(Stats[Stat.AttackDamage], this, ability);
-        foreach (StatusContext statusContext in Statuses.Values)
+        foreach (StatusContext statusContext in Statuses.Values) // todo will crash if Statuses changes
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
     
@@ -523,15 +527,29 @@ public class Unit : UnitBase<IUnitNode>
         if (ability.PassiveStatus != null)
         {
             AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand(slot));
-            AddStatus(ability.PassiveStatus, double.PositiveInfinity, ability.PassiveTickInterval, abilityContext, this);
+            AddStatus
+            (
+                ability.PassiveStatus,
+                double.PositiveInfinity,
+                ability.PassiveTickInterval,
+                abilityContext,
+                this
+            );
         }
     }
     
-    public void AddStatus(Status status, double time, double tickInterval, AbilityContext? abilityContext, Unit? source)
+    public void AddStatus
+    (
+        Status status,
+        double time,
+        double tickInterval,
+        AbilityContext? abilityContext,
+        Unit? source
+    )
     {
         if (time < 0) throw new ArgumentException();
-        if (tickInterval < 0) throw new ArgumentException();
-        if (IsDead) return;
+        if (tickInterval < 0) throw new ArgumentException(); // todo use null, throw on 0
+        if (IsRemoved) return;
         
         StatusContext context = new StatusContext
         {
@@ -604,7 +622,7 @@ public class Unit : UnitBase<IUnitNode>
     private void AddStatusWithoutDuplicateResolution(StatusContext context)
     {
         StatusesInternal[context.Id] = context;
-        if (context.TickInterval != 0)
+        if (context.TickInterval != 0) // todo null
             context.Status.Tick(context);
     }
     
@@ -624,14 +642,14 @@ public class Unit : UnitBase<IUnitNode>
     
     public void RemoveStatus(Guid id)
     {
-        if (IsDead) return;
+        if (IsRemoved) return;
         StatusesInternal.Remove(id);
         UpdateStats();
     }
     
     public void Die()
     {
-        if (IsDead) return;
+        if (IsRemoved) return;
         IsDead = true;
         Remove();
     }

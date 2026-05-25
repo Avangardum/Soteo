@@ -43,10 +43,7 @@ public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>
         );
     }
     
-    public override EntitySnapshot CreateSnapshot() => throw new InvalidOperationException();
+    public override EntitySnapshot CreateSnapshot() => throw new NotSupportedException();
     
-    private void OnZoomChanged()
-    {
-        UpdateNodePosition();
-    }
+    private void OnZoomChanged() => UpdateNodePosition();
 }

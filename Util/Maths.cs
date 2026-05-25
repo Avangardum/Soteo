@@ -187,4 +187,6 @@ public static class Maths
         double mod = PosMod(value, factor);
         return mod < tolerance || mod > factor - tolerance;
     }
+    
+    public static double Sign(double value) => Math.Sign(value);
 }
