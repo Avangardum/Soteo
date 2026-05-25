@@ -3,6 +3,7 @@ using Soteo.Core.Gameplay.Interfaces;
 
 namespace Soteo.Core.Gameplay.Services;
 
+/// <inheritdoc />
 public sealed class EntityLocator(IShardServiceProviderSource shardServiceProviderSource) : IEntityLocator
 {
     public T? FindEntity<T>(Guid entityId, out Guid shardId) where T : class, IEntity

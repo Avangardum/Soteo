@@ -15,7 +15,7 @@ public enum CanTarget
     
     // Values prefixed "With" specify whether that data should be included in addition to the target
     WithDirection = 1 << 6,
-    WithShard = 1 << 7
+    WithShard = 1 << 7,
         
     // Example: Position | Enemy | Character | WithDirection - Can target either a position or an enemy character and
     // should specify a direction from the target

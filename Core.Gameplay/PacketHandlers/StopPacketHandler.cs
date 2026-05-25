@@ -11,6 +11,6 @@ public sealed class StopPacketHandler(IEntityManager entityManager) : PacketHand
 {
     protected override void Handle(StopPacket packet, Guid senderId)
     {
-        entityManager.GetEntity<Unit>(senderId)?.CancelCommands();
+        entityManager.GetEntity<Unit>(senderId)?.Stop();
     }
 }

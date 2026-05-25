@@ -21,5 +21,5 @@ public enum AbilitySlot : byte
     Item7,
     Item8,
     Item9,
-    ItemLast = Item9
+    ItemLast = Item9,
 }

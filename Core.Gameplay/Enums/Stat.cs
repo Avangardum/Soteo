@@ -20,7 +20,7 @@ public enum Stat : byte
     TurnSpeed,
     AttackDamage,
     /// <summary>
-    /// Attack speed in Millihertz (number of attacks per 1000 seconds)
+    /// Attack speed in millihertz (number of attacks per 1000 seconds)
     /// </summary>
     AttackSpeed,
     /// <summary>
@@ -32,9 +32,9 @@ public enum Stat : byte
     /// </summary>
     AttackRange,
     /// <summary>
-    /// Attack projectile speed in pixels per seconds
+    /// Attack projectile speed in pixels per second
     /// </summary>
-    AttackProjectileSpeed
+    AttackProjectileSpeed,
 }
 
 public static class StatExtensions
@@ -57,7 +57,7 @@ public static class StatExtensions
         public static ImmutableList<Stat> AllComputed => _allComputed;
         
         /// <summary>
-        /// Resource stats are independent values and can change freely for any reason.<br />
+        /// Resource stats are independent values and can change freely for any reason.
         /// Other stats are computed and cannot be changed directly.
         /// </summary>
         public bool IsResource => self is Stat.CurrentHealth or Stat.CurrentMana;

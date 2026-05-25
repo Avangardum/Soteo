@@ -30,5 +30,5 @@ public enum DuplicateStatusResolution
     /// <summary>
     /// An exception is thrown, used when uniqueness is enforced manually
     /// </summary>
-    Throw
+    Throw,
 }

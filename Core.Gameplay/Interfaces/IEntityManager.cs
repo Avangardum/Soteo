@@ -11,10 +11,10 @@ public interface IEntityManager
     event Action<IEntity> EntityAdded;
     event Action<IEntity> EntityRemoved;
     
-    void ReplicateSnapshotEntities(ShardSnapshot snapshot);
+    void ReplicateSnapshot(ShardSnapshot snapshot);
     void ApplyDelta(ShardSnapshotDelta delta, double lerpWeight);
     PlayerCharacter SpawnPlayerCharacter(Guid id);
-    TargetedProjectile SpawnAttackProjectile(AbilityContext abilityContext, double speed);
+    TargetedProjectile SpawnProjectile(AbilityContext abilityContext, double speed);
     T? GetEntity<T>(Guid id);
     IEntity? GetEntity(Guid id);
 }

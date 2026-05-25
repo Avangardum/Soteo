@@ -1,4 +1,5 @@
 using Soteo.Core.Gameplay.Dto.Snapshots;
+using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
 using Soteo.Util;
@@ -62,7 +63,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         _networkDebugger = networkDebugger;
         _packetSender = packetSender;
         
-        _processSubscription = processPublisher.SubscribeToProcess(Process);
+        _processSubscription = processPublisher.SubscribeToProcess(Process, ProcessPriorityEnum.Default);
     }
     
     public void Dispose()
@@ -175,7 +176,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
     
     private void ReplicateSnapshot(ShardSnapshot snapshot)
     {
-        _entityManager.ReplicateSnapshotEntities(snapshot);
+        _entityManager.ReplicateSnapshot(snapshot);
     }
 
     private void WriteBufferTicksHistory()

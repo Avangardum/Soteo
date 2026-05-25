@@ -32,7 +32,7 @@ public sealed class EntityManager : IEntityManager
     
     public IEntity? GetEntity(Guid id) => _entities.GetOrDefault(id);
     
-    public void ReplicateSnapshotEntities(ShardSnapshot snapshot)
+    public void ReplicateSnapshot(ShardSnapshot snapshot)
     {
         List<Guid> ids = [];
         foreach (EntitySnapshot entitySnapshot in snapshot.Entities.Values)
@@ -93,7 +93,7 @@ public sealed class EntityManager : IEntityManager
     public PlayerCharacter SpawnPlayerCharacter(Guid id) =>
         Add(new PlayerCharacter(id, AddNode<IUnitNode>(id), _serviceProvider));
 
-    public TargetedProjectile SpawnAttackProjectile(AbilityContext abilityContext, double speed)
+    public TargetedProjectile SpawnProjectile(AbilityContext abilityContext, double speed)
     {
         var id = Guid.NewGuid();
         return Add(new TargetedProjectile(id, abilityContext, speed, AddNode<IProjectileNode>(id), _serviceProvider)

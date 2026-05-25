@@ -4,5 +4,5 @@ public enum Faction
 {
     Neutral,
     Empire,
-    Syndicate
+    Syndicate,
 }

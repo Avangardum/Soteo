@@ -6,3 +6,4 @@ namespace Soteo.Core.Gameplay.Packets;
 
 [PacketType(PacketType.ShardSnapshotRequest)]
 public sealed record ShardSnapshotRequestPacket : Packet;
+

@@ -449,7 +449,7 @@ public class Unit : UnitBase<IUnitNode>
             AbilityUseProgress = null;
     }
     
-    public void CancelCommands()
+    public void Stop()
     {
         _commands.Clear();
         AbilityUseProgress = null;

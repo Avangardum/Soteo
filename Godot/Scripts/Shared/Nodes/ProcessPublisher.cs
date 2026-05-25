@@ -13,42 +13,18 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
         Name = nameof(ProcessPublisher);
     }
 
-    public IDisposable SubscribeToProcess
-    (
-        Action<double> subscription,
-        ProcessPriorityEnum priority = ProcessPriorityEnum.Default
-    )
-    {
-        return Subscribe(it => it.Process, subscription, priority);
-    }
-    
-    public IDisposable SubscribeToProcess
-    (
-        Action subscription,
-        ProcessPriorityEnum priority = ProcessPriorityEnum.Default
-    )
-    {
-        return SubscribeToProcess(_ => subscription(), priority);
-    }
-    
-    public IDisposable SubscribeToPhysicsProcess
-    (
-        Action<double> subscription,
-        ProcessPriorityEnum priority = ProcessPriorityEnum.Default
-    )
-    {
-        return Subscribe(it => it.PhysicsProcess, subscription, priority);
-    }
-    
-    public IDisposable SubscribeToPhysicsProcess
-    (
-        Action subscription,
-        ProcessPriorityEnum priority = ProcessPriorityEnum.Default
-    )
-    {
-        return SubscribeToPhysicsProcess(_ => subscription(), priority);
-    }
-    
+    public IDisposable SubscribeToProcess(Action<double> subscription, ProcessPriorityEnum priority) =>
+        Subscribe(it => it.Process, subscription, priority);
+
+    public IDisposable SubscribeToProcess(Action subscription, ProcessPriorityEnum priority) =>
+        SubscribeToProcess(_ => subscription(), priority);
+
+    public IDisposable SubscribeToPhysicsProcess(Action<double> subscription, ProcessPriorityEnum priority) =>
+        Subscribe(it => it.PhysicsProcess, subscription, priority);
+
+    public IDisposable SubscribeToPhysicsProcess(Action subscription, ProcessPriorityEnum priority) =>
+        SubscribeToPhysicsProcess(_ => subscription(), priority);
+
     private IDisposable Subscribe
     (
         Func<Subscriptions, List<Action<double>>> listSelector,
