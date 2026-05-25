@@ -28,7 +28,7 @@ public sealed class SpawnCharacterPacketHandler
             character = new Character { Id = senderId };
             charRepo.Add(character);
         }
-        if (character.ShardId != Guid.Empty) return;
+        if (character.ShardId != null) return;
         character.ShardId = packet.PeerId;
         packetSender.RelayFrom(packet, senderId);
     }

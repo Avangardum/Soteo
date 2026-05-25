@@ -197,6 +197,12 @@ definition after a high level method that calls it. Secondarily, sort from `publ
 Nullable reference types should be enabled everywhere. Generated code, where they are disabled by default, should
 include the `#nullable enable` directive.
 
+When possible, use the `Required` extension property to assert that a value is not null
+instead of the null forgiving operator `!`.
+
+Avoid using special values like `0`, `-1`, `NaN`, `Guid.Empty` to encode a special meaning like "nothing", "unknown",
+"invalid", "unchanged". Instead use `null` or a custom wrapper like `Delta`.
+
 ## Files
 
 | Object | Naming     |
