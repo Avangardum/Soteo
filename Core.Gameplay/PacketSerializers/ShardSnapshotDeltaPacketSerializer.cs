@@ -9,12 +9,6 @@ namespace Soteo.Core.Gameplay.PacketSerializers;
 
 public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardSnapshotDeltaPacket>
 {
-    private enum EntityKind : byte
-    {
-        UnitPuppet,
-        ProjectilePuppet
-    }
-
     protected override void SerializeInternal(ShardSnapshotDeltaPacket packet, Stream stream)
     {
         base.SerializeInternal(packet, stream);
@@ -129,7 +123,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
         if (delta.HasChanged)
             SerializeNullableClass(delta.NewValue, serializer, stream);
     }
-
+    
     private Delta<T?> DeserializeNullableClassDelta<T>(Deserializer<T> deserializer, Stream stream)
         where T : class
     {
@@ -183,5 +177,11 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
         var changes = DeserializeIndexedDictionary(deserializeValue, keySelector, stream);
         var removedKeys = DeserializeList(deserializeKey, stream);
         return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
+    }
+    
+    private enum EntityKind : byte
+    {
+        UnitPuppet,
+        ProjectilePuppet
     }
 }

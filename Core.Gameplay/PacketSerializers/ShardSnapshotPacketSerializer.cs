@@ -11,14 +11,6 @@ namespace Soteo.Core.Gameplay.PacketSerializers;
 
 public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapshotPacket>
 {
-    private enum EntityKind : byte
-    {
-        Unit,
-        Projectile,
-        UnitPuppet,
-        ProjectilePuppet
-    }
-    
     protected override void SerializeInternal(ShardSnapshotPacket packet, Stream stream)
     {
         base.SerializeInternal(packet, stream);
@@ -225,7 +217,15 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
             TickInterval = DeserializeDouble(stream),
-            Ordinal = DeserializeLong(stream)
+            Ordinal = DeserializeLong(stream),
         };
+    }
+    
+    private enum EntityKind : byte
+    {
+        Unit,
+        Projectile,
+        UnitPuppet,
+        ProjectilePuppet
     }
 }
