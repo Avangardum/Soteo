@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Numerics;
 using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
@@ -31,10 +32,10 @@ public abstract class Ability
     
     public virtual int MaxLevel => 1;
     public virtual Status? PassiveStatus => null;
-    public virtual double PassiveTickInterval => 0;
+    public virtual double PassiveTickInterval => 0; // todo null
     public virtual CanTarget Targeting => CanTarget.Passive;
     
-    public virtual string Animation => "Attack Right";
+    public virtual string Animation => "Attack Right"; // todo rename animations
     public virtual bool LoopAnimation => false;
     
     /// <summary>
@@ -42,7 +43,7 @@ public abstract class Ability
     /// </summary>
     public virtual string IconPath => "Placeholder";
     
-    // Static values define what is shown in ability description. They are constant and independent of context.
+    // Static values define what is shown in the ability description. They are constant and independent of context.
     public virtual Scalable<double> StaticHealthCost => 0;
     public virtual Scalable<double> StaticManaCost => 0;
     public virtual Scalable<double> StaticCooldown => 0;
@@ -50,7 +51,7 @@ public abstract class Ability
     public virtual Scalable<double> StaticAngularRange => 30;
     public virtual Scalable<double> StaticUseTime => 0;
    
-    // Dynamic values are context dependent values declared by an ability before applying status effect modifiers.
+    // Dynamic values are context dependent values declared by the ability before applying status effect modifiers.
     // By default, they are same as static values, but if an ability has a value that can't be declared statically, it
     // should override the matching dynamic value method, in which case the static value is used for ability description
     // only and should be 0 to hide it in most cases.
@@ -115,8 +116,9 @@ public abstract class Ability
             return AbilityValidationResult.InvalidTarget;
         if (context.TargetUnit != null)
         {
-            AbilityValidationResult targetUnitValidationResult = ValidateTargetUnit(context);
-            if (targetUnitValidationResult != AbilityValidationResult.Ok) return targetUnitValidationResult;
+            AbilityValidationResult targetUnitValidationResult = ValidateTargetUnit(context.User, context.TargetUnit);
+            if (targetUnitValidationResult != AbilityValidationResult.Ok)
+                return targetUnitValidationResult;
         }
         if (Targeting.HasFlag(CanTarget.WithDirection) != context.TargetDirection.HasValue)
             return AbilityValidationResult.InvalidTarget;
@@ -125,15 +127,17 @@ public abstract class Ability
         return AbilityValidationResult.Ok;
     }
     
-    private AbilityValidationResult ValidateTargetUnit(AbilityContext context)
+    private AbilityValidationResult ValidateTargetUnit(Unit user, Unit target)
     {
-        if (context.User.IsAlliedTo(context.TargetUnit.Required))
+        if (user.IsAlliedTo(target))
         {
-            if (!Targeting.HasFlag(CanTarget.Ally)) return AbilityValidationResult.InvalidTarget;
+            if (!Targeting.HasFlag(CanTarget.Ally))
+                return AbilityValidationResult.InvalidTarget;
         }
         else
         {
-            if (!Targeting.HasFlag(CanTarget.Enemy)) return AbilityValidationResult.InvalidTarget;
+            if (!Targeting.HasFlag(CanTarget.Enemy))
+                return AbilityValidationResult.InvalidTarget;
         }
         
         // todo validate character / building
@@ -152,8 +156,11 @@ public abstract class Ability
     
     private AbilityValidationResult ValidateRange(AbilityContext context, bool strict)
     {
-        if ((context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition &&
-            targetPosition != context.User.Position)
+        if 
+        (
+            (context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition &&
+            targetPosition != context.User.Position
+        )
         {
             Vector2 deltaPosition = targetPosition - context.User.Position;
             double rangeMultiplier = strict ? 1 : 1.5f;
@@ -197,7 +204,7 @@ public abstract class Ability
                 {
                     null => "ERROR",
                     Scalable s => s.ToBbcode(level, format),
-                    IFormattable f => f.ToString(format, CultureInfo.CurrentCulture),
+                    IFormattable f => f.ToString(format, CultureInfo.CurrentCulture), // todo global invariant culture
                     _ => propertyValue.ToString()
                 };
             }

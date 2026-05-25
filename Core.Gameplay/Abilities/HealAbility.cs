@@ -17,6 +17,6 @@ public sealed class HealAbility : Ability
     public override void TakeEffect(AbilityContext context)
     {
         base.TakeEffect(context);
-        context.TargetUnit!.RestoreHealth(Heal[context.Level], context.User, this);
+        context.TargetUnit.Required.RestoreHealth(Heal[context.Level], context.User, this);
     }
 }

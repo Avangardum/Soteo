@@ -21,7 +21,7 @@ public sealed class ProjectileBurstAbility : Ability
         {
             Vector2 target = context.User.Position + Maths.AzimuthToDirection(azimuth) * 1000;
             double speed = 150 + 15 * Math.Sin(Maths.Deg2Rad(azimuth) * 20);
-            entityManager.SpawnAttackProjectile(context with { TargetPosition = target }, speed);
+            entityManager.SpawnAttackProjectile(context with { TargetPosition = target }, speed); // todo pass the projectile target independently of the ability target
         }
     }
 }
