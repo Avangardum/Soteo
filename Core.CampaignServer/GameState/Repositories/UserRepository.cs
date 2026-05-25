@@ -27,6 +27,7 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
     
     public void OnDisconnected(Guid id)
     {
-        if (TryGetValue(id, out User? user)) user.IsConnected = false;
+        if (TryGetValue(id, out User? user))
+            user.IsConnected = false;
     }
 }

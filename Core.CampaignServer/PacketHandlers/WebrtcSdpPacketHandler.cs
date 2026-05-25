@@ -14,8 +14,11 @@ public sealed class WebrtcSdpPacketHandler(IPacketSender packetSender, IUserRepo
     {
         if (!userRepo.TryGetValue(packet.PeerId, out User? receiver)) return;
         User sender = userRepo[senderId];
-        Validate(sender.IsPlayer && receiver.IsShard || sender.IsShard && receiver.IsPlayer,
-            "WebRTC signaling can only happen between a player and a shard server");
+        Validate
+        (
+            sender.IsPlayer && receiver.IsShard || sender.IsShard && receiver.IsPlayer,
+            "WebRTC signaling can only happen between a player and a shard server"
+        );
         packetSender.RelayFrom(packet, senderId);
     }
-}
+} // todo DRY

@@ -9,6 +9,6 @@ public sealed class CharacterRecalledPacketHandler(ICharacterRepository characte
 {
     protected override void Handle(CharacterRecalledPacket packet, Guid senderId)
     {
-        characterRepository[packet.CharacterId].ShardId = Guid.Empty;
+        characterRepository[packet.CharacterId].ShardId = Guid.Empty; // todo null
     }
 }
