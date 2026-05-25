@@ -8,13 +8,17 @@ namespace Soteo.Core.Gameplay;
 
 public static class GameplaySerializationHelper
 {
-    public static void SerializeAbility(Ability value, Stream stream) => SerializeInt(value.Id, stream);
+    public static void SerializeAbility(Ability value, Stream stream) =>
+        SerializeInt(value.Id, stream);
     
-    public static Ability DeserializeAbility(Stream stream) => Ability.All[DeserializeInt(stream)];
+    public static Ability DeserializeAbility(Stream stream) =>
+        Ability.All[DeserializeInt(stream)];
     
-    public static void SerializeStatus(Status value, Stream stream) => SerializeInt(value.Id, stream);
+    public static void SerializeStatus(Status value, Stream stream) =>
+        SerializeInt(value.Id, stream);
     
-    public static Status DeserializeStatus(Stream stream) => Status.All[DeserializeInt(stream)];
+    public static Status DeserializeStatus(Stream stream) =>
+        Status.All[DeserializeInt(stream)];
     
     public static void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
     {
@@ -34,10 +38,10 @@ public static class GameplaySerializationHelper
             Id = DeserializeGuid(stream),
             Status = DeserializeStatus(stream),
             Ability = DeserializeNullableClass(DeserializeAbility, stream),
-            ElapsedTime = DeserializeDouble(stream),
+            ElapsedTime = DeserializeDouble(stream), // todo remove from puppet
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
-            Ordinal = DeserializeLong(stream)
+            Ordinal = DeserializeLong(stream),
         };
     }
     
@@ -54,13 +58,13 @@ public static class GameplaySerializationHelper
         {
             Slot = DeserializeEnum<AbilitySlot>(stream),
             ElapsedTime = DeserializeDouble(stream),
-            RemainingTime = DeserializeDouble(stream)
+            RemainingTime = DeserializeDouble(stream),
         };
     }
     
     public static void SerializeAbilitySlotState(AbilitySlotState value, Stream stream)
     {
-        SerializeInt(value.Ability.Id, stream);
+        SerializeAbility(value.Ability, stream);
         SerializeInt(value.Level, stream);
         SerializeDouble(value.Cooldown, stream);
         SerializeDouble(value.MaxCooldown, stream);
@@ -70,10 +74,10 @@ public static class GameplaySerializationHelper
     {
         return new AbilitySlotState
         {
-            Ability = Ability.All[DeserializeInt(stream)],
+            Ability = DeserializeAbility(stream),
             Level = DeserializeInt(stream),
             Cooldown = DeserializeDouble(stream),
-            MaxCooldown = DeserializeDouble(stream)
+            MaxCooldown = DeserializeDouble(stream),
         };
     }
 }

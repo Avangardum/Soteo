@@ -18,7 +18,7 @@ public sealed class EntityLocator(IShardServiceProviderSource shardServiceProvid
             }
         }
         
-        shardId = Guid.Empty;
+        shardId = Guid.Empty; // todo null
         return null;
     }
 }

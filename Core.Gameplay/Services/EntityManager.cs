@@ -25,8 +25,8 @@ public sealed class EntityManager : IEntityManager
     
     public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;
     
-    public event Action<IEntity> EntityAdded = delegate {};
-    public event Action<IEntity> EntityRemoved = delegate {};
+    public event Action<IEntity> EntityAdded = delegate { };
+    public event Action<IEntity> EntityRemoved = delegate { };
 
     public T? GetEntity<T>(Guid id) => (T?)_entities.GetOrDefault(id);
     

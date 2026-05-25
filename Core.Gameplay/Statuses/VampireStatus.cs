@@ -7,7 +7,7 @@ namespace Soteo.Core.Gameplay.Statuses;
 
 public sealed class VampireStatus : Status
 {
-    public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Replace;
+    public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Stack;
 
     public override bool HudVisible => false;
 
@@ -31,7 +31,7 @@ public sealed class VampireStatus : Status
     public override void OnDealAttackDamage(StatusContext context, Unit target, double damage)
     {
         double lifestealFactor = context.AbilityAs<VampireAbility>().LifestealFactor[context.AbilityContext.Level];
-        context.Unit.RestoreHealth(damage * lifestealFactor, context.Unit, context.AbilityContext.Ability);
+        context.Unit.RestoreHealth(damage * lifestealFactor, context.Unit, context.AbilityContext.Ability); // todo overload for context
         target.AddStatus<BleedingStatus>(BleedingStatus.Time, BleedingStatus.TickInterval, context);
     }
 }

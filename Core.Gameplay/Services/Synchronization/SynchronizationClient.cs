@@ -8,34 +8,6 @@ namespace Soteo.Core.Gameplay.Services.Synchronization;
 
 public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
 {
-    private enum StateEnum
-    {
-        Desynchronized,
-        Synchronizing,
-        Synchronized
-    }
-    
-    private record SynchronizationData
-    {
-        public double? Tick { get; set; }
-        public double? ApproxServerTick { get; set; }
-        public long? LastDeltaTick { get; set; }
-        public ShardSnapshotPacket? LastSnapshotPacket { get; set; }
-        public ShardSnapshotDelta?[] DeltaRing { get; } = new ShardSnapshotDelta[10 * Const.TicksPerSecond];
-        public double[] ServerLoadHistoryRing { get; } = new double[10 * Const.TicksPerSecond];
-        
-        // Stores minimal difference between _tick and _lastDeltaTick for every recent second. This number
-        // shouldn't go below 0, or else synchronization will pause until the delta necessary to continue arrives.
-        // At the same time it's desirable to keep it as low as possible, without risking it going below 0, in order to
-        // minimize latency and recover from past pauses caused by one-off network issues. Therefore, if all recent
-        // values are above BufferTicksMinValueToFastForward, synchronization will fast-forward accordingly.
-        public double[] BufferTicksHistoryRing { get; } = new double[5];
-        
-        public double? Second => Tick / Const.TicksPerSecond;
-        
-        public long? DeltaRingEarliestValidTick => LastDeltaTick - DeltaRing.Length + 1;
-    }
-    
     private static readonly double BufferTicksMinSafeValue = 0.05f * Const.TicksPerSecond;
     
     private static readonly double BufferTicksMinValueToFastForward =
@@ -131,25 +103,23 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         long lastFullDeltaTick = Maths.FloorToLong(_syncData.Tick!.Value);
         
         for (long t = firstFullDeltaTick; t <= lastFullDeltaTick; t++)
-            ApplyDelta(_syncData.DeltaRing.RingGet(t).Required, 1);
+            _entityManager.ApplyDelta(_syncData.DeltaRing.RingGet(t).Required, 1);
 
         if (_syncData.Tick % 1 > 0)
         {
             ShardSnapshotDelta partialDelta = _syncData.DeltaRing.RingGet(lastFullDeltaTick + 1).Required;
             if ((long)prevTick < (long)_syncData.Tick)
             {
-                ApplyDelta(partialDelta, _syncData.Tick.Value % 1);
+                double interpolationWeight = _syncData.Tick.Value % 1;
+                _entityManager.ApplyDelta(partialDelta, interpolationWeight);
             }
             else
             {
                 double weight = Maths.InverseLerp(prevTick, lastFullDeltaTick + 1, _syncData.Tick.Value);
-                ApplyDelta(partialDelta, weight);
+                _entityManager.ApplyDelta(partialDelta, weight);
             }
         }
     }
-    
-    private void ApplyDelta(ShardSnapshotDelta delta, double interpolationWeight) =>
-        _entityManager.ApplyDelta(delta, interpolationWeight);
 
     private void RequestSnapshot() =>
         _packetSender.SendReliable(new ShardSnapshotRequestPacket(), _shard.Id);
@@ -168,22 +138,17 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         bool canSynchronize = _syncData.LastDeltaTick >= _syncData.LastSnapshotPacket?.Tick + 2;
         if (!canSynchronize) return false;
         
-        ReplicateSnapshot(_syncData.LastSnapshotPacket.Required.Snapshot);
+        _entityManager.ReplicateSnapshot(_syncData.LastSnapshotPacket.Required.Snapshot);
         _syncData.Tick = _syncData.LastSnapshotPacket.Tick;
         State = StateEnum.Synchronized;
         return true;
-    }
-    
-    private void ReplicateSnapshot(ShardSnapshot snapshot)
-    {
-        _entityManager.ReplicateSnapshot(snapshot);
     }
 
     private void WriteBufferTicksHistory()
     {
         if (State != StateEnum.Synchronized) throw new InvalidOperationException();
         
-        double bufferTicks = _syncData.LastDeltaTick!.Value - _syncData.Tick!.Value;
+        double bufferTicks = _syncData.LastDeltaTick!.Value - _syncData.Tick!.Value; // todo Required
         if (bufferTicks < _syncData.BufferTicksHistoryRing.RingGet((long)_syncData.Second!))
             _syncData.BufferTicksHistoryRing.RingSet((long)_syncData.Second, bufferTicks);
     }
@@ -198,7 +163,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         double fastForwardTicks = minBufferTicks - BufferTicksMinSafeValue;
         _syncData.Tick += fastForwardTicks;
         _syncData.BufferTicksHistoryRing
-            .RingSet((long)_syncData.Second!, _syncData.LastDeltaTick!.Value - _syncData.Tick!.Value);
+            .RingSet((long)_syncData.Second!, _syncData.LastDeltaTick!.Value - _syncData.Tick!.Value); // todo Required
         FastForwardCount++;
     }
 
@@ -218,5 +183,33 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         _syncData.ServerLoadHistoryRing.RingSet(packet.Tick, packet.ServerLoad);
         _syncData.ApproxServerTick = packet.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
         _syncData.LastDeltaTick = packet.Tick;
+    }
+    
+    private enum StateEnum
+    {
+        Desynchronized,
+        Synchronizing,
+        Synchronized
+    }
+    
+    private record SynchronizationData
+    {
+        public double? Tick { get; set; }
+        public double? ApproxServerTick { get; set; }
+        public long? LastDeltaTick { get; set; }
+        public ShardSnapshotPacket? LastSnapshotPacket { get; set; }
+        public ShardSnapshotDelta?[] DeltaRing { get; } = new ShardSnapshotDelta[10 * Const.TicksPerSecond];
+        public double[] ServerLoadHistoryRing { get; } = new double[10 * Const.TicksPerSecond];
+        
+        // Stores minimal difference between _tick and _lastDeltaTick for every recent second. This number
+        // shouldn't go below 0, or else synchronization will pause until the delta necessary to continue arrives.
+        // At the same time it's desirable to keep it as low as possible, without risking it going below 0, in order to
+        // minimize latency and recover from past pauses caused by one-off network issues. Therefore, if all recent
+        // values are above BufferTicksMinValueToFastForward, synchronization will fast-forward accordingly.
+        public double[] BufferTicksHistoryRing { get; } = new double[5];
+        
+        public double? Second => Tick / Const.TicksPerSecond;
+        
+        public long? DeltaRingEarliestValidTick => LastDeltaTick - DeltaRing.Length + 1;
     }
 }

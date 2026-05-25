@@ -19,7 +19,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     private ShardSnapshot? _prevShardSnapshot;
     private readonly HashSet<Guid> _snapshotRequesters = [];
     private readonly List<EntitySnapshot> _entitySnapshots = [];
-    private readonly IDisposable _processSubscription;
+    private readonly IDisposable _physicsProcessSubscription;
     
     public SynchronizationServer
     (
@@ -37,7 +37,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         
         entityManager.EntityRemoved += OnEntityRemoved;
         connectionNotifier.PeerConnected += OnPeerConnected;
-        _processSubscription =
+        _physicsProcessSubscription =
             processPublisher.SubscribeToPhysicsProcess(PhysicsProcess, ProcessPriorityEnum.SynchronizationServer);
     }
 
@@ -45,7 +45,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     {
         _entityManager.EntityRemoved -= OnEntityRemoved;
         _connectionNotifier.PeerConnected -= OnPeerConnected;
-        _processSubscription.Dispose();
+        _physicsProcessSubscription.Dispose();
     }
 
     private void OnEntityRemoved(IEntity entity)
