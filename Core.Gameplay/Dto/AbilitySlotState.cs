@@ -8,6 +8,7 @@ public record AbilitySlotState
     public required Ability Ability { get; init; }
     public required int Level { get; init; }
     public double Cooldown { get; init; }
+    
     /// <summary>
     /// Cooldown of the ability at the last moment it was used
     /// </summary>

@@ -29,7 +29,7 @@ public sealed record DeflatedAbilityContext
             UserStats = UserStats,
             ServiceProvider = serviceProvider,
             TargetPosition = TargetPosition,
-            TargetUnit = TargetUnitId == null ? null : entityManager.GetEntity<Unit>(TargetUnitId.Value),
+            TargetUnit = TargetUnitId == null ? null : entityManager.GetEntity<Unit>(TargetUnitId.Value).Required,
             TargetDirection = TargetDirection,
             TargetShardId = TargetShardId
         };
