@@ -162,9 +162,6 @@ Goto labels should be indented one level less than surrounding code.
 
 ### Miscellaneous
 
-When comparing a value with boundary values, the values should be sorted in the ascending order from left to right.
-(`min <= value && value <= max`).
-
 Use `var` only when the type is explicitly named on the right-hand side.
 
 Use target-typed `new` only when the type is explicitly named on the left-hand side.
@@ -197,11 +194,11 @@ definition after a high level method that calls it. Secondarily, sort from `publ
 Nullable reference types should be enabled everywhere. Generated code, where they are disabled by default, should
 include the `#nullable enable` directive.
 
-When possible, use the `Required` extension property to assert that a value is not null
+Where possible, use the `Required` extension property to assert that a value is not null
 instead of the null forgiving operator `!`.
 
-Avoid using special values like `0`, `-1`, `NaN`, `Guid.Empty` to encode a special meaning like "nothing", "unknown",
-"invalid", "unchanged". Instead use `null` or a custom wrapper like `Delta`.
+Avoid using special values like `0`, `-1`, `NaN`, `Guid.Empty`, `""` to encode a special meaning like
+"nothing", "unknown", "invalid", "unchanged". Instead use `null` or a custom wrapper like `Delta`.
 
 ## Files
 

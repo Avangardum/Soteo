@@ -3,6 +3,9 @@ using Soteo.Core.Shared.Enums;
 
 namespace Soteo.Core.Shared.Packets;
 
+/// <summary>
+/// Fragment of a chunked packet
+/// </summary>
 [PacketType(PacketType.Chunk)]
 public sealed record ChunkPacket : Packet
 {

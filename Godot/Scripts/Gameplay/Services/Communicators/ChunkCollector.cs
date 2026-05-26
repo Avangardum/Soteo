@@ -5,16 +5,10 @@ namespace Soteo.Gameplay.Services.Communicators;
 
 public sealed class ChunkCollector : IChunkCollector
 {
-    private record Group(Guid SenderId, DateTime TimeOutAfter, List<ChunkPacket> Chunks)
-    {
-        public int? TargetSize { get; set; }
-        
-        public bool IsTimedOut => DateTime.UtcNow > TimeOutAfter;
-    }
-    
     private readonly Dictionary<Guid, Group> _groups = [];
     private DateTime _nextCleanupTime = DateTime.UtcNow;
-    
+
+    /// <inheritdoc />
     public byte[]? AddChunk(ChunkPacket chunk, Guid senderId)
     {
         if (DateTime.UtcNow >= _nextCleanupTime)
@@ -57,5 +51,11 @@ public sealed class ChunkCollector : IChunkCollector
         foreach (Guid id in timedOutGroupIds)
             _groups.Remove(id);
         _nextCleanupTime = DateTime.UtcNow.AddMinutes(1);
+    }
+    
+    private record Group(Guid SenderId, DateTime TimeOutAfter, List<ChunkPacket> Chunks)
+    {
+        public int? TargetSize { get; set; }
+        public bool IsTimedOut => DateTime.UtcNow > TimeOutAfter;
     }
 }

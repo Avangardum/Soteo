@@ -7,8 +7,6 @@ namespace Soteo.Gameplay.EntityNodes;
 
 public sealed class ProjectileNode : Area2D, IProjectileNode
 {
-    public Node2D Node => this;
-    
     public Projectile? Projectile { get; set; }
     
     public IEntity? Entity

@@ -19,13 +19,6 @@ namespace Soteo.Gameplay.Services.Communicators;
 public sealed class WebRtcFromGameplayToGameplayCommunicator :
     Node, IPacketSender, IWebrtcPacketReceiver, INetworkDebugger, IConnectionNotifier
 {
-    private record PeerConnectionAndChannels
-    (
-        WebRTCPeerConnection Connection,
-        WebRTCDataChannel ReliableChannel,
-        WebRTCDataChannel UnreliableChannel
-    );
-    
     private const double PingInterval = 1;
     
     // Web export has a bug that seemingly corrupts memory when receiving a large packet.
@@ -34,7 +27,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private const int MaxChunkSize = 32000;
     
     private double _timeSinceLastPing;
-    private Guid _lastPingId;
+    private Guid _lastPingId; // todo nullable
     private bool _didPollThisFrame;
     private byte[]? _deferredShardSnapshotPacketBytes;
     
@@ -107,7 +100,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         
         foreach
         (
-            (Guid peerId, PeerConnectionAndChannels? peerConnectionAndChannels) in
+            (Guid peerId, PeerConnectionAndChannels peerConnectionAndChannels) in
                 _peerConnectionsAndChannels.ToDictionary()
         )
         {
@@ -156,6 +149,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         // Snapshot deserialization can take a long time. If FPS is low, several snapshot packets may accumulate
         // per frame, which lower FPS further, causing a snowball effect. To prevent this, if FPS is low, only
         // the last snapshot packet is handled every frame.
+        // todo obsolete safeguard, remove
         bool deferShardSnapshotPacket = delta >= 1.0 / 20.0;
         _deferredShardSnapshotPacketBytes = null;
         
@@ -266,7 +260,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             ["negotiated"] = true,
             ["id"] = 0,
         });
-        WebRTCDataChannel unreliableChannel = connection.CreateDataChannel("unreliable", new Dictionary
+        WebRTCDataChannel unreliableChannel = connection.CreateDataChannel("unreliable", new Dictionary // todo GdDictionary
         {
             ["negotiated"] = true,
             ["id"] = 1,
@@ -304,7 +298,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     public void SendUnreliable(Packet packet, Guid receiverId) =>
         Send(_packetSerializer.Serialize(packet), receiverId, it => it.UnreliableChannel);
 
-    public void SendReliable(Packet packet, IEnumerable<Guid> receiverIds) =>
+    public void SendReliable(Packet packet, IEnumerable<Guid> receiverIds) => // todo params
         SendToMany(packet, receiverIds, it => it.ReliableChannel);
 
     public void SendUnreliable(Packet packet, IEnumerable<Guid> receiverIds) =>
@@ -315,23 +309,6 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     public void BroadcastUnreliable(Packet packet) =>
         SendToMany(packet, _peerConnectionsAndChannels.Keys, it => it.UnreliableChannel);
-
-    private void SendToMany(Packet packet, IEnumerable<Guid> receiverIds, Func<PeerConnectionAndChannels, WebRTCDataChannel> channelSelector)
-    {
-        byte[] bytes = _packetSerializer.Serialize(packet);
-        if (bytes.Length <= MaxChunkSize)
-        {
-            foreach (Guid receiverId in receiverIds)
-                SendWithoutChunking(bytes, receiverId, channelSelector);
-        }
-        else
-        {
-            byte[][] chunks = SplitIntoChunks(bytes);
-            foreach (Guid receiverId in receiverIds)
-                foreach (byte[] chunk in chunks)
-                    SendWithoutChunking(chunk, receiverId, channelSelector);
-        }
-    }
     
     private void Send
     (
@@ -347,6 +324,28 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         else
         {
             byte[][] chunks = SplitIntoChunks(bytes);
+            foreach (byte[] chunk in chunks)
+                SendWithoutChunking(chunk, receiverId, channelSelector);
+        }
+    }
+    // todo unify
+    private void SendToMany
+    (
+        Packet packet,
+        IEnumerable<Guid> receiverIds,
+        Func<PeerConnectionAndChannels, WebRTCDataChannel> channelSelector
+    )
+    {
+        byte[] bytes = _packetSerializer.Serialize(packet);
+        if (bytes.Length <= MaxChunkSize)
+        {
+            foreach (Guid receiverId in receiverIds)
+                SendWithoutChunking(bytes, receiverId, channelSelector);
+        }
+        else
+        {
+            byte[][] chunks = SplitIntoChunks(bytes);
+            foreach (Guid receiverId in receiverIds)
             foreach (byte[] chunk in chunks)
                 SendWithoutChunking(chunk, receiverId, channelSelector);
         }
@@ -403,4 +402,11 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     public double? Ping(Guid peerId) =>
         _ping.TryGetValue(peerId, out var tuple) ? tuple.ResponseTime : null;
+    
+    private record PeerConnectionAndChannels
+    (
+        WebRTCPeerConnection Connection,
+        WebRTCDataChannel ReliableChannel,
+        WebRTCDataChannel UnreliableChannel
+    );
 }

@@ -14,8 +14,6 @@ namespace Soteo.Gameplay.Services.Communicators;
 
 public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, ICampaignServerCommunicator
 {
-    private enum Status { Disconnected, Connecting, Connected }
-    
     private const string CampaignServerUrl = "wss://localhost:3706";
     private const string AuthServerUrl = "https://localhost:3705";
 
@@ -26,7 +24,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
     private readonly IShardLoader _shardLoader;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     
-    private string _token = "";
+    private string _token = ""; // todo null
     private Status _status;
 
     public WebSocketFromGameplayToCampaignServerCommunicator
@@ -55,7 +53,6 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         _wsClient.Connect("connection_error", this, nameof(OnConnectionError));
         _wsClient.Connect("connection_established", this, nameof(OnConnectionEstablished));
         _wsClient.Connect("data_received", this, nameof(OnDataReceived));
-        _wsClient.Connect("server_close_request", this, nameof(OnServerCloseRequest));
         
         AddChild(_httpRequest);
         _httpRequest.Connect("request_completed", this, nameof(OnAuthRequestCompleted));
@@ -78,7 +75,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
     public void OnConnectionClosed(bool wasCleanClose)
     {
         _status = Status.Disconnected;
-        _currentUserIdRepository.UserId = Guid.Empty;
+        _currentUserIdRepository.UserId = Guid.Empty; // todo null
     }
     
     public void OnConnectionError()
@@ -107,11 +104,6 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         _packetHandler.HandleAsync(packet, Const.CampaignServerId).CollectException();
     }
     
-    public void OnServerCloseRequest(int code, string reason)
-    {
-        
-    }
-    
     public void ConnectAsPlayer(string email, string password)
     {
         if (_status != Status.Disconnected) return;
@@ -128,7 +120,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         string intercomSecret = SysEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
-            throw new InvalidOperationException("Intercom secret is not set.");
+            throw new Exception("Intercom secret is not set.");
         Guid id = _currentUserIdRepository.UserId;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(intercomSecret)}";
@@ -171,4 +163,6 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         byte[] bytes = _packetSerializer.Serialize(packet);
         _wsClient.GetPeer(1).PutPacket(bytes);
     }
+    
+    private enum Status { Disconnected, Connecting, Connected }
 }

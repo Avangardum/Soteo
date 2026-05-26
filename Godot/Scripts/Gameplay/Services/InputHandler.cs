@@ -75,7 +75,7 @@ public sealed class InputHandler : Node2D
         
         if (targetUnit != null)
         {
-            var command  = new UseAbilityCommand(Slot: AbilitySlot.Attack, Repeat: true, TargetUnitId: targetUnit.Id);
+            var command = new UseAbilityCommand(Slot: AbilitySlot.Attack, Repeat: true, TargetUnitId: targetUnit.Id);
             _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
         }
         else
@@ -94,14 +94,13 @@ public sealed class InputHandler : Node2D
         if (user == null || !user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
         IReadOnlyList<UnitPuppet> candidateTargetUnits =
-            Input.IsActionPressed("alt") ? [user] : GetUnitsUnderMouse();
+            Input.IsActionPressed("alt") ? [user] : GetUnitsUnderMouse(); // todo target nothing on alt (if supported)
         UnitPuppet? targetUnit = candidateTargetUnits
             .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
         
         bool canTargetPosition = state.Ability.Targeting.HasFlag(CanTarget.Position);
         Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition().ToSys() : null;
         var command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id);
-        if (targetUnit == null && ValidateAbility(user, command) != AbilityValidationResult.Ok) return;
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
     }
 
@@ -128,6 +127,8 @@ public sealed class InputHandler : Node2D
             if (!targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(CanTarget.Enemy))
                 return AbilityValidationResult.InvalidTarget;
         }
+        
+        // todo validate character / building
         
         return AbilityValidationResult.Ok;
     }

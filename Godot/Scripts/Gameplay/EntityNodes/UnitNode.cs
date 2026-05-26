@@ -6,8 +6,6 @@ namespace Soteo.Gameplay.EntityNodes;
 
 public sealed class UnitNode : KinematicBody2D, IUnitNode
 {
-    public Node2D Node => this;
-        
     public Unit? Unit { get; set; }
     
     public IEntity? Entity

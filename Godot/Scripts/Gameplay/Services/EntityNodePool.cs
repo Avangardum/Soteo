@@ -17,7 +17,7 @@ public sealed class EntityNodePool : IEntityNodePool
     
     private readonly ImmutableDictionary<Type, Stack<IEntityNode>> _stacks =
         Scenes.ToImmutableDictionary(it => it.Key, _ => new Stack<IEntityNode>());
-
+    
     public T GetNode<T>() where T : class, IEntityNode
     {
         Stack<IEntityNode> stack = _stacks[typeof(T)];

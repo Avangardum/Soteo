@@ -14,14 +14,15 @@ namespace Soteo.Gameplay.Services.Communicators;
 /// <summary>
 /// Communicator using the JavaScript message queue instead of WebSockets / WebRTC. Used for singleplayer in browser.
 /// </summary>
-public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunicator, IPacketSender, INetworkDebugger, IConnectionNotifier
+public sealed class JsmqFromGameplayCommunicator :
+    Node, ICampaignServerCommunicator, IPacketSender, INetworkDebugger, IConnectionNotifier
 {
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     private readonly IShardLoader _shardLoader;
     
-    public event Action ConnectionEstablished = delegate {};
+    public event Action ConnectionEstablished = delegate { };
     public event Action<Guid> PeerConnected = delegate { };
     public event Action<Guid> PeerDisconnected = delegate { };
 
@@ -124,7 +125,8 @@ public sealed class JsmqFromGameplayCommunicator : Node, ICampaignServerCommunic
 
     public void BroadcastUnreliable(Packet packet) => BroadcastReliable(packet);
 
-    void ICampaignServerCommunicator.SendPacket(Packet packet) => SendReliable(packet, Const.CampaignServerId);
+    void ICampaignServerCommunicator.SendPacket(Packet packet) =>
+        SendReliable(packet, Const.CampaignServerId);
 
     public long BytesSent => 0;
 
