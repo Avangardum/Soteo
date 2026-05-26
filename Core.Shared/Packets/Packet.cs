@@ -4,7 +4,7 @@ using Soteo.Util.Extensions;
 
 namespace Soteo.Core.Shared.Packets;
 
-public abstract record Packet
+public abstract record Packet // todo use required fields, avoid gradual construction
 {
     protected Packet()
     {

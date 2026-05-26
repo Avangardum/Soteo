@@ -30,7 +30,7 @@ public static class TypeLocator
                     it.BaseType is { IsGenericType: true } &&
                     it.IsAssignableTo(typeof(IPacketSerializer))
             )
-            .ToImmutableDictionary<Type, PacketType, IPacketSerializer>(
+            .ToImmutableDictionary(
                 it => it.GetPacketType(typeof(PacketSerializer<>)),
                 it => (IPacketSerializer)Activator.CreateInstance(it)
             );
