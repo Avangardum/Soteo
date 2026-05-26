@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace Soteo.Util;
+namespace Soteo.Core.Gameplay.Dto;
 
 public abstract class Scalable
 {

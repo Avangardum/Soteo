@@ -1,3 +1,4 @@
+using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Statuses;
 using Soteo.Util;
 
