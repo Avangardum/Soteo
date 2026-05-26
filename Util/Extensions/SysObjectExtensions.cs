@@ -10,6 +10,11 @@ public static class SysObjectExtensions
         public T Required => self ?? throw new NullReferenceException();
     }
     
+    extension<T> ([NotNull] T? self) where T : struct
+    {
+        public T Required => self ?? throw new NullReferenceException();
+    }
+    
     extension<T> (T self)
     {
         public TResult PassTo<TResult>(Func<T, TResult> func) => func(self);

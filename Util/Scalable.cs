@@ -15,7 +15,7 @@ public abstract class Scalable
 /// <summary>
 /// Value that scales with level
 /// </summary>
-[CollectionBuilder(typeof(Scalable), nameof(Scalable.Create))]
+[CollectionBuilder(typeof(Scalable), nameof(Create))]
 public sealed class Scalable<T> : Scalable, IEnumerable<T> where T : notnull
 {
     private readonly ImmutableArray<T> _values;
@@ -27,16 +27,12 @@ public sealed class Scalable<T> : Scalable, IEnumerable<T> where T : notnull
     
     public T this[int level] => level > _values.Length ? _values[^1] : _values[level - 1];
     
-    public IEnumerator<T> GetEnumerator()
-    {
-        return ((IEnumerable<T>)_values).GetEnumerator();
-    }
+    public IEnumerator<T> GetEnumerator() =>
+        ((IEnumerable<T>)_values).GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable)_values).GetEnumerator();
-    }
-    
+    IEnumerator IEnumerable.GetEnumerator() =>
+        ((IEnumerable)_values).GetEnumerator();
+
     public static implicit operator Scalable<T>(T value) => [value];
 
     public override string ToString() => string.Join(" / ", this);
@@ -45,7 +41,7 @@ public sealed class Scalable<T> : Scalable, IEnumerable<T> where T : notnull
     {
         return string.Join(" / ",
             this.Select((v, i) => i + 1 == highlightLevel ? $"[b]{Format(v, format)}[/b]" : Format(v, format)));
-    }
+    } // todo overflow handling inconsistent with this[int]
     
     private string Format(T value, string? format) =>
         value is IFormattable f && format != null ? f.ToString(format, CultureInfo.CurrentCulture) : value.ToString();

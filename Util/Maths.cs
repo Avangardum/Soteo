@@ -17,23 +17,22 @@ public static class Maths
     }
     
     /// <summary>
-    /// Linear interpolation, but for modular arithmetics with possible wrapping around zero. Useful for azimuth
-    /// interpolation.<br />
+    /// Linear interpolation, but for modular arithmetics with possible wrapping around zero.<br />
     /// Examples: f(350, 30, 0.5, 360) = 20, f(100, 80, 0.5, 360) = 90.
     /// </summary>
     public static double ModularLerp(double from, double to, double weight, double modulo) =>
         PosMod(from + ModularDelta(from, to, modulo) * weight, modulo);
     
     /// <summary>
-    /// Linear interpolation, but for modular arithmetics with possible wrapping around zero and only moving in positive
-    /// direction. Useful for animations.<br />
+    /// Linear interpolation, but for modular arithmetics with possible wrapping around zero
+    /// and only moving in the positive direction.<br />
     /// Examples: f(350, 30, 0.5, 360) = 20, f(100, 80, 0.5, 360) = 270.
     /// </summary>
     public static double ModularLerpPositive(double from, double to, double weight, double modulo) =>
         PosMod(from + ModularDeltaPositive(from, to, modulo) * weight, modulo);
 
     /// <summary>
-    /// Find difference, but for modular arithmetics with possible wrapping around zero. Useful for azimuth.<br />
+    /// Find difference, but for modular arithmetics with possible wrapping around zero.<br />
     /// Examples: f(350, 30, 360) = +40, f(100, 80, 360) = -20.
     /// </summary>
     public static double ModularDelta(double from, double to, double modulo)
@@ -48,9 +47,9 @@ public static class Maths
     }
     
     /// <summary>
-    /// Find difference, but for modular arithmetics with possible wrapping around zero and only moving in positive
-    /// direction.<br />
-    /// Examples: f(350, 30, 360) = +40, f(100, 80, 360) = 340.
+    /// Find difference, but for modular arithmetics with possible wrapping around zero
+    /// and only moving in the positive direction.<br />
+    /// Examples: f(350, 30, 360) = +40, f(100, 80, 360) = +340.
     /// </summary>
     public static double ModularDeltaPositive(double from, double to, double modulo)
     {
@@ -144,7 +143,7 @@ public static class Maths
     
     public static double Clamp(double value, double min, double max)
     {
-        if (min > max) throw new ArgumentException("Min was greater than max");
+        if (min > max) throw new ArgumentException("Min is greater than max");
         return Math.Min(Math.Max(value, min), max);
     }
     
@@ -178,9 +177,9 @@ public static class Maths
     
     public static long PrevIntegerToLong(double value) => (long)PrevInteger(value);
     
-    public static double Rad2Deg(double radians) => radians * 180 / Math.PI;
+    public static double Rad2Deg(double radians) => radians * 180 / Pi;
     
-    public static double Deg2Rad(double degrees) => degrees * Math.PI / 180;
+    public static double Deg2Rad(double degrees) => degrees * Pi / 180;
     
     public static bool IsMultipleOf(double factor, double value, double tolerance = 0.001)
     {

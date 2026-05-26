@@ -2,9 +2,14 @@ namespace Soteo.Util.Extensions;
 
 public static class LinqExtensions
 {
-    extension<T> (IEnumerable<T?> self)
+    extension<T> (IEnumerable<T?> self) where T : class
     {
         public IEnumerable<T> WhereNotNull() => self.Where(it => it != null)!;
+    }
+    
+    extension<T> (IEnumerable<T?> self) where T : struct
+    {
+        public IEnumerable<T> WhereNotNull() => self.Where(it => it != null).Select(it => it.Required);
     }
     
     extension<T> (IEnumerable<T> self)
@@ -24,11 +29,15 @@ public static class LinqExtensions
             T[] array = self.ToArray();
             
             if (array.Length <= count)
+            {
                 foreach(T item in array)
                     yield return item;
-            
-            for (int i = array.Length - count; i < array.Length; i++)
-                yield return array[i];
+            }
+            else
+            {
+                for (int i = array.Length - count; i < array.Length; i++)
+                    yield return array[i];
+            }
         }
     }
     
