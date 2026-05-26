@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Shared;
 using Soteo.Core.Shared.Packets;
 using Soteo.Util;
 

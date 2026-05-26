@@ -6,6 +6,7 @@ using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
+using Soteo.Core.Shared;
 using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;

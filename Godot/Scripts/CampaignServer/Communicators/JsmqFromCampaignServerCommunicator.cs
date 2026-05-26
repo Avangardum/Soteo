@@ -1,4 +1,5 @@
 using Soteo.Core.CampaignServer.Interfaces;
+using Soteo.Core.Shared;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.Packets;
 using Soteo.Gameplay.Interfaces;
@@ -21,7 +22,7 @@ public sealed class JsmqFromCampaignServerCommunicator
     {
         while (true)
         {
-            string? base64 = (string?)JavaScript.Eval($"""jsmq.receive("{Const.CampaignServerId}")""");
+            var base64 = (string?)JavaScript.Eval($"""jsmq.receive("{Const.CampaignServerId}")""");
             if (base64 == null) return;
             byte[] bytes = Convert.FromBase64String(base64);
             var senderId = new Guid(bytes.AsSpan()[..Const.BytesInGuid].ToArray());

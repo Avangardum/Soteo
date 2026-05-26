@@ -2,6 +2,7 @@ using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
 using Soteo.Core.CampaignServer.Interfaces;
+using Soteo.Core.Shared;
 using Soteo.Core.Shared.Exceptions;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.Packets;
@@ -20,7 +21,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : Object, 
     private readonly IUserRepository _userRepo;
     private readonly JwtBuilder _jwtBuilder;
 
-    private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = [];
+    private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = []; // todo rename?
     
     public WebSocketFromCampaignServerToGameplayCommunicator
     (
@@ -34,15 +35,16 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : Object, 
         _userRepo = userRepo;
         
         string intercomSecret = SysEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
-            throw new InvalidOperationException("Intercom secret is not set");
-        _jwtBuilder = JwtBuilder.Create().WithAlgorithm(new HMACSHA256Algorithm())
+            throw new Exception("Intercom secret is not set");
+        _jwtBuilder = JwtBuilder.Create()
+            .WithAlgorithm(new HMACSHA256Algorithm())
             .WithSecret(Convert.FromBase64String(intercomSecret));
 
         _wsServer.SslCertificate = new X509Certificate();
         _wsServer.SslCertificate.Load("res://devcert.crt");
         _wsServer.PrivateKey = new CryptoKey();
         string privateKeyPath = SysEnvironment.GetEnvironmentVariable("Soteo__PrivateKeyPath") ??
-            throw new InvalidOperationException("Private key path is not set");
+            throw new Exception("Private key path is not set");
         _wsServer.PrivateKey.Load(privateKeyPath);
         _wsServer.Listen(3706);
         _wsServer.Connect("client_disconnected", this, nameof(OnClientDisconnected));
@@ -68,7 +70,8 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : Object, 
     
     private void OnClientDisconnected(int wsPeerId, bool wasClean)
     {
-        if (_userIdsByWsPeerId.TryGetValue(wsPeerId, out Guid userId)) _userRepo.OnDisconnected(userId);
+        if (_userIdsByWsPeerId.TryGetValue(wsPeerId, out Guid userId))
+            _userRepo.OnDisconnected(userId);
         _userIdsByWsPeerId.Remove(wsPeerId);
     }
     

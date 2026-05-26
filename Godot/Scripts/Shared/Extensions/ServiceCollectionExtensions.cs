@@ -20,6 +20,8 @@ public static class ServiceCollectionExtensions
             return new AutofacServiceProvider(container);
         }
         
+        // Null forgiving operator used instead of Required to preserve the behavior where attempting to get
+        // a nonexistent service returns null instead of throwing.
         public IServiceCollection AddAlias<TAlias, TRefersTo>() where TRefersTo : TAlias where TAlias : class =>
             self.AddTransient<TAlias>(sp => sp.GetService<TRefersTo>()!);
         

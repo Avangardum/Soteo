@@ -25,7 +25,7 @@ public sealed class CampaignServer : Node
         TypeLocator.Init(CoreCampaignServerAssembly.Value, CoreSharedAssembly.Value);
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
-        var serviceProvider = serviceCollection.BuildAutofacServiceProvider();
+        IServiceProvider serviceProvider = serviceCollection.BuildAutofacServiceProvider();
         _communicator = serviceProvider.GetRequiredService<ICommunicator>();
     }
 
@@ -42,9 +42,12 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IPacketSender, ICommunicator>();
         
-        if (Const.UseJsmq) services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
-        else services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
+        if (Const.UseJsmq)
+            services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
+        else
+            services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
         
-        foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
+        foreach (Type type in TypeLocator.PacketHandlerTypes.Values)
+            services.AddTransient(type);
     }
 }

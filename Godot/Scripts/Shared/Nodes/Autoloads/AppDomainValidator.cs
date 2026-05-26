@@ -8,6 +8,6 @@ public sealed class AppDomainValidator : Node
     public override void _PhysicsProcess(float delta)
     {
         if (AppDomain.CurrentDomain.FriendlyName != "GodotEngine.Domain.Scripts")
-            throw new InvalidOperationException("AppDomain switch detected, we are so cooked!");
+            throw new Exception("AppDomain switch detected, we are so cooked!");
     }
 }

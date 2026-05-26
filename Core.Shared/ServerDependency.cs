@@ -1,4 +1,4 @@
-namespace Soteo.Util;
+namespace Soteo.Core.Shared;
 
 public static class ServerDependency
 {

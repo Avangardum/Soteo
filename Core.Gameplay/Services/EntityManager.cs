@@ -4,6 +4,7 @@ using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Dto.Snapshots;
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Shared;
 using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Services;

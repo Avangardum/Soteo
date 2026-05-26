@@ -1,3 +1,4 @@
+using Soteo.Core.Shared;
 using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Tests;
