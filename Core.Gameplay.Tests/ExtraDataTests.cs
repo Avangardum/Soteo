@@ -1,6 +1,8 @@
 using System.Numerics;
 using AwesomeAssertions;
 using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Shared;
+using Soteo.Core.Shared.Exceptions;
 
 namespace Soteo.Core.Gameplay.Tests;
 
@@ -123,6 +125,48 @@ public sealed class ExtraDataTests
         sut.Get(doubleKey).Should().BeNull();
         sut.Get(guidKey).Should().BeNull();
         sut.Get(vector2Key).Should().BeNull();
+    }
+    
+    [Theory]
+    [InlineData(-2293)]
+    [InlineData(1000)]
+    public void DeserializeWithInvalidCountThrows(int count)
+    {
+        var schema = new ExtraData.Schema();
+        ExtraData.Key<int?> key = schema.AddNullableInt();
+        ExtraData sut = schema.Instance();
+        
+        var stream = new MemoryStream();
+        sut.Serialize(stream);
+        stream.Position = 0;
+        SerializationHelper.SerializeInt(count, stream);
+        stream.Position = 0;
+        
+        FluentActions.Invoking(() => ExtraData.Deserialize(stream)).Should().Throw<BadPacketException>();
+    }
+    
+    [Fact]
+    public void OverridingDefaultWithNullThenGettingTheValueReturnsNull()
+    {
+        var schema = new ExtraData.Schema();
+        ExtraData.Key<int?> key = schema.AddNullableIntWithDefault(42);
+        ExtraData sut = schema.Instance();
+        
+        sut.Set(key, null);
+        
+        sut.Get(key).Should().BeNull();
+    }
+    
+    [Fact]
+    public void AddingValuesAfterInstanceThrows()
+    {
+        var schema = new ExtraData.Schema();
+        schema.Instance();
+        
+        schema.Invoking(it => it.AddIntLateInit()).Should().Throw<InvalidOperationException>();
+        schema.Invoking(it => it.AddLongWithDefault()).Should().Throw<InvalidOperationException>();
+        schema.Invoking(it => it.AddNullableGuid()).Should().Throw<InvalidOperationException>();
+        schema.Invoking(it => it.AddNullableVector2WithDefault(default)).Should().Throw<InvalidOperationException>();
     }
     
     // todo reconsider default switch case warning
