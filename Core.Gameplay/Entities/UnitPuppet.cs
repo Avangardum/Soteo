@@ -1,4 +1,5 @@
 using System.Numerics;
+using Soteo.Core.Gameplay.Abilities;
 using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Dto.Snapshots;
 using Soteo.Core.Gameplay.Enums;
@@ -119,7 +120,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.Zoom);
     }
     
-    private void UpdateAnimation() // todo rename animations and split the method
+    private void UpdateAnimation()
     {
         if (IsRemoved) return;
         
@@ -132,30 +133,35 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         }
         else if (AbilityUseProgress != null)
         {
-            var ability = AbilitySlotStates[AbilityUseProgress.Slot].Ability;
-            Node.Animation = ability.Animation;
-            if (ability.LoopAnimation)
-            {
-                Node.AnimationSpeedScale = 1;
-            }
-            else
-            {
-                int frameCount = Node.AnimationFrameCount;
-                double progress = AbilityUseProgress.NormalizedProgress;
-                Node.AnimationFrame = Math.Min(Maths.FloorToInt(frameCount * progress), frameCount - 1);
-                Node.AnimationSpeedScale = 0;
-            }
+            UpdateAbilityAnimation(Node, AbilityUseProgress);
         }
         else if (IsMoving)
         {
-            Node.Animation = "Walk Right";
+            Node.Animation = "Move";
             const double referenceMoveSpeed = 35;
             Node.AnimationSpeedScale = (float)(Stats[Stat.MoveSpeed] / referenceMoveSpeed);
         }
         else
         {
-            Node.Animation = "Idle Right";
+            Node.Animation = "Idle";
             Node.AnimationSpeedScale = 1;
+        }
+    }
+    
+    private void UpdateAbilityAnimation(IUnitPuppetNode node, AbilityUseProgress abilityUseProgress)
+    {
+        Ability ability = AbilitySlotStates[abilityUseProgress.Slot].Ability;
+        node.Animation = ability.Animation;
+        if (ability.LoopAnimation)
+        {
+            node.AnimationSpeedScale = 1;
+        }
+        else
+        {
+            int frameCount = node.AnimationFrameCount;
+            double progress = abilityUseProgress.NormalizedProgress;
+            node.AnimationFrame = Maths.Min(Maths.FloorToInt(frameCount * progress), frameCount - 1);
+            node.AnimationSpeedScale = 0;
         }
     }
 }

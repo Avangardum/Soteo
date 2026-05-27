@@ -35,7 +35,7 @@ public abstract class Ability
     public virtual double PassiveTickInterval => 0; // todo null
     public virtual CanTarget Targeting => CanTarget.Passive;
     
-    public virtual string Animation => "Attack Right"; // todo rename animations
+    public virtual string Animation => "Ability";
     public virtual bool LoopAnimation => false;
     
     /// <summary>

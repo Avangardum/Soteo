@@ -143,10 +143,18 @@ public static class Maths
     public static double RoundToMultipleOfPlusHalf(double multipleOf, double value) =>
         multipleOf == 0 ? 0 : RoundToNonIntHalf(value / multipleOf) * multipleOf;
     
+    public static double Min(double a, double b) => Math.Min(a, b);
+    
+    public static double Max(double a, double b) => Math.Max(a, b);
+    
+    public static int Min(int a, int b) => Math.Min(a, b);
+    
+    public static int Max(int a, int b) => Math.Max(a, b);
+    
     public static double Clamp(double value, double min, double max)
     {
         if (min > max) throw new ArgumentException("Min is greater than max");
-        return Math.Min(Math.Max(value, min), max);
+        return Min(Max(value, min), max);
     }
     
     public static double Floor(double value) => Math.Floor(value);
