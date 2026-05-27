@@ -12,11 +12,10 @@ public sealed record StatusContext : IServiceProvider
     public required AbilityContext? AbilityContext { get; init; }
     public required Unit Unit { get; init; }
     public required Unit? Source { get; init; }
-    public required double TickCountdown { get; init; }
+    public required StatusTickContext? Tick { get; init; }
     public required double ElapsedTime { get; init; }
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
-    public required double TickInterval { get; init; }
     public required long Ordinal { get; init; }
     public required IServiceProvider ServiceProvider { get; init; }
     
@@ -34,11 +33,10 @@ public sealed record StatusContext : IServiceProvider
             AbilityContext = AbilityContext?.Deflate(),
             UnitId = Unit.Id,
             SourceId = Source?.Id,
-            TickCountdown = TickCountdown,
+            Tick = Tick,
             ElapsedTime = ElapsedTime,
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
-            TickInterval = TickInterval,
             Ordinal = Ordinal
         };
     }

@@ -43,7 +43,7 @@ public sealed class UnitTests
         sut.AddStatus<StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff>
         (
             time: double.PositiveInfinity,
-            tickInterval: 0,
+            tickInterval: null,
             abilityContext: null,
             source: null
         );

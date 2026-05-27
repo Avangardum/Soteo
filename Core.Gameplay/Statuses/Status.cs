@@ -35,7 +35,7 @@ public abstract class Status
     
     public virtual IReadOnlyList<StatModifier> StatModifiers(StatusContext context) => [];
     
-    public virtual void Tick(StatusContext context) { }
+    public virtual void Tick(StatusContext context, double delta) { }
     
     public virtual void OnDealAttackDamage(StatusContext context, Unit target, double damage) { }
     

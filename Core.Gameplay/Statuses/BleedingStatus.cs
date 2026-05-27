@@ -15,10 +15,10 @@ public sealed class BleedingStatus : Status
         new(Stat.MoveSpeed, StatModifierKind.Add, -20)
     ];
 
-    public override void Tick(StatusContext context)
+    public override void Tick(StatusContext context, double delta)
     {
         const double damagePerSecond = 5;
-        double damage = damagePerSecond * context.TickInterval;
+        double damage = damagePerSecond * delta;
         context.Unit.TakeDamage(damage, context);
     }
 }

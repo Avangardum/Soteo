@@ -9,7 +9,7 @@ public record PuppetStatusContext
     public required Guid Id { get; init; }
     public required Status Status { get; init; }
     public required Ability? Ability { get; init; }
-    public required double ElapsedTime { get; init; }
+    public required double ElapsedTime { get; init; } // todo remove
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
     public required long Ordinal { get; init; }

@@ -196,11 +196,10 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeNullableClass(value.AbilityContext, SerializeAbilityContext, stream);
         SerializeGuid(value.UnitId, stream);
         SerializeNullableStruct(value.SourceId, SerializeGuid, stream);
-        SerializeDouble(value.TickCountdown, stream);
+        SerializeNullableClass(value.Tick, SerializeStatusTickContext, stream);
         SerializeDouble(value.ElapsedTime, stream);
         SerializeDouble(value.DisplayElapsedTime, stream);
         SerializeDouble(value.RemainingTime, stream);
-        SerializeDouble(value.TickInterval, stream);
         SerializeLong(value.Ordinal, stream);
     }
     
@@ -213,12 +212,28 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             AbilityContext = DeserializeNullableClass(DeserializeAbilityContext, stream),
             UnitId = DeserializeGuid(stream),
             SourceId = DeserializeNullableStruct(DeserializeGuid, stream),
-            TickCountdown = DeserializeDouble(stream),
+            Tick = DeserializeNullableClass(DeserializeStatusTickContext, stream),
             ElapsedTime = DeserializeDouble(stream),
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
-            TickInterval = DeserializeDouble(stream),
             Ordinal = DeserializeLong(stream),
+        };
+    }
+    
+    public void SerializeStatusTickContext(StatusTickContext value, Stream stream)
+    {
+        SerializeDouble(value.Interval, stream);
+        SerializeDouble(value.Countdown, stream);
+    }
+    
+    public StatusTickContext DeserializeStatusTickContext(Stream stream)
+    {
+        double interval = DeserializeDouble(stream);
+        double countdown = DeserializeDouble(stream);
+        return new StatusTickContext
+        {
+            Interval = interval,
+            Countdown = countdown,
         };
     }
     

@@ -32,7 +32,7 @@ public abstract class Ability
     
     public virtual int MaxLevel => 1;
     public virtual Status? PassiveStatus => null;
-    public virtual double PassiveTickInterval => 0; // todo null
+    public virtual double? PassiveTickInterval => null;
     public virtual CanTarget Targeting => CanTarget.Passive;
     
     public virtual string Animation => "Ability";

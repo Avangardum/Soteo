@@ -2,6 +2,7 @@ using Soteo.Core.Gameplay.Abilities;
 using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Enums;
+using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Statuses;
 
@@ -16,14 +17,14 @@ public sealed class VampireStatus : Status
         new(Stat.HealthRegen, StatModifierKind.Set, 0)
     ];
 
-    public override void Tick(StatusContext context)
+    public override void Tick(StatusContext context, double delta)
     {
         double maxStableHealth = context.Unit.Stats[Stat.MaxHealth] * 0.7;
         double unstableHealth = context.Unit.Stats[Stat.CurrentHealth] - maxStableHealth;
         if (unstableHealth > 0)
         {
             const double healthDrainPerSecond = 5;
-            double healthDrain = Math.Min(unstableHealth, healthDrainPerSecond * context.TickInterval);
+            double healthDrain = Maths.Min(unstableHealth, healthDrainPerSecond * delta);
             context.Unit.SpendHealth(healthDrain, context.AbilityContext.Required.Ability);
         }
     }

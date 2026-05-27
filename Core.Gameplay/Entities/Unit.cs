@@ -104,10 +104,10 @@ public class Unit : UnitBase<IUnitNode>
         {
             StatusContext context = contexts[i];
             double limitedDelta = Math.Min(delta, context.RemainingTime);
-            double newTickCountdown = ProcessStatusTickCountdown(context, limitedDelta);
+            StatusTickContext? newTick = ProcessStatusTickCountdown(context, limitedDelta);
             context = context with
             {
-                TickCountdown = newTickCountdown,
+                Tick = newTick,
                 ElapsedTime = context.ElapsedTime + limitedDelta,
                 DisplayElapsedTime = context.DisplayElapsedTime + limitedDelta,
                 RemainingTime = context.RemainingTime - limitedDelta
@@ -119,16 +119,16 @@ public class Unit : UnitBase<IUnitNode>
         }
     }
     
-    private double ProcessStatusTickCountdown(StatusContext context, double delta)
+    private StatusTickContext? ProcessStatusTickCountdown(StatusContext context, double delta)
     {
-        if (context.TickInterval == 0) return 0; // todo null
-        double countdown = context.TickCountdown - delta;
+        if (context.Tick == null) return null;
+        double countdown = context.Tick.Countdown - delta;
         while (countdown <= 0)
         {
-            context.Status.Tick(context);
-            countdown += context.TickInterval;
+            context.Status.Tick(context, context.Tick.Interval);
+            countdown += context.Tick.Interval;
         }
-        return countdown;
+        return context.Tick with { Countdown = countdown };
     }
     
     private void UpdateStats()
@@ -542,13 +542,13 @@ public class Unit : UnitBase<IUnitNode>
     (
         Status status,
         double time,
-        double tickInterval,
+        double? tickInterval,
         AbilityContext? abilityContext,
         Unit? source
     )
     {
         if (time < 0) throw new ArgumentException();
-        if (tickInterval < 0) throw new ArgumentException(); // todo use null, throw on 0
+        if (tickInterval <= 0) throw new ArgumentException();
         if (IsRemoved) return;
         
         StatusContext context = new StatusContext
@@ -558,11 +558,14 @@ public class Unit : UnitBase<IUnitNode>
             AbilityContext = abilityContext,
             Unit = this,
             Source = source,
-            TickCountdown = tickInterval,
+            Tick = tickInterval == null ? null : new StatusTickContext
+            {
+                Interval = tickInterval.Value,
+                Countdown = tickInterval.Value,
+            },
             ElapsedTime = 0,
             DisplayElapsedTime = 0,
             RemainingTime = time,
-            TickInterval = tickInterval,
             Ordinal = _nextStatusOrdinal++,
             ServiceProvider = _serviceProvider
         };
@@ -602,18 +605,18 @@ public class Unit : UnitBase<IUnitNode>
         UpdateStats();
     }
     
-    public void AddStatus(Status status, double time, double tickInterval, StatusContext sourceStatusContext)
+    public void AddStatus(Status status, double time, double? tickInterval, StatusContext sourceStatusContext)
     {
         AddStatus(status, time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
     }
     
-    public void AddStatus<T>(double time, double tickInterval, AbilityContext? abilityContext, Unit? source)
+    public void AddStatus<T>(double time, double? tickInterval, AbilityContext? abilityContext, Unit? source)
         where T : Status
     {
         AddStatus(Status.Instance<T>(), time, tickInterval, abilityContext, source);
     }
     
-    public void AddStatus<T>(double time, double tickInterval, StatusContext sourceStatusContext)
+    public void AddStatus<T>(double time, double? tickInterval, StatusContext sourceStatusContext)
         where T : Status
     {
         AddStatus<T>(time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
@@ -622,8 +625,8 @@ public class Unit : UnitBase<IUnitNode>
     private void AddStatusWithoutDuplicateResolution(StatusContext context)
     {
         StatusesInternal[context.Id] = context;
-        if (context.TickInterval != 0) // todo null
-            context.Status.Tick(context);
+        if (context.Tick != null)
+            context.Status.Tick(context, context.Tick.Interval);
     }
     
     private void RefreshDuplicateStatuses(StatusContext reference, params IReadOnlyList<StatusContext> targets)

@@ -12,11 +12,10 @@ public sealed record DeflatedStatusContext
     public required DeflatedAbilityContext? AbilityContext { get; init; }
     public required Guid UnitId { get; init; }
     public required Guid? SourceId { get; init; }
-    public required double TickCountdown { get; init; }
+    public required StatusTickContext? Tick { get; init; }
     public required double ElapsedTime { get; init; }
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
-    public required double TickInterval { get; init; }
     public required long Ordinal { get; init; }
     
     public StatusContext Inflate(IServiceProvider serviceProvider)
@@ -29,11 +28,10 @@ public sealed record DeflatedStatusContext
             AbilityContext = AbilityContext?.Inflate(serviceProvider),
             Unit = entityManager.GetEntity<Unit>(UnitId).Required,
             Source = SourceId == null ? null : entityManager.GetEntity<Unit>(SourceId.Value).Required,
-            TickCountdown = TickCountdown,
+            Tick = Tick,
             ElapsedTime = ElapsedTime,
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
-            TickInterval = TickInterval,
             Ordinal = Ordinal,
             ServiceProvider = serviceProvider
         };
