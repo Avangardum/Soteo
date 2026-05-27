@@ -8,11 +8,6 @@ public sealed class ExtraData
 {
     private readonly object?[] _values;
     
-    private ExtraData(int count)
-    {
-        _values = new object[count];
-    }
-    
     private ExtraData(object?[] values)
     {
         _values = values;
@@ -87,6 +82,7 @@ public sealed class ExtraData
                 TypeCode.Double => DeserializeDouble(stream),
                 TypeCode.Guid => DeserializeGuid(stream),
                 TypeCode.Vector2 => DeserializeVector2(stream),
+                _ => throw new ArgumentOutOfRangeException(),
             };
         }
         return new ExtraData(values);

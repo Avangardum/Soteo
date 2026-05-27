@@ -56,7 +56,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             EntityKind.Unit => DeserializeUnit(stream),
             EntityKind.Projectile => DeserializeProjectile(stream),
             EntityKind.UnitPuppet => DeserializeUnitPuppet(stream),
-            EntityKind.ProjectilePuppet => DeserializeProjectilePuppet(stream)
+            EntityKind.ProjectilePuppet => DeserializeProjectilePuppet(stream),
+            _ => throw new ArgumentOutOfRangeException(),
         };
     }
     

@@ -5,6 +5,16 @@
         <LangVersion>14</LangVersion>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+
+        <NoWarn>
+            $(NoWarn),
+
+            <!--
+            Field is never assigned to, and will always have its default value.
+            Ignored because of false positives on [Export] fields.
+            -->
+            CS0649,
+        </NoWarn>
     </PropertyGroup>
     
     <ItemGroup>

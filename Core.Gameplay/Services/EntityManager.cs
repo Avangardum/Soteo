@@ -77,7 +77,8 @@ public sealed class EntityManager : IEntityManager
         {
             UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, AddNode<IUnitPuppetNode>(s.Id), _camera.Required)),
             ProjectilePuppetSnapshot s =>
-                Add(new ProjectilePuppet(s.Id, AddNode<IProjectilePuppetNode>(s.Id), _camera.Required))
+                Add(new ProjectilePuppet(s.Id, AddNode<IProjectilePuppetNode>(s.Id), _camera.Required)),
+            _ => throw new ArgumentOutOfRangeException(),
         };
     }
     
@@ -88,6 +89,7 @@ public sealed class EntityManager : IEntityManager
             UnitPuppetSnapshotDelta d => Add(new UnitPuppet(d.Id, AddNode<IUnitPuppetNode>(d.Id), _camera.Required)),
             ProjectilePuppetSnapshotDelta d =>
                 Add(new ProjectilePuppet(d.Id, AddNode<IProjectilePuppetNode>(d.Id), _camera.Required)),
+            _ => throw new ArgumentOutOfRangeException(),
         };
     }
     

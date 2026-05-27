@@ -1,5 +1,14 @@
 <Project>
     <PropertyGroup>
-        <NoWarn>$(NoWarn), CS9107, CS8509, CS0649, CS8524</NoWarn>
+        <NoWarn>
+            $(NoWarn),
+
+            <!--
+            Parameter is captured into the state of the enclosing type and its value is also passed to the
+            base constructor. The value might be captured by the base class as well.
+            Ignored because primary constructor parameters are immutable by convention.
+            -->
+            CS9107,
+        </NoWarn>
     </PropertyGroup>
 </Project>

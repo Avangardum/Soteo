@@ -48,7 +48,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
         return DeserializeEnum<EntityKind>(stream) switch
         {
             EntityKind.UnitPuppet => DeserializeUnitPuppetDelta(stream),
-            EntityKind.ProjectilePuppet => DeserializeProjectilePuppetDelta(stream)
+            EntityKind.ProjectilePuppet => DeserializeProjectilePuppetDelta(stream),
+            _ => throw new ArgumentOutOfRangeException(),
         };
     }
 
