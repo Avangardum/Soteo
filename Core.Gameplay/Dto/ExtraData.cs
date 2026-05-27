@@ -1,4 +1,5 @@
 using System.Numerics;
+using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Core.Gameplay.Dto;
 
@@ -10,7 +11,12 @@ public sealed class ExtraData
     {
         _values = new object[count];
     }
-
+    
+    private ExtraData(object?[] values)
+    {
+        _values = values;
+    }
+    
     public void Set<T>(Key<T> key, T value)
     {
         _values[key.Index] = value;
@@ -32,7 +38,63 @@ public sealed class ExtraData
         return (T)value;
     }
     
-    public class Builder
+    public void Serialize(Stream stream)
+    {
+        SerializeInt(_values.Length, stream);
+        foreach (object? value in _values)
+        {
+            switch (value)
+            {
+                case null:
+                    SerializeEnum(TypeCode.Null, stream);
+                    break;
+                case int i:
+                    SerializeEnum(TypeCode.Int, stream);
+                    SerializeInt(i, stream);
+                    break;
+                case long l:
+                    SerializeEnum(TypeCode.Long, stream);
+                    SerializeLong(l, stream);
+                    break;
+                case double d:
+                    SerializeEnum(TypeCode.Double, stream);
+                    SerializeDouble(d, stream);
+                    break;
+                case Guid g:
+                    SerializeEnum(TypeCode.Guid, stream);
+                    SerializeGuid(g, stream);
+                    break;
+                case Vector2 v:
+                    SerializeEnum(TypeCode.Vector2, stream);
+                    SerializeVector2(v, stream);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+    }
+    
+    public static ExtraData Deserialize(Stream stream)
+    {
+        int count = DeserializeInt(stream);
+        var values = new object?[count];
+        for (int i = 0; i < count; i++)
+        {
+            var typeCode = DeserializeEnum<TypeCode>(stream);
+            values[i] = typeCode switch
+            {
+                TypeCode.Null => null,
+                TypeCode.Int => DeserializeInt(stream),
+                TypeCode.Long => DeserializeLong(stream),
+                TypeCode.Double => DeserializeDouble(stream),
+                TypeCode.Guid => DeserializeGuid(stream),
+                TypeCode.Vector2 => DeserializeVector2(stream),
+            };
+        }
+        return new ExtraData(values);
+    }
+    
+    public sealed class Schema
     {
         private int _count;
         
@@ -60,7 +122,7 @@ public sealed class ExtraData
         public Key<Guid?> AddNullableGuidWithDefault(Guid defaultValue) => new(_count++, defaultValue);
         public Key<Vector2?> AddNullableVector2WithDefault(Vector2 defaultValue) => new(_count++, defaultValue);
         
-        public ExtraData Build() => new(_count);
+        public ExtraData Instance() => new(_count);
     }
     
     public sealed class Key<T>
@@ -81,4 +143,6 @@ public sealed class ExtraData
             Default = defaultValue;
         }
     }
+    
+    private enum TypeCode : byte { Null, Int, Long, Double, Guid, Vector2 }
 }

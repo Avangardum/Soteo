@@ -9,65 +9,66 @@ public sealed class ExtraDataTests
     [Theory]
     [InlineData(42, 24)]
     [InlineData(67, 69, 228, 420)]
-    public void GetSetInt(params int[] values)
+    public void SerializingThenDeserializingIntsReturnsSameValues(params int[] values)
     {
-        var builder = new ExtraData.Builder();
-        ExtraData.Key<int>[] keys = values.Select(_ => builder.AddIntLateInit()).ToArray();
-        ExtraData sut = builder.Build();
+        var schema = new ExtraData.Schema();
+        ExtraData.Key<int>[] keys = values.Select(_ => schema.AddIntLateInit()).ToArray();
+        ExtraData sut = schema.Instance();
         
         for (int i = 0; i < values.Length; i++)
             sut.Set(keys[i], values[i]);
         
+        var stream = new MemoryStream();
+        sut.Serialize(stream);
+        stream.Position = 0;
+        sut = ExtraData.Deserialize(stream);
+        
         for (int i = 0; i < values.Length; i++)
-        {
-            int returned = sut.Get(keys[i]);
-            returned.Should().Be(values[i]);
-        }
+            sut.Get(keys[i]).Should().Be(values[i]);
     }
     
     [Fact]
-    public void GetSetMixed()
+    public void SerializingThenDeserializingMixedValuesReturnsSameValues()
     {
-        const int intValue = 42;
-        const long longValue = long.MaxValue;
-        const double doubleValue = 1.46;
-        var guidValue = Guid.NewGuid();
-        var vector2Value = new Vector2(3, 8);
+        var schema = new ExtraData.Schema();
+        ExtraData.Key<int> intKey = schema.AddIntLateInit();
+        ExtraData.Key<long> longKey = schema.AddLongLateInit();
+        ExtraData.Key<double> doubleKey = schema.AddDoubleLateInit();
+        ExtraData.Key<Guid> guidKey = schema.AddGuidLateInit();
+        ExtraData.Key<Vector2> vector2Key = schema.AddVector2LateInit();
+        ExtraData.Key<Vector2?> nullableVector2Key = schema.AddNullableVector2();
+        ExtraData sut = schema.Instance();
         
-        var builder = new ExtraData.Builder();
-        ExtraData.Key<int> intKey = builder.AddIntLateInit();
-        ExtraData.Key<long> longKey = builder.AddLongLateInit();
-        ExtraData.Key<double> doubleKey = builder.AddDoubleLateInit();
-        ExtraData.Key<Guid> guidKey = builder.AddGuidLateInit();
-        ExtraData.Key<Vector2> vector2Key = builder.AddVector2LateInit();
-        ExtraData.Key<Vector2?> nullableVector2Key = builder.AddNullableVector2();
-        ExtraData sut = builder.Build();
-        
-        sut.Set(intKey, intValue);
-        sut.Set(longKey, longValue);
-        sut.Set(doubleKey, doubleValue);
-        sut.Set(guidKey, guidValue);
-        sut.Set(vector2Key, vector2Value);
+        sut.Set(intKey, 42);
+        sut.Set(longKey, long.MaxValue);
+        sut.Set(doubleKey, 1.46);
+        sut.Set(guidKey, Guid.Empty);
+        sut.Set(vector2Key, new Vector2(3, 8));
         sut.Set(nullableVector2Key, null);
         
-        sut.Get(intKey).Should().Be(intValue);
-        sut.Get(longKey).Should().Be(longValue);
-        sut.Get(doubleKey).Should().Be(doubleValue);
-        sut.Get(guidKey).Should().Be(guidValue);
-        sut.Get(vector2Key).Should().Be(vector2Value);
+        var stream = new MemoryStream();
+        sut.Serialize(stream);
+        stream.Position = 0;
+        sut = ExtraData.Deserialize(stream);
+        
+        sut.Get(intKey).Should().Be(42);
+        sut.Get(longKey).Should().Be(long.MaxValue);
+        sut.Get(doubleKey).Should().Be(1.46);
+        sut.Get(guidKey).Should().Be(Guid.Empty);
+        sut.Get(vector2Key).Should().Be(new Vector2(3, 8));
         sut.Get(nullableVector2Key).Should().BeNull();
     }
     
     [Fact]
     public void GetWithoutSetThrowsWhenUsingLateInit()
     {
-        var builder = new ExtraData.Builder();
-        ExtraData.Key<int> intKey = builder.AddIntLateInit();
-        ExtraData.Key<long> longKey = builder.AddLongLateInit();
-        ExtraData.Key<double> doubleKey = builder.AddDoubleLateInit();
-        ExtraData.Key<Guid> guidKey = builder.AddGuidLateInit();
-        ExtraData.Key<Vector2> vector2Key = builder.AddVector2LateInit();
-        ExtraData sut = builder.Build();
+        var schema = new ExtraData.Schema();
+        ExtraData.Key<int> intKey = schema.AddIntLateInit();
+        ExtraData.Key<long> longKey = schema.AddLongLateInit();
+        ExtraData.Key<double> doubleKey = schema.AddDoubleLateInit();
+        ExtraData.Key<Guid> guidKey = schema.AddGuidLateInit();
+        ExtraData.Key<Vector2> vector2Key = schema.AddVector2LateInit();
+        ExtraData sut = schema.Instance();
         
         sut.Invoking(it => it.Get(intKey)).Should().Throw<InvalidOperationException>();
         sut.Invoking(it => it.Get(longKey)).Should().Throw<InvalidOperationException>();
@@ -79,20 +80,20 @@ public sealed class ExtraDataTests
     [Fact]
     public void GetWithoutSetReturnsSpecifiedDefault()
     {
-        var builder = new ExtraData.Builder();
-        ExtraData.Key<int> intKey = builder.AddIntWithDefault(42);
-        ExtraData.Key<int?> nullableIntKey = builder.AddNullableIntWithDefault(-42);
-        ExtraData.Key<long> longKey = builder.AddLongWithDefault(long.MaxValue);
-        ExtraData.Key<long?> nullableLongKey = builder.AddNullableLongWithDefault(long.MinValue);
-        ExtraData.Key<double> doubleKey = builder.AddDoubleWithDefault(12.34);
-        ExtraData.Key<double?> nullableDoubleKey = builder.AddNullableDoubleWithDefault(-12.34);
+        var schema = new ExtraData.Schema();
+        ExtraData.Key<int> intKey = schema.AddIntWithDefault(42);
+        ExtraData.Key<int?> nullableIntKey = schema.AddNullableIntWithDefault(-42);
+        ExtraData.Key<long> longKey = schema.AddLongWithDefault(long.MaxValue);
+        ExtraData.Key<long?> nullableLongKey = schema.AddNullableLongWithDefault(long.MinValue);
+        ExtraData.Key<double> doubleKey = schema.AddDoubleWithDefault(12.34);
+        ExtraData.Key<double?> nullableDoubleKey = schema.AddNullableDoubleWithDefault(-12.34);
         var guid1 = Guid.NewGuid();
-        ExtraData.Key<Guid> guidKey = builder.AddGuidWithDefault(guid1);
+        ExtraData.Key<Guid> guidKey = schema.AddGuidWithDefault(guid1);
         var guid2 = Guid.NewGuid();
-        ExtraData.Key<Guid?> nullableGuidKey = builder.AddNullableGuidWithDefault(guid2);
-        ExtraData.Key<Vector2> vector2Key = builder.AddVector2WithDefault(new Vector2(1, 2));
-        ExtraData.Key<Vector2?> nullableVector2Key = builder.AddNullableVector2WithDefault(new Vector2(2, 1));
-        ExtraData sut = builder.Build();
+        ExtraData.Key<Guid?> nullableGuidKey = schema.AddNullableGuidWithDefault(guid2);
+        ExtraData.Key<Vector2> vector2Key = schema.AddVector2WithDefault(new Vector2(1, 2));
+        ExtraData.Key<Vector2?> nullableVector2Key = schema.AddNullableVector2WithDefault(new Vector2(2, 1));
+        ExtraData sut = schema.Instance();
         
         sut.Get(intKey).Should().Be(42);
         sut.Get(nullableIntKey).Should().Be(-42);
@@ -102,18 +103,20 @@ public sealed class ExtraDataTests
         sut.Get(nullableDoubleKey).Should().Be(-12.34);
         sut.Get(guidKey).Should().Be(guid1);
         sut.Get(nullableGuidKey).Should().Be(guid2);
+        sut.Get(vector2Key).Should().Be(new Vector2(1, 2));
+        sut.Get(nullableVector2Key).Should().Be(new Vector2(2, 1));
     }
     
     [Fact]
     public void GetWithoutSetReturnsNullWhenUsingNullable()
     {
-        var builder = new ExtraData.Builder();
-        ExtraData.Key<int?> intKey = builder.AddNullableInt();
-        ExtraData.Key<long?> longKey = builder.AddNullableLong();
-        ExtraData.Key<double?> doubleKey = builder.AddNullableDouble();
-        ExtraData.Key<Guid?> guidKey = builder.AddNullableGuid();
-        ExtraData.Key<Vector2?> vector2Key = builder.AddNullableVector2();
-        ExtraData sut = builder.Build();
+        var schema = new ExtraData.Schema();
+        ExtraData.Key<int?> intKey = schema.AddNullableInt();
+        ExtraData.Key<long?> longKey = schema.AddNullableLong();
+        ExtraData.Key<double?> doubleKey = schema.AddNullableDouble();
+        ExtraData.Key<Guid?> guidKey = schema.AddNullableGuid();
+        ExtraData.Key<Vector2?> vector2Key = schema.AddNullableVector2();
+        ExtraData sut = schema.Instance();
         
         sut.Get(intKey).Should().BeNull();
         sut.Get(longKey).Should().BeNull();
