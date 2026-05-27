@@ -11,11 +11,12 @@ namespace Soteo.Gameplay.Ui;
 public sealed class DebugScreen : Control
 {
     private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/DebugScreen.tscn"); 
-    
-    private readonly double[] _fpsRing = new double[10 * Const.TicksPerSecond];
-    private readonly double[] _unrolledFpsRing = new double[10 * Const.TicksPerSecond];
-    private readonly double[] _entityCountRing = new double[10 * Const.TicksPerSecond];
-    private readonly double[] _unrolledEntityCountRing = new double[10 * Const.TicksPerSecond];
+ 
+    private const int RingLength = 10 * Const.TicksPerSecond;
+    private readonly double[] _fpsRing = new double[RingLength];
+    private readonly double[] _unrolledFpsRing = new double[RingLength];
+    private readonly double[] _entityCountRing = new double[RingLength];
+    private readonly double[] _unrolledEntityCountRing = new double[RingLength];
     private int _ringNextIndex;
     private int _pendingProcessCount;
     
@@ -60,7 +61,7 @@ public sealed class DebugScreen : Control
             var synchronizationClient = shardServiceProvider?.GetRequiredService<ISynchronizationClient>();
             var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
 
-            _ringNextIndex = (_ringNextIndex + 1) % _fpsRing.Length;
+            _ringNextIndex = (_ringNextIndex + 1) % RingLength;
             ProcessFpsGraph(delta);
             ProcessEntityCountGraph(entityManager);
             if (synchronizationClient != null)
@@ -104,6 +105,7 @@ public sealed class DebugScreen : Control
 
     public override void _UnhandledInput(InputEvent e)
     {
-        if (e.IsActionPressed("debug_screen")) Visible = !Visible;
+        if (e.IsActionPressed("debug_screen"))
+            Visible = !Visible;
     }
 }

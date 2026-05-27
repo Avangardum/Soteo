@@ -4,7 +4,7 @@ namespace Soteo.Util;
 /// Immutable value that must be initialized before using,
 /// but can't be initialized in a constructor or initializer.
 /// </summary>
-public sealed class LateInit<T> // todo remove null! with this
+public sealed class LateInit<T> // todo replace null! with this
 {
     private bool _hasValue;
     

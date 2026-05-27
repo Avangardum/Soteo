@@ -129,51 +129,44 @@ public sealed class Hud : Control, IHud
         }
 
         Visible = true;
-        ProcessBars();
-        ProcessAbilities();
+        ProcessBars(SelectedUnit);
+        ProcessAbilities(SelectedUnit);
         ProcessStatuses(SelectedUnit);
     }
     
-    private void ProcessBars()
+    private void ProcessBars(UnitPuppet unit)
     {
-        _healthBar.TintProgress = SelectedUnit.Required.Faction switch
-        {
-            Faction.Empire => _palette.Empire,
-            Faction.Syndicate => _palette.Syndicate,
-            _ => _palette.Neutral
-        };
+        _healthBar.TintProgress = _palette.FactionColor(unit.Faction);
         
-        _healthBar.Value = SelectedUnit.Stats[Stat.CurrentHealth];
-        _healthBar.MaxValue = SelectedUnit.Stats[Stat.MaxHealth];
-        _healthLabel.Text = $"{Maths.CeilToInt(SelectedUnit.Stats[Stat.CurrentHealth])} / " +
-             $"{Maths.CeilToInt(SelectedUnit.Stats[Stat.MaxHealth])}";
-        _manaBar.Value = SelectedUnit.Stats[Stat.CurrentMana];
-        _manaBar.MaxValue = SelectedUnit.Stats[Stat.MaxMana];
-        _manaLabel.Text = $"{Maths.CeilToInt(SelectedUnit.Stats[Stat.CurrentMana])} / " +
-            $"{Maths.CeilToInt(SelectedUnit.Stats[Stat.MaxMana])}";
+        _healthBar.Value = unit.Stats[Stat.CurrentHealth];
+        _healthBar.MaxValue = unit.Stats[Stat.MaxHealth];
+        _healthLabel.Text = $"{Maths.CeilToInt(unit.Stats[Stat.CurrentHealth])} / " +
+             $"{Maths.CeilToInt(unit.Stats[Stat.MaxHealth])}";
+        _manaBar.Value = unit.Stats[Stat.CurrentMana];
+        _manaBar.MaxValue = unit.Stats[Stat.MaxMana];
+        _manaLabel.Text = $"{Maths.CeilToInt(unit.Stats[Stat.CurrentMana])} / " +
+            $"{Maths.CeilToInt(unit.Stats[Stat.MaxMana])}";
     }
     
-    private void ProcessAbilities()
+    private void ProcessAbilities(UnitPuppet unit)
     {
         for (var slot = AbilitySlot.Class0; slot <= AbilitySlot.ClassLast; slot++)
         {
             AbilityButton button = _abilityButtons[slot - AbilitySlot.Class0];
-            if (!SelectedUnit.Required.AbilitySlotStates.ContainsKey(slot))
+            if (!unit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState state))
             {
                 button.Visible = false;
                 continue;
             }
             
             button.Visible = true;
-            AbilitySlotState state = SelectedUnit.AbilitySlotStates[slot];
-            
             button.IconRect.Texture = state.Ability.Icon;
             
             button.CooldownIndicator.Value = state.Cooldown;
             button.CooldownIndicator.MaxValue = state.MaxCooldown == 0 ? 1 : state.MaxCooldown;
 
-            button.UseProgressIndicator.Value = SelectedUnit.AbilityUseProgress?.Slot != slot ? 0 :
-                SelectedUnit.AbilityUseProgress.NormalizedProgress;
+            button.UseProgressIndicator.Value = unit.AbilityUseProgress?.Slot != slot ? 0 :
+                unit.AbilityUseProgress.NormalizedProgress;
             button.UseProgressIndicator.MaxValue = 1;
             
             double healthCost = state.Ability.StaticHealthCost[state.Level];
@@ -189,14 +182,13 @@ public sealed class Hud : Control, IHud
     private void ProcessStatuses(UnitPuppet unit)
     {
         ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(unit);
-        int i = 0;
-        for (; i < contexts.Count; i++)
+        for (int i = 0; i < contexts.Count; i++)
         {
             _statusIndicators[i].Visible = true;
             _statusIndicators[i].IconRect.Texture = contexts[i].Status.ResolveIcon(contexts[i]);
             _statusIndicators[i].Value = contexts[i].DisplayNormalizedRemainingTime;
         }
-        for (; i < _statusIndicators.Count; i++)
+        for (int i = contexts.Count; i < _statusIndicators.Count; i++)
         {
             _statusIndicators[i].Visible = false;
         }

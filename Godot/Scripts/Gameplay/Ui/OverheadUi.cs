@@ -7,13 +7,6 @@ namespace Soteo.Gameplay.Ui;
 
 public sealed class OverheadUi : Control
 {
-    private enum Variant
-    {
-        None,
-        PlayerCharacter,
-        TinyHealth
-    }
-    
     private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/OverheadUi.tscn");
 
     private readonly UnitPuppet _unit;
@@ -97,20 +90,14 @@ public sealed class OverheadUi : Control
     {
         const double tinyHealthMinZoom = 0.9;
         const double tinyHealthMaxZoom = 2.4;
-        double zoom = _camera.Zoom;
-        CurrentVariant = zoom < tinyHealthMinZoom ? Variant.None :
-            zoom <= tinyHealthMaxZoom ? Variant.TinyHealth :
+        CurrentVariant = _camera.Zoom < tinyHealthMinZoom ? Variant.None :
+            _camera.Zoom <= tinyHealthMaxZoom ? Variant.TinyHealth :
             Variant.PlayerCharacter;
     }
     
     private void SetFaction(Faction faction)
     {
-        Color color = faction switch
-        {
-            Faction.Empire => _palette.Empire,
-            Faction.Syndicate => _palette.Syndicate,
-            Faction.Neutral => _palette.Neutral
-        };
+        Color color = _palette.FactionColor(faction);
         switch (CurrentVariant)
         {
             case Variant.PlayerCharacter:
@@ -148,9 +135,16 @@ public sealed class OverheadUi : Control
         }
     }
     
-    public void OnUnitRemoved()
+    private void OnUnitRemoved()
     {
         SetProcess(false);
         QueueFree();
+    }
+    
+    private enum Variant
+    {
+        None,
+        PlayerCharacter,
+        TinyHealth
     }
 }

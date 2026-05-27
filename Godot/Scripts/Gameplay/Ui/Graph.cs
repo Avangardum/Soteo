@@ -12,7 +12,7 @@ public sealed class Graph : Control
     private Label _lastLabel = null!;
     
     private GdVector2[] _frame = null!;
-
+    
     public override void _Ready()
     {
         _dataRect = GetNode<Control>("DataRect");

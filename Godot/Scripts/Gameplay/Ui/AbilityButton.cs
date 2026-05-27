@@ -2,6 +2,7 @@ namespace Soteo.Gameplay.Ui;
 
 public sealed class AbilityButton : TextureButton
 {
+    // todo lateinit
     public TextureRect IconRect { get; private set; } = null!;
     public TextureProgress CooldownIndicator { get; private set; } = null!;
     public TextureProgress UseProgressIndicator { get; private set; } = null!;
