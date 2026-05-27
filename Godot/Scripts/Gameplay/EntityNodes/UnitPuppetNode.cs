@@ -13,7 +13,14 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
     
     private AnimatedSprite _sprite = null!;
     private AzimuthIndicator _azimuthIndicator = null!;
-    private EntityProperties _properties = null!;
+    
+    // If the sprite has position with .5 as fractional part in any dimension (used to center sprites with odd sizes),
+    // the following fields help compensate it for pixel perfect rendering. See NodeHelper for details.
+    [Export] private bool _halfPixelXVisualOffset;
+    [Export] private bool _halfPixelYVisualOffset;
+    
+    public bool HalfPixelXVisualOffset => _halfPixelXVisualOffset;
+    public bool HalfPixelYVisualOffset => _halfPixelYVisualOffset;
     
     public UnitPuppet? UnitPuppet
     {
@@ -56,9 +63,8 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
     
     public override void _Ready()
     {
-        _sprite = GetNode<AnimatedSprite>("Visuals/AnimatedSprite");
-        _azimuthIndicator = GetNode<AzimuthIndicator>("Visuals/AzimuthIndicator");
-        _properties = GetNode<EntityProperties>("Properties");
+        _sprite = GetNode<AnimatedSprite>("AnimatedSprite");
+        _azimuthIndicator = GetNode<AzimuthIndicator>("AzimuthIndicator");
         
         _sprite.Playing = true;
     }
@@ -80,9 +86,6 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
         get => _azimuthIndicator.Visible;
         set => _azimuthIndicator.Visible = value;
     }
-
-    public bool HalfPixelXVisualOffset => _properties.HalfPixelXVisualOffset;
-    public bool HalfPixelYVisualOffset => _properties.HalfPixelYVisualOffset;
 
     public bool FlipSpriteH
     {

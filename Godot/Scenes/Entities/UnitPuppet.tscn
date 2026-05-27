@@ -1,8 +1,7 @@
-[gd_scene load_steps=27 format=2]
+[gd_scene load_steps=26 format=2]
 
 [ext_resource path="res://Scripts/Gameplay/EntityNodes/UnitPuppetNode.cs" type="Script" id=1]
 [ext_resource path="res://Textures/Cute Fantasy Free/Player/Player.png" type="Texture" id=2]
-[ext_resource path="res://Scripts/Gameplay/EntityNodes/EntityProperties.cs" type="Script" id=3]
 [ext_resource path="res://Scripts/Gameplay/AzimuthIndicator.cs" type="Script" id=4]
 
 [sub_resource type="AtlasTexture" id=28]
@@ -114,19 +113,14 @@ height = 10.0
 
 [node name="UnitPuppet" type="Node2D"]
 script = ExtResource( 1 )
+_halfPixelXVisualOffset = true
 
-[node name="Properties" type="Node" parent="."]
-script = ExtResource( 3 )
-HalfPixelXVisualOffset = true
-
-[node name="Visuals" type="Node2D" parent="."]
-
-[node name="AnimatedSprite" type="AnimatedSprite" parent="Visuals"]
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 position = Vector2( 0.5, -7 )
 frames = SubResource( 7 )
 animation = "Death"
 
-[node name="AzimuthIndicator" type="Line2D" parent="Visuals"]
+[node name="AzimuthIndicator" type="Line2D" parent="."]
 position = Vector2( 0, -1 )
 z_index = -1
 width = 2.0

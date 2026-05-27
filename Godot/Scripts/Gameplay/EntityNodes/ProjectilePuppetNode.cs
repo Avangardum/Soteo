@@ -6,7 +6,13 @@ namespace Soteo.Gameplay.EntityNodes;
 
 public sealed class ProjectilePuppetNode : Node2D, IProjectilePuppetNode
 {
-    private EntityProperties _properties = null!;
+    // If the sprite has position with .5 as fractional part in any dimension (used to center sprites with odd sizes),
+    // the following fields help compensate it for pixel perfect rendering. See NodeHelper for details.
+    [Export] private bool _halfPixelXVisualOffset;
+    [Export] private bool _halfPixelYVisualOffset;
+    
+    public bool HalfPixelXVisualOffset => _halfPixelXVisualOffset;
+    public bool HalfPixelYVisualOffset => _halfPixelYVisualOffset;
     
     public ProjectilePuppet? ProjectilePuppet { get; set; }
     
@@ -20,13 +26,5 @@ public sealed class ProjectilePuppetNode : Node2D, IProjectilePuppetNode
     {
         get => base.Position.ToSys();
         set => base.Position = value.ToGd();
-    }
-    
-    public bool HalfPixelXVisualOffset => _properties.HalfPixelXVisualOffset;
-    public bool HalfPixelYVisualOffset => _properties.HalfPixelYVisualOffset;
-
-    public override void _Ready()
-    {
-        _properties = GetNode<EntityProperties>("Properties");
     }
 }
