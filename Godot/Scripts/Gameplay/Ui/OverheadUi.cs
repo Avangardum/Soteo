@@ -86,7 +86,7 @@ public sealed class OverheadUi : Control
 
     public override void _Process(float delta)
     {
-        RectPosition = (_unit.Position - _camera.Position + _offset).ToGd() * _camera.TrueZoom;
+        RectPosition = (_unit.Position - _camera.Position + _offset).ToGd() * _camera.Zoom;
         SelectVariant();
         SetFaction(_unit.Faction);
         SetHealth((float)_unit.Stats[Stat.CurrentHealth], (float)_unit.Stats[Stat.MaxHealth]);
@@ -97,7 +97,7 @@ public sealed class OverheadUi : Control
     {
         const double tinyHealthMinZoom = 0.9;
         const double tinyHealthMaxZoom = 2.4;
-        double zoom = _camera.TrueZoom;
+        double zoom = _camera.Zoom;
         CurrentVariant = zoom < tinyHealthMinZoom ? Variant.None :
             zoom <= tinyHealthMaxZoom ? Variant.TinyHealth :
             Variant.PlayerCharacter;

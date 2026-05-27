@@ -31,6 +31,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
+    // todo LateInit
     private Hud? _hud;
     private Node2D? _shardRoot;
     private WebSocketFromGameplayToCampaignServerCommunicator? _webSocketCampaignServerCommunicator;
@@ -46,7 +47,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     // Fields for running a shard server from the editor
     public static bool EditorIsServer { get; private set; }
     public static Guid EditorLocalShardServerId { get; private set; }
-    [Export] private bool _editorIsServer = false;
+    [Export] private bool _editorIsServer;
     [Export] private string _editorLocalShardServerId = "";
 
     public IReadOnlyDictionary<Guid, IServiceProvider> ShardServiceProviders =>

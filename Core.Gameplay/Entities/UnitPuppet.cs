@@ -50,7 +50,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         set
         {
             base.Azimuth = value;
-            Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.TrueZoom);
+            Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.Zoom);
         }
     }
     
@@ -62,7 +62,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         Node?.Position = NodeHelper.RoundPositionToPixelPerfect
         (
             Position,
-            _camera.TrueZoom,
+            _camera.Zoom,
             isCamera: false,
             Node.HalfPixelXVisualOffset,
             Node.HalfPixelYVisualOffset
@@ -116,7 +116,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
     private void OnZoomChanged()
     {
         UpdateNodePosition();
-        Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.TrueZoom);
+        Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.Zoom);
     }
     
     private void UpdateAnimation() // todo rename animations and split the method

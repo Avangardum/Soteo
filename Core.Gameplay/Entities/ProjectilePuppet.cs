@@ -36,7 +36,7 @@ public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>
         Node?.Position = NodeHelper.RoundPositionToPixelPerfect
         (
             Position,
-            _camera.TrueZoom,
+            _camera.Zoom,
             isCamera: false,
             Node.HalfPixelXVisualOffset,
             Node.HalfPixelYVisualOffset

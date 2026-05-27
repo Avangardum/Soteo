@@ -124,7 +124,9 @@ public static class Maths
     public static double PosMod(double value, double modulo) =>
         value >= 0 ? value % modulo : value % modulo + modulo;
     
-    public static float Log(float value, float newBase) => (float)Math.Log(value, newBase);
+    public static double Pow(double x, double y) => Math.Pow(x, y);
+        
+    public static double Log(double value, double newBase) => Math.Log(value, newBase);
     
     /// <summary>
     /// Round a value to the nearest noninteger multiple of 0.5
