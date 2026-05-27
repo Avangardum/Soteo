@@ -204,7 +204,7 @@ public abstract class Ability
                 {
                     null => "ERROR",
                     Scalable s => s.ToBbcode(level, format),
-                    IFormattable f => f.ToString(format, CultureInfo.CurrentCulture), // todo global invariant culture
+                    IFormattable f => f.ToString(format, CultureInfo.CurrentCulture),
                     _ => propertyValue.ToString()
                 };
             }

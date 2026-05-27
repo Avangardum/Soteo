@@ -1,3 +1,4 @@
+using System.Globalization;
 using Soteo.Core.Shared;
 using Soteo.Gameplay;
 using Soteo.Util;
@@ -8,6 +9,8 @@ public static class ConstInitializer
 {
     public static void Init()
     {
+        CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
+        
         Const.IsServer.Value = OS.GetCmdlineArgs().Contains("--server") || Main.EditorIsServer;
         Const.IsSingleplayer.Value = OS.GetCmdlineArgs().Contains("--singleplayer");
         Const.IsWeb.Value = OS.HasFeature("web");
