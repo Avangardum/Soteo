@@ -8,6 +8,7 @@ using Soteo.Core.Gameplay.Dto.Snapshots;
 using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
+using Soteo.Core.Shared;
 using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Entities;
@@ -548,7 +549,8 @@ public class Unit : UnitBase<IUnitNode>
     )
     {
         if (time < 0) throw new ArgumentException();
-        if (tickInterval <= 0) throw new ArgumentException();
+        const double minTickInterval = Const.TickInterval;
+        if (tickInterval < minTickInterval) throw new ArgumentException();
         if (IsRemoved) return;
         
         StatusContext context = new StatusContext

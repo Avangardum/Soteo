@@ -219,14 +219,14 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Ordinal = DeserializeLong(stream),
         };
     }
-    
-    public void SerializeStatusTickContext(StatusTickContext value, Stream stream)
+
+    private void SerializeStatusTickContext(StatusTickContext value, Stream stream)
     {
         SerializeDouble(value.Interval, stream);
         SerializeDouble(value.Countdown, stream);
     }
-    
-    public StatusTickContext DeserializeStatusTickContext(Stream stream)
+
+    private StatusTickContext DeserializeStatusTickContext(Stream stream)
     {
         double interval = DeserializeDouble(stream);
         double countdown = DeserializeDouble(stream);
