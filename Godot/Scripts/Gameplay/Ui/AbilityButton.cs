@@ -1,20 +1,27 @@
+using Soteo.Util;
+
 namespace Soteo.Gameplay.Ui;
 
 public sealed class AbilityButton : TextureButton
 {
-    // todo lateinit
-    public TextureRect IconRect { get; private set; } = null!;
-    public TextureProgress CooldownIndicator { get; private set; } = null!;
-    public TextureProgress UseProgressIndicator { get; private set; } = null!;
-    public Label HealthCostLabel { get; private set; } = null!;
-    public Label ManaCostLabel { get; private set; } = null!;
+    private readonly LateInit<TextureRect> _iconRect = new();
+    private readonly LateInit<TextureProgress> _cooldownIndicator = new();
+    private readonly LateInit<TextureProgress> _useProgressIndicator = new();
+    private readonly LateInit<Label> _healthCostLabel = new();
+    private readonly LateInit<Label> _manaCostLabel = new();
+    
+    public TextureRect IconRect => _iconRect;
+    public TextureProgress CooldownIndicator => _cooldownIndicator;
+    public TextureProgress UseProgressIndicator => _useProgressIndicator;
+    public Label HealthCostLabel => _healthCostLabel;
+    public Label ManaCostLabel => _manaCostLabel;
 
     public override void _Ready()
     {
-        IconRect = GetNode<TextureRect>("Icon");
-        CooldownIndicator = GetNode<TextureProgress>("Cooldown");
-        UseProgressIndicator = GetNode<TextureProgress>("UseProgress");
-        HealthCostLabel = GetNode<Label>("HealthCost");
-        ManaCostLabel = GetNode<Label>("ManaCost");
+        _iconRect.Value = GetNode<TextureRect>("Icon");
+        _cooldownIndicator.Value = GetNode<TextureProgress>("Cooldown");
+        _useProgressIndicator.Value = GetNode<TextureProgress>("UseProgress");
+        _healthCostLabel.Value = GetNode<Label>("HealthCost");
+        _manaCostLabel.Value = GetNode<Label>("ManaCost");
     }
 }
