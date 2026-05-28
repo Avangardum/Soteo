@@ -93,13 +93,22 @@ public sealed class InputHandler : Node2D
         UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.UserId, out _);
         if (user == null || !user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
-        IReadOnlyList<UnitPuppet> candidateTargetUnits =
-            Input.IsActionPressed("alt") ? [user] : GetUnitsUnderMouse(); // todo target nothing on alt (if supported)
-        UnitPuppet? targetUnit = candidateTargetUnits
-            .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
+        UnitPuppet? targetUnit = null;
+        Vector2? targetPosition = null;
         
-        bool canTargetPosition = state.Ability.Targeting.HasFlag(CanTarget.Position);
-        Vector2? targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition().ToSys() : null;
+        bool alt = Input.IsActionPressed("alt");
+        bool forceNoTarget = alt && state.Ability.Targeting.HasFlag(CanTarget.Nothing);
+        
+        if (!forceNoTarget)
+        {
+            IReadOnlyList<UnitPuppet> candidateTargetUnits = alt ? [user] : GetUnitsUnderMouse();
+            targetUnit = candidateTargetUnits
+                .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
+            
+            bool canTargetPosition = state.Ability.Targeting.HasFlag(CanTarget.Position);
+            targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition().ToSys() : null;
+        }
+
         var command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id);
         _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
     }
