@@ -5,36 +5,42 @@ namespace Soteo.Gameplay.Ui;
 
 public sealed class Graph : Control
 {
-    private Control _dataRect = null!;
-    private Line2D _line = null!;
-    private Label _minLabel = null!;
-    private Label _maxLabel = null!;
-    private Label _lastLabel = null!;
+    private readonly LateInit<Control> _dataRect = new();
+    private readonly LateInit<Line2D> _line = new();
+    private readonly LateInit<Label> _minLabel = new();
+    private readonly LateInit<Label> _maxLabel = new();
+    private readonly LateInit<Label> _lastLabel = new();
+    private readonly LateInit<GdVector2[]> _frame = new();
     
-    private GdVector2[] _frame = null!;
+    private Control DataRect => _dataRect;
+    private Line2D Line => _line;
+    private Label MinLabel => _minLabel;
+    private Label MaxLabel => _maxLabel;
+    private Label LastLabel => _lastLabel;
+    private GdVector2[] Frame => _frame;
     
     public override void _Ready()
     {
-        _dataRect = GetNode<Control>("DataRect");
-        _line = GetNode<Line2D>("Line2D");
-        _minLabel = GetNode<Label>("Min");
-        _maxLabel = GetNode<Label>("Max");
-        _lastLabel = GetNode<Label>("Last");
+        _dataRect.Value = GetNode<Control>("DataRect");
+        _line.Value = GetNode<Line2D>("Line2D");
+        _minLabel.Value = GetNode<Label>("Min");
+        _maxLabel.Value = GetNode<Label>("Max");
+        _lastLabel.Value = GetNode<Label>("Last");
         
-        _frame = 
+        _frame.Value = 
         [
-            new GdVector2(_dataRect.RectPosition.x, RectSize.y),
-            new GdVector2(_dataRect.RectPosition.x, 0),
-            new GdVector2(_dataRect.RectPosition.x + _dataRect.RectSize.x, 0),
-            new GdVector2(_dataRect.RectPosition.x + _dataRect.RectSize.x, RectSize.y),
-            new GdVector2(_dataRect.RectPosition.x, RectSize.y),
-            new GdVector2(_dataRect.RectPosition.x, _dataRect.RectPosition.y + _dataRect.RectSize.y),
-            new GdVector2(_dataRect.RectPosition.x - _dataRect.RectPosition.y,
-                _dataRect.RectPosition.y + _dataRect.RectSize.y),
-            new GdVector2(_dataRect.RectPosition.x, _dataRect.RectPosition.y + _dataRect.RectSize.y),
-            new GdVector2(_dataRect.RectPosition.x, _dataRect.RectPosition.y),
-            new GdVector2(_dataRect.RectPosition.x - _dataRect.RectPosition.y, _dataRect.RectPosition.y),
-            new GdVector2(_dataRect.RectPosition.x, _dataRect.RectPosition.y),
+            new GdVector2(DataRect.RectPosition.x, RectSize.y),
+            new GdVector2(DataRect.RectPosition.x, 0),
+            new GdVector2(DataRect.RectPosition.x + DataRect.RectSize.x, 0),
+            new GdVector2(DataRect.RectPosition.x + DataRect.RectSize.x, RectSize.y),
+            new GdVector2(DataRect.RectPosition.x, RectSize.y),
+            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y + DataRect.RectSize.y),
+            new GdVector2(DataRect.RectPosition.x - DataRect.RectPosition.y,
+                DataRect.RectPosition.y + DataRect.RectSize.y),
+            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y + DataRect.RectSize.y),
+            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y),
+            new GdVector2(DataRect.RectPosition.x - DataRect.RectPosition.y, DataRect.RectPosition.y),
+            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y),
         ];
         
         SetData([0, 0], "N0", 0, 1);
@@ -48,19 +54,19 @@ public sealed class Graph : Control
         var dataPoints = new GdVector2[data.Count];
         min ??= data.Min();
         max ??= data.Max();
-        _minLabel.Text = min.Value.ToString(format);
-        _maxLabel.Text = max.Value.ToString(format);
+        MinLabel.Text = min.Value.ToString(format);
+        MaxLabel.Text = max.Value.ToString(format);
         for (int i = 0; i < data.Count; i++)
         {
             double x = i / (data.Count - 1.0);
             double y = Maths.InverseLerp(max.Value, min.Value, data[i]);
-            GdVector2 point = GdVector2.New(x, y) * _dataRect.RectSize + _dataRect.RectPosition;
+            GdVector2 point = GdVector2.New(x, y) * DataRect.RectSize + DataRect.RectPosition;
             point.y = Mathf.Clamp(point.y, 0, RectSize.y);
             dataPoints[i] = point;
         }
         
-        _line.Points = [.._frame, ..dataPoints, dataPoints[^1] + new GdVector2(_dataRect.RectPosition.y, 0)];
-        _lastLabel.Text = data[^1].ToString(format);
-        _lastLabel.RectPosition = _lastLabel.RectPosition with { y = dataPoints[^1].y - _lastLabel.RectSize.y / 2 };
+        Line.Points = [..Frame, ..dataPoints, dataPoints[^1] + new GdVector2(DataRect.RectPosition.y, 0)];
+        LastLabel.Text = data[^1].ToString(format);
+        LastLabel.RectPosition = LastLabel.RectPosition with { y = dataPoints[^1].y - LastLabel.RectSize.y / 2 };
     }
 }

@@ -17,7 +17,7 @@ namespace Soteo.CampaignServer;
 
 public sealed class CampaignServer : Node
 {
-    private ICommunicator _communicator = null!;
+    private LateInit<ICommunicator> _communicator = new();
     
     public override void _Ready()
     {
@@ -26,12 +26,12 @@ public sealed class CampaignServer : Node
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         IServiceProvider serviceProvider = serviceCollection.BuildAutofacServiceProvider();
-        _communicator = serviceProvider.GetRequiredService<ICommunicator>();
+        _communicator.Value = serviceProvider.GetRequiredService<ICommunicator>();
     }
 
     public override void _Process(float delta)
     {
-        _communicator.Poll();
+        _communicator.Value.Poll();
     }
     
     private void RegisterServices(IServiceCollection services)

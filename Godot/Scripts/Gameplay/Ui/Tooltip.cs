@@ -1,53 +1,57 @@
 using Soteo.Gameplay.Interfaces;
+using Soteo.Util;
 
 namespace Soteo.Gameplay.Ui;
 
 public sealed class Tooltip : Control, ITooltip
 {
-    private Label _headerLabel = null!;
-    private HSeparator _separator = null!;
-    private RichTextLabel _bodyLabel = null!;
+    private readonly LateInit<Label> _headerLabel = new();
+    private readonly LateInit<HSeparator> _separator = new();
+    private readonly LateInit<RichTextLabel> _bodyLabel = new();
+    private readonly LateInit<float> _bodyDefaultMinWidth = new();
     
-    private float _bodyDefaultMinWidth;
+    public Label HeaderLabel => _headerLabel;
+    public HSeparator Separator => _separator;
+    public RichTextLabel BodyLabel => _bodyLabel;
 
     public override void _Ready()
     {
-        _headerLabel = GetNode<Label>("PanelContainer/MarginContainer/VBoxContainer/Header");
-        _separator = GetNode<HSeparator>("PanelContainer/MarginContainer/VBoxContainer/HSeparator");
-        _bodyLabel = GetNode<RichTextLabel>("PanelContainer/MarginContainer/VBoxContainer/Body");
+        _headerLabel.Value = GetNode<Label>("PanelContainer/MarginContainer/VBoxContainer/Header");
+        _separator.Value = GetNode<HSeparator>("PanelContainer/MarginContainer/VBoxContainer/HSeparator");
+        _bodyLabel.Value = GetNode<RichTextLabel>("PanelContainer/MarginContainer/VBoxContainer/Body");
         
-        _bodyDefaultMinWidth = _bodyLabel.RectMinSize.x;
+        _bodyDefaultMinWidth.Value = BodyLabel.RectMinSize.x;
     }
 
     public void Show(Vector2 position, string header, string body)
     {
         Visible = true;
         RectGlobalPosition = position.ToGd();
-        _headerLabel.Text = header;
-        _bodyLabel.BbcodeText = body;
-        _headerLabel.Visible = header != "";
-        _bodyLabel.Visible = body != "";
-        _separator.Visible = header != "" && body != "";
+        HeaderLabel.Text = header;
+        BodyLabel.BbcodeText = body;
+        HeaderLabel.Visible = header != "";
+        BodyLabel.Visible = body != "";
+        Separator.Visible = header != "" && body != "";
         UpdateBodyMinWidth();
     }
     
     private void UpdateBodyMinWidth()
     {
-        _bodyLabel.RectMinSize = new GdVector2(_bodyDefaultMinWidth, 0);
-        _bodyLabel.RectSize = _bodyLabel.RectSize with { x = _bodyDefaultMinWidth };
+        BodyLabel.RectMinSize = new GdVector2(_bodyDefaultMinWidth, 0);
+        BodyLabel.RectSize = BodyLabel.RectSize with { x = _bodyDefaultMinWidth };
         
-        string text = _bodyLabel.BbcodeText;
-        _bodyLabel.BbcodeText = "Lorem ipsum";
-        int lineHeight = _bodyLabel.GetContentHeight();
-        _bodyLabel.BbcodeText = text;
+        string text = BodyLabel.BbcodeText;
+        BodyLabel.BbcodeText = "Lorem ipsum";
+        int lineHeight = BodyLabel.GetContentHeight();
+        BodyLabel.BbcodeText = text;
         
         const int step = 10; 
-        while (_bodyLabel.GetContentHeight() == lineHeight && _bodyLabel.RectMinSize.x > step)
+        while (BodyLabel.GetContentHeight() == lineHeight && BodyLabel.RectMinSize.x > step)
         {
-            _bodyLabel.RectMinSize -= new GdVector2(step, 0);
-            _bodyLabel.RectSize = _bodyLabel.RectSize with { x = _bodyLabel.RectMinSize.x };
+            BodyLabel.RectMinSize -= new GdVector2(step, 0);
+            BodyLabel.RectSize = BodyLabel.RectSize with { x = BodyLabel.RectMinSize.x };
         }
-        _bodyLabel.RectMinSize += new GdVector2(step, 0);
+        BodyLabel.RectMinSize += new GdVector2(step, 0);
     }
     
     public new void Hide() => Visible = false;

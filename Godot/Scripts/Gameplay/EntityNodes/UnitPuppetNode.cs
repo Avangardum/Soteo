@@ -11,8 +11,11 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
     private double? _removalCountdown;
     private TaskCompletionSource _waitUntilCanRemoveSource = new();
     
-    private AnimatedSprite _sprite = null!;
-    private AzimuthIndicator _azimuthIndicator = null!;
+    private readonly LateInit<AnimatedSprite> _sprite = new();
+    private readonly LateInit<AzimuthIndicator> _azimuthIndicator = new();
+    
+    private AnimatedSprite Sprite => _sprite;
+    private AzimuthIndicator AzimuthIndicator => _azimuthIndicator;
     
     // If the sprite has position with .5 as fractional part in any dimension (used to center sprites with odd sizes),
     // the following fields help compensate it for pixel perfect rendering. See NodeHelper for details.
@@ -41,7 +44,7 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
     {
         _removalCountdown = null;
         _waitUntilCanRemoveSource = new TaskCompletionSource();
-        _azimuthIndicator.Visible = true;
+        AzimuthIndicator.Visible = true;
     }
     
     private void OnDetached()
@@ -63,10 +66,10 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
     
     public override void _Ready()
     {
-        _sprite = GetNode<AnimatedSprite>("AnimatedSprite");
-        _azimuthIndicator = GetNode<AzimuthIndicator>("AzimuthIndicator");
+        _sprite.Value = GetNode<AnimatedSprite>("AnimatedSprite");
+        _azimuthIndicator.Value = GetNode<AzimuthIndicator>("AzimuthIndicator");
         
-        _sprite.Playing = true;
+        Sprite.Playing = true;
     }
 
     public override void _Process(float delta)
@@ -83,36 +86,36 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
 
     public bool IsAzimuthIndicatorVisible
     {
-        get => _azimuthIndicator.Visible;
-        set => _azimuthIndicator.Visible = value;
+        get => AzimuthIndicator.Visible;
+        set => AzimuthIndicator.Visible = value;
     }
 
     public bool FlipSpriteH
     {
-        get => _sprite.FlipH;
-        set => _sprite.FlipH = value;
+        get => Sprite.FlipH;
+        set => Sprite.FlipH = value;
     }
 
     public string Animation
     {
-        get => _sprite.Animation;
-        set => _sprite.Animation = value;
+        get => Sprite.Animation;
+        set => Sprite.Animation = value;
     }
 
     public double AnimationSpeedScale
     {
-        get => _sprite.SpeedScale;
-        set => _sprite.SpeedScale = (float)value;
+        get => Sprite.SpeedScale;
+        set => Sprite.SpeedScale = (float)value;
     }
 
     public int AnimationFrame
     {
-        get => _sprite.Frame;
-        set => _sprite.Frame = value;
+        get => Sprite.Frame;
+        set => Sprite.Frame = value;
     }
 
-    public int AnimationFrameCount => _sprite.Frames.GetFrameCount(Animation);
+    public int AnimationFrameCount => Sprite.Frames.GetFrameCount(Animation);
 
     public void CalculateAzimuthIndicatorPoints(double azimuth, double zoom) =>
-        _azimuthIndicator.CalculatePoints(azimuth, zoom);
+        AzimuthIndicator.CalculatePoints(azimuth, zoom);
 }
