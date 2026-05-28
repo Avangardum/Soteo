@@ -67,7 +67,8 @@ public sealed class InputHandler : Node2D
     
     private void HandleInteract()
     {
-        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.UserId, out _);
+        if (_currentUserIdRepo.Value == null) return;
+        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.Required, out _);
         if (user == null) return;
         
         UnitPuppet? targetUnit = GetUnitsUnderMouse()
@@ -90,7 +91,8 @@ public sealed class InputHandler : Node2D
 
     private void HandleUseAbility(AbilitySlot slot)
     {
-        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.UserId, out _);
+        if (_currentUserIdRepo.Value == null) return;
+        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.Required, out _);
         if (user == null || !user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
         UnitPuppet? targetUnit = null;

@@ -121,7 +121,8 @@ public sealed class Hud : Control, IHud
 
     public override void _Process(float delta)
     {
-        SelectedUnit ??= _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepository.UserId, out _);
+        if (_currentUserIdRepository.Value == null) return;
+        SelectedUnit ??= _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepository.Required, out _);
         if (SelectedUnit == null)
         {
             Visible = false;

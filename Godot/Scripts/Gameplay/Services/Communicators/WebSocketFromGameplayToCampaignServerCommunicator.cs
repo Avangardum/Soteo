@@ -24,7 +24,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
     private readonly IShardLoader _shardLoader;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     
-    private string _token = ""; // todo null
+    private string? _token;
     private Status _status;
 
     public WebSocketFromGameplayToCampaignServerCommunicator
@@ -75,7 +75,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
     public void OnConnectionClosed(bool wasCleanClose)
     {
         _status = Status.Disconnected;
-        _currentUserIdRepository.UserId = Guid.Empty; // todo null
+        _currentUserIdRepository.Value = null;
     }
     
     public void OnConnectionError()
@@ -86,8 +86,8 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
     public void OnConnectionEstablished(string protocol)
     {
         _status = Status.Connected;
-        SendPacket(new CampaignServerHandshakePacket { Token = _token, Version = Const.Version });
-        _token = "";
+        SendPacket(new CampaignServerHandshakePacket { Token = _token.Required, Version = Const.Version });
+        _token = null;
         ConnectionEstablished();
         
         if (!Const.IsServer)
@@ -106,6 +106,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
     
     public void ConnectAsPlayer(string email, string password)
     {
+        if (Const.IsServer) throw new InvalidOperationException();
         if (_status != Status.Disconnected) return;
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
@@ -116,12 +117,13 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
     
     public void ConnectAsShardServer()
     {
+        if (!Const.IsServer) throw new InvalidOperationException();
         if (_status != Status.Disconnected) return;
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         string intercomSecret = SysEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
             throw new Exception("Intercom secret is not set.");
-        Guid id = _currentUserIdRepository.UserId;
+        Guid id = _currentUserIdRepository.Required;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(intercomSecret)}";
         string url = $"{AuthServerUrl}/token/service";
@@ -147,7 +149,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         else
         {
             _token = Encoding.UTF8.GetString(body);
-            _currentUserIdRepository.UserId = GetPlayerIdFromTrustedToken(_token);
+            _currentUserIdRepository.Value = GetPlayerIdFromTrustedToken(_token);
             _wsClient.ConnectToUrl(CampaignServerUrl);
         }
     }

@@ -9,10 +9,12 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
 {
     public CurrentUserIdRepository()
     {
-        if (Const.IsServer) UserId = GetLocalShardServerId();
+        if (Const.IsServer) Value = GetLocalShardServerId();
     }
     
-    public Guid UserId { get; set; }
+    public Guid? Value { get; set; }
+    
+    public Guid Required => Value.Required;
     
     private Guid GetLocalShardServerId()
     {

@@ -19,7 +19,7 @@ public sealed class RoutingPacketHandler
     public async Task HandleAsync(Packet packet, Guid senderId)
     {
         IServiceProvider? serviceProvider =
-            Const.IsServer ? shardServiceProviders[currentUserIdRepository.UserId] :
+            Const.IsServer ? shardServiceProviders[currentUserIdRepository.Required] :
             senderId == Const.CampaignServerId ? rootServiceProvider :
             shardServiceProviders[senderId];
         if (serviceProvider == null) return;
