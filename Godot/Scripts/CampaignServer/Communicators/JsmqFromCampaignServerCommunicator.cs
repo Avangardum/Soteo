@@ -16,7 +16,7 @@ public sealed class JsmqFromCampaignServerCommunicator
     IPacketSerializer packetSerializer,
     IPacketHandler packetHandler,
     IUserRepository userRepo
-) : Object, ICommunicator
+) : GdObject, ICommunicator
 {
     public void Poll()
     {

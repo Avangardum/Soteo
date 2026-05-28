@@ -1,4 +1,3 @@
-using Godot.Collections;
 using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
@@ -7,8 +6,6 @@ using Soteo.Core.Shared.Exceptions;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.Packets;
 using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
-using Soteo.Shared.Nodes.Autoloads;
 using Soteo.Util;
 
 namespace Soteo.Gameplay.Services.Communicators;
@@ -27,13 +24,12 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private const int MaxChunkSize = 32000;
     
     private double _timeSinceLastPing;
-    private Guid _lastPingId; // todo nullable
+    private Guid? _lastPingId;
     private bool _didPollThisFrame;
     private byte[]? _deferredShardSnapshotPacketBytes;
     
-    private readonly System.Collections.Generic.Dictionary<Guid, PeerConnectionAndChannels>
-        _peerConnectionsAndChannels = [];
-    private readonly System.Collections.Generic.Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
+    private readonly Dictionary<Guid, PeerConnectionAndChannels> _peerConnectionsAndChannels = [];
+    private readonly Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
     private readonly HashSet<Guid> _connectedPeerIds = [];
 
     public event Action<Guid> PeerConnected = delegate { };
@@ -140,39 +136,24 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
                 if (pingId != _lastPingId) _ping.Remove(peerId);
             _timeSinceLastPing = 0;
             _lastPingId = Guid.NewGuid();
-            BroadcastUnreliable(new PingPacket { Id = _lastPingId });
+            BroadcastUnreliable(new PingPacket { Id = _lastPingId.Value });
         }
     }
     
     private void HandlePackets(WebRTCDataChannel channel, Guid senderId, double delta)
     {
-        // Snapshot deserialization can take a long time. If FPS is low, several snapshot packets may accumulate
-        // per frame, which lower FPS further, causing a snowball effect. To prevent this, if FPS is low, only
-        // the last snapshot packet is handled every frame.
-        // todo obsolete safeguard, remove
-        bool deferShardSnapshotPacket = delta >= 1.0 / 20.0;
-        _deferredShardSnapshotPacketBytes = null;
-        
         while (channel.GetAvailablePacketCount() > 0)
         {
             byte[] bytes = channel.GetPacket();
             BytesReceived += bytes.Length;
-            HandlePacket(bytes, senderId, deferShardSnapshotPacket);
+            HandlePacket(bytes, senderId);
         }
-        if (_deferredShardSnapshotPacketBytes != null)
-            HandlePacket(_deferredShardSnapshotPacketBytes, senderId, false);
     }
     
-    private void HandlePacket(byte[] bytes, Guid senderId, bool deferShardSnapshotPacket)
+    private void HandlePacket(byte[] bytes, Guid senderId)
     {
         Try(senderId, async () =>
         {
-            if (bytes.Length == 0) return;
-            if (deferShardSnapshotPacket && bytes[0] == (byte)PacketType.ShardSnapshot)
-            {
-                _deferredShardSnapshotPacketBytes = bytes;
-                return;
-            }
             Packet packet = _packetSerializer.Deserialize(bytes);
             if (packet is PingPacket pingPacket)
             {
@@ -183,7 +164,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             {
                 byte[]? restoredPacketBytes = _chunkCollector.AddChunk(chunkPacket, senderId);
                 if (restoredPacketBytes != null)
-                    HandlePacket(restoredPacketBytes, senderId, deferShardSnapshotPacket);
+                    HandlePacket(restoredPacketBytes, senderId);
                 return;
             }
             
@@ -255,12 +236,12 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         connection.Connect("session_description_created", this, nameof(OnSessionDescriptionCreated), [peerIdBytes]);
         connection.Connect("ice_candidate_created", this, nameof(OnIceCandidateCreated), [peerIdBytes]);
         
-        WebRTCDataChannel reliableChannel = connection.CreateDataChannel("reliable", new Dictionary
+        WebRTCDataChannel reliableChannel = connection.CreateDataChannel("reliable", new GdDictionary
         {
             ["negotiated"] = true,
             ["id"] = 0,
         });
-        WebRTCDataChannel unreliableChannel = connection.CreateDataChannel("unreliable", new Dictionary // todo GdDictionary
+        WebRTCDataChannel unreliableChannel = connection.CreateDataChannel("unreliable", new GdDictionary
         {
             ["negotiated"] = true,
             ["id"] = 1,

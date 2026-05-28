@@ -13,7 +13,7 @@ using Soteo.Util;
 
 namespace Soteo.CampaignServer.Communicators;
 
-public sealed class WebSocketFromCampaignServerToGameplayCommunicator : Object, ICommunicator
+public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject, ICommunicator
 {
     private readonly WebSocketServer _wsServer = new();
     private readonly IPacketSerializer _packetSerializer;
