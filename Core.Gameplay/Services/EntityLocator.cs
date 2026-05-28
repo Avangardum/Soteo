@@ -6,7 +6,7 @@ namespace Soteo.Core.Gameplay.Services;
 /// <inheritdoc />
 public sealed class EntityLocator(IShardServiceProviderSource shardServiceProviderSource) : IEntityLocator
 {
-    public T? FindEntity<T>(Guid entityId, out Guid shardId) where T : class, IEntity
+    public T? FindEntity<T>(Guid entityId, out Guid? shardId) where T : class, IEntity
     {
         foreach ((Guid currentShardId, IServiceProvider services) in shardServiceProviderSource.ShardServiceProviders)
         {
@@ -18,7 +18,7 @@ public sealed class EntityLocator(IShardServiceProviderSource shardServiceProvid
             }
         }
         
-        shardId = Guid.Empty; // todo null
+        shardId = null;
         return null;
     }
 }

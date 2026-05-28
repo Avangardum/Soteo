@@ -2,10 +2,11 @@ using System.Numerics;
 using Soteo.Core.Gameplay.Abilities;
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 
 namespace Soteo.Core.Gameplay.Dto;
 
-public sealed record AbilityContext : IServiceProvider
+public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
 {
     public required Ability Ability { get; init; }
     public required int Level { get; init; }
@@ -21,6 +22,9 @@ public sealed record AbilityContext : IServiceProvider
     public Unit? TargetUnit { get; init; }
     public Vector2? TargetDirection { get; init; }
     public Guid? TargetShardId { get; init; }
+
+    Unit ISourceUnitAndAbility.Unit => User;
+    AbilityContext ISourceUnitAndAbility.AbilityContext => this;
     
     public object? GetService(Type serviceType) => ServiceProvider.GetService(serviceType);
     

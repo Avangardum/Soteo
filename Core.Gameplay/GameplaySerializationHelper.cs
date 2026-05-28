@@ -25,7 +25,6 @@ public static class GameplaySerializationHelper
         SerializeGuid(value.Id, stream);
         SerializeStatus(value.Status, stream);
         SerializeNullableClass(value.Ability, SerializeAbility, stream);
-        SerializeDouble(value.ElapsedTime, stream);
         SerializeDouble(value.DisplayElapsedTime, stream);
         SerializeDouble(value.RemainingTime, stream);
         SerializeLong(value.Ordinal, stream);
@@ -38,7 +37,6 @@ public static class GameplaySerializationHelper
             Id = DeserializeGuid(stream),
             Status = DeserializeStatus(stream),
             Ability = DeserializeNullableClass(DeserializeAbility, stream),
-            ElapsedTime = DeserializeDouble(stream), // todo remove from puppet
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
             Ordinal = DeserializeLong(stream),

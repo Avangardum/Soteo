@@ -1,17 +1,18 @@
 using System.Diagnostics.CodeAnalysis;
 using Soteo.Core.Gameplay.Abilities;
 using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
 
 namespace Soteo.Core.Gameplay.Dto;
 
-public sealed record StatusContext : IServiceProvider
+public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
 {
     public required Guid Id { get; init; }
     public required Status Status { get; init; }
-    public required AbilityContext? AbilityContext { get; init; }
+    public required AbilityContext? SourceAbilityContext { get; init; }
     public required Unit Unit { get; init; }
-    public required Unit? Source { get; init; }
+    public required Unit? SourceUnit { get; init; }
     public required StatusTickContext? Tick { get; init; }
     public required double ElapsedTime { get; init; }
     public required double DisplayElapsedTime { get; init; }
@@ -19,10 +20,14 @@ public sealed record StatusContext : IServiceProvider
     public required long Ordinal { get; init; }
     public required IServiceProvider ServiceProvider { get; init; }
     
+    Unit? ISourceUnitAndAbility.Unit => SourceUnit;
+    Ability? ISourceUnitAndAbility.Ability => SourceAbilityContext?.Ability;
+    AbilityContext? ISourceUnitAndAbility.AbilityContext => SourceAbilityContext;
+    
     public object? GetService(Type type) => ServiceProvider.GetService(type);
     
-    [MemberNotNull(nameof(AbilityContext))]
-    public T AbilityAs<T>() where T : Ability => (T)AbilityContext.Required.Ability;
+    [MemberNotNull(nameof(SourceAbilityContext))]
+    public T SourceAbilityAs<T>() where T : Ability => (T)SourceAbilityContext.Required.Ability;
     
     public DeflatedStatusContext Deflate()
     {
@@ -30,9 +35,9 @@ public sealed record StatusContext : IServiceProvider
         {
             Id = Id,
             Status = Status,
-            AbilityContext = AbilityContext?.Deflate(),
+            AbilityContext = SourceAbilityContext?.Deflate(),
             UnitId = Unit.Id,
-            SourceId = Source?.Id,
+            SourceId = SourceUnit?.Id,
             Tick = Tick,
             ElapsedTime = ElapsedTime,
             DisplayElapsedTime = DisplayElapsedTime,

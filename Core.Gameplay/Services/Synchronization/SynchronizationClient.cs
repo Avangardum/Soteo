@@ -149,7 +149,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
     {
         if (State != StateEnum.Synchronized) throw new InvalidOperationException();
         
-        double bufferTicks = _syncData.LastDeltaTick!.Value - _syncData.Tick!.Value; // todo Required
+        double bufferTicks = _syncData.LastDeltaTick.Required - _syncData.Tick.Required;
         if (bufferTicks < _syncData.BufferTicksHistoryRing.RingGet((long)_syncData.Second!))
             _syncData.BufferTicksHistoryRing.RingSet((long)_syncData.Second, bufferTicks);
     }
@@ -164,10 +164,10 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         double fastForwardTicks = minBufferTicks - BufferTicksMinSafeValue;
         _syncData.Tick += fastForwardTicks;
         _syncData.BufferTicksHistoryRing
-            .RingSet((long)_syncData.Second!, _syncData.LastDeltaTick!.Value - _syncData.Tick!.Value); // todo Required
+            .RingSet((long)_syncData.Second!, _syncData.LastDeltaTick.Required - _syncData.Tick.Required);
         FastForwardCount++;
     }
-
+    
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet)
     {
         if (State != StateEnum.Desynchronized) return;

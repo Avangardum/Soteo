@@ -44,7 +44,6 @@ public sealed class UnitTests
         (
             time: double.PositiveInfinity,
             tickInterval: null,
-            abilityContext: null,
             source: null
         );
 

@@ -466,27 +466,24 @@ public class Unit : UnitBase<IUnitNode>
         ChangeResourceStat(Stat.CurrentMana, -amount);
     }
     
-    public void TakeDamage(double amount, Unit? source, Ability? ability)
-    {
+    public void TakeDamage(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentHealth, -amount);
-    }
+
+    public void TakeDamage(double amount, ISourceUnitAndAbility? source) =>
+        TakeDamage(amount, source?.Unit, source?.Ability);
     
-    public void TakeDamage(double amount, StatusContext context) =>
-        TakeDamage(amount, context.Source, context.AbilityContext?.Ability);
-    
-    public void TakeDamage(double amount, AbilityContext context) =>
-        TakeDamage(amount, context.User, context.Ability);
-    
-    public void RestoreHealth(double amount, Unit? source, Ability? ability)
-    {
+    public void RestoreHealth(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentHealth, amount);
-    }
     
-    public void RestoreMana(double amount, Unit? source, Ability? ability)
-    {
+    public void RestoreHealth(double amount, ISourceUnitAndAbility? source) =>
+        RestoreHealth(amount, source?.Unit, source?.Ability);
+
+    public void RestoreMana(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentMana, amount);
-    }
     
+    public void RestoreMana(double amount, ISourceUnitAndAbility? source) =>
+        RestoreMana(amount, source?.Unit, source?.Ability);
+
     protected void ChangeResourceStat(Stat stat, double delta) =>
         SetResourceStat(stat, Stats[stat] + delta);
 
@@ -544,8 +541,8 @@ public class Unit : UnitBase<IUnitNode>
         Status status,
         double time,
         double? tickInterval,
-        AbilityContext? abilityContext,
-        Unit? source
+        AbilityContext? sourceAbilityContext,
+        Unit? sourceUnit
     )
     {
         if (time < 0) throw new ArgumentException();
@@ -557,9 +554,9 @@ public class Unit : UnitBase<IUnitNode>
         {
             Id = Guid.NewGuid(),
             Status = status,
-            AbilityContext = abilityContext,
+            SourceAbilityContext = sourceAbilityContext,
             Unit = this,
-            Source = source,
+            SourceUnit = sourceUnit,
             Tick = tickInterval == null ? null : new StatusTickContext
             {
                 Interval = tickInterval.Value,
@@ -607,23 +604,11 @@ public class Unit : UnitBase<IUnitNode>
         UpdateStats();
     }
     
-    public void AddStatus(Status status, double time, double? tickInterval, StatusContext sourceStatusContext)
+    public void AddStatus<T>(double time, double? tickInterval, ISourceUnitAndAbility? source) where T : Status
     {
-        AddStatus(status, time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
+        AddStatus(Status.Instance<T>(), time, tickInterval, source?.AbilityContext, source?.Unit);
     }
     
-    public void AddStatus<T>(double time, double? tickInterval, AbilityContext? abilityContext, Unit? source)
-        where T : Status
-    {
-        AddStatus(Status.Instance<T>(), time, tickInterval, abilityContext, source);
-    }
-    
-    public void AddStatus<T>(double time, double? tickInterval, StatusContext sourceStatusContext)
-        where T : Status
-    {
-        AddStatus<T>(time, tickInterval, sourceStatusContext.AbilityContext, sourceStatusContext.Source);
-    }
-
     private void AddStatusWithoutDuplicateResolution(StatusContext context)
     {
         StatusesInternal[context.Id] = context;
@@ -637,8 +622,8 @@ public class Unit : UnitBase<IUnitNode>
         {
             StatusesInternal[target.Id] = target with
             {
-                Source = reference.Source,
-                AbilityContext = reference.AbilityContext,
+                SourceUnit = reference.SourceUnit,
+                SourceAbilityContext = reference.SourceAbilityContext,
                 DisplayElapsedTime = 0,
                 RemainingTime = Math.Max(target.RemainingTime, reference.RemainingTime)
             };

@@ -45,4 +45,6 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
             Statuses = DictionaryDelta.Between(from.Statuses, Statuses)
         };
     }
+    
+    public override EntitySnapshot ToPuppet() => this;
 }

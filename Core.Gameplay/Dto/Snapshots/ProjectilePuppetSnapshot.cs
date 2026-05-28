@@ -23,4 +23,6 @@ public sealed record ProjectilePuppetSnapshot : EntitySnapshot<ProjectilePuppetS
             Azimuth = Delta.Between(from.Azimuth, Azimuth),
         };
     }
+
+    public override EntitySnapshot ToPuppet() => this;
 }

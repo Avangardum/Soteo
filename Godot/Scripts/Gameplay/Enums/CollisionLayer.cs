@@ -7,4 +7,4 @@ public enum CollisionLayer : uint
     All = ~0u,
     Default = 1u,
     ClickArea = 1u << 8,
-} // todo move to main
+}

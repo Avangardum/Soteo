@@ -25,14 +25,15 @@ public sealed class VampireStatus : Status
         {
             const double healthDrainPerSecond = 5;
             double healthDrain = Maths.Min(unstableHealth, healthDrainPerSecond * delta);
-            context.Unit.SpendHealth(healthDrain, context.AbilityContext.Required.Ability);
+            context.Unit.SpendHealth(healthDrain, context.SourceAbilityContext.Required.Ability);
         }
     }
 
     public override void OnDealAttackDamage(StatusContext context, Unit target, double damage)
     {
-        double lifestealFactor = context.AbilityAs<VampireAbility>().LifestealFactor[context.AbilityContext.Level];
-        context.Unit.RestoreHealth(damage * lifestealFactor, context.Unit, context.AbilityContext.Ability); // todo overload for context
+        double lifestealFactor =
+            context.SourceAbilityAs<VampireAbility>().LifestealFactor[context.SourceAbilityContext.Level];
+        context.Unit.RestoreHealth(damage * lifestealFactor, context);
         target.AddStatus<BleedingStatus>(BleedingStatus.Time, BleedingStatus.TickInterval, context);
     }
 }

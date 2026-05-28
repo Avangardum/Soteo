@@ -168,6 +168,4 @@ public sealed class ExtraDataTests
         schema.Invoking(it => it.AddNullableGuid()).Should().Throw<InvalidOperationException>();
         schema.Invoking(it => it.AddNullableVector2WithDefault(default)).Should().Throw<InvalidOperationException>();
     }
-    
-    // todo reconsider default switch case warning
 }

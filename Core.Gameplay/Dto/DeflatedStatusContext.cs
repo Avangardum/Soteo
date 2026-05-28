@@ -25,9 +25,9 @@ public sealed record DeflatedStatusContext
         {
             Id = Id,
             Status = Status,
-            AbilityContext = AbilityContext?.Inflate(serviceProvider),
+            SourceAbilityContext = AbilityContext?.Inflate(serviceProvider),
             Unit = entityManager.GetEntity<Unit>(UnitId).Required,
-            Source = SourceId == null ? null : entityManager.GetEntity<Unit>(SourceId.Value).Required,
+            SourceUnit = SourceId == null ? null : entityManager.GetEntity<Unit>(SourceId.Value).Required,
             Tick = Tick,
             ElapsedTime = ElapsedTime,
             DisplayElapsedTime = DisplayElapsedTime,
@@ -44,7 +44,6 @@ public sealed record DeflatedStatusContext
             Id = Id,
             Status = Status,
             Ability = AbilityContext?.Ability,
-            ElapsedTime = ElapsedTime,
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
             Ordinal = Ordinal

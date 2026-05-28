@@ -5,5 +5,5 @@ namespace Soteo.Core.Gameplay.Interfaces;
 /// </summary>
 public interface IEntityLocator
 {
-    T? FindEntity<T>(Guid entityId, out Guid shardId) where T : class, IEntity;
+    T? FindEntity<T>(Guid entityId, out Guid? shardId) where T : class, IEntity;
 }
