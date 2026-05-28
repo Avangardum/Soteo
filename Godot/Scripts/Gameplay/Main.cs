@@ -1,7 +1,4 @@
-using System.Collections.Immutable;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.CampaignServer;
 using Soteo.Core.Gameplay;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Services;
@@ -15,23 +12,18 @@ using Soteo.Gameplay.Services;
 using Soteo.Gameplay.Services.Communicators;
 using Soteo.Gameplay.Ui;
 using Soteo.Shared;
-using Soteo.Shared.Extensions;
 using Soteo.Shared.Nodes;
-using Soteo.Shared.Nodes.Autoloads;
-using Soteo.Util;
-using Soteo.Util.Extensions;
 using RoutingPacketHandler = Soteo.Core.Gameplay.PacketHandlers.RoutingPacketHandler;
 
 namespace Soteo.Gameplay;
 
-public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
+public sealed class Main : Node2D, IShardLoader
 {
     // This class handles scene loading and dependency injection.
     // A service scope corresponds to a shard.
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
-    // todo LateInit
     private Hud? _hud;
     private Node2D? _shardRoot;
     private WebSocketFromGameplayToCampaignServerCommunicator? _webSocketCampaignServerCommunicator;
@@ -49,9 +41,6 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
     public static Guid EditorLocalShardServerId { get; private set; }
     [Export] private bool _editorIsServer;
     [Export] private string _editorLocalShardServerId = "";
-
-    public IReadOnlyDictionary<Guid, IServiceProvider> ShardServiceProviders =>
-        _shardServiceScopes.ToImmutableDictionary(it => it.Key, it => it.Value.ServiceProvider);
 
     public override void _EnterTree()
     {
@@ -130,7 +119,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         services.AddSingleton(this);
         services.AddSingleton<IShardLoader>(this);
-        services.AddSingleton<IShardServiceProviderSource>(this);
+        services.AddSingleton<IShardServiceProviders>(new ShardServiceProviders(_shardServiceScopes));
         services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
         services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();

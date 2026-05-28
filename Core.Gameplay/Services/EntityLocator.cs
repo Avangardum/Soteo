@@ -4,11 +4,11 @@ using Soteo.Core.Gameplay.Interfaces;
 namespace Soteo.Core.Gameplay.Services;
 
 /// <inheritdoc />
-public sealed class EntityLocator(IShardServiceProviderSource shardServiceProviderSource) : IEntityLocator
+public sealed class EntityLocator(IShardServiceProviders shardServiceProviders) : IEntityLocator
 {
     public T? FindEntity<T>(Guid entityId, out Guid? shardId) where T : class, IEntity
     {
-        foreach ((Guid currentShardId, IServiceProvider services) in shardServiceProviderSource.ShardServiceProviders)
+        foreach ((Guid currentShardId, IServiceProvider services) in shardServiceProviders)
         {
             T? entity = services.GetRequiredService<IEntityManager>().GetEntity<T>(entityId);
             if (entity != null)

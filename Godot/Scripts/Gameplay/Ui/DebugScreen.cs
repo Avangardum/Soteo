@@ -21,17 +21,17 @@ public sealed class DebugScreen : Control
     private int _pendingProcessCount;
     
     private readonly INetworkDebugger _networkDebugger;
-    private readonly IShardServiceProviderSource _shardServiceProviderSource;
+    private readonly IShardServiceProviders _shardServiceProviders;
     
     private readonly Label _label;
     private readonly Graph _fpsGraph;
     private readonly Graph _serverLoadGraph;
     private readonly Graph _entityCountGraph;
     
-    public DebugScreen(INetworkDebugger networkDebugger, IShardServiceProviderSource shardServiceProviderSource)
+    public DebugScreen(INetworkDebugger networkDebugger, IShardServiceProviders shardServiceProviders)
     {
         _networkDebugger = networkDebugger;
-        _shardServiceProviderSource = shardServiceProviderSource;
+        _shardServiceProviders = shardServiceProviders;
         
         Name = nameof(DebugScreen);
         Visible = false;
@@ -56,8 +56,7 @@ public sealed class DebugScreen : Control
         while (_pendingProcessCount > 0)
         {
             _pendingProcessCount--;
-            IServiceProvider? shardServiceProvider = _shardServiceProviderSource.ShardServiceProviders
-                .GetOrDefault(Const.TestShardId);
+            IServiceProvider? shardServiceProvider = _shardServiceProviders.GetOrDefault(Const.TestShardId);
             var synchronizationClient = shardServiceProvider?.GetRequiredService<ISynchronizationClient>();
             var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
 
