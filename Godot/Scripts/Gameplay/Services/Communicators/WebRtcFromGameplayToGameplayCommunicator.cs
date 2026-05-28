@@ -26,7 +26,6 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private double _timeSinceLastPing;
     private Guid? _lastPingId;
     private bool _didPollThisFrame;
-    private byte[]? _deferredShardSnapshotPacketBytes;
     
     private readonly Dictionary<Guid, PeerConnectionAndChannels> _peerConnectionsAndChannels = [];
     private readonly Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
