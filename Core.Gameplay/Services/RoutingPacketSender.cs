@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
 using Soteo.Core.Shared.Packets;
@@ -11,25 +12,31 @@ public sealed class RoutingPacketSender
     IPacketSender gameplaySender
 ) : IPacketSender
 {
-    public void SendReliable(Packet packet, Guid receiverId)
+    public void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds)
     {
-        if (receiverId == Const.CampaignServerId)
+        if (receiverIds.Contains(Const.CampaignServerId))
+        {
             campaignSender.SendPacket(packet);
-        else gameplaySender.SendReliable(packet, receiverId);
+            gameplaySender.SendReliable(packet, receiverIds.Except([Const.CampaignServerId]).ToImmutableList());
+        }
+        else
+        {
+            gameplaySender.SendReliable(packet, receiverIds);
+        }
     }
 
-    public void SendUnreliable(Packet packet, Guid receiverId)
+    public void SendUnreliable(Packet packet, params IEnumerable<Guid> receiverIds)
     {
-        if (receiverId == Const.CampaignServerId)
+        if (receiverIds.Contains(Const.CampaignServerId))
+        {
             campaignSender.SendPacket(packet);
-        gameplaySender.SendUnreliable(packet, receiverId);
+            gameplaySender.SendUnreliable(packet, receiverIds.Except([Const.CampaignServerId]).ToImmutableList());
+        }
+        else
+        {
+            gameplaySender.SendUnreliable(packet, receiverIds);
+        }
     }
-
-    public void SendReliable(Packet packet, IEnumerable<Guid> receiverIds) =>
-        gameplaySender.SendReliable(packet, receiverIds);
-
-    public void SendUnreliable(Packet packet, IEnumerable<Guid> receiverIds) =>
-        gameplaySender.SendUnreliable(packet, receiverIds);
 
     public void BroadcastReliable(Packet packet) => gameplaySender.BroadcastReliable(packet);
 

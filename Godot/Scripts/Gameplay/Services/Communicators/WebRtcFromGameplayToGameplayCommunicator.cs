@@ -292,16 +292,10 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         });
     }
 
-    public void SendReliable(Packet packet, Guid receiverId) =>
-        Send(_packetSerializer.Serialize(packet), receiverId, it => it.ReliableChannel);
-
-    public void SendUnreliable(Packet packet, Guid receiverId) =>
-        Send(_packetSerializer.Serialize(packet), receiverId, it => it.UnreliableChannel);
-
-    public void SendReliable(Packet packet, IEnumerable<Guid> receiverIds) => // todo params
+    public void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds) =>
         SendToMany(packet, receiverIds, it => it.ReliableChannel);
 
-    public void SendUnreliable(Packet packet, IEnumerable<Guid> receiverIds) =>
+    public void SendUnreliable(Packet packet, params IEnumerable<Guid> receiverIds) =>
         SendToMany(packet, receiverIds, it => it.UnreliableChannel);
 
     public void BroadcastReliable(Packet packet) =>
@@ -310,25 +304,6 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     public void BroadcastUnreliable(Packet packet) =>
         SendToMany(packet, _peerConnectionsAndChannels.Keys, it => it.UnreliableChannel);
     
-    private void Send
-    (
-        byte[] bytes,
-        Guid receiverId,
-        Func<PeerConnectionAndChannels, WebRTCDataChannel> channelSelector
-    )
-    {
-        if (bytes.Length <= MaxChunkSize)
-        {
-            SendWithoutChunking(bytes, receiverId, channelSelector);
-        }
-        else
-        {
-            byte[][] chunks = SplitIntoChunks(bytes);
-            foreach (byte[] chunk in chunks)
-                SendWithoutChunking(chunk, receiverId, channelSelector);
-        }
-    }
-    // todo unify
     private void SendToMany
     (
         Packet packet,
