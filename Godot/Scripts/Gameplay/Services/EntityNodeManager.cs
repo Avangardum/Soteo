@@ -3,7 +3,7 @@ using Soteo.Gameplay.Interfaces;
 
 namespace Soteo.Gameplay.Services;
 
-public sealed class EntityNodeManager(IShardNode shard, IEntityNodePool pool) : IEntityNodeManager
+public sealed class EntityNodeManager(ShardNode shard, IEntityNodePool pool) : IEntityNodeManager
 {
     private readonly Dictionary<Guid, IEntityNode> _nodes = [];
     

@@ -1,15 +1,17 @@
-using Soteo.Gameplay.Interfaces;
+using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Util;
 
 namespace Soteo.Gameplay;
 
-public sealed class ShardNode : Node2D, IShardNode
+public sealed class ShardNode : Node2D, IShard
 {
+    private readonly LateInit<Node2D> _entityRootLateInit = new();
+    public Node2D EntityRoot => _entityRootLateInit;
+    
     public Guid Id { get; set; }
-    public Node2D Node => this; // todo remove
-    public Node2D EntityRoot { get; private set; } = null!; // todo lateinit
-
+    
     public override void _Ready()
     {
-        EntityRoot = GetNode<Node2D>("Entities");
+        _entityRootLateInit.Value = GetNode<Node2D>("Entities");
     }
 }

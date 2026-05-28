@@ -139,9 +139,9 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
         
-        services.AddScoped<IShardNode>(
+        services.AddScoped<ShardNode>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
-        services.AddAlias<IShard, IShardNode>();
+        services.AddAlias<IShard, ShardNode>();
         services.AddScoped<IEntityManager, EntityManager>();
         services.AddScoped<IEntityNodeManager, EntityNodeManager>();
         
@@ -198,7 +198,7 @@ public sealed class Main : Node2D, IShardLoader, IShardServiceProviderSource
         
         var scope = _rootServiceProvider.Required.CreateScope();
         _newScopeShard = shard;
-        scope.ServiceProvider.GetRequiredService<IShardNode>();
+        scope.ServiceProvider.GetRequiredService<ShardNode>();
         _newScopeShard = null;
         CreateShardNodes(shard, scope.ServiceProvider);
         scope.ServiceProvider.GetService<ISynchronizationServer>();

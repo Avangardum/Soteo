@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
         }
 
         public IServiceCollection AddShardScopedNode<TService>(string path) where TService : class =>
-            self.AddScoped<TService>(sp => sp.GetRequiredService<IShardNode>().Node.GetNode<TService>(path));
+            self.AddScoped<TService>(sp => sp.GetRequiredService<ShardNode>().GetNode<TService>(path));
         
         public IServiceCollection AddShardScopedNode<TService, TImplementation>()
             where TImplementation : class, TService
