@@ -17,7 +17,12 @@ public abstract class Ability
 
     public static ImmutableList<Ability> All { get; }
 
-    public static T Instance<T>() where T : Ability => (T)InstancesByType[typeof(T)];
+    public static T Instance<T>() where T : Ability
+    {
+        if (InstancesByType.TryGetValue(typeof(T), out Ability? instance))
+            return (T)instance;
+        throw ExceptionFactory.TypeNotFound(typeof(T));
+    }
 
     static Ability()
     {

@@ -13,7 +13,12 @@ public abstract class Status
 
     public static ImmutableList<Status> All { get; }
 
-    public static T Instance<T>() where T : Status => (T)InstancesByType[typeof(T)];
+    public static T Instance<T>() where T : Status
+    {
+        if (InstancesByType.TryGetValue(typeof(T), out Status? instance))
+            return (T)instance;
+        throw ExceptionFactory.TypeNotFound(typeof(T));
+    }
 
     static Status()
     {

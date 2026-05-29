@@ -15,10 +15,10 @@ public sealed class RoutingPacketHandler(IServiceProvider serviceProvider) : IPa
     public async Task HandleAsync(Packet packet, Guid senderId)
     {
         if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type? handlerType))
-            Throw.PacketHandlerNotFound(packet.Type);
+            throw ExceptionFactory.PacketHandlerNotFound(packet.Type);
         User sender = serviceProvider.GetRequiredService<IUserRepository>()[senderId];
         if (sender.IsPlayer && !handlerType.HasAttribute<AllowClientPacketsAttribute>())
-            Throw.ClientPacketsNotAllowed(handlerType);
+            throw ExceptionFactory.ClientPacketsNotAllowed(handlerType);
         var handler = (IPacketHandler)serviceProvider.GetRequiredService(handlerType);
         await handler.HandleAsync(packet, senderId);
     }

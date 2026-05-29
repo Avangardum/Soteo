@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Reflection;
 using AwesomeAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -15,14 +14,8 @@ using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Tests;
 
-public sealed class UnitTests
+public sealed class UnitTests : Tests
 {
-    static UnitTests()
-    {
-        TypeLocator.Init(Assembly.GetExecutingAssembly(), CoreGameplayAssembly.Value);
-        // todo private discovery, error messages
-    }
-    
     private readonly Sut _sut;
     private readonly IEntityManager _entityManager;
     private readonly IUnitNode _node;

@@ -26,7 +26,7 @@ public sealed class RoutingPacketHandler
 
         if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type? handlerType))
         {
-            Throw.PacketHandlerNotFound(packet.Type);
+            throw ExceptionFactory.PacketHandlerNotFound(packet.Type);
         }
         if
         (
@@ -35,7 +35,7 @@ public sealed class RoutingPacketHandler
             !handlerType.HasAttribute<AllowClientPacketsAttribute>()
         )
         {
-            Throw.ClientPacketsNotAllowed(handlerType);
+            throw ExceptionFactory.ClientPacketsNotAllowed(handlerType);
         }
         
         var handler = (IPacketHandler)serviceProvider.GetRequiredService(handlerType);
