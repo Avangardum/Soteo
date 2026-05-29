@@ -26,7 +26,6 @@ public sealed class UnitTests : Tests
         _entityManager = Substitute.For<IEntityManager>();
         _node = Substitute.For<IUnitNode>();
         _serviceProvider = new ServiceCollection().AddSingleton(_entityManager).BuildServiceProvider();
-        _node = Substitute.For<IUnitNode>();
         _sut = new Sut(Guid.NewGuid(), _node, _serviceProvider);
     }
     
