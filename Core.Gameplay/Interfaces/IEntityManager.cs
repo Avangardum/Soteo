@@ -15,6 +15,13 @@ public interface IEntityManager
     void ApplyDelta(ShardSnapshotDelta delta, double lerpWeight);
     PlayerCharacter SpawnPlayerCharacter(Guid id);
     TargetedProjectile SpawnProjectile(AbilityContext abilityContext, double speed);
-    T? GetEntity<T>(Guid id);
     IEntity? GetEntity(Guid id);
+}
+
+public static class EntityManagerExtensions
+{
+    extension (IEntityManager self)
+    {
+        public T? GetEntity<T>(Guid id) => (T?)self.GetEntity(id);
+    }
 }

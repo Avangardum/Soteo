@@ -13,7 +13,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Entities;
 
-public class Unit : UnitBase<IUnitNode>
+public abstract class Unit : UnitBase<IUnitNode>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
@@ -312,16 +312,15 @@ public class Unit : UnitBase<IUnitNode>
 
     private void UseAbility(UseAbilityCommand command, ref double remainingDeltaTime, IUnitNode node)
     {
-        if (!AbilitySlotStatesInternal.TryGetValue(command.Slot, out AbilitySlotState? state))
+        AbilityContext? context = GetAbilityContext(command);
+        if (context == null)
         {
             _commands.Dequeue();
             AbilityUseProgress = null;
             return;
         }
         
-        AbilityContext context = GetAbilityContext(command);
-        
-        if (state.Cooldown > 0)
+        if (AbilitySlotStates[command.Slot].Cooldown > 0)
         {
             if (command.Repeat)
                 WaitForAbilityCooldown(context, ref remainingDeltaTime);
@@ -332,7 +331,7 @@ public class Unit : UnitBase<IUnitNode>
         }
         
         AbilityValidationResult validationResult =
-            ValidateAbilityWithCorrection(state.Ability, context, command, ref remainingDeltaTime, node);
+            ValidateAbilityWithCorrection(context.Ability, context, command, ref remainingDeltaTime, node);
         if (validationResult != AbilityValidationResult.Ok || remainingDeltaTime == 0)
         {
             AbilityUseProgress = null;
@@ -344,7 +343,7 @@ public class Unit : UnitBase<IUnitNode>
             AbilityUseProgress = new AbilityUseProgress
             {
                 Slot = command.Slot,
-                RemainingTime = state.Ability.UseTime(context)
+                RemainingTime = context.Ability.UseTime(context)
             };
         }
         
@@ -360,10 +359,15 @@ public class Unit : UnitBase<IUnitNode>
         }
     }
     
-    private AbilityContext GetAbilityContext(UseAbilityCommand command)
+    private AbilityContext? GetAbilityContext(UseAbilityCommand command)
     {
-        if (!AbilitySlotStates.TryGetValue(command.Slot, out AbilitySlotState? state))
-            throw new ArgumentException($"Unit {Id} doesn't have an ability in slot {command.Slot}");
+        if (!AbilitySlotStates.TryGetValue(command.Slot, out AbilitySlotState? state)) return null;
+        Unit? targetUnit = null;
+        if (command.TargetUnitId != null)
+        {
+            targetUnit = _entityManager.GetEntity(command.TargetUnitId.Value) as Unit;
+            if (targetUnit == null) return null;
+        }
         return new AbilityContext
         {
             Ability = state.Ability,
@@ -372,8 +376,7 @@ public class Unit : UnitBase<IUnitNode>
             UserStats = Stats.ToImmutableDictionary(),
             ServiceProvider = _serviceProvider,
             TargetPosition = command.TargetPosition,
-            TargetUnit = command.TargetUnitId == null ? null :
-                _entityManager.GetEntity(command.TargetUnitId.Value) as Unit, // todo if target unit is not found, ability should be canceled immediately, not treated as nothing-targeted
+            TargetUnit = targetUnit,
             TargetDirection = command.TargetDirection,
             TargetShardId = command.TargetShardId
         };
@@ -509,7 +512,7 @@ public class Unit : UnitBase<IUnitNode>
     public void DealAttackDamageTo(Unit target, Ability ability)
     {
         target.TakeDamage(Stats[Stat.AttackDamage], this, ability);
-        foreach (StatusContext statusContext in Statuses.Values) // todo will crash if Statuses changes
+        foreach (StatusContext statusContext in Statuses.Values.ToList())
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
     
@@ -524,14 +527,14 @@ public class Unit : UnitBase<IUnitNode>
         AbilitySlotStatesInternal[slot] = new AbilitySlotState { Ability = ability, Level = level };
         if (ability.PassiveStatus != null)
         {
-            AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand(slot));
+            AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand(slot)).Required;
             AddStatus
             (
                 ability.PassiveStatus,
                 double.PositiveInfinity,
                 ability.PassiveTickInterval,
                 abilityContext,
-                this
+                sourceUnit: this
             );
         }
     }
@@ -572,25 +575,25 @@ public class Unit : UnitBase<IUnitNode>
         List<StatusContext> duplicates = Statuses.Values.Where(it => it.Status == status).ToList();
         if (duplicates.Count == 0)
         {
-            AddStatusWithoutDuplicateResolution(context);
+            StatusesInternal[context.Id] = context;
         }
         else
         {
             switch (status.DuplicateResolution)
             {
                 case DuplicateStatusResolution.Stack:
-                    AddStatusWithoutDuplicateResolution(context);
+                    StatusesInternal[context.Id] = context;
                     break;
                 case DuplicateStatusResolution.Refresh:
                     RefreshDuplicateStatuses(context, duplicates.Single());
                     break;
                 case DuplicateStatusResolution.StackAndRefresh:
-                    AddStatusWithoutDuplicateResolution(context);
+                    StatusesInternal[context.Id] = context;
                     RefreshDuplicateStatuses(context, duplicates);
                     break;
                 case DuplicateStatusResolution.Replace:
                     RemoveStatus(duplicates.Single().Id);
-                    AddStatusWithoutDuplicateResolution(context);
+                    StatusesInternal[context.Id] = context;
                     break;
                 case DuplicateStatusResolution.Discard:
                     break;
@@ -608,14 +611,7 @@ public class Unit : UnitBase<IUnitNode>
     {
         AddStatus(Status.Instance<T>(), time, tickInterval, source?.AbilityContext, source?.Unit);
     }
-    
-    private void AddStatusWithoutDuplicateResolution(StatusContext context)
-    {
-        StatusesInternal[context.Id] = context;
-        if (context.Tick != null)
-            context.Status.Tick(context, context.Tick.Interval);
-    }
-    
+
     private void RefreshDuplicateStatuses(StatusContext reference, params IReadOnlyList<StatusContext> targets)
     {
         foreach (StatusContext target in targets)
