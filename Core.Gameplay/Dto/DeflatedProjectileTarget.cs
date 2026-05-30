@@ -24,8 +24,10 @@ public class DeflatedProjectileTarget
     public ProjectileTarget Inflate(IServiceProvider serviceProvider)
     {
         if (IsUnit)
-            return serviceProvider.GetRequiredService<IEntityManager>().GetEntity<Unit>(UnitId.Value).Required;
-        else
-            return Position;
+        {
+            var target = serviceProvider.GetRequiredService<IEntityManager>().GetEntity<IUnit>(UnitId.Value).Required;
+            return new ProjectileTarget(target);
+        }
+        return Position;
     }
 }

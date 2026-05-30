@@ -44,6 +44,4 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEnti
     
     public AbilityUseProgress? AbilityUseProgress { get; protected set; }
     public Faction Faction { get; }
-    
-    public bool IsAlliedTo(UnitBase<TNode> other) => Faction != Faction.Neutral && other.Faction == Faction;
 }

@@ -10,7 +10,7 @@ namespace Soteo.Core.Gameplay.Interfaces;
 /// </summary>
 public interface ISourceUnitAndAbility
 {
-    Unit? Unit { get; }
+    IUnit? Unit { get; }
     Ability? Ability { get; }
     AbilityContext? AbilityContext { get; }
 }

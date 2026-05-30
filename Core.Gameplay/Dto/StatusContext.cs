@@ -11,8 +11,8 @@ public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
     public required Guid Id { get; init; }
     public required Status Status { get; init; }
     public required AbilityContext? SourceAbilityContext { get; init; }
-    public required Unit Unit { get; init; }
-    public required Unit? SourceUnit { get; init; }
+    public required IUnit Unit { get; init; }
+    public required IUnit? SourceUnit { get; init; }
     public required StatusTickContext? Tick { get; init; }
     public required double ElapsedTime { get; init; }
     public required double DisplayElapsedTime { get; init; }
@@ -20,7 +20,7 @@ public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
     public required long Ordinal { get; init; }
     public required IServiceProvider ServiceProvider { get; init; }
     
-    Unit? ISourceUnitAndAbility.Unit => SourceUnit;
+    IUnit? ISourceUnitAndAbility.Unit => SourceUnit;
     Ability? ISourceUnitAndAbility.Ability => SourceAbilityContext?.Ability;
     AbilityContext? ISourceUnitAndAbility.AbilityContext => SourceAbilityContext;
     

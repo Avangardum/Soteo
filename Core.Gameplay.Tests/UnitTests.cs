@@ -62,7 +62,7 @@ public sealed class UnitTests : Tests
             projectileId,
             projectileAbilityContext,
             speed: 1,
-            target: _sut,
+            target: new ProjectileTarget(_sut),
             Substitute.For<IProjectileNode>(),
             _serviceProvider
         );
@@ -100,7 +100,7 @@ public sealed class UnitTests : Tests
         int statusTickCount = 0;
         SpyStatus.Ticked += () => statusTickCount++;
         
-        _sut.AddStatus<SpyStatus>(10, 1, source: null);
+        _sut.AddStatus<SpyStatus>(time: 10, tickInterval: 1, source: null);
         statusTickCount.Should().Be(0);
         
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
@@ -184,7 +184,7 @@ public sealed class UnitTests : Tests
     {
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
 
-        public override void OnDealAttackDamage(StatusContext context, Unit target, double damage)
+        public override void OnDealAttackDamage(StatusContext context, IUnit target, double damage)
         {
             base.OnDealAttackDamage(context, target, damage);
             context.Unit.RemoveStatus(context.Id);

@@ -2,6 +2,7 @@ using Soteo.Core.Gameplay.Abilities;
 using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Statuses;
@@ -29,7 +30,7 @@ public sealed class VampireStatus : Status
         }
     }
 
-    public override void OnDealAttackDamage(StatusContext context, Unit target, double damage)
+    public override void OnDealAttackDamage(StatusContext context, IUnit target, double damage)
     {
         double lifestealFactor =
             context.SourceAbilityAs<VampireAbility>().LifestealFactor[context.SourceAbilityContext.Level];

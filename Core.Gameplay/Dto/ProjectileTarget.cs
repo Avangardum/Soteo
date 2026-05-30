@@ -1,18 +1,18 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Gameplay.Interfaces;
 
 namespace Soteo.Core.Gameplay.Dto;
 
 public class ProjectileTarget
 {
-    public Unit? Unit { get; }
+    public IUnit? Unit { get; }
     public Vector2? Position { get; }
         
-    public ProjectileTarget(Unit unit) => Unit = unit;
+    public ProjectileTarget(IUnit unit) => Unit = unit;
     public ProjectileTarget(Vector2 position) => Position = position;
         
-    public static implicit operator ProjectileTarget(Unit unit) => new(unit);
     public static implicit operator ProjectileTarget(Vector2 target) => new(target);
         
     [MemberNotNullWhen(true, nameof(Unit))]

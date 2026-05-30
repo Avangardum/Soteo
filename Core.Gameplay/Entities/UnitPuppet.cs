@@ -164,4 +164,6 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
             node.AnimationSpeedScale = 0;
         }
     }
+    
+    public bool IsAlliedTo(UnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
 }

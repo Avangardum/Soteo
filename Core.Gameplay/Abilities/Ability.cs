@@ -132,7 +132,7 @@ public abstract class Ability
         return AbilityValidationResult.Ok;
     }
     
-    private AbilityValidationResult ValidateTargetUnit(Unit user, Unit target)
+    private AbilityValidationResult ValidateTargetUnit(IUnit user, IUnit target)
     {
         if (user.IsAlliedTo(target))
         {

@@ -13,7 +13,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Entities;
 
-public abstract class Unit : UnitBase<IUnitNode> // todo extract IUnit interface
+public abstract class Unit : UnitBase<IUnitNode>, IUnit
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
@@ -362,7 +362,7 @@ public abstract class Unit : UnitBase<IUnitNode> // todo extract IUnit interface
     private AbilityContext? GetAbilityContext(UseAbilityCommand command)
     {
         if (!AbilitySlotStates.TryGetValue(command.Slot, out AbilitySlotState? state)) return null;
-        Unit? targetUnit = null;
+        IUnit? targetUnit = null;
         if (command.TargetUnitId != null)
         {
             targetUnit = _entityManager.GetEntity(command.TargetUnitId.Value) as Unit;
@@ -459,34 +459,25 @@ public abstract class Unit : UnitBase<IUnitNode> // todo extract IUnit interface
         AbilityUseProgress = null;
     }
     
-    public void SpendHealth(double amount, Ability? ability)
+    public void SpendHealth(double amount, Ability? sourceAbility)
     {
         ChangeResourceStat(Stat.CurrentHealth, -amount);
     }
     
-    public void SpendMana(double amount, Ability? ability)
+    public void SpendMana(double amount, Ability? sourceAbility)
     {
         ChangeResourceStat(Stat.CurrentMana, -amount);
     }
     
-    public void TakeDamage(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
+    public void TakeDamage(double amount, IUnit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentHealth, -amount);
 
-    public void TakeDamage(double amount, ISourceUnitAndAbility? source) =>
-        TakeDamage(amount, source?.Unit, source?.Ability);
-    
-    public void RestoreHealth(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
+    public void RestoreHealth(double amount, IUnit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentHealth, amount);
-    
-    public void RestoreHealth(double amount, ISourceUnitAndAbility? source) =>
-        RestoreHealth(amount, source?.Unit, source?.Ability);
 
-    public void RestoreMana(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
+    public void RestoreMana(double amount, IUnit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentMana, amount);
     
-    public void RestoreMana(double amount, ISourceUnitAndAbility? source) =>
-        RestoreMana(amount, source?.Unit, source?.Ability);
-
     protected void ChangeResourceStat(Stat stat, double delta) =>
         SetResourceStat(stat, Stats[stat] + delta);
 
@@ -509,9 +500,9 @@ public abstract class Unit : UnitBase<IUnitNode> // todo extract IUnit interface
             Die();
     }
     
-    public void DealAttackDamageTo(Unit target, Ability ability)
+    public void DealAttackDamageTo(IUnit target, Ability sourceAbility)
     {
-        target.TakeDamage(Stats[Stat.AttackDamage], this, ability);
+        target.TakeDamage(Stats[Stat.AttackDamage], this, sourceAbility);
         foreach (StatusContext statusContext in Statuses.Values.ToList())
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
@@ -533,8 +524,8 @@ public abstract class Unit : UnitBase<IUnitNode> // todo extract IUnit interface
                 ability.PassiveStatus,
                 double.PositiveInfinity,
                 ability.PassiveTickInterval,
-                abilityContext,
-                sourceUnit: this
+                sourceUnit: this,
+                sourceAbilityContext: abilityContext
             );
         }
     }
@@ -544,8 +535,8 @@ public abstract class Unit : UnitBase<IUnitNode> // todo extract IUnit interface
         Status status,
         double time,
         double? tickInterval,
-        AbilityContext? sourceAbilityContext,
-        Unit? sourceUnit
+        IUnit? sourceUnit,
+        AbilityContext? sourceAbilityContext
     )
     {
         if (time < 0) throw new ArgumentException();
@@ -607,11 +598,6 @@ public abstract class Unit : UnitBase<IUnitNode> // todo extract IUnit interface
         UpdateStats();
     }
     
-    public void AddStatus<T>(double time, double? tickInterval, ISourceUnitAndAbility? source) where T : Status
-    {
-        AddStatus(Status.Instance<T>(), time, tickInterval, source?.AbilityContext, source?.Unit);
-    }
-
     private void RefreshDuplicateStatuses(StatusContext reference, params IReadOnlyList<StatusContext> targets)
     {
         foreach (StatusContext target in targets)
@@ -639,4 +625,6 @@ public abstract class Unit : UnitBase<IUnitNode> // todo extract IUnit interface
         IsDead = true;
         Remove();
     }
+
+    public bool IsAlliedTo(IUnit other) => Faction != Faction.Neutral && other.Faction == Faction;
 }

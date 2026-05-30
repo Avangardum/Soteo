@@ -42,7 +42,7 @@ public abstract class Status
     
     public virtual void Tick(StatusContext context, double delta) { }
     
-    public virtual void OnDealAttackDamage(StatusContext context, Unit target, double damage) { }
+    public virtual void OnDealAttackDamage(StatusContext context, IUnit target, double damage) { }
     
     public string Description(ILocalizer localizer) =>
         localizer.GetString(GetType().Name.PascalCaseToSnakeCase().ToUpperInvariant() + "_DESCRIPTION");
