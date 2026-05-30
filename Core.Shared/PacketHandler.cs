@@ -1,9 +1,21 @@
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using Soteo.Core.Shared.Enums;
 using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Shared.Extensions;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Shared;
+
+public static class PacketHandler
+{
+    public static readonly ImmutableDictionary<PacketType, Type> TypesByPacketType = TypeLocator
+        .ConcreteSubclassesOf<IPacketHandler>(where: it => it.BaseType.Required.IsGenericType)
+        .ToImmutableDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
+    
+    public static Type? TypeFor(PacketType packetType) => TypesByPacketType.GetOrDefault(packetType);
+}
 
 public abstract class PacketHandler<T> : IPacketHandler where T : Packet
 {

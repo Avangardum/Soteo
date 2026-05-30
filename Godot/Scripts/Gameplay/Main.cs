@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core.Gameplay;
 using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Gameplay.PacketHandlers;
 using Soteo.Core.Gameplay.Services;
 using Soteo.Core.Gameplay.Services.Synchronization;
 using Soteo.Core.Shared;
@@ -13,7 +14,6 @@ using Soteo.Gameplay.Services.Communicators;
 using Soteo.Gameplay.Ui;
 using Soteo.Shared;
 using Soteo.Shared.Nodes;
-using RoutingPacketHandler = Soteo.Core.Gameplay.PacketHandlers.RoutingPacketHandler;
 
 namespace Soteo.Gameplay;
 
@@ -121,7 +121,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IShardLoader>(this);
         services.AddSingleton<IShardServiceProviders>(new ShardServiceProviders(_shardServiceScopes));
         services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
-        services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
+        services.AddSingleton<IPacketHandler, GameplayRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddSingleton<IEntityNodePool>(new EntityNodePool());
         services.AddSingleton<IChunkCollector, ChunkCollector>();
@@ -134,7 +134,8 @@ public sealed class Main : Node2D, IShardLoader
         services.AddScoped<IEntityManager, EntityManager>();
         services.AddScoped<IEntityNodeManager, EntityNodeManager>();
         
-        foreach (Type type in TypeLocator.PacketHandlerTypes.Values) services.AddTransient(type);
+        foreach (Type type in PacketHandler.TypesByPacketType.Values)
+            services.AddTransient(type);
         
         if (Const.UseJsmq)
         {

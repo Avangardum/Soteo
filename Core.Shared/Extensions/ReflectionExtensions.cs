@@ -1,6 +1,5 @@
 using Soteo.Core.Shared.Attributes;
 using Soteo.Core.Shared.Enums;
-using Soteo.Util.Extensions;
 
 namespace Soteo.Core.Shared.Extensions;
 
@@ -12,8 +11,7 @@ public static class ReflectionExtensions
         {
             return self.BaseTypes
                 .Single(bt => bt.IsConstructedGenericType && bt.GetGenericTypeDefinition() == baseGenericClass)
-                .GenericTypeArguments.Single()
-                .GetRequiredAttribute<PacketTypeAttribute>().Type;
+                .GenericTypeArguments.Single().GetRequiredAttribute<PacketTypeAttribute>().Type;
         }
     }
 }

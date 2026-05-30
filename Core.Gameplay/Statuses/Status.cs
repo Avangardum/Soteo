@@ -22,7 +22,7 @@ public abstract class Status
 
     static Status()
     {
-        All = TypeLocator.InstanceAllSubclasses<Status>();
+        All = TypeLocator.InstanceSubclassesOf<Status>();
         InstancesByType = All.ToImmutableDictionary(it => it.GetType(), it => it);
     }
     

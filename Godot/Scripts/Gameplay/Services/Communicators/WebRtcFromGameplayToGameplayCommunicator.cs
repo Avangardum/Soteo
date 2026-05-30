@@ -1,7 +1,6 @@
 using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
-using Soteo.Core.Shared.Enums;
 using Soteo.Core.Shared.Exceptions;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.Packets;

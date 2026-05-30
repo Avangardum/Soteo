@@ -1,7 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
 using Soteo.Core.Shared.Enums;
 using Soteo.Core.Shared.Exceptions;
-using Soteo.Util;
 
 namespace Soteo.Core.Shared;
 

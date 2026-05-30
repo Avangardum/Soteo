@@ -1,15 +1,13 @@
-using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
 using Soteo.Core.Shared.Attributes;
-using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Shared.Extensions;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.Packets;
-using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.PacketHandlers;
 
-public sealed class RoutingPacketHandler
+public sealed class GameplayRoutingPacketHandler
 (
     IServiceProvider rootServiceProvider,
     IShardServiceProviders shardServiceProviders,
@@ -23,22 +21,20 @@ public sealed class RoutingPacketHandler
             senderId == Const.CampaignServerId ? rootServiceProvider :
             shardServiceProviders[senderId];
         if (serviceProvider == null) return;
-
-        if (!TypeLocator.PacketHandlerTypes.TryGetValue(packet.Type, out Type? handlerType))
-        {
+        
+        IPacketHandler handler = serviceProvider.GetPacketHandlerFor(packet.Type) ??
             throw ExceptionFactory.PacketHandlerNotFound(packet.Type);
-        }
+        
         if
         (
             Const.IsServer &&
             senderId != Const.CampaignServerId &&
-            !handlerType.HasAttribute<AllowClientPacketsAttribute>()
+            !handler.GetType().HasAttribute<AllowClientPacketsAttribute>()
         )
         {
-            throw ExceptionFactory.ClientPacketsNotAllowed(handlerType);
+            throw ExceptionFactory.ClientPacketsNotAllowed(handler.GetType());
         }
         
-        var handler = (IPacketHandler)serviceProvider.GetRequiredService(handlerType);
         await handler.HandleAsync(packet, senderId);
     }
 }

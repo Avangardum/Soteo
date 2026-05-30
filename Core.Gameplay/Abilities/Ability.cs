@@ -26,7 +26,7 @@ public abstract class Ability
 
     static Ability()
     {
-        All = TypeLocator.InstanceAllSubclasses<Ability>();
+        All = TypeLocator.InstanceSubclassesOf<Ability>();
         InstancesByType = All.ToImmutableDictionary(it => it.GetType(), it => it);
     }
     

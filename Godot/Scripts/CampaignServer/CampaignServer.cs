@@ -38,7 +38,7 @@ public sealed class CampaignServer : Node
     {
         services.AddSingleton<IUserRepository, UserRepository>();
         services.AddSingleton<ICharacterRepository, CharacterRepository>();
-        services.AddSingleton<IPacketHandler, RoutingPacketHandler>();
+        services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IPacketSender, ICommunicator>();
         
@@ -47,7 +47,7 @@ public sealed class CampaignServer : Node
         else
             services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
         
-        foreach (Type type in TypeLocator.PacketHandlerTypes.Values)
+        foreach (Type type in PacketHandler.TypesByPacketType.Values)
             services.AddTransient(type);
     }
 }

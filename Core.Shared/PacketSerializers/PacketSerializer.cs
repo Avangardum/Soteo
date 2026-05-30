@@ -1,13 +1,24 @@
-﻿using Soteo.Core.Shared.Enums;
+﻿using System.Collections.Immutable;
+using Soteo.Core.Shared.Attributes;
+using Soteo.Core.Shared.Enums;
 using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Shared.Extensions;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.Packets;
 using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Core.Shared.PacketSerializers;
 
-public abstract class PacketSerializer<TPacket> : IPacketSerializer
-    where TPacket : Packet, new()
+public static class PacketSerializer
+{
+    public static readonly ImmutableDictionary<PacketType, IPacketSerializer> InstancesByPacketType = TypeLocator
+        .InstanceSubclassesOf<IPacketSerializer>(where: it => it.BaseType.Required.IsGenericType)
+        .ToImmutableDictionary(it => it.GetType().GetPacketType(typeof(PacketSerializer<>)));
+    
+    public static IPacketSerializer For(PacketType packetType) => InstancesByPacketType[packetType];
+}
+
+public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacket : Packet, new()
 {
     byte[] IPacketSerializer.Serialize(Packet packet) => Serialize((TPacket)packet);
     

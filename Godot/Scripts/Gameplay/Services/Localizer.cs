@@ -13,7 +13,7 @@ public sealed class Localizer : ILocalizer
     public Localizer()
     {
         Dictionary<string, IPluralizer> pluralizers = [];
-        foreach (IPluralizer pluralizer in TypeLocator.InstanceAllSubclasses<IPluralizer>())
+        foreach (IPluralizer pluralizer in TypeLocator.InstanceSubclassesOf<IPluralizer>())
         {
             foreach (string languageCode in pluralizer.LanguageCodes)
             {
