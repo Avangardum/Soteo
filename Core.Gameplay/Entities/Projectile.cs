@@ -11,6 +11,7 @@ public sealed class Projectile : Entity<IProjectileNode>
     
     private AbilityContext _abilityContext;
     private double _speed;
+    private ProjectileTarget _target;
     private bool _didHit;
     
     public Projectile
@@ -18,12 +19,14 @@ public sealed class Projectile : Entity<IProjectileNode>
         Guid id,
         AbilityContext abilityContext,
         double speed,
+        ProjectileTarget target,
         IProjectileNode node,
         IServiceProvider serviceProvider
     ) : base(id, node)
     {
         _abilityContext = abilityContext;
         _speed = speed;
+        _target = target;
         _serviceProvider = serviceProvider;
     }
 
@@ -45,7 +48,8 @@ public sealed class Projectile : Entity<IProjectileNode>
             Position = Position,
             Azimuth = Azimuth,
             AbilityContext = _abilityContext.Deflate(),
-            Speed = _speed
+            Speed = _speed,
+            Target = _target.Deflate(),
         };
     }
 
@@ -55,6 +59,7 @@ public sealed class Projectile : Entity<IProjectileNode>
         var s = (ProjectileSnapshot)snapshot;
         _abilityContext = s.AbilityContext.Inflate(_serviceProvider);
         _speed = s.Speed;
+        _target = s.Target.Inflate(_serviceProvider);
     }
 
     public void Tick(double delta)
@@ -65,8 +70,7 @@ public sealed class Projectile : Entity<IProjectileNode>
             return;
         }
         
-        Vector2 targetPosition =
-            _abilityContext.TargetUnit?.Position ?? _abilityContext.TargetPosition ?? Position;
+        Vector2 targetPosition = _target.IsUnit ? _target.Unit.Position : _target.Position.Value;
         Vector2 directionToTarget = targetPosition - Position;
         double movementLength = _speed * delta;
         if (movementLength * movementLength < directionToTarget.LengthSquared())
@@ -81,9 +85,7 @@ public sealed class Projectile : Entity<IProjectileNode>
             // a snapshot where the projectile reaches the target, to prevent it from visually disappearing near the
             // target. If targeting a unit, offset it 1 pixel up so that when coming from above it doesn't flicker for 1
             // frame in front of the target.
-            Position = _abilityContext.TargetUnit != null ?
-                _abilityContext.TargetUnit.Position - Vector2.UnitY :
-                targetPosition;
+            Position = _target.IsUnit ? targetPosition - Vector2.UnitY : targetPosition;
         }
     }
 }

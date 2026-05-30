@@ -14,7 +14,7 @@ public interface IEntityManager
     void ReplicateSnapshot(ShardSnapshot snapshot);
     void ApplyDelta(ShardSnapshotDelta delta, double lerpWeight);
     PlayerCharacter SpawnPlayerCharacter(Guid id);
-    Projectile SpawnProjectile(AbilityContext abilityContext, double speed);
+    Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target);
     IEntity? GetEntity(Guid id);
 }
 

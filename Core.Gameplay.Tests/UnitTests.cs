@@ -62,6 +62,7 @@ public sealed class UnitTests : Tests
             projectileId,
             projectileAbilityContext,
             speed: 1,
+            target: _sut,
             Substitute.For<IProjectileNode>(),
             _serviceProvider
         );

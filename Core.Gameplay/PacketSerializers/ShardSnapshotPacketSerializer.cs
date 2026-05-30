@@ -132,6 +132,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeBaseEntity(projectile, stream);
         SerializeDouble(projectile.Speed, stream);
         SerializeAbilityContext(projectile.AbilityContext, stream);
+        SerializeProjectileTarget(projectile.Target, stream);
     }
     
     private ProjectileSnapshot DeserializeProjectile(Stream stream)
@@ -142,8 +143,27 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream),
             Speed = DeserializeDouble(stream),
-            AbilityContext = DeserializeAbilityContext(stream)
+            AbilityContext = DeserializeAbilityContext(stream),
+            Target = DeserializeProjectileTarget(stream),
         };
+    }
+    
+    private void SerializeProjectileTarget(DeflatedProjectileTarget value, Stream stream)
+    {
+        SerializeBool(value.IsUnit, stream);
+        if (value.IsUnit)
+            SerializeGuid(value.UnitId.Value, stream);
+        else
+            SerializeVector2(value.Position.Value, stream);
+    }
+    
+    private DeflatedProjectileTarget DeserializeProjectileTarget(Stream stream)
+    {
+        bool isUnit = DeserializeBool(stream);
+        if (isUnit)
+            return DeserializeGuid(stream);
+        else
+            return DeserializeVector2(stream);
     }
     
     private void SerializeProjectilePuppet(ProjectilePuppetSnapshot projectilePuppet, Stream stream)

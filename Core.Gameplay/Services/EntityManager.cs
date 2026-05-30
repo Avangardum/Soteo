@@ -94,10 +94,10 @@ public sealed class EntityManager : IEntityManager
     public PlayerCharacter SpawnPlayerCharacter(Guid id) =>
         Add(new PlayerCharacter(id, AddNode<IUnitNode>(id), _serviceProvider));
 
-    public Projectile SpawnProjectile(AbilityContext abilityContext, double speed)
+    public Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target)
     {
         var id = Guid.NewGuid();
-        return Add(new Projectile(id, abilityContext, speed, AddNode<IProjectileNode>(id), _serviceProvider)
+        return Add(new Projectile(id, abilityContext, speed, target, AddNode<IProjectileNode>(id), _serviceProvider)
         {
             // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
             // of the projectile over the source
