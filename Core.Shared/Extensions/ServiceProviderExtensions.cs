@@ -8,7 +8,7 @@ public static class ServiceProviderExtensions
 {
     extension (IServiceProvider self)
     {
-        public IPacketHandler? GetPacketHandlerFor(PacketType packetType) =>
-            (IPacketHandler?)PacketHandler.TypeFor(packetType)?.PassTo(self.GetRequiredService);
+        public IPacketHandler? GetPacketHandlerFor(PacketTypeCode packetTypeCode) =>
+            (IPacketHandler?)PacketHandler.TypeFor(packetTypeCode)?.PassTo(self.GetRequiredService);
     }
 }

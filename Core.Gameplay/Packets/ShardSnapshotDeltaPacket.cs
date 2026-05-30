@@ -5,7 +5,7 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.Packets;
 
-[PacketType(PacketType.ShardSnapshotDelta)]
+[PacketTypeCode(PacketTypeCode.ShardSnapshotDelta)]
 public sealed record ShardSnapshotDeltaPacket : Packet
 {
     public long Tick { get; set; }

@@ -3,7 +3,7 @@ using Soteo.Core.Shared.Enums;
 
 namespace Soteo.Core.Shared.Packets;
 
-[PacketType(PacketType.BadInput)]
+[PacketTypeCode(PacketTypeCode.BadInput)]
 public sealed record BadInputPacket : Packet
 {
     public string Reason { get; set; } = "";

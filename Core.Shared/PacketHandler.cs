@@ -10,11 +10,11 @@ namespace Soteo.Core.Shared;
 
 public static class PacketHandler
 {
-    public static readonly ImmutableDictionary<PacketType, Type> TypesByPacketType = TypeLocator
+    public static readonly ImmutableDictionary<PacketTypeCode, Type> TypesByPacketType = TypeLocator
         .ConcreteSubclassesOf<IPacketHandler>(where: it => it.BaseType.Required.IsGenericType)
         .ToImmutableDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
     
-    public static Type? TypeFor(PacketType packetType) => TypesByPacketType.GetOrDefault(packetType);
+    public static Type? TypeFor(PacketTypeCode packetTypeCode) => TypesByPacketType.GetOrDefault(packetTypeCode);
 }
 
 public abstract class PacketHandler<T> : IPacketHandler where T : Packet

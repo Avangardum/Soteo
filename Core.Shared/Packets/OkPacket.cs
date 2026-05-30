@@ -3,5 +3,5 @@ using Soteo.Core.Shared.Enums;
 
 namespace Soteo.Core.Shared.Packets;
 
-[PacketType(PacketType.Ok)]
+[PacketTypeCode(PacketTypeCode.Ok)]
 public sealed record OkPacket : Packet;

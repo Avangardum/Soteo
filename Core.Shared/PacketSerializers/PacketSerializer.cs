@@ -11,11 +11,11 @@ namespace Soteo.Core.Shared.PacketSerializers;
 
 public static class PacketSerializer
 {
-    public static readonly ImmutableDictionary<PacketType, IPacketSerializer> InstancesByPacketType = TypeLocator
+    public static readonly ImmutableDictionary<PacketTypeCode, IPacketSerializer> InstancesByPacketType = TypeLocator
         .InstanceSubclassesOf<IPacketSerializer>(where: it => it.BaseType.Required.IsGenericType)
         .ToImmutableDictionary(it => it.GetType().GetPacketType(typeof(PacketSerializer<>)));
     
-    public static IPacketSerializer For(PacketType packetType) => InstancesByPacketType[packetType];
+    public static IPacketSerializer For(PacketTypeCode packetTypeCode) => InstancesByPacketType[packetTypeCode];
 }
 
 public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacket : Packet, new()
@@ -31,7 +31,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacke
     
     protected virtual void SerializeInternal(TPacket packet, Stream stream)
     {
-        SerializeEnum(packet.Type, stream);
+        SerializeEnum(packet.TypeCode, stream);
     }
     
     Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
@@ -55,8 +55,8 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacke
     protected virtual TPacket DeserializeInternal(Stream stream)
     {
         var packet = new TPacket();
-        var type = DeserializeEnum<PacketType>(stream);
-        if (type != packet.Type)
+        var typeCode = DeserializeEnum<PacketTypeCode>(stream);
+        if (typeCode != packet.TypeCode)
             throw new InvalidOperationException("Wrong serializer");
         return packet;
     }

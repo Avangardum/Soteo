@@ -4,5 +4,5 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.Packets;
 
-[PacketType(PacketType.Stop)]
+[PacketTypeCode(PacketTypeCode.Stop)]
 public sealed record StopPacket : Packet;

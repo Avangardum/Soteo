@@ -1,6 +1,6 @@
 namespace Soteo.Core.Shared.Enums;
 
-public enum PacketType : byte
+public enum PacketTypeCode : byte
 {
     // Shared
     Chunk,

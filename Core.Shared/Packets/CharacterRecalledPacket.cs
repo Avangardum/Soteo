@@ -3,7 +3,7 @@ using Soteo.Core.Shared.Enums;
 
 namespace Soteo.Core.Shared.Packets;
 
-[PacketType(PacketType.CharacterRecalled)]
+[PacketTypeCode(PacketTypeCode.CharacterRecalled)]
 public sealed record CharacterRecalledPacket : Packet
 {
     public Guid CharacterId { get; set; }

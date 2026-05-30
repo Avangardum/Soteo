@@ -7,8 +7,8 @@ namespace Soteo.Core.Shared.PacketSerializers;
 public sealed class RoutingPacketSerializer : IPacketSerializer
 {
     public Packet Deserialize(Span<byte> bytes) =>
-        PacketSerializer.For((PacketType)bytes[0]).Deserialize(bytes);
+        PacketSerializer.For((PacketTypeCode)bytes[0]).Deserialize(bytes);
 
     public byte[] Serialize(Packet packet) =>
-        PacketSerializer.For(packet.Type).Serialize(packet);
+        PacketSerializer.For(packet.TypeCode).Serialize(packet);
 }

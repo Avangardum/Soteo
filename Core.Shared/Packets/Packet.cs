@@ -8,8 +8,8 @@ public abstract record Packet // todo use required fields, avoid gradual constru
 {
     protected Packet()
     {
-        Type = GetType().GetRequiredAttribute<PacketTypeAttribute>().Type;
+        TypeCode = GetType().GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;
     }
     
-    public PacketType Type { get; }
+    public PacketTypeCode TypeCode { get; }
 }

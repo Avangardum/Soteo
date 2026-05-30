@@ -7,11 +7,11 @@ public static class ReflectionExtensions
 {
     extension (Type self)
     {
-        public PacketType GetPacketType(Type baseGenericClass)
+        public PacketTypeCode GetPacketType(Type baseGenericClass)
         {
             return self.BaseTypes
                 .Single(bt => bt.IsConstructedGenericType && bt.GetGenericTypeDefinition() == baseGenericClass)
-                .GenericTypeArguments.Single().GetRequiredAttribute<PacketTypeAttribute>().Type;
+                .GenericTypeArguments.Single().GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;
         }
     }
 }

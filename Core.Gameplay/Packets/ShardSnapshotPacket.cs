@@ -5,7 +5,7 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.Packets;
 
-[PacketType(PacketType.ShardSnapshot)]
+[PacketTypeCode(PacketTypeCode.ShardSnapshot)]
 public sealed record ShardSnapshotPacket : Packet
 {
     public long Tick { get; set; }

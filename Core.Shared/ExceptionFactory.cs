@@ -11,9 +11,9 @@ public static class ExceptionFactory
         return new Exception(message);
     }
     
-    public static Exception PacketHandlerNotFound(PacketType packetType)
+    public static Exception PacketHandlerNotFound(PacketTypeCode packetTypeCode)
     {
-        var message = $"Packet handler for packet type {packetType} was not found. " +
+        var message = $"Packet handler for packet type {packetTypeCode} was not found. " +
             $"Make sure the handler exists, is public and its assembly is passed to TypeLocator.Init.";
         return new BadPacketException(message);
     }

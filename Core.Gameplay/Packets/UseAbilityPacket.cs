@@ -5,7 +5,7 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.Packets;
 
-[PacketType(PacketType.UseAbility)]
+[PacketTypeCode(PacketTypeCode.UseAbility)]
 public sealed record UseAbilityPacket : Packet
 {
     public UseAbilityCommand Command { get; set; } = null!;

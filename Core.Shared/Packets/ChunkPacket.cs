@@ -6,7 +6,7 @@ namespace Soteo.Core.Shared.Packets;
 /// <summary>
 /// Fragment of a chunked packet
 /// </summary>
-[PacketType(PacketType.Chunk)]
+[PacketTypeCode(PacketTypeCode.Chunk)]
 public sealed record ChunkPacket : Packet
 {
     public Guid GroupId { get; set; }

@@ -3,7 +3,7 @@ using Soteo.Core.Shared.Enums;
 
 namespace Soteo.Core.Shared.Packets;
 
-[PacketType(PacketType.SpawnCharacter)]
+[PacketTypeCode(PacketTypeCode.SpawnCharacter)]
 public sealed record SpawnCharacterPacket : RelayedPacket
 {
     public Guid SpawnPointId { get; set; }

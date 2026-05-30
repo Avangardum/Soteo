@@ -5,7 +5,7 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.Packets;
 
-[PacketType(PacketType.Move)]
+[PacketTypeCode(PacketTypeCode.Move)]
 public sealed record MovePacket : Packet
 {
     public Vector2 Position { get; set; }
