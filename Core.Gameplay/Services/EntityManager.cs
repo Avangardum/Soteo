@@ -11,7 +11,7 @@ using Soteo.Util.Interfaces;
 
 namespace Soteo.Core.Gameplay.Services;
 
-public sealed class EntityManager : IEntityManager
+public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ClientDependency<ICamera> _camera;
@@ -34,7 +34,7 @@ public sealed class EntityManager : IEntityManager
     
     public IEntity? GetEntity(Guid id) => _entities.GetOrDefault(id);
     
-    public IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntityPuppetSnapshots()
+    public IReadOnlyDictionary<Guid, EntitySnapshot> GetEntityPuppetSnapshots()
     {
         ImmutableDictionary<Guid, EntitySnapshot> snapshots = _entities.Values
             .Select(it => it.CreateSnapshot().ToPuppet())
@@ -44,10 +44,10 @@ public sealed class EntityManager : IEntityManager
         return snapshots;
     }
     
-    public void ReplicateSnapshot(ShardSnapshot snapshot)
+    public void ReplicateEntitySnapshots(IReadOnlyDictionary<Guid, EntitySnapshot> snapshots)
     {
         List<Guid> ids = [];
-        foreach (EntitySnapshot entitySnapshot in snapshot.Entities.Values)
+        foreach (EntitySnapshot entitySnapshot in snapshots.Values)
         {
             ids.Add(entitySnapshot.Id);
             if (GetEntity(entitySnapshot.Id) == null)
@@ -57,7 +57,7 @@ public sealed class EntityManager : IEntityManager
         {
             _entities[id].Remove();
         }
-        foreach (EntitySnapshot entitySnapshot in snapshot.Entities.Values)
+        foreach (EntitySnapshot entitySnapshot in snapshots.Values)
         {
             // Entity snapshots are replicated only after all entities are spawned so that references between entities
             // can be replicated correctly.

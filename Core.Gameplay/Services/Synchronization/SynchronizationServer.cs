@@ -11,7 +11,7 @@ namespace Soteo.Core.Gameplay.Services.Synchronization;
 
 public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 {
-    private readonly IEntityManager _entityManager;
+    private readonly IEntitySnapshotManager _entitySnapshotManager;
     private readonly IPacketSender _packetSender;
     private readonly IConnectionNotifier _connectionNotifier;
     private readonly IFrameStopwatch _frameStopwatch;
@@ -23,14 +23,14 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     
     public SynchronizationServer
     (
-        IEntityManager entityManager,
+        IEntitySnapshotManager entitySnapshotManager,
         IPacketSender packetSender,
         IConnectionNotifier connectionNotifier,
         IProcessPublisher processPublisher,
         IFrameStopwatch frameStopwatch
     )
     {
-        _entityManager = entityManager;
+        _entitySnapshotManager = entitySnapshotManager;
         _packetSender = packetSender;
         _connectionNotifier = connectionNotifier;
         _frameStopwatch = frameStopwatch;
@@ -56,7 +56,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 
     private void PhysicsProcess(double delta)
     {
-        var entitySnapshots = _entityManager.CreateEntityPuppetSnapshots();
+        var entitySnapshots = _entitySnapshotManager.GetEntityPuppetSnapshots();
         var shardSnapshot = new ShardSnapshot { Entities = entitySnapshots };
         
         ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :

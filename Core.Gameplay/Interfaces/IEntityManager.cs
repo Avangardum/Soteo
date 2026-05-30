@@ -1,5 +1,4 @@
 using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Dto.Snapshots;
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Util.Interfaces;
 
@@ -12,10 +11,8 @@ public interface IEntityManager
     event Action<IEntity> EntityAdded;
     event Action<IEntity> EntityRemoved;
     
-    IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntityPuppetSnapshots(); // todo internal
-    void ReplicateSnapshot(ShardSnapshot snapshot); // todo internal, rename and pass only entities
-    void ApplyDelta(ShardSnapshotDelta delta, double lerpWeight); // todo internal
-    PlayerCharacter SpawnPlayerCharacter(Guid id); // todo internal
+    
+    PlayerCharacter SpawnPlayerCharacter(Guid id);
     Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target); 
     IEntity? GetEntity(Guid id); // todo to extension
 }

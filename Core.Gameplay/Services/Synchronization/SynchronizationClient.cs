@@ -14,7 +14,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
     private static readonly double BufferTicksMinValueToFastForward =
         BufferTicksMinSafeValue + 0.01f * Const.TicksPerSecond;
     
-    private readonly IEntityManager _entityManager;
+    private readonly IEntitySnapshotManager _entitySnapshotManager;
     private readonly IShard _shard;
     private readonly INetworkDebugger _networkDebugger;
     private readonly IPacketSender _packetSender;
@@ -24,14 +24,14 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
 
     public SynchronizationClient
     (
-        IEntityManager entityManager,
+        IEntitySnapshotManager entitySnapshotManager,
         IShard shard,
         INetworkDebugger networkDebugger,
         IPacketSender packetSender,
         IProcessPublisher processPublisher
     )
     {
-        _entityManager = entityManager;
+        _entitySnapshotManager = entitySnapshotManager;
         _shard = shard;
         _networkDebugger = networkDebugger;
         _packetSender = packetSender;
@@ -104,7 +104,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         long lastFullDeltaTick = Maths.FloorToLong(_syncData.Tick!.Value);
         
         for (long t = firstFullDeltaTick; t <= lastFullDeltaTick; t++)
-            _entityManager.ApplyDelta(_syncData.DeltaRing.RingGet(t).Required, 1);
+            _entitySnapshotManager.ApplyDelta(_syncData.DeltaRing.RingGet(t).Required, 1);
 
         if (_syncData.Tick % 1 > 0)
         {
@@ -112,12 +112,12 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
             if ((long)prevTick < (long)_syncData.Tick)
             {
                 double interpolationWeight = _syncData.Tick.Value % 1;
-                _entityManager.ApplyDelta(partialDelta, interpolationWeight);
+                _entitySnapshotManager.ApplyDelta(partialDelta, interpolationWeight);
             }
             else
             {
                 double weight = Maths.InverseLerp(prevTick, lastFullDeltaTick + 1, _syncData.Tick.Value);
-                _entityManager.ApplyDelta(partialDelta, weight);
+                _entitySnapshotManager.ApplyDelta(partialDelta, weight);
             }
         }
     }
@@ -139,7 +139,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         bool canSynchronize = _syncData.LastDeltaTick >= _syncData.LastSnapshotPacket?.Tick + 2;
         if (!canSynchronize) return false;
         
-        _entityManager.ReplicateSnapshot(_syncData.LastSnapshotPacket.Required.Snapshot);
+        _entitySnapshotManager.ReplicateEntitySnapshots(_syncData.LastSnapshotPacket.Required.Snapshot.Entities);
         _syncData.Tick = _syncData.LastSnapshotPacket.Tick;
         State = StateEnum.Synchronized;
         return true;

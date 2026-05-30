@@ -131,7 +131,9 @@ public sealed class Main : Node2D, IShardLoader
         services.AddScoped<ShardNode>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
         services.AddAlias<IShard, ShardNode>();
-        services.AddScoped<IEntityManager, EntityManager>();
+        services.AddScoped<EntityManager>();
+        services.AddAlias<IEntityManager, EntityManager>();
+        services.AddAlias<IEntitySnapshotManager, EntityManager>();
         services.AddScoped<IEntityNodeManager, EntityNodeManager>();
         
         foreach (Type type in PacketHandler.TypesByPacketType.Values)
