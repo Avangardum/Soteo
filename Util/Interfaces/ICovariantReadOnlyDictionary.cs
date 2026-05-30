@@ -6,4 +6,5 @@ public interface ICovariantReadOnlyDictionary<TKey, out TValue> : IEnumerable<IR
     TValue this[TKey key] { get; }
     IEnumerable<TKey> Keys { get; }
     IEnumerable<TValue> Value { get; }
+    int Count { get; }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core.Gameplay.Dto;
@@ -6,6 +7,7 @@ using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
 using Soteo.Util;
+using Soteo.Util.Interfaces;
 
 namespace Soteo.Core.Gameplay.Services;
 
@@ -15,7 +17,8 @@ public sealed class EntityManager : IEntityManager
     private readonly ClientDependency<ICamera> _camera;
     private readonly IEntityNodeManager _entityNodeManager; 
     
-    private readonly Dictionary<Guid, IEntity> _entities = [];
+    private readonly Dictionary<Guid, ISnapshottableEntity> _entities = [];
+    private readonly List<EntitySnapshot> _deadPuppetSnapshots = [];
     
     public EntityManager(IServiceProvider serviceProvider)
     {
@@ -24,12 +27,22 @@ public sealed class EntityManager : IEntityManager
         _entityNodeManager = serviceProvider.GetRequiredService<IEntityNodeManager>();
     }
     
-    public IReadOnlyDictionary<Guid, IEntity> Entities => _entities;
+    public ICovariantReadOnlyDictionary<Guid, IEntity> Entities => _entities.AsCovariant();
     
     public event Action<IEntity> EntityAdded = delegate { };
     public event Action<IEntity> EntityRemoved = delegate { };
-
+    
     public IEntity? GetEntity(Guid id) => _entities.GetOrDefault(id);
+    
+    public IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntityPuppetSnapshots()
+    {
+        ImmutableDictionary<Guid, EntitySnapshot> snapshots = _entities.Values
+            .Select(it => it.CreateSnapshot().ToPuppet())
+            .Concat(_deadPuppetSnapshots)
+            .ToImmutableDictionary(it => it.Id);
+        _deadPuppetSnapshots.Clear();
+        return snapshots;
+    }
     
     public void ReplicateSnapshot(ShardSnapshot snapshot)
     {
@@ -48,7 +61,7 @@ public sealed class EntityManager : IEntityManager
         {
             // Entity snapshots are replicated only after all entities are spawned so that references between entities
             // can be replicated correctly.
-            GetEntity(entitySnapshot.Id).Required.ReplicateSnapshot(entitySnapshot);
+            _entities[entitySnapshot.Id].ReplicateSnapshot(entitySnapshot);
         }
     }
 
@@ -56,7 +69,7 @@ public sealed class EntityManager : IEntityManager
     {
         foreach (EntitySnapshotDelta entityDelta in delta.Entities.Changes.Values)
         {
-            bool isNew = !_entities.TryGetValue(entityDelta.Id, out IEntity? entity);
+            bool isNew = !_entities.TryGetValue(entityDelta.Id, out ISnapshottableEntity? entity);
             if (isNew)
                 entity = SpawnEntityFromDelta(entityDelta);
             // Unlike in ReplicateSnapshotEntities, deltas are applied without waiting for all new entities to spawn,
@@ -69,7 +82,7 @@ public sealed class EntityManager : IEntityManager
         }
     }
 
-    private IEntity SpawnEntityFromSnapshot(EntitySnapshot snapshot)
+    private ISnapshottableEntity SpawnEntityFromSnapshot(EntitySnapshot snapshot)
     {
         return snapshot switch
         {
@@ -80,7 +93,7 @@ public sealed class EntityManager : IEntityManager
         };
     }
     
-    private IEntity SpawnEntityFromDelta(EntitySnapshotDelta delta)
+    private ISnapshottableEntity SpawnEntityFromDelta(EntitySnapshotDelta delta)
     {
         return delta switch
         {
@@ -105,7 +118,7 @@ public sealed class EntityManager : IEntityManager
         });
     }
 
-    private T Add<T>(T entity) where T : IEntity 
+    private T Add<T>(T entity) where T : ISnapshottableEntity 
     {
         entity.Removed += () => OnEntityRemoved(entity);
         _entities.Add(entity.Id, entity);
@@ -116,10 +129,16 @@ public sealed class EntityManager : IEntityManager
     private T AddNode<T>(Guid id) where T : class, IEntityNode =>
         _entityNodeManager.AddNode<T>(id);
 
-    private void OnEntityRemoved(IEntity entity)
+    private void OnEntityRemoved(ISnapshottableEntity entity)
     {
         _entityNodeManager.RemoveNode(entity.Id);
         _entities.Remove(entity.Id);
+        
+        // A final snapshot is sent when a unit dies to notify clients that it's removed due to its death and
+        // not for another reason like recall.
+        if (entity is Unit { IsDead: true })
+            _deadPuppetSnapshots.Add(entity.CreateSnapshot().ToPuppet());
+        
         EntityRemoved(entity);
     }
 }

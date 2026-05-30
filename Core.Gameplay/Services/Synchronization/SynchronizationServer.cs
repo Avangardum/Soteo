@@ -19,7 +19,6 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     private long _tick;
     private ShardSnapshot? _prevShardSnapshot;
     private readonly HashSet<Guid> _snapshotRequesters = [];
-    private readonly List<EntitySnapshot> _entitySnapshots = [];
     private readonly IDisposable _physicsProcessSubscription;
     
     public SynchronizationServer
@@ -36,7 +35,6 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         _connectionNotifier = connectionNotifier;
         _frameStopwatch = frameStopwatch;
         
-        entityManager.EntityRemoved += OnEntityRemoved;
         connectionNotifier.PeerConnected += OnPeerConnected;
         _physicsProcessSubscription =
             processPublisher.SubscribeToPhysicsProcess(PhysicsProcess, ProcessPriorityEnum.SynchronizationServer);
@@ -44,18 +42,11 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 
     public void Dispose()
     {
-        _entityManager.EntityRemoved -= OnEntityRemoved;
         _connectionNotifier.PeerConnected -= OnPeerConnected;
         _physicsProcessSubscription.Dispose();
     }
 
-    private void OnEntityRemoved(IEntity entity)
-    {
-        // A final snapshot is sent when a unit dies to notify clients that it's removed due to its death and
-        // not for another reason like recall.
-        if (entity is Unit { IsDead: true })
-            _entitySnapshots.Add(entity.CreateSnapshot().ToPuppet());
-    }
+    
     
     private void OnPeerConnected(Guid peerId)
     {
@@ -65,11 +56,8 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 
     private void PhysicsProcess(double delta)
     {
-        foreach (IEntity entity in _entityManager.Entities.Values)
-            _entitySnapshots.Add(entity.CreateSnapshot().ToPuppet());
-        
-        var shardSnapshot = new ShardSnapshot { Entities = _entitySnapshots.ToImmutableDictionary(it => it.Id) };
-        _entitySnapshots.Clear();
+        var entitySnapshots = _entityManager.CreateEntityPuppetSnapshots();
+        var shardSnapshot = new ShardSnapshot { Entities = entitySnapshots };
         
         ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
             ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);

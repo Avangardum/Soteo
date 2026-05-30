@@ -6,7 +6,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Entities;
 
-public abstract class Entity<TNode> : IEntity where TNode : class, IEntityNode
+public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, IEntityNode
 {
     protected Entity(Guid id, TNode node)
     {

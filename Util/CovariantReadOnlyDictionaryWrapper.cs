@@ -21,4 +21,6 @@ public class CovariantReadOnlyDictionaryWrapper<TKey, TValue>(IReadOnlyDictionar
     public IEnumerable<TKey> Keys => dictionary.Keys;
 
     public IEnumerable<TValue> Value => dictionary.Values;
+    
+    public int Count => dictionary.Count;
 }
