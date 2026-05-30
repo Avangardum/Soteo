@@ -13,7 +13,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Entities;
 
-public abstract class Unit : UnitBase<IUnitNode>
+public abstract class Unit : UnitBase<IUnitNode> // todo extract IUnit interface
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;

@@ -5,11 +5,15 @@ using Soteo.Core.Gameplay.Interfaces;
 
 namespace Soteo.Core.Gameplay.Entities;
 
-public abstract class Projectile : Entity<IProjectileNode>
+public sealed class Projectile : Entity<IProjectileNode>
 {
     private readonly IServiceProvider _serviceProvider;
     
-    protected Projectile
+    private AbilityContext _abilityContext;
+    private double _speed;
+    private bool _didHit;
+    
+    public Projectile
     (
         Guid id,
         AbilityContext abilityContext,
@@ -18,8 +22,8 @@ public abstract class Projectile : Entity<IProjectileNode>
         IServiceProvider serviceProvider
     ) : base(id, node)
     {
-        AbilityContext = abilityContext;
-        Speed = speed;
+        _abilityContext = abilityContext;
+        _speed = speed;
         _serviceProvider = serviceProvider;
     }
 
@@ -33,9 +37,6 @@ public abstract class Projectile : Entity<IProjectileNode>
         }
     }
     
-    protected AbilityContext AbilityContext { get; private set; }
-    protected double Speed { get; private set; }
-    
     public override EntitySnapshot CreateSnapshot()
     {
         return new ProjectileSnapshot
@@ -43,8 +44,8 @@ public abstract class Projectile : Entity<IProjectileNode>
             Id = Id,
             Position = Position,
             Azimuth = Azimuth,
-            AbilityContext = AbilityContext.Deflate(),
-            Speed = Speed
+            AbilityContext = _abilityContext.Deflate(),
+            Speed = _speed
         };
     }
 
@@ -52,9 +53,37 @@ public abstract class Projectile : Entity<IProjectileNode>
     {
         base.ReplicateSnapshot(snapshot);
         var s = (ProjectileSnapshot)snapshot;
-        AbilityContext = s.AbilityContext.Inflate(_serviceProvider);
-        Speed = s.Speed;
+        _abilityContext = s.AbilityContext.Inflate(_serviceProvider);
+        _speed = s.Speed;
     }
 
-    public virtual void Tick(double delta) { }
+    public void Tick(double delta)
+    {
+        if (_didHit)
+        {
+            Remove();
+            return;
+        }
+        
+        Vector2 targetPosition =
+            _abilityContext.TargetUnit?.Position ?? _abilityContext.TargetPosition ?? Position;
+        Vector2 directionToTarget = targetPosition - Position;
+        double movementLength = _speed * delta;
+        if (movementLength * movementLength < directionToTarget.LengthSquared())
+        {
+            Position += Vector2.Normalize(directionToTarget) * movementLength;
+        }
+        else
+        {
+            _didHit = true;
+            _abilityContext.Ability.OnProjectileHit(_abilityContext);
+            // Update position for the last time and defer removing the entity to the next frame so that clients receive
+            // a snapshot where the projectile reaches the target, to prevent it from visually disappearing near the
+            // target. If targeting a unit, offset it 1 pixel up so that when coming from above it doesn't flicker for 1
+            // frame in front of the target.
+            Position = _abilityContext.TargetUnit != null ?
+                _abilityContext.TargetUnit.Position - Vector2.UnitY :
+                targetPosition;
+        }
+    }
 }

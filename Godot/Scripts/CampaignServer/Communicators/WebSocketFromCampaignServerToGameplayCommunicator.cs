@@ -20,8 +20,8 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
     private readonly IPacketHandler _packetHandler;
     private readonly IUserRepository _userRepo;
     private readonly JwtBuilder _jwtBuilder;
-
-    private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = []; // todo rename?
+    
+    private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = [];
     
     public WebSocketFromCampaignServerToGameplayCommunicator
     (

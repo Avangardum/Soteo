@@ -57,7 +57,7 @@ public sealed class UnitTests : Tests
             UserStats = _sut.Stats.ToImmutableDictionary(),
             ServiceProvider = _serviceProvider
         };
-        var projectile = new TargetedProjectile
+        var projectile = new Projectile
         (
             projectileId,
             projectileAbilityContext,
