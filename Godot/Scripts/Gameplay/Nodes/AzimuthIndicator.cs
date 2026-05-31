@@ -1,8 +1,6 @@
-using Soteo.Shared;
-using Soteo.Shared.Extensions;
 using Soteo.Util;
 
-namespace Soteo.Gameplay;
+namespace Soteo.Gameplay.Nodes;
 
 public sealed class AzimuthIndicator : Line2D
 {

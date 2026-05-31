@@ -1,8 +1,7 @@
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.EntityNodes;
+namespace Soteo.Gameplay.Nodes;
 
 public sealed class UnitNode : KinematicBody2D, IUnitNode
 {

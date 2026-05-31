@@ -8,6 +8,7 @@ using Soteo.Core.Shared;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.PacketSerializers;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Nodes;
 using Soteo.Gameplay.Resources;
 using Soteo.Gameplay.Services;
 using Soteo.Gameplay.Services.Communicators;
@@ -25,6 +26,7 @@ public sealed class Main : Node2D, IShardLoader
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
     private Hud? _hud;
+    private DebugScreenNode? _debugScreenNode;
     private Node2D? _shardRoot;
     private WebSocketFromGameplayToCampaignServerCommunicator? _webSocketCampaignServerCommunicator;
     private WebRtcFromGameplayToGameplayCommunicator? _webRtcGameplayCommunicator;
@@ -57,6 +59,7 @@ public sealed class Main : Node2D, IShardLoader
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
         GetNodes();
         CreateNodes();
+        CreateSingletonServices(_rootServiceProvider);
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
@@ -99,8 +102,15 @@ public sealed class Main : Node2D, IShardLoader
             ui.AddChild(_hud);
             AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));
             ui.AddChild(ActivatorUtilities.CreateInstance<LogInUi>(_rootServiceProvider));
-            ui.AddChild(ActivatorUtilities.CreateInstance<DebugScreen>(_rootServiceProvider));
+            _debugScreenNode = DebugScreenNode.Instance();
+            ui.AddChild(_debugScreenNode);
         }
+    }
+    
+    private void CreateSingletonServices(IServiceProvider serviceProvider)
+    {
+        if (!Const.IsServer)
+            serviceProvider.GetRequiredService<DebugScreen>();
     }
     
     private void RegisterServices(IServiceCollection services)
@@ -167,6 +177,8 @@ public sealed class Main : Node2D, IShardLoader
         services.AddScoped<ISynchronizationClient, SynchronizationClient>();
         services.AddSingletonNode<ICamera>("Camera");
         services.AddSingleton<IHud>(_ => _hud.Required);
+        services.AddSingleton<DebugScreenNode>(_ => _debugScreenNode.Required);
+        services.AddSingleton<DebugScreen>();
         services.AddSingleton<IEntityLocator, EntityLocator>();
         services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
         services.AddSingletonNode<ITooltip>("Ui/TooltipLayer/Tooltip");
@@ -192,14 +204,20 @@ public sealed class Main : Node2D, IShardLoader
         _newScopeShard = shard;
         scope.ServiceProvider.GetRequiredService<ShardNode>();
         _newScopeShard = null;
-        CreateShardNodes(shard, scope.ServiceProvider);
-        scope.ServiceProvider.GetService<ISynchronizationServer>();
+        CreateShardScopedNodes(shard, scope.ServiceProvider);
+        CreateShardScopedServices(scope.ServiceProvider);
         _shardServiceScopes[shardId] = scope;
     }
     
-    private void CreateShardNodes(ShardNode shard, IServiceProvider serviceProvider)
+    private void CreateShardScopedNodes(ShardNode shard, IServiceProvider serviceProvider)
     {
         if (Const.IsServer) return;
         shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
+    }
+    
+    private void CreateShardScopedServices(IServiceProvider serviceProvider)
+    {
+        if (Const.IsServer)
+            serviceProvider.GetRequiredService<ISynchronizationServer>();
     }
 }

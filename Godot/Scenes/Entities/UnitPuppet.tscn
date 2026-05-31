@@ -1,8 +1,8 @@
 [gd_scene load_steps=26 format=2]
 
-[ext_resource path="res://Scripts/Gameplay/EntityNodes/UnitPuppetNode.cs" type="Script" id=1]
+[ext_resource path="res://Scripts/Gameplay/Nodes/UnitPuppetNode.cs" type="Script" id=1]
 [ext_resource path="res://Textures/Cute Fantasy Free/Player/Player.png" type="Texture" id=2]
-[ext_resource path="res://Scripts/Gameplay/AzimuthIndicator.cs" type="Script" id=4]
+[ext_resource path="res://Scripts/Gameplay/Nodes/AzimuthIndicator.cs" type="Script" id=4]
 
 [sub_resource type="AtlasTexture" id=28]
 atlas = ExtResource( 2 )

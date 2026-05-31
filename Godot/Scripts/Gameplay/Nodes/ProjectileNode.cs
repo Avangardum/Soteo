@@ -1,9 +1,7 @@
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Extensions;
 
-namespace Soteo.Gameplay.EntityNodes;
+namespace Soteo.Gameplay.Nodes;
 
 public sealed class ProjectileNode : Area2D, IProjectileNode
 {

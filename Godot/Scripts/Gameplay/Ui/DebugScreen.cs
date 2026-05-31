@@ -1,17 +1,17 @@
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Nodes;
 using Soteo.Shared;
 using Soteo.Shared.Extensions;
 using Soteo.Util;
 
 namespace Soteo.Gameplay.Ui;
 
-public sealed class DebugScreen : Control
+public sealed class DebugScreen
 {
-    private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/DebugScreen.tscn"); 
- 
     private const int RingLength = 10 * Const.TicksPerSecond;
     private readonly double[] _fpsRing = new double[RingLength];
     private readonly double[] _unrolledFpsRing = new double[RingLength];
@@ -23,35 +23,37 @@ public sealed class DebugScreen : Control
     private readonly INetworkDebugger _networkDebugger;
     private readonly IShardServiceProviders _shardServiceProviders;
     
+    private readonly DebugScreenNode _node;
     private readonly Label _label;
     private readonly Graph _fpsGraph;
     private readonly Graph _serverLoadGraph;
     private readonly Graph _entityCountGraph;
     
-    public DebugScreen(INetworkDebugger networkDebugger, IShardServiceProviders shardServiceProviders)
+    public DebugScreen
+    (
+        DebugScreenNode node,
+        INetworkDebugger networkDebugger,
+        IShardServiceProviders shardServiceProviders
+    )
     {
         _networkDebugger = networkDebugger;
         _shardServiceProviders = shardServiceProviders;
         
-        Name = nameof(DebugScreen);
-        Visible = false;
-        MouseFilter = MouseFilterEnum.Ignore;
-        AnchorRight = 1;
-        AnchorBottom = 1;
-        
-        Scene.InstanceAndReparentTo(this);
-        _label = GetNode<Label>("Label");
-        _fpsGraph = GetNode<Graph>("FpsGraph");
-        _serverLoadGraph = GetNode<Graph>("ServerLoadGraph");
-        _entityCountGraph = GetNode<Graph>("EntityCountGraph");
+        node.DebugScreen = this;
+        node.Visible = false;
+        _node = node;
+        _label = node.GetNode<Label>("Label");
+        _fpsGraph = node.GetNode<Graph>("FpsGraph");
+        _serverLoadGraph = node.GetNode<Graph>("ServerLoadGraph");
+        _entityCountGraph = node.GetNode<Graph>("EntityCountGraph");
     }
     
-    public override void _PhysicsProcess(float delta)
+    public void PhysicsProcess(double delta)
     {
         _pendingProcessCount++;
     }
-
-    public override void _Process(float delta)
+    
+    public void Process(double delta)
     {
         while (_pendingProcessCount > 0)
         {
@@ -102,9 +104,9 @@ public sealed class DebugScreen : Control
     private string ToMillisecondsString(double? seconds) =>
         seconds == null ? "?" : (seconds.Value * 1000).ToString("N0") + "ms";
 
-    public override void _UnhandledInput(InputEvent e)
+    public void _UnhandledInput(InputEvent e)
     {
         if (e.IsActionPressed("debug_screen"))
-            Visible = !Visible;
+            _node.Visible = !_node.Visible;
     }
 }

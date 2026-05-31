@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Gameplay.EntityNodes;
 using Soteo.Gameplay.Interfaces;
 
 namespace Soteo.Gameplay.Services;
