@@ -27,12 +27,11 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         _entityNodeManager = serviceProvider.GetRequiredService<IEntityNodeManager>();
     }
     
-    public ICovariantReadOnlyDictionary<Guid, IEntity> Entities => _entities.AsCovariant();
+    public IReadOnlyDictionary<Guid, IEntity> Entities =>
+        _entities.CovariantCast<Guid, ISnapshottableEntity, IEntity>();
     
     public event Action<IEntity> EntityAdded = delegate { };
     public event Action<IEntity> EntityRemoved = delegate { };
-    
-    public IEntity? GetEntity(Guid id) => _entities.GetOrDefault(id);
     
     public IReadOnlyDictionary<Guid, EntitySnapshot> GetEntityPuppetSnapshots()
     {
@@ -50,7 +49,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         foreach (EntitySnapshot entitySnapshot in snapshots.Values)
         {
             ids.Add(entitySnapshot.Id);
-            if (GetEntity(entitySnapshot.Id) == null)
+            if (this.GetEntity(entitySnapshot.Id) == null)
                 SpawnEntityFromSnapshot(entitySnapshot);
         }
         foreach (Guid id in _entities.Keys.Except(ids).ToArray())

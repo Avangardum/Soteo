@@ -66,7 +66,7 @@ public sealed class UnitTests : Tests
             Substitute.For<IProjectileNode>(),
             _serviceProvider
         );
-        _entityManager.GetEntity(projectileId).Returns(projectile);
+        _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [projectileId] = projectile });
         
         _sut.SetCommand(new UseAbilityCommand(AbilitySlot.Class0, TargetUnitId: projectileId));
         _sut.Tick(Const.TickInterval);

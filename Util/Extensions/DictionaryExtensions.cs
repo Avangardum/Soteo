@@ -33,34 +33,17 @@ public static class DictionaryExtensions
         
         public TValue? GetOrDefault(TKey key) =>
             self.TryGetValue(key, out TValue? value) ? value : default;
-        
-        public ICovariantReadOnlyDictionary<TKey, TValue> AsCovariant() =>
-            new CovariantReadOnlyDictionaryWrapper<TKey, TValue>(self);
     }
-    
+
+    extension<TKey, TValue, TTarget>(IReadOnlyDictionary<TKey, TValue> self) where TValue : TTarget
+    {
+        public IReadOnlyDictionary<TKey, TTarget> CovariantCast() =>
+            new CovariantDictionaryWrapper<TKey, TTarget, TValue>(self);
+    }
+
     extension<TKey, TValue> (IReadOnlyDictionary<TKey, TValue> self) where TValue : struct
     {
         public TValue? GetOrNull(TKey key) => self.TryGetValue(key, out TValue value) ? value : null; 
-    }
-    
-    extension<TKey, TValue> (ICovariantReadOnlyDictionary<TKey, TValue> self) where TValue : notnull
-    {
-        public bool TryGetValue(TKey key, [NotNullWhen(true)] out TValue? value)
-        {
-            if (self.ContainsKey(key))
-            {
-                value = self[key];
-                return true;
-            }
-            else
-            {
-                value = default;
-                return false;
-            }
-        }
-        
-        public TValue? GetOrDefault(TKey key, TValue? defaultValue = default) =>
-            self.TryGetValue(key, out TValue? value) ? value : defaultValue;
     }
     
     extension<TKey, TValue> (IDictionary<TKey, TValue> self)
