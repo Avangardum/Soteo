@@ -1,26 +1,27 @@
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Nodes;
 using Soteo.Shared.Extensions;
 
 namespace Soteo.Gameplay.Ui;
 
-public class LogInUi : Control
+public sealed class LogInScreen
 {
-    private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/LogIn.tscn");
+    private readonly ICampaignServerCommunicator _campaignServerCommunicator;
     
+    private readonly LogInScreenNode _node;
     private readonly LineEdit _emailLineEdit;
     private readonly LineEdit _passwordLineEdit;
-    private readonly ICampaignServerCommunicator _campaignServerCommunicator;
 
-    public LogInUi(ICampaignServerCommunicator campaignServerCommunicator)
+    public LogInScreen(LogInScreenNode node, ICampaignServerCommunicator campaignServerCommunicator)
     {
         _campaignServerCommunicator = campaignServerCommunicator;
-        Scene.InstanceAndReparentTo(this);
-        _emailLineEdit = GetNode<LineEdit>("Email");
-        _passwordLineEdit = GetNode<LineEdit>("Password");
-        GetNode<Button>("LogIn").Connect("pressed", this, nameof(OnLogInPressed));
+        
+        _node = node;
+        _emailLineEdit = node.GetNode<LineEdit>("Email");
+        _passwordLineEdit = node.GetNode<LineEdit>("Password");
+        node.GetNode<Button>("LogIn").Connect("pressed", OnLogInPressed);
         LoadCredentialsFromCmdLineArgs();
-        Name = nameof(LogInUi);
     }
     
     private void LoadCredentialsFromCmdLineArgs()
@@ -31,11 +32,11 @@ public class LogInUi : Control
             _emailLineEdit.Text = args[emailIndex];
     }
 
-    public void OnLogInPressed()
+    private void OnLogInPressed()
     {
         string email = _emailLineEdit.Text;
         string password = _passwordLineEdit.Text;
         _campaignServerCommunicator.ConnectAsPlayer(email, password);
-        Visible = false;
+        _node.Visible = false;
     }
 }

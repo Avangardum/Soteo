@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://Scripts/Shared/Proxy.gd" type="Script" id=1]
+[ext_resource path="res://Scripts/Gameplay/Nodes/LogInScreenNode.cs" type="Script" id=1]
 
 [node name="LogIn" type="Control"]
 anchor_right = 1.0

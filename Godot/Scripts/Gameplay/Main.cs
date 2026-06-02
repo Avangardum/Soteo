@@ -25,6 +25,7 @@ public sealed class Main : Node2D, IShardLoader
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
+    private LogInScreenNode? _logIScreenNode;
     private HudNode? _hudNode;
     private DebugScreenNode? _debugScreenNode;
     private Node2D? _shardRoot;
@@ -100,16 +101,18 @@ public sealed class Main : Node2D, IShardLoader
             var ui = GetNode<CanvasLayer>("Ui");
             _hudNode = HudNode.Instance().Also(it => ui.AddChild(it));
             AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));
-            ui.AddChild(ActivatorUtilities.CreateInstance<LogInUi>(_rootServiceProvider));
-            _debugScreenNode = DebugScreenNode.Instance();
-            ui.AddChild(_debugScreenNode);
+            _logIScreenNode = LogInScreenNode.Instance().Also(it => ui.AddChild(it));
+            _debugScreenNode = DebugScreenNode.Instance().Also(it => ui.AddChild(it));
         }
     }
     
     private void CreateSingletonServices(IServiceProvider serviceProvider)
     {
         if (!Const.IsServer)
+        {
+            serviceProvider.GetRequiredService<LogInScreen>();
             serviceProvider.GetRequiredService<DebugScreen>();
+        }
     }
     
     private void RegisterServices(IServiceCollection services)
@@ -173,6 +176,8 @@ public sealed class Main : Node2D, IShardLoader
     
     private void RegisterClientServices(IServiceCollection services)
     {
+        services.AddSingleton<LogInScreenNode>(_ => _logIScreenNode.Required);
+        services.AddSingleton<LogInScreen>();
         services.AddScoped<ISynchronizationClient, SynchronizationClient>();
         services.AddSingletonNode<ICamera>("Camera");
         services.AddSingleton<HudNode>(_ => _hudNode.Required);
