@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://Scripts/Gameplay/Nodes/UnitNode.cs" type="Script" id=1]
+[ext_resource path="res://Scripts/Gameplay/EntityNodes/UnitNode.cs" type="Script" id=1]
 
 [sub_resource type="CapsuleShape2D" id=67]
 radius = 2.0

@@ -1,4 +1,4 @@
-namespace Soteo.Core.Gameplay.Enums;
+namespace Soteo.Gameplay.Enums;
 
 [Flags]
 public enum CollisionLayer : uint

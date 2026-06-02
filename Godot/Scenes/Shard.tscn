@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://Scripts/Gameplay/Nodes/ShardNode.cs" type="Script" id=2]
+[ext_resource path="res://Scripts/Gameplay/ShardNode.cs" type="Script" id=2]
 
 [node name="Shard" type="Node2D"]
 script = ExtResource( 2 )
