@@ -16,7 +16,7 @@ public sealed class SpawnCharacterPacketHandler
 {
     protected override void Handle(SpawnCharacterPacket packet, Guid senderId)
     {
-        userRepo.TryGetValue(packet.PeerId, out User? receiver);
+        Validate(userRepo.TryGetValue(packet.PeerId, out User? receiver), "Receiver not found");
         User sender = userRepo[senderId];
         Validate
         (

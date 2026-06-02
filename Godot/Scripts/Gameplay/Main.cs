@@ -192,8 +192,8 @@ public sealed class Main : Node2D, IShardLoader
     
     public void LoadShard()
     {
-        string mapPath = "res://Scenes/Maps/Test.tscn";
         Guid shardId = Const.TestShardId;
+        string mapPath = $"res://Scenes/Maps/Test{shardId.ToString()[^1]}.tscn";
         Vector2 position = new Vector2(0, 0);
 
         var shard = _shardScene.Required.Instance<ShardNode>();
