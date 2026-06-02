@@ -8,6 +8,8 @@ public sealed class DebugScreenNode : Control
     
     public DebugScreen? DebugScreen { get; set; }
 
+    private DebugScreenNode() { }
+    
     public static DebugScreenNode Instance() => Scene.Instance<DebugScreenNode>();
     
     public override void _PhysicsProcess(float delta) => DebugScreen?.PhysicsProcess(delta);

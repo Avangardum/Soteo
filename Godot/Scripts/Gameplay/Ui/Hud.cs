@@ -5,16 +5,16 @@ using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Nodes;
 using Soteo.Shared;
 using Soteo.Util;
 using Soteo.Util.Extensions;
 
 namespace Soteo.Gameplay.Ui;
 
-public sealed class Hud : Control, IHud
+public sealed class Hud : IHud
 {
-    private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/Hud.tscn"); 
-    
+    private readonly HudNode _node;
     private readonly TextureProgress _healthBar;
     private readonly TextureProgress _manaBar;
     private readonly Label _healthLabel;
@@ -32,6 +32,7 @@ public sealed class Hud : Control, IHud
 
     public Hud
     (
+        HudNode node,
         IEntityLocator entityLocator,
         ICurrentUserIdRepository currentUserIdRepository,
         IPalette palette,
@@ -44,21 +45,17 @@ public sealed class Hud : Control, IHud
         _palette = palette;
         _tooltip = tooltip;
         _localizer = localizer;
-        
-        Name = nameof(Hud);
-        AnchorBottom = 1;
-        AnchorRight = 1;
-        MouseFilter = MouseFilterEnum.Ignore;
-        
-        Scene.InstanceAndReparentTo(this);
-        _healthBar = GetNode<TextureProgress>("VBoxContainer/UnitPanel/VBoxContainer/Health");
-        _manaBar = GetNode<TextureProgress>("VBoxContainer/UnitPanel/VBoxContainer/Mana");
+
+        node.Hud = this;
+        _node = node;
+        _healthBar = node.GetNode<TextureProgress>("VBoxContainer/UnitPanel/VBoxContainer/Health");
+        _manaBar = node.GetNode<TextureProgress>("VBoxContainer/UnitPanel/VBoxContainer/Mana");
         _healthLabel = _healthBar.GetNode<Label>("Label");
         _manaLabel = _manaBar.GetNode<Label>("Label");
-        _abilityButtons = GetNode("VBoxContainer/UnitPanel/VBoxContainer/Abilities").GetChildren()
+        _abilityButtons = node.GetNode("VBoxContainer/UnitPanel/VBoxContainer/Abilities").GetChildren()
             .Cast<AbilityButton>()
             .ToImmutableList();
-        _statusIndicators = GetNode("VBoxContainer/Statuses").GetChildren()
+        _statusIndicators = node.GetNode("VBoxContainer/Statuses").GetChildren()
             .Cast<StatusIndicator>()
             .ToImmutableList();
 
@@ -121,17 +118,17 @@ public sealed class Hud : Control, IHud
         _tooltip.Hide();
     }
 
-    public override void _Process(float delta)
+    public void Process(double delta)
     {
         if (_currentUserIdRepository.Value != null)
             SelectedUnit ??= _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepository.Required, out _);
         if (SelectedUnit == null)
         {
-            Visible = false;
+            _node.Visible = false;
             return;
         }
 
-        Visible = true;
+        _node.Visible = true;
         ProcessBars(SelectedUnit);
         ProcessAbilities(SelectedUnit);
         ProcessStatuses(SelectedUnit);

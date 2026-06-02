@@ -25,7 +25,7 @@ public sealed class Main : Node2D, IShardLoader
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
-    private Hud? _hud;
+    private HudNode? _hudNode;
     private DebugScreenNode? _debugScreenNode;
     private Node2D? _shardRoot;
     private WebSocketFromGameplayToCampaignServerCommunicator? _webSocketCampaignServerCommunicator;
@@ -98,8 +98,7 @@ public sealed class Main : Node2D, IShardLoader
         else
         {
             var ui = GetNode<CanvasLayer>("Ui");
-            _hud = ActivatorUtilities.CreateInstance<Hud>(_rootServiceProvider);
-            ui.AddChild(_hud);
+            _hudNode = HudNode.Instance().Also(it => ui.AddChild(it));
             AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));
             ui.AddChild(ActivatorUtilities.CreateInstance<LogInUi>(_rootServiceProvider));
             _debugScreenNode = DebugScreenNode.Instance();
@@ -176,7 +175,8 @@ public sealed class Main : Node2D, IShardLoader
     {
         services.AddScoped<ISynchronizationClient, SynchronizationClient>();
         services.AddSingletonNode<ICamera>("Camera");
-        services.AddSingleton<IHud>(_ => _hud.Required);
+        services.AddSingleton<HudNode>(_ => _hudNode.Required);
+        services.AddSingleton<IHud, Hud>();
         services.AddSingleton<DebugScreenNode>(_ => _debugScreenNode.Required);
         services.AddSingleton<DebugScreen>();
         services.AddSingleton<IEntityLocator, EntityLocator>();
