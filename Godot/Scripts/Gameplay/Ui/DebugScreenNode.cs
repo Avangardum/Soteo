@@ -12,5 +12,5 @@ public sealed class DebugScreenNode : Control
     
     public override void _PhysicsProcess(float delta) => DebugScreen?.PhysicsProcess(delta);
     public override void _Process(float delta) => DebugScreen?.Process(delta);
-    public override void _UnhandledInput(InputEvent e) => DebugScreen?._UnhandledInput(e);
+    public override void _UnhandledInput(InputEvent e) => DebugScreen?.UnhandledInput(e);
 }

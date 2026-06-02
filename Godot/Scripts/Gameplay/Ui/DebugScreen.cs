@@ -103,7 +103,7 @@ public sealed class DebugScreen
     private string ToMillisecondsString(double? seconds) =>
         seconds == null ? "?" : (seconds.Value * 1000).ToString("N0") + "ms";
 
-    public void _UnhandledInput(InputEvent e)
+    public void UnhandledInput(InputEvent e)
     {
         if (e.IsActionPressed("debug_screen"))
             _node.Visible = !_node.Visible;

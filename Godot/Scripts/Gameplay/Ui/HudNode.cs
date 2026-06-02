@@ -6,6 +6,8 @@ public sealed class HudNode : Control
     
     public Hud? Hud { get; set; }
 
+    private HudNode() { }
+    
     public static HudNode Instance() => Scene.Instance<HudNode>();
     
     public override void _Process(float delta) => Hud?.Process(delta);
