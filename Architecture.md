@@ -1,29 +1,36 @@
-# Gameplay
+The solution consists of the following projects:
 
-The gameplay section of the Godot project represents both the shard server and the client.
+AuthServer - ASP.NET authentication server which manages user accounts and issues tokens.
+Core - Core game logic independent from Godot. Covered with unit tests.
+    CampaignServer - Orchestrates shard servers and clients, handles global state.
+    Gameplay - Client and shard server (shard server simulates gameplay for a single shard).
+    Shared - Shared core logic.
+Util - Utilities extending standard libraries.
+Soteo - Main Godot entry point project for the client, the shard server and the campaign server. Contains all Godot
+dependent code.
+
+# Gameplay
 
 The shard server runs with a fixed tick rate, all gameplay logic is executed exclusively in _PhysicsProcess.
 
 The client sends commands to the shard server and replicates the state using snapshots sent by the server.
 
-`Main` node is the entry point that sets up dependency injection and creates services. Scoped services are instantiated
+`Main` node is the entry point that sets up dependency injection and creates services. Scoped services are instantced
 once per every loaded shard. For the server, they are equivalent to singletons, since a shard server handles only one
 shard. For the client, they are created for each shard the client connects to.
 
-Constructor dependency injection is used for all classes, even for nodes. Since nodes without a parameterless
-constructor can't be instanced by Godot, they must created from the code. Dependency-injected nodes that have children
-nodes as part of their inherent structure use scenes to store this structure, which are instanced and reparented to
-the node in its constructor, such scenes have a `Proxy.gd` node as a placeholder parent, which is freed immediately
-afer instancing, so any properties of it are lost, any initialization of the parent node should happen in the
-constructor.
+Constructor dependency injection is used for all classes. When a node needs dependencies, but at the same time it needs
+to exist in a scene (which wouldn't allow using constructor injection), it's split into two classes: plain C# class
+and a node class. Most code resides in the plain C# class, which gets its dependencies from a constrcutror. Among these
+dependencies it receives the node, which it uses as a helper to interact with Godot. Other benefits of this approach
+include avoidance of manual lifetime management (no need to call Free, GC will collect entities after they are
+unreferenced) and object pooling for entities.
 
 ## Entities
 
-Any dynamic object in the game world is an entity. The `Entity` class is a base of all entities. `Unit` and `Projectile`
-subclasses define the correspoinding entity types. Entities are plain C# classes, not inherited from `Node`, instead
-they create nodes of `UnitNode` / `ProjectileNode` type and use them. This way entities are managed by the garbage
-collector and remain valid even after their node is freed. Entities can create and replicate `EntitySnapshot`s, which
-are used for network synchronization and persistence.
+Any dynamic object in the game world is an entity. The `Entity` class is a base of all entities.
+`Unit` and `Projectile` are server side entities containing the gameplay logic.
+`UnitPuppet` and `ProjectilePuppet` are client side entities containing only the presentation logic.
 
 ### Units
 
@@ -66,7 +73,6 @@ validating them.
 
 ## Shard scoped services
 
-`EntityManager` creates entities, stores an index of existing entities,
-notifies about entity additions and removals.
+`EntityManager` creates entities, stores an index of existing entities, notifies about entity additions and removals.
 
-`Synchronization Server` and `Synchronization Client` synchronize entities between the shard server and the client.
+`Synchronization Server` and `Synchronization Client` synchronize entities between shard servers and clients.
