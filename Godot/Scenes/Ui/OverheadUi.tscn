@@ -2,7 +2,7 @@
 
 [ext_resource path="res://Themes/OverheadUI.tres" type="Theme" id=1]
 [ext_resource path="res://Textures/White.png" type="Texture" id=2]
-[ext_resource path="res://Scripts/Shared/Proxy.gd" type="Script" id=3]
+[ext_resource path="res://Scripts/Gameplay/Nodes/OverheadUiNode.cs" type="Script" id=3]
 
 [sub_resource type="StyleBoxFlat" id=1]
 bg_color = Color( 0.145098, 0.145098, 0.164706, 1 )

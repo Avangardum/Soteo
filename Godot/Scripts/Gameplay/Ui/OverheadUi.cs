@@ -2,17 +2,17 @@ using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Nodes;
 
 namespace Soteo.Gameplay.Ui;
 
-public sealed class OverheadUi : Control
+public sealed class OverheadUi
 {
-    private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/OverheadUi.tscn");
-
     private readonly UnitPuppet _unit;
     private readonly ICamera _camera;
     private readonly IPalette _palette;
     
+    private readonly OverheadUiNode _node;
     private readonly Control _playerCharacterPanel;
     private readonly Label _playerCharacterNameLabel;
     private readonly Label _playerCharacterLevelLabel;
@@ -23,25 +23,23 @@ public sealed class OverheadUi : Control
     
     private Vector2 _offset;
     
-    public OverheadUi(UnitPuppet unit, ICamera camera, IPalette palette)
+    public OverheadUi(OverheadUiNode node, UnitPuppet unit, ICamera camera, IPalette palette)
     {
-        Name = $"{nameof(OverheadUi)} {unit.Id}";
-        ProcessPriority = (int)ProcessPriorityEnum.OverheadUi;
-        MouseFilter = MouseFilterEnum.Ignore;
-        
         _unit = unit;
         _camera = camera;
         _palette = palette;
         
-        Scene.InstanceAndReparentTo(this);
-        
-        _playerCharacterPanel = GetNode<Control>("PlayerCharacter");
-        _playerCharacterNameLabel = GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Name");
-        _playerCharacterLevelLabel = GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Level");
-        _playerCharacterHealthBar = GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Health");
-        _playerCharacterManaBar = GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Mana");
-        _tinyHealthPanel = GetNode<Control>("TinyHealth");
-        _tinyHealthBar = GetNode<TextureProgress>("TinyHealth/MarginContainer/Health");
+        node.Name = $"{nameof(OverheadUi)} {unit.Id}";
+        node.ProcessPriority = (int)ProcessPriorityEnum.OverheadUi;
+        node.OverheadUi = this;
+        _node = node;
+        _playerCharacterPanel = node.GetNode<Control>("PlayerCharacter");
+        _playerCharacterNameLabel = node.GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Name");
+        _playerCharacterLevelLabel = node.GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Level");
+        _playerCharacterHealthBar = node.GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Health");
+        _playerCharacterManaBar = node.GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Mana");
+        _tinyHealthPanel = node.GetNode<Control>("TinyHealth");
+        _tinyHealthBar = node.GetNode<TextureProgress>("TinyHealth/MarginContainer/Health");
         
         unit.Removed += OnUnitRemoved;
         
@@ -77,9 +75,9 @@ public sealed class OverheadUi : Control
         }
     }
 
-    public override void _Process(float delta)
+    public void Process(double delta)
     {
-        RectPosition = (_unit.Position - _camera.Position + _offset).ToGd() * _camera.Zoom;
+        _node.RectPosition = (_unit.Position - _camera.Position + _offset).ToGd() * _camera.Zoom;
         SelectVariant();
         SetFaction(_unit.Faction);
         SetHealth((float)_unit.Stats[Stat.CurrentHealth], (float)_unit.Stats[Stat.MaxHealth]);
@@ -137,8 +135,9 @@ public sealed class OverheadUi : Control
     
     private void OnUnitRemoved()
     {
-        SetProcess(false);
-        QueueFree();
+        _node.SetProcess(false);
+        _node.QueueFree();
+        // todo use pooling
     }
     
     private enum Variant

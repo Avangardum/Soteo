@@ -1,6 +1,7 @@
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Gameplay.Interfaces;
+using Soteo.Gameplay.Nodes;
 
 namespace Soteo.Gameplay.Ui;
 
@@ -25,6 +26,8 @@ public sealed class OverheadUiManager : Control
     {
         if (entity is not UnitPuppet unit) return;
         
-        AddChild(new OverheadUi(unit, _camera, _palette));
+        var node = OverheadUiNode.Instance();
+        AddChild(node);
+        new OverheadUi(node, unit, _camera, _palette);
     }
 }
