@@ -111,6 +111,7 @@ public sealed class Main : Node2D, IShardLoader
         {
             serviceProvider.GetRequiredService<LogInScreen>();
             serviceProvider.GetRequiredService<DebugScreen>();
+            serviceProvider.GetRequiredService<IHud>();
         }
     }
     
