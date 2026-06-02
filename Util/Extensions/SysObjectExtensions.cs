@@ -20,5 +20,17 @@ public static class SysObjectExtensions
         public TResult PassTo<TResult>(Func<T, TResult> func) => func(self);
         
         public void PassTo(Action<T> func) => func(self);
+        
+        public T Also(Action<T> func)
+        {
+            func(self);
+            return self;
+        }
+        
+        public T Also<TResult>(Func<T, TResult> func)
+        {
+            func(self);
+            return self;
+        }
     }
 }

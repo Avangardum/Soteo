@@ -64,16 +64,18 @@ public sealed class Hud : Control, IHud
 
         for (int i = 0; i < _abilityButtons.Count; i++)
         {
-            _abilityButtons[i].Connect("button_down", this, nameof(OnAbilityButtonDown), [i]);
-            _abilityButtons[i].Connect("button_up", this, nameof(OnAbilityButtonUp), [i]);
-            _abilityButtons[i].Connect("mouse_entered", this, nameof(OnMouseEnteredAbilityButton), [i]);
-            _abilityButtons[i].Connect("mouse_exited", this, nameof(OnMouseExitedTooltipableControl));
+            int index = i;
+            _abilityButtons[i].Connect("button_down", () => OnAbilityButtonDown(index));
+            _abilityButtons[i].Connect("button_up", () => OnAbilityButtonUp(index));
+            _abilityButtons[i].Connect("mouse_entered", () => OnMouseEnteredAbilityButton(index));
+            _abilityButtons[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
         }
         
         for (int i = 0; i < _statusIndicators.Count; i++)
         {
-            _statusIndicators[i].Connect("mouse_entered", this, nameof(OnMouseEnteredStatusIndicator), [i]);
-            _statusIndicators[i].Connect("mouse_exited", this, nameof(OnMouseExitedTooltipableControl));
+            int index = i;
+            _statusIndicators[i].Connect("mouse_entered", () => OnMouseEnteredStatusIndicator(index));
+            _statusIndicators[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
         }
     }
 
