@@ -20,6 +20,12 @@
 <canvas id="shardServerCanvas" style="display: none"></canvas>
 <script src="$GODOT_URL"></script>
 <script>
+    const canvasResizePolicy = {
+        doNotResize: 0,
+        resizeOnStartAndWithEngineResizeFunctions: 1,
+        fillPage: 2,
+    };
+    
     class Jsmq {
         constructor() {
             this.queues = {};
@@ -46,7 +52,7 @@
     function print(text, func, source) {
         if (!printL && text.startsWith("L:")) return;
         
-        // This error is printed due to native WebRTC plugin not working in a browser, but we don't need it there.
+        // This error is printed due to native WebRTC plugin not working in a browser, but we don't need it there
         if (text.endsWith("No library set for this platform")) return;
         
         // This error is always printed, even in an empty project.
@@ -66,7 +72,7 @@
         Promise.resolve().then(() =>
             campaignServer.startGame({
                 unloadAfterInit: false,
-                canvasResizePolicy: 0,
+                canvasResizePolicy: canvasResizePolicy.doNotResize,
                 args: ["--singleplayer", "Scenes/CampaignServer.tscn"],
                 canvas: document.querySelector("#campaignServerCanvas"),
                 onPrint: text => print(text, console.log, "Campaign server"),
@@ -74,17 +80,17 @@
             })
         ).then(() =>
             shardServer.startGame({
-                unloadAfterInit: true,
-                canvasResizePolicy: 0,
-                args: ["--singleplayer", "--server", "00000000-0000-0000-0000-000000007e57"],
+                unloadAfterInit: false,
+                canvasResizePolicy: canvasResizePolicy.doNotResize,
+                args: ["--singleplayer", "--server", "00000000-0000-0000-0000-0000000deb09"],
                 canvas: document.querySelector("#shardServerCanvas"),
                 onPrint: text => print(text, console.log, "Shard server"),
                 onPrintError: text => print(text, console.error, "Shard server"),
             })
         ).then(() =>
             client.startGame({
-                unloadAfterInit: false,
-                canvasResizePolicy: 2,
+                unloadAfterInit: true,
+                canvasResizePolicy: canvasResizePolicy.fillPage,
                 args: ["--singleplayer"],
                 canvas: document.querySelector("#clientCanvas"),
                 onPrint: text => print(text, console.log, "Client"),
@@ -97,7 +103,7 @@
         const client = new Engine(config);
         client.startGame({
             unloadAfterInit: true,
-            canvasResizePolicy: 2,
+            canvasResizePolicy: canvasResizePolicy.fillPage,
             args: [],
             canvas: document.querySelector("#clientCanvas"),
             onPrint: text => print(text, console.log),
