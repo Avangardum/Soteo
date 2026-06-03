@@ -7,7 +7,6 @@ public sealed class CharacterRecalledPacketSerializer : PacketSerializer<Charact
 {
     protected override void SerializeInternal(CharacterRecalledPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeGuid(packet.CharacterId, stream);
     }
 

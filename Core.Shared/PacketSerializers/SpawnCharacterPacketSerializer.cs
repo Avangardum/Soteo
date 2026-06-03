@@ -7,7 +7,6 @@ public sealed class SpawnCharacterPacketSerializer : PacketSerializer<SpawnChara
 {
     protected override void SerializeInternal(SpawnCharacterPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeGuid(packet.PeerId, stream);
         SerializeGuid(packet.CharacterId, stream);
     }

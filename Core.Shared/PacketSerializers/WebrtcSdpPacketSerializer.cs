@@ -7,7 +7,6 @@ public sealed class WebrtcSdpPacketSerializer : PacketSerializer<WebrtcSdpPacket
 {
     protected override void SerializeInternal(WebrtcSdpPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeGuid(packet.PeerId, stream);
         SerializeString(packet.Sdp, stream);
     }

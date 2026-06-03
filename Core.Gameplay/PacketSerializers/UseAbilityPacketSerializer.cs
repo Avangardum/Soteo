@@ -11,7 +11,6 @@ public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPack
 {
     protected override void SerializeInternal(UseAbilityPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeEnum(packet.Command.Slot, stream);
         SerializeBool(packet.Command.Repeat, stream);
         

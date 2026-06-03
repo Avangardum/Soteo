@@ -7,7 +7,6 @@ public sealed class WebrtcIceCandidatePacketSerializer : PacketSerializer<Webrtc
 {
     protected override void SerializeInternal(WebrtcIceCandidatePacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeGuid(packet.PeerId, stream);
         SerializeString(packet.Media, stream);
         SerializeInt(packet.Index, stream);

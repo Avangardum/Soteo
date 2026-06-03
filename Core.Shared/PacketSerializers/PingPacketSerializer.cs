@@ -7,7 +7,6 @@ public class PingPacketSerializer : PacketSerializer<PingPacket>
 {
     protected override void SerializeInternal(PingPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeGuid(packet.Id, stream);
         SerializeBool(packet.IsResponse, stream);
     }

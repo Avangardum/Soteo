@@ -8,7 +8,6 @@ public sealed class MovePacketSerializer : PacketSerializer<MovePacket>
 {
     protected override void SerializeInternal(MovePacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeVector2(packet.Position, stream);
     }
 

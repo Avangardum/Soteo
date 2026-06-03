@@ -28,14 +28,12 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacke
     public byte[] Serialize(TPacket packet)
     {
         var stream = new MemoryStream();
+        SerializeEnum(packet.TypeCode, stream);
         SerializeInternal(packet, stream);
         return stream.ToArray();
     }
     
-    protected virtual void SerializeInternal(TPacket packet, Stream stream)
-    {
-        SerializeEnum(packet.TypeCode, stream);
-    }
+    protected abstract void SerializeInternal(TPacket packet, Stream stream);
     
     Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
     

@@ -7,7 +7,6 @@ public sealed class CampaignServerHandshakePacketSerializer : PacketSerializer<C
 {
     protected override void SerializeInternal(CampaignServerHandshakePacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeString(packet.Token, stream);
         SerializeString(packet.Version, stream);
     }

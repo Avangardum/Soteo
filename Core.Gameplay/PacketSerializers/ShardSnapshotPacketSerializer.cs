@@ -13,7 +13,6 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
 {
     protected override void SerializeInternal(ShardSnapshotPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeLong(packet.Tick, stream);
         SerializeIndexedDictionary(packet.Snapshot.Entities, SerializeEntity, stream);
     }

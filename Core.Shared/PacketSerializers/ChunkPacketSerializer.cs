@@ -7,7 +7,6 @@ public sealed class ChunkPacketSerializer : PacketSerializer<ChunkPacket>
 {
     protected override void SerializeInternal(ChunkPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeGuid(packet.GroupId, stream);
         SerializeInt(packet.Index, stream);
         SerializeBool(packet.IsLast, stream);

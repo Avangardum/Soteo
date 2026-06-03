@@ -7,7 +7,6 @@ public sealed class BadInputPacketSerializer : PacketSerializer<BadInputPacket>
 {
     protected override void SerializeInternal(BadInputPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeString(packet.Reason, stream);
     }
 

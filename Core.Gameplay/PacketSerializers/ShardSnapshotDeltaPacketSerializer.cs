@@ -11,7 +11,6 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
 {
     protected override void SerializeInternal(ShardSnapshotDeltaPacket packet, Stream stream)
     {
-        base.SerializeInternal(packet, stream);
         SerializeLong(packet.Tick, stream);
         SerializeDouble(packet.ServerLoad, stream);
         SerializeIndexedDictionaryDelta(packet.SnapshotDelta.Entities, SerializeGuid, SerializeEntityDelta, stream);
