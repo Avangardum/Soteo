@@ -8,6 +8,6 @@ public class SpawnCharacterPacketHandler(IEntityManager entityManager) : PacketH
 {
     protected override void Handle(SpawnCharacterPacket packet, Guid senderId)
     {
-        entityManager.SpawnPlayerCharacter(packet.PeerId);
+        entityManager.SpawnPlayerCharacter(packet.CharacterId);
     }
 }

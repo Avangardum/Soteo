@@ -20,12 +20,12 @@ public sealed class SpawnCharacterPacketHandler
         User sender = userRepo[senderId];
         Validate
         (
-            sender.IsPlayer && receiver != null && receiver.IsShard,
+            sender.IsPlayer && receiver.IsShard,
             "Spawn character packet should be sent from a player to a shard server"
         );
-        if (!charRepo.TryGetValue(senderId, out Character? character))
+        if (!charRepo.TryGetValue(packet.CharacterId, out Character? character))
         {
-            character = new Character { Id = senderId };
+            character = new Character { Id = packet.CharacterId };
             charRepo.Add(character);
         }
         if (character.ShardId != null) return;
