@@ -12,7 +12,8 @@ using Soteo.Util;
 
 namespace Soteo.Gameplay.Services.Communicators;
 
-public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, ICampaignServerCommunicator
+public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
+    Node, ICampaignServerPacketSender, ICampaignServerConnector
 {
     private const string CampaignServerUrl = "wss://localhost:3706";
     private const string AuthServerUrl = "https://localhost:3705";
@@ -43,7 +44,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
     }
     
-    public event Action ConnectionEstablished = delegate {};
+    public event Action Connected = delegate {};
     
     public override void _Ready()
     {
@@ -91,7 +92,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         _status = Status.Connected;
         SendPacket(new CampaignServerHandshakePacket { Token = _token.Required, Version = Const.Version });
         _token = null;
-        ConnectionEstablished();
+        Connected();
     }
     
     public void OnDataReceived()

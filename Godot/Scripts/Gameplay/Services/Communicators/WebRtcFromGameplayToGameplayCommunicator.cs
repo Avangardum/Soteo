@@ -13,7 +13,7 @@ namespace Soteo.Gameplay.Services.Communicators;
 /// Communicates between clients and shard servers
 /// </summary>
 public sealed class WebRtcFromGameplayToGameplayCommunicator :
-    Node, IPacketSender, IWebrtcPacketReceiver, INetworkDebugger, IConnectionNotifier
+    Node, IShardServerConnector, IPacketSender, IWebrtcPacketReceiver, INetworkDebugger, IConnectionNotifier
 {
     private const double PingInterval = 1;
     
@@ -35,7 +35,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
     
-    private readonly ICampaignServerCommunicator _campaignServerCommunicator;
+    private readonly ICampaignServerPacketSender _campaignServerPacketSender;
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     private readonly IChunkCollector _chunkCollector;
@@ -45,13 +45,13 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     public WebRtcFromGameplayToGameplayCommunicator
     (
-        ICampaignServerCommunicator campaignServerCommunicator,
+        ICampaignServerPacketSender campaignServerPacketSender,
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer, 
         IChunkCollector chunkCollector
     )
     {
-        _campaignServerCommunicator = campaignServerCommunicator;
+        _campaignServerPacketSender = campaignServerPacketSender;
         
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
@@ -208,10 +208,11 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         }
     }
     
-    public void ConnectToShardServer(Guid peerId)
+    public void ConnectToShardServer(Guid id)
     {
         if (Const.IsServer) throw new InvalidOperationException();
-        WebRTCPeerConnection connection = CreateConnection(peerId);
+        
+        WebRTCPeerConnection connection = CreateConnection(id);
         connection.CreateOffer();
     }
     
@@ -250,13 +251,13 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     {
         var peerId = new Guid(peerIdBytes);
         _peerConnectionsAndChannels[peerId].Connection.SetLocalDescription(type, sdp);
-        _campaignServerCommunicator.SendPacket(new WebrtcSdpPacket { Sdp = sdp, PeerId = peerId } );
+        _campaignServerPacketSender.SendPacket(new WebrtcSdpPacket { Sdp = sdp, PeerId = peerId } );
     }
     
     private void OnIceCandidateCreated(string media, int index, String name, byte[] peerIdBytes)
     {
         var peerId = new Guid(peerIdBytes);
-        _campaignServerCommunicator.SendPacket(new WebrtcIceCandidatePacket
+        _campaignServerPacketSender.SendPacket(new WebrtcIceCandidatePacket
         {
             Media = media,
             Index = index,

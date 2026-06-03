@@ -27,6 +27,7 @@ public sealed class Main : Node2D, IShardLoader
     private LogInScreenNode? _logIScreenNode;
     private HudNode? _hudNode;
     private DebugScreenNode? _debugScreenNode;
+    private CampaignScreenNode? _campaignScreenNode;
     private Node2D? _shardRoot;
     private WebSocketFromGameplayToCampaignServerCommunicator? _webSocketCampaignServerCommunicator;
     private WebRtcFromGameplayToGameplayCommunicator? _webRtcGameplayCommunicator;
@@ -58,12 +59,13 @@ public sealed class Main : Node2D, IShardLoader
         RegisterServices(serviceCollection);
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
         GetNodes();
-        CreateNodes();
+        CreateSingletonNodes();
         CreateSingletonServices(_rootServiceProvider);
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
-        if (Const.IsServer) LoadShard();
+        if (Const.IsServer)
+            LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
     }
     
     private void GetNodes()
@@ -71,37 +73,34 @@ public sealed class Main : Node2D, IShardLoader
         _shardRoot = GetNode<Node2D>("Shards");
     }
     
-    private void CreateNodes()
+    private void CreateSingletonNodes()
     {
-        _processPublisher = new ProcessPublisher();
-        AddChild(_processPublisher);
+        _processPublisher = new ProcessPublisher().Also(it => AddChild(it));
         
         if (Const.UseJsmq)
         {
-            _jsmqCommunicator = ActivatorUtilities.CreateInstance<JsmqFromGameplayCommunicator>(_rootServiceProvider.Required);
-            AddChild(_jsmqCommunicator);
+            _jsmqCommunicator = ActivatorUtilities
+                .CreateInstance<JsmqFromGameplayCommunicator>(_rootServiceProvider.Required)
+                .Also(it => AddChild(it));
         }
         else
         {
-            _webSocketCampaignServerCommunicator =
-                ActivatorUtilities.CreateInstance<WebSocketFromGameplayToCampaignServerCommunicator>(_rootServiceProvider.Required);
-            AddChild(_webSocketCampaignServerCommunicator);
-            _webRtcGameplayCommunicator =
-                ActivatorUtilities.CreateInstance<WebRtcFromGameplayToGameplayCommunicator>(_rootServiceProvider);
-            AddChild(_webRtcGameplayCommunicator);
+            _webSocketCampaignServerCommunicator = ActivatorUtilities
+                .CreateInstance<WebSocketFromGameplayToCampaignServerCommunicator>(_rootServiceProvider.Required)
+                .Also(it => AddChild(it));
+            _webRtcGameplayCommunicator = ActivatorUtilities
+                .CreateInstance<WebRtcFromGameplayToGameplayCommunicator>(_rootServiceProvider)
+                .Also(it => AddChild(it));
         }
         
-        if (Const.IsServer)
+        if (!Const.IsServer)
         {
-            
-        }
-        else
-        {
-            var ui = GetNode<CanvasLayer>("Ui");
+            var ui = GetNode<CanvasLayer>("Ui").Required;
             _hudNode = HudNode.Instance().Also(it => ui.AddChild(it));
             AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));
             _logIScreenNode = LogInScreenNode.Instance().Also(it => ui.AddChild(it));
             _debugScreenNode = DebugScreenNode.Instance().Also(it => ui.AddChild(it));
+            _campaignScreenNode = CampaignScreenNode.Instance().Also(it => ui.AddChild(it));
         }
     }
     
@@ -112,6 +111,7 @@ public sealed class Main : Node2D, IShardLoader
             serviceProvider.GetRequiredService<LogInScreen>();
             serviceProvider.GetRequiredService<DebugScreen>();
             serviceProvider.GetRequiredService<IHud>();
+            serviceProvider.GetRequiredService<CampaignScreen>();
         }
     }
     
@@ -153,16 +153,24 @@ public sealed class Main : Node2D, IShardLoader
         
         if (Const.UseJsmq)
         {
-            services.AddSingleton<ICampaignServerCommunicator>(_ => _jsmqCommunicator.Required);
+            services.AddSingleton<ICampaignServerConnector>(_ => _jsmqCommunicator.Required);
+            services.AddSingleton<ICampaignServerPacketSender>(_ => _jsmqCommunicator.Required);
             services.AddSingleton<IPacketSender>(_ => _jsmqCommunicator.Required);
             services.AddSingleton<INetworkDebugger>(_ => _jsmqCommunicator.Required);
             services.AddSingleton<IConnectionNotifier>(_ => _jsmqCommunicator.Required);
         }
         else
         {
-            services.AddSingleton<ICampaignServerCommunicator>(_ => _webSocketCampaignServerCommunicator.Required);
-            services.AddSingleton<IPacketSender>(_ => new RoutingPacketSender(
-                _webSocketCampaignServerCommunicator.Required, _webRtcGameplayCommunicator.Required));
+            services.AddSingleton<ICampaignServerConnector>(_ => _webSocketCampaignServerCommunicator.Required);
+            services.AddSingleton<ICampaignServerPacketSender>(_ => _webSocketCampaignServerCommunicator.Required);
+            services.AddSingleton<IPacketSender>
+            (
+                _ => new RoutingPacketSender
+                (
+                    _webSocketCampaignServerCommunicator.Required,
+                    _webRtcGameplayCommunicator.Required
+                )
+            );
             services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
             services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
             services.AddSingleton<IConnectionNotifier>(_ => _webRtcGameplayCommunicator.Required);
@@ -184,21 +192,27 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IHud, Hud>();
         services.AddSingleton<DebugScreenNode>(_ => _debugScreenNode.Required);
         services.AddSingleton<DebugScreen>();
+        services.AddSingleton<CampaignScreenNode>(_ => _campaignScreenNode.Required);
+        services.AddSingleton<CampaignScreen>();
         services.AddSingleton<IEntityLocator, EntityLocator>();
         services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
         services.AddSingletonNode<ITooltip>("Ui/TooltipLayer/Tooltip");
         services.AddSingleton<ILocalizer, Localizer>();
+        
+        if (Const.UseJsmq)
+            services.AddSingleton<IShardServerConnector>(_ => _jsmqCommunicator.Required);
+        else
+            services.AddSingleton<IShardServerConnector>(_ => _webRtcGameplayCommunicator.Required);
     }
     
-    public void LoadShard()
+    public void LoadShard(Guid id)
     {
-        Guid shardId = Const.TestShardId;
-        string mapPath = $"res://Scenes/Maps/Test{shardId.ToString()[^1]}.tscn";
+        string mapPath = $"res://Scenes/Maps/Test{id.ToString()[^1]}.tscn";
         Vector2 position = new Vector2(0, 0);
 
         var shard = _shardScene.Required.Instance<ShardNode>();
-        shard.Id = shardId;
-        shard.Name = shardId.ToString();
+        shard.Id = id;
+        shard.Name = id.ToString();
         shard.Position = position.ToGd();
         _shardRoot.Required.AddChild(shard);
         
@@ -211,7 +225,7 @@ public sealed class Main : Node2D, IShardLoader
         _newScopeShard = null;
         CreateShardScopedNodes(shard, scope.ServiceProvider);
         CreateShardScopedServices(scope.ServiceProvider);
-        _shardServiceScopes[shardId] = scope;
+        _shardServiceScopes[id] = scope;
     }
     
     private void CreateShardScopedNodes(ShardNode shard, IServiceProvider serviceProvider)

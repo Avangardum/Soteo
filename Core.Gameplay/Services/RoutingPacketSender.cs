@@ -8,7 +8,7 @@ namespace Soteo.Core.Gameplay.Services;
 
 public sealed class RoutingPacketSender
 (
-    ICampaignServerCommunicator campaignSender,
+    ICampaignServerPacketSender campaignServerSender,
     IPacketSender gameplaySender
 ) : IPacketSender
 {
@@ -16,7 +16,7 @@ public sealed class RoutingPacketSender
     {
         if (receiverIds.Contains(Const.CampaignServerId))
         {
-            campaignSender.SendPacket(packet);
+            campaignServerSender.SendPacket(packet);
             gameplaySender.SendReliable(packet, receiverIds.Except([Const.CampaignServerId]).ToImmutableList());
         }
         else
@@ -29,7 +29,7 @@ public sealed class RoutingPacketSender
     {
         if (receiverIds.Contains(Const.CampaignServerId))
         {
-            campaignSender.SendPacket(packet);
+            campaignServerSender.SendPacket(packet);
             gameplaySender.SendUnreliable(packet, receiverIds.Except([Const.CampaignServerId]).ToImmutableList());
         }
         else

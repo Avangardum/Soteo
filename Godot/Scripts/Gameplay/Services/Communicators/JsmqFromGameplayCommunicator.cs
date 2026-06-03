@@ -15,14 +15,19 @@ namespace Soteo.Gameplay.Services.Communicators;
 /// Communicator using the JavaScript message queue instead of WebSockets / WebRTC. Used for singleplayer in browser.
 /// </summary>
 public sealed class JsmqFromGameplayCommunicator :
-    Node, ICampaignServerCommunicator, IPacketSender, INetworkDebugger, IConnectionNotifier
+    Node,
+    IShardServerConnector,
+    ICampaignServerConnector,
+    IPacketSender,
+    ICampaignServerPacketSender,
+    INetworkDebugger,
+    IConnectionNotifier
 {
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
-    private readonly IShardLoader _shardLoader;
     
-    public event Action ConnectionEstablished = delegate { };
+    public event Action Connected = delegate { };
     public event Action<Guid> PeerConnected = delegate { };
     public event Action<Guid> PeerDisconnected = delegate { };
 
@@ -32,14 +37,12 @@ public sealed class JsmqFromGameplayCommunicator :
     (
         ICurrentUserIdRepository currentUserIdRepository,
         IPacketSerializer packetSerializer,
-        IPacketHandler packetHandler,
-        IShardLoader shardLoader
+        IPacketHandler packetHandler
     )
     {
         _currentUserIdRepository = currentUserIdRepository;
         _packetSerializer = packetSerializer;
         _packetHandler = packetHandler;
-        _shardLoader = shardLoader;
         
         Name = nameof(JsmqFromGameplayCommunicator);
     }
@@ -70,7 +73,7 @@ public sealed class JsmqFromGameplayCommunicator :
             new CampaignServerHandshakePacket { Token = "player", Version = Const.Version },
             Const.CampaignServerId
         );
-        ConnectionEstablished();
+        Connected();
     }
 
     public void ConnectAsShardServer()
@@ -80,7 +83,7 @@ public sealed class JsmqFromGameplayCommunicator :
             new CampaignServerHandshakePacket { Token = "shard", Version = Const.Version },
             Const.CampaignServerId
         );
-        ConnectionEstablished();
+        Connected();
     }
     
     private void Poll()
@@ -94,6 +97,7 @@ public sealed class JsmqFromGameplayCommunicator :
             if (_connectedPeers.Add(senderId))
                 PeerConnected(senderId);
             Packet packet = _packetSerializer.Deserialize(bytes.AsSpan()[Const.BytesInGuid..]);
+            if (packet is PingPacket) return;
             _packetHandler.HandleAsync(packet, senderId).CollectException();
         }
     }
@@ -125,7 +129,7 @@ public sealed class JsmqFromGameplayCommunicator :
 
     public void BroadcastUnreliable(Packet packet) => BroadcastReliable(packet);
 
-    void ICampaignServerCommunicator.SendPacket(Packet packet) =>
+    void ICampaignServerPacketSender.SendPacket(Packet packet) =>
         SendReliable(packet, Const.CampaignServerId);
 
     public long BytesSent => 0;
@@ -133,4 +137,13 @@ public sealed class JsmqFromGameplayCommunicator :
     public long BytesReceived => 0;
 
     public double? Ping(Guid peerId) => 0;
+    
+    public void ConnectToShardServer(Guid id)
+    {
+        if (_connectedPeers.Add(id))
+            PeerConnected(id);
+        
+        // Send ping to trigger PeerConnected on the server
+        SendReliable(new PingPacket { Id = Guid.Empty, IsResponse = false }, id);
+    }
 }

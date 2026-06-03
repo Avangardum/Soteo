@@ -6,15 +6,15 @@ namespace Soteo.Gameplay.Ui;
 
 public sealed class LogInScreen
 {
-    private readonly ICampaignServerCommunicator _campaignServerCommunicator;
+    private readonly ICampaignServerConnector _campaignServerConnector;
     
     private readonly LogInScreenNode _node;
     private readonly LineEdit _emailLineEdit;
     private readonly LineEdit _passwordLineEdit;
 
-    public LogInScreen(LogInScreenNode node, ICampaignServerCommunicator campaignServerCommunicator)
+    public LogInScreen(LogInScreenNode node, ICampaignServerConnector campaignServerConnector)
     {
-        _campaignServerCommunicator = campaignServerCommunicator;
+        _campaignServerConnector = campaignServerConnector;
         
         _node = node;
         _emailLineEdit = node.GetNode<LineEdit>("Email");
@@ -35,7 +35,7 @@ public sealed class LogInScreen
     {
         string email = _emailLineEdit.Text;
         string password = _passwordLineEdit.Text;
-        _campaignServerCommunicator.ConnectAsPlayer(email, password);
+        _campaignServerConnector.ConnectAsPlayer(email, password);
         _node.Visible = false;
     }
 }

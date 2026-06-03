@@ -1,0 +1,84 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/Gameplay/Ui/CampaignScreenNode.cs" type="Script" id=1]
+
+[node name="CampaignScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+
+[node name="Label" type="Label" parent="."]
+margin_right = 350.0
+margin_bottom = 19.0
+text = "Select character"
+
+[node name="CharacterButtons" type="VBoxContainer" parent="."]
+margin_top = 25.0
+margin_right = 350.0
+margin_bottom = 225.0
+
+[node name="Button" type="Button" parent="CharacterButtons"]
+margin_right = 350.0
+margin_bottom = 25.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-0000000000c1"
+
+[node name="Button2" type="Button" parent="CharacterButtons"]
+margin_top = 29.0
+margin_right = 350.0
+margin_bottom = 54.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-0000000000c2"
+
+[node name="Button3" type="Button" parent="CharacterButtons"]
+margin_top = 58.0
+margin_right = 350.0
+margin_bottom = 83.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-0000000000c3"
+
+[node name="Label2" type="Label" parent="."]
+margin_left = 400.0
+margin_right = 750.0
+margin_bottom = 19.0
+text = "Select shard"
+
+[node name="ShardButtons" type="VBoxContainer" parent="."]
+margin_left = 400.0
+margin_top = 25.0
+margin_right = 750.0
+margin_bottom = 225.0
+
+[node name="Button" type="Button" parent="ShardButtons"]
+margin_right = 350.0
+margin_bottom = 25.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-00000007e571"
+
+[node name="Button2" type="Button" parent="ShardButtons"]
+margin_top = 29.0
+margin_right = 350.0
+margin_bottom = 54.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-00000007e572"
+
+[node name="Button3" type="Button" parent="ShardButtons"]
+margin_top = 58.0
+margin_right = 350.0
+margin_bottom = 83.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-00000007e573"
+
+[node name="Button4" type="Button" parent="ShardButtons"]
+margin_top = 87.0
+margin_right = 350.0
+margin_bottom = 112.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-0000000deb09"
+
+[node name="DeployButton" type="Button" parent="."]
+margin_left = 436.0
+margin_top = 361.0
+margin_right = 571.0
+margin_bottom = 438.0
+text = "Deploy"
