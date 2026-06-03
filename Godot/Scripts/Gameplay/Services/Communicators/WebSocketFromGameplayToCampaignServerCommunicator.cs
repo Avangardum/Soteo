@@ -56,20 +56,23 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         
         AddChild(_httpRequest);
         _httpRequest.Connect("request_completed", this, nameof(OnAuthRequestCompleted));
-        
-        if (Const.IsServer) ConnectAsShardServer();
     }
 
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (Const.IsServer) _wsClient.Poll();
+        if (Const.IsServer)
+            _wsClient.Poll();
     }
     
     public override void _Process(float delta)
     {
+        if (Const.IsServer && _status == Status.Disconnected)
+            ConnectAsShardServer();
+        
         // Client polls in _Process to minimize latency
-        if (!Const.IsServer) _wsClient.Poll();
+        if (!Const.IsServer)
+            _wsClient.Poll();
     }
 
     public void OnConnectionClosed(bool wasCleanClose)
@@ -149,9 +152,10 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
             GD.PrintErr("Incorrect credentials");
             _status = Status.Disconnected;
         }
-        else if (responseCode / 100 != 2)
+        else if (responseCode is not (>= 200 and < 300))
         {
             GD.PrintErr($"Auth server responded with code {responseCode}");
+            _status = Status.Disconnected;
         }
         else
         {
