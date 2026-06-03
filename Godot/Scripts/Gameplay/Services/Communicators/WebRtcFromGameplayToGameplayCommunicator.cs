@@ -52,7 +52,6 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     )
     {
         _campaignServerCommunicator = campaignServerCommunicator;
-        _campaignServerCommunicator.ConnectionEstablished += OnCampaignServerConnectionEstablished;
         
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
@@ -207,12 +206,6 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         {
             SendUnreliable(packet with { IsResponse = true }, senderId);
         }
-    }
-    
-    private void OnCampaignServerConnectionEstablished()
-    {
-        if (!Const.IsServer)
-            ConnectToShardServer(Const.TestShardId);
     }
     
     public void ConnectToShardServer(Guid peerId)
