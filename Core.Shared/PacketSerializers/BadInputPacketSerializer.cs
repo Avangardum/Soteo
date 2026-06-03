@@ -13,8 +13,6 @@ public sealed class BadInputPacketSerializer : PacketSerializer<BadInputPacket>
 
     protected override BadInputPacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(stream);
-        packet.Reason = DeserializeString(stream);
-        return packet;
+        return new BadInputPacket { Reason = DeserializeString(stream) };
     }
 }

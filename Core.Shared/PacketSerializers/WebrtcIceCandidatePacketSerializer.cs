@@ -3,11 +3,12 @@ using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Core.Shared.PacketSerializers;
 
-public sealed class WebrtcIceCandidatePacketSerializer : RelayedPacketSerializer<WebrtcIceCandidatePacket>
+public sealed class WebrtcIceCandidatePacketSerializer : PacketSerializer<WebrtcIceCandidatePacket>
 {
     protected override void SerializeInternal(WebrtcIceCandidatePacket packet, Stream stream)
     {
         base.SerializeInternal(packet, stream);
+        SerializeGuid(packet.PeerId, stream);
         SerializeString(packet.Media, stream);
         SerializeInt(packet.Index, stream);
         SerializeString(packet.Name, stream);
@@ -15,10 +16,12 @@ public sealed class WebrtcIceCandidatePacketSerializer : RelayedPacketSerializer
 
     protected override WebrtcIceCandidatePacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(stream);
-        packet.Media = DeserializeString(stream);
-        packet.Index = DeserializeInt(stream);
-        packet.Name = DeserializeString(stream);
-        return packet;
+        return new WebrtcIceCandidatePacket
+        {
+            PeerId = DeserializeGuid(stream),
+            Media = DeserializeString(stream),
+            Index = DeserializeInt(stream),
+            Name = DeserializeString(stream),
+        };
     }
 }

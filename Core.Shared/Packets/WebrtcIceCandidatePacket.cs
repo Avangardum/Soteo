@@ -9,7 +9,7 @@ namespace Soteo.Core.Shared.Packets;
 [PacketTypeCode(PacketTypeCode.WebrtcIceCandidate)]
 public sealed record WebrtcIceCandidatePacket : RelayedPacket
 {
-    public string Media { get; set; } = "";
-    public int Index { get; set; }
-    public string Name { get; set; } = "";
+    public required string Media { get; init; }
+    public required int Index { get; init; }
+    public required string Name { get; init; }
 }

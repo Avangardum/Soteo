@@ -23,17 +23,17 @@ public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPack
 
     protected override UseAbilityPacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(stream);
-        var slot = DeserializeEnum<AbilitySlot>(stream);
-        var repeat = DeserializeBool(stream);
-        
-        Vector2? targetPosition = DeserializeNullableStruct(DeserializeVector2, stream);
-        Guid? targetUnitId = DeserializeNullableStruct(DeserializeGuid, stream);
-        Vector2? targetDirection = DeserializeNullableStruct(DeserializeVector2, stream);
-        Guid? targetShardId = DeserializeNullableStruct(DeserializeGuid, stream);
-        
-        packet.Command =
-            new UseAbilityCommand(slot, repeat, targetPosition, targetUnitId, targetDirection, targetShardId);
-        return packet;
+        return new UseAbilityPacket
+        {
+            Command = new UseAbilityCommand
+            (
+                Slot: DeserializeEnum<AbilitySlot>(stream),
+                Repeat: DeserializeBool(stream),
+                TargetPosition: DeserializeNullableStruct(DeserializeVector2, stream),
+                TargetUnitId: DeserializeNullableStruct(DeserializeGuid, stream),
+                TargetDirection: DeserializeNullableStruct(DeserializeVector2, stream),
+                TargetShardId: DeserializeNullableStruct(DeserializeGuid, stream)
+            ),
+        };
     }
 }

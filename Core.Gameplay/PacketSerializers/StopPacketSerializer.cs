@@ -3,4 +3,4 @@ using Soteo.Core.Shared.PacketSerializers;
 
 namespace Soteo.Core.Gameplay.PacketSerializers;
 
-public sealed class StopPacketSerializer : PacketSerializer<StopPacket>;
+public sealed class StopPacketSerializer : EmptyPacketSerializer<StopPacket>;

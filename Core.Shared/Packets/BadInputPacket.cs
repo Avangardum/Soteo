@@ -6,5 +6,5 @@ namespace Soteo.Core.Shared.Packets;
 [PacketTypeCode(PacketTypeCode.BadInput)]
 public sealed record BadInputPacket : Packet
 {
-    public string Reason { get; set; } = "";
+    public required string Reason { get; set; }
 }

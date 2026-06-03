@@ -8,5 +8,5 @@ namespace Soteo.Core.Gameplay.Packets;
 [PacketTypeCode(PacketTypeCode.Move)]
 public sealed record MovePacket : Packet
 {
-    public Vector2 Position { get; set; }
+    public required Vector2 Position { get; init; }
 }

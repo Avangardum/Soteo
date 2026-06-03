@@ -3,4 +3,4 @@ using Soteo.Core.Shared.PacketSerializers;
 
 namespace Soteo.Core.Gameplay.PacketSerializers;
 
-public sealed class ShardSnapshotRequestPacketSerializer : PacketSerializer<ShardSnapshotRequestPacket>;
+public sealed class ShardSnapshotRequestPacketSerializer : EmptyPacketSerializer<ShardSnapshotRequestPacket>;

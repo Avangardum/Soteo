@@ -8,6 +8,6 @@ namespace Soteo.Core.Gameplay.Packets;
 [PacketTypeCode(PacketTypeCode.ShardSnapshot)]
 public sealed record ShardSnapshotPacket : Packet
 {
-    public long Tick { get; set; }
-    public ShardSnapshot Snapshot { get; set; } = null!;
+    public required long Tick { get; init; }
+    public required ShardSnapshot Snapshot { get; init; }
 }

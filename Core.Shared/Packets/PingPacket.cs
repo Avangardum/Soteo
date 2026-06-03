@@ -6,6 +6,6 @@ namespace Soteo.Core.Shared.Packets;
 [PacketTypeCode(PacketTypeCode.Ping)]
 public sealed record PingPacket : Packet
 {
-    public Guid Id { get; set; }
-    public bool IsResponse { get; set; }
+    public required Guid Id { get; init; }
+    public required bool IsResponse { get; init; }
 }

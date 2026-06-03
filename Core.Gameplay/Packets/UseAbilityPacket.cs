@@ -8,5 +8,5 @@ namespace Soteo.Core.Gameplay.Packets;
 [PacketTypeCode(PacketTypeCode.UseAbility)]
 public sealed record UseAbilityPacket : Packet
 {
-    public UseAbilityCommand Command { get; set; } = null!;
+    public required UseAbilityCommand Command { get; init; }
 }

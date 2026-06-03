@@ -14,9 +14,10 @@ public class PingPacketSerializer : PacketSerializer<PingPacket>
 
     protected override PingPacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(stream);
-        packet.Id = DeserializeGuid(stream);
-        packet.IsResponse = DeserializeBool(stream);
-        return packet;
+        return new PingPacket
+        {
+            Id = DeserializeGuid(stream),
+            IsResponse = DeserializeBool(stream),
+        };
     }
 }

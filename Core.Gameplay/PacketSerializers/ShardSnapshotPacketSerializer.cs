@@ -20,12 +20,14 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     
     protected override ShardSnapshotPacket DeserializeInternal(Stream stream)
     {
-        var message = base.DeserializeInternal(stream);
-        message.Tick = DeserializeLong(stream);
-        ImmutableDictionary<Guid, EntitySnapshot> entities =
-            DeserializeIndexedDictionary(DeserializeEntity, it => it.Id, stream);
-        message.Snapshot = new ShardSnapshot { Entities = entities };
-        return message;
+        return new ShardSnapshotPacket
+        {
+            Tick = DeserializeLong(stream),
+            Snapshot = new ShardSnapshot
+            {
+                Entities = DeserializeIndexedDictionary(DeserializeEntity, it => it.Id, stream),
+            },
+        };
     }
     
     private void SerializeEntity(EntitySnapshot entity, Stream stream)

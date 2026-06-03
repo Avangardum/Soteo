@@ -3,18 +3,21 @@ using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Core.Shared.PacketSerializers;
 
-public sealed class WebrtcSdpPacketSerializer : RelayedPacketSerializer<WebrtcSdpPacket>
+public sealed class WebrtcSdpPacketSerializer : PacketSerializer<WebrtcSdpPacket>
 {
     protected override void SerializeInternal(WebrtcSdpPacket packet, Stream stream)
     {
         base.SerializeInternal(packet, stream);
+        SerializeGuid(packet.PeerId, stream);
         SerializeString(packet.Sdp, stream);
     }
 
     protected override WebrtcSdpPacket DeserializeInternal(Stream stream)
     {
-        WebrtcSdpPacket packet = base.DeserializeInternal(stream);
-        packet.Sdp = DeserializeString(stream);
-        return packet;
+        return new WebrtcSdpPacket
+        {
+            PeerId = DeserializeGuid(stream),
+            Sdp = DeserializeString(stream),
+        };
     }
 }

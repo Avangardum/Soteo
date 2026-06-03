@@ -65,7 +65,11 @@ public sealed class JsmqFromGameplayCommunicator :
     public void ConnectAsPlayer(string email, string password)
     {
         _currentUserIdRepository.Value = Const.SingleplayerPlayerId;
-        SendReliable(new CampaignServerHandshakePacket { Token = "player" }, Const.CampaignServerId );
+        SendReliable
+        (
+            new CampaignServerHandshakePacket { Token = "player", Version = Const.Version },
+            Const.CampaignServerId
+        );
         ConnectionEstablished();
         
         if (!Const.IsServer)
@@ -73,14 +77,22 @@ public sealed class JsmqFromGameplayCommunicator :
             // Normally shard snapshot would be sent automatically on connection, but when using JSMQ, connection
             // is not detected until a packet is sent, so it's requested manually.
             SendReliable(new ShardSnapshotRequestPacket(), Const.TestShardId);
-            SendReliable(new SpawnCharacterPacket { PeerId = Const.TestShardId }, Const.CampaignServerId);
+            SendReliable
+            (
+                new SpawnCharacterPacket { PeerId = Const.TestShardId, CharacterId = Const.SingleplayerPlayerId },
+                Const.CampaignServerId
+            );
             _shardLoader.LoadShard();
         }
     }
 
     public void ConnectAsShardServer()
     {
-        SendReliable(new CampaignServerHandshakePacket { Token = "shard" }, Const.CampaignServerId );
+        SendReliable
+        (
+            new CampaignServerHandshakePacket { Token = "shard", Version = Const.Version },
+            Const.CampaignServerId
+        );
         ConnectionEstablished();
     }
     

@@ -6,5 +6,5 @@ namespace Soteo.Core.Shared.Packets;
 [PacketTypeCode(PacketTypeCode.CharacterRecalled)]
 public sealed record CharacterRecalledPacket : Packet
 {
-    public Guid CharacterId { get; set; }
+    public required Guid CharacterId { get; init; }
 }

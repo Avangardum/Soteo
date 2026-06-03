@@ -14,8 +14,6 @@ public sealed class MovePacketSerializer : PacketSerializer<MovePacket>
 
     protected override MovePacket DeserializeInternal(Stream stream)
     {
-        var message = base.DeserializeInternal(stream);
-        message.Position = DeserializeVector2(stream);
-        return message;
+        return new MovePacket { Position = DeserializeVector2(stream) };
     }
 }

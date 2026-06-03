@@ -13,8 +13,6 @@ public sealed class CharacterRecalledPacketSerializer : PacketSerializer<Charact
 
     protected override CharacterRecalledPacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(stream);
-        packet.CharacterId = DeserializeGuid(stream);
-        return packet;
+        return new CharacterRecalledPacket { CharacterId = DeserializeGuid(stream) };
     }
 }

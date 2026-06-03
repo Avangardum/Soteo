@@ -6,5 +6,5 @@ namespace Soteo.Core.Shared.Packets;
 [PacketTypeCode(PacketTypeCode.WebrtcSdp)]
 public sealed record WebrtcSdpPacket : RelayedPacket
 {
-    public string Sdp { get; set; } = "";
+    public required string Sdp { get; init; }
 }

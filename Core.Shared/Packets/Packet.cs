@@ -4,12 +4,12 @@ using Soteo.Util.Extensions;
 
 namespace Soteo.Core.Shared.Packets;
 
-public abstract record Packet // todo use required fields, avoid gradual construction
+public abstract record Packet
 {
+    public PacketTypeCode TypeCode { get; }
+    
     protected Packet()
     {
         TypeCode = GetType().GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;
     }
-    
-    public PacketTypeCode TypeCode { get; }
 }

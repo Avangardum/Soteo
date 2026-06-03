@@ -6,5 +6,5 @@ namespace Soteo.Core.Shared.Packets;
 [PacketTypeCode(PacketTypeCode.SpawnCharacter)]
 public sealed record SpawnCharacterPacket : RelayedPacket
 {
-    public Guid SpawnPointId { get; set; }
+    public required Guid CharacterId { get; init; }
 }

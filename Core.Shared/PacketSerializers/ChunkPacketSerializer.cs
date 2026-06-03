@@ -16,11 +16,12 @@ public sealed class ChunkPacketSerializer : PacketSerializer<ChunkPacket>
 
     protected override ChunkPacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(stream);
-        packet.GroupId = DeserializeGuid(stream);
-        packet.Index = DeserializeInt(stream);
-        packet.IsLast = DeserializeBool(stream);
-        packet.Bytes = DeserializeList(DeserializeByte, stream);
-        return packet;
+        return new ChunkPacket
+        {
+            GroupId = DeserializeGuid(stream),
+            Index = DeserializeInt(stream),
+            IsLast = DeserializeBool(stream),
+            Bytes = DeserializeList(DeserializeByte, stream),
+        };
     }
 }

@@ -6,6 +6,6 @@ namespace Soteo.Core.Shared.Packets;
 [PacketTypeCode(PacketTypeCode.CampaignServerHandshake)]
 public sealed record CampaignServerHandshakePacket : Packet
 {
-    public string Token { get; set; } = "";
-    public string Version { get; set; } = "";
+    public required string Token { get; init; }
+    public required string Version { get; init; }
 }

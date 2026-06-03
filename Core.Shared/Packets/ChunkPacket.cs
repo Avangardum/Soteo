@@ -9,8 +9,8 @@ namespace Soteo.Core.Shared.Packets;
 [PacketTypeCode(PacketTypeCode.Chunk)]
 public sealed record ChunkPacket : Packet
 {
-    public Guid GroupId { get; set; }
-    public int Index { get; set; }
-    public bool IsLast { get; set; }
-    public byte[] Bytes { get; set; } = [];
+    public required Guid GroupId { get; init; }
+    public required int Index { get; init; }
+    public required bool IsLast { get; init; }
+    public required byte[] Bytes { get; init; }
 }

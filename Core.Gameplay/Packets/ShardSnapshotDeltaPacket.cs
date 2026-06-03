@@ -8,7 +8,7 @@ namespace Soteo.Core.Gameplay.Packets;
 [PacketTypeCode(PacketTypeCode.ShardSnapshotDelta)]
 public sealed record ShardSnapshotDeltaPacket : Packet
 {
-    public long Tick { get; set; }
-    public double ServerLoad { get; set; }
-    public ShardSnapshotDelta SnapshotDelta { get; set; } = null!;
+    public required long Tick { get; init; }
+    public required double ServerLoad { get; init; }
+    public required ShardSnapshotDelta SnapshotDelta { get; init; }
 }

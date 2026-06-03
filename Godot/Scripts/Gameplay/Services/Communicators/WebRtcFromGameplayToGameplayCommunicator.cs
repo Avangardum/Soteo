@@ -131,10 +131,11 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         if (_timeSinceLastPing >= PingInterval)
         {
             foreach ((Guid peerId, (Guid pingId, _)) in _ping.ToList())
-                if (pingId != _lastPingId) _ping.Remove(peerId);
+                if (pingId != _lastPingId)
+                    _ping.Remove(peerId);
             _timeSinceLastPing = 0;
             _lastPingId = Guid.NewGuid();
-            BroadcastUnreliable(new PingPacket { Id = _lastPingId.Value });
+            BroadcastUnreliable(new PingPacket { Id = _lastPingId.Value, IsResponse = false });
         }
     }
     

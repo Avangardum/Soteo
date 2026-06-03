@@ -19,13 +19,21 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
 
     protected override ShardSnapshotDeltaPacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(stream);
-        packet.Tick = DeserializeLong(stream);
-        packet.ServerLoad = DeserializeDouble(stream);
-        DictionaryDelta<Guid, EntitySnapshotDelta> entities =
-            DeserializeIndexedDictionaryDelta(DeserializeGuid, DeserializeEntityDelta, it => it.Id, stream);
-        packet.SnapshotDelta = new ShardSnapshotDelta { Entities = entities };
-        return packet;
+        return new ShardSnapshotDeltaPacket
+        {
+            Tick = DeserializeLong(stream),
+            ServerLoad = DeserializeDouble(stream),
+            SnapshotDelta = new ShardSnapshotDelta
+            {
+                Entities = DeserializeIndexedDictionaryDelta
+                (
+                    DeserializeGuid,
+                    DeserializeEntityDelta,
+                    it => it.Id,
+                    stream
+                ),
+            },
+        };
     }
 
     private void SerializeEntityDelta(EntitySnapshotDelta entity, Stream stream)

@@ -14,9 +14,10 @@ public sealed class CampaignServerHandshakePacketSerializer : PacketSerializer<C
 
     protected override CampaignServerHandshakePacket DeserializeInternal(Stream stream)
     {
-        var packet = base.DeserializeInternal(stream);
-        packet.Token = DeserializeString(stream);
-        packet.Version = DeserializeString(stream);
-        return packet;
+        return new CampaignServerHandshakePacket
+        {
+            Token = DeserializeString(stream),
+            Version = DeserializeString(stream),
+        };
     }
 }

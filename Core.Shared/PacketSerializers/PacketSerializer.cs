@@ -18,8 +18,11 @@ public static class PacketSerializer
     public static IPacketSerializer For(PacketTypeCode packetTypeCode) => InstancesByPacketType[packetTypeCode];
 }
 
-public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacket : Packet, new()
+public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacket : Packet
 {
+    public static readonly PacketTypeCode PacketTypeCode =
+        typeof(TPacket).GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;
+    
     byte[] IPacketSerializer.Serialize(Packet packet) => Serialize((TPacket)packet);
     
     public byte[] Serialize(TPacket packet)
@@ -41,9 +44,17 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacke
         try
         {
             var stream = new MemoryStream(bytes.ToArray());
+            var typeCode = DeserializeEnum<PacketTypeCode>(stream);
+            if (typeCode != PacketTypeCode)
+                throw new InvalidOperationException("Wrong serializer");
             TPacket packet = DeserializeInternal(stream);
-            if (stream.Position != bytes.Length) throw new BadPacketException(
-                $"Packet deserialized as {packet}, but contains {bytes.Length - stream.Position} extra bytes");
+            if (stream.Position != bytes.Length)
+            {
+                throw new BadPacketException
+                (
+                    $"Packet deserialized as {packet}, but contains {bytes.Length - stream.Position} extra bytes"
+                );
+            }
             return packet;
         }
         catch (BadPacketException e)
@@ -52,12 +63,5 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacke
         }
     }
     
-    protected virtual TPacket DeserializeInternal(Stream stream)
-    {
-        var packet = new TPacket();
-        var typeCode = DeserializeEnum<PacketTypeCode>(stream);
-        if (typeCode != packet.TypeCode)
-            throw new InvalidOperationException("Wrong serializer");
-        return packet;
-    }
+    protected abstract TPacket DeserializeInternal(Stream stream);
 }
