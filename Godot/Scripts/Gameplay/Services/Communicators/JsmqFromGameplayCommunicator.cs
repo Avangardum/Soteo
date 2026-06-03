@@ -72,18 +72,10 @@ public sealed class JsmqFromGameplayCommunicator :
         );
         ConnectionEstablished();
         
+        // Normally shard snapshot would be sent automatically on connection, but when using JSMQ, connection
+        // is not detected until a packet is sent, so it's requested manually.
         if (!Const.IsServer)
-        {
-            // Normally shard snapshot would be sent automatically on connection, but when using JSMQ, connection
-            // is not detected until a packet is sent, so it's requested manually.
             SendReliable(new ShardSnapshotRequestPacket(), Const.TestShardId);
-            SendReliable
-            (
-                new SpawnCharacterPacket { PeerId = Const.TestShardId, CharacterId = Const.SingleplayerPlayerId },
-                Const.CampaignServerId
-            );
-            _shardLoader.LoadShard();
-        }
     }
 
     public void ConnectAsShardServer()

@@ -92,19 +92,6 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator : Node, IC
         SendPacket(new CampaignServerHandshakePacket { Token = _token.Required, Version = Const.Version });
         _token = null;
         ConnectionEstablished();
-        
-        if (!Const.IsServer)
-        {
-            SendPacket
-            (
-                new SpawnCharacterPacket
-                {
-                    PeerId = Const.TestShardId,
-                    CharacterId = _currentUserIdRepository.Required,
-                }
-            );
-            _shardLoader.LoadShard();
-        }
     }
     
     public void OnDataReceived()
