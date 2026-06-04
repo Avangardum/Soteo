@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Enums;
@@ -77,12 +78,14 @@ public sealed class Hud : IHud
 
     public void OnAbilityButtonDown(int buttonIndex)
     {
-        Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = true });
+        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepository.Value)
+            Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = true });
     }
     
     public void OnAbilityButtonUp(int buttonIndex)
     {
-        Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
+        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepository.Value)
+            Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
     }
     
     public void OnMouseEnteredAbilityButton(int buttonIndex)
@@ -119,9 +122,7 @@ public sealed class Hud : IHud
 
     public void Process(double delta)
     {
-        if (_currentCharIdRepository.Value != null)
-            SelectedUnit ??= _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepository.Required, out _);
-        if (SelectedUnit == null)
+        if (SelectedUnit == null && !TrySelectCurrentUnit())
         {
             _node.Visible = false;
             return;
@@ -131,6 +132,16 @@ public sealed class Hud : IHud
         ProcessBars(SelectedUnit);
         ProcessAbilities(SelectedUnit);
         ProcessStatuses(SelectedUnit);
+    }
+    
+    [MemberNotNullWhen(true, nameof(SelectedUnit))]
+    public bool TrySelectCurrentUnit()
+    {
+        if (_currentCharIdRepository.Value == null) return false;
+        UnitPuppet? unit = _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepository.Required, out _);
+        if (unit == null) return false;
+        SelectedUnit = unit;
+        return true;
     }
     
     private void ProcessBars(UnitPuppet unit)

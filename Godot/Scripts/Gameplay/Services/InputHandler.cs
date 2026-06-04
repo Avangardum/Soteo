@@ -69,6 +69,7 @@ public sealed class InputHandler : Node2D
     private void HandleInteract()
     {
         if (_currentCharIdRepo.Value == null) return;
+        _hud.TrySelectCurrentUnit();
         UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepo.Required, out _);
         if (user == null) return;
         
@@ -100,6 +101,8 @@ public sealed class InputHandler : Node2D
     
     private void HandleStop()
     {
+        if (_currentCharIdRepo.Value == null) return;
+        _hud.TrySelectCurrentUnit();
         _packetSender.SendReliable
         (
             new StopPacket { UnitId = _currentCharIdRepo.Required, Command = new StopCommand() },
@@ -110,6 +113,7 @@ public sealed class InputHandler : Node2D
     private void HandleUseAbility(AbilitySlot slot)
     {
         if (_currentCharIdRepo.Value == null) return;
+        _hud.TrySelectCurrentUnit();
         UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepo.Required, out _);
         if (user == null || !user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
