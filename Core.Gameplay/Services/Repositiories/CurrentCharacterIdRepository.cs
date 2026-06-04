@@ -1,6 +1,6 @@
 using Soteo.Core.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Services;
+namespace Soteo.Core.Gameplay.Services.Repositiories;
 
 public sealed class CurrentCharacterIdRepository : ICurrentCharacterIdRepository
 {

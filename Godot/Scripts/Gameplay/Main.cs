@@ -3,6 +3,7 @@ using Soteo.Core.Gameplay;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.PacketHandlers;
 using Soteo.Core.Gameplay.Services;
+using Soteo.Core.Gameplay.Services.Repositiories;
 using Soteo.Core.Gameplay.Services.Synchronization;
 using Soteo.Core.Shared;
 using Soteo.Core.Shared.Interfaces;
@@ -199,6 +200,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingletonNode<ITooltip>("Ui/TooltipLayer/Tooltip");
         services.AddSingleton<ILocalizer, Localizer>();
         services.AddSingleton<ICurrentCharacterIdRepository, CurrentCharacterIdRepository>();
+        services.AddSingleton<IVisibleShardIdRepository, VisibleShardIdRepository>();
         
         if (Const.UseJsmq)
             services.AddSingleton<IShardServerConnector>(_ => _jsmqCommunicator.Required);

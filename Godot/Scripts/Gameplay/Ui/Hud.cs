@@ -138,8 +138,8 @@ public sealed class Hud : IHud
     public bool TrySelectCurrentUnit()
     {
         if (_currentCharIdRepository.Value == null) return false;
-        UnitPuppet? unit = _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepository.Required, out _);
-        if (unit == null) return false;
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepository.Required, out UnitPuppet? unit, out _)) return false;
+        
         SelectedUnit = unit;
         return true;
     }

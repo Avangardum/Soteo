@@ -21,7 +21,8 @@ public sealed class DebugScreen
     
     private readonly INetworkDebugger _networkDebugger;
     private readonly IShardServiceProviders _shardServiceProviders;
-    
+    private readonly IVisibleShardIdRepository _visibleShardIdRepository;
+
     private readonly DebugScreenNode _node;
     private readonly Label _label;
     private readonly Graph _fpsGraph;
@@ -32,12 +33,14 @@ public sealed class DebugScreen
     (
         DebugScreenNode node,
         INetworkDebugger networkDebugger,
-        IShardServiceProviders shardServiceProviders
+        IShardServiceProviders shardServiceProviders,
+        IVisibleShardIdRepository visibleShardIdRepository
     )
     {
         _networkDebugger = networkDebugger;
         _shardServiceProviders = shardServiceProviders;
-        
+        _visibleShardIdRepository = visibleShardIdRepository;
+
         node.DebugScreen = this;
         node.Visible = false;
         _node = node;
@@ -57,7 +60,8 @@ public sealed class DebugScreen
         while (_pendingProcessCount > 0)
         {
             _pendingProcessCount--;
-            IServiceProvider? shardServiceProvider = _shardServiceProviders.GetOrDefault(Const.TestShardId);
+            IServiceProvider? shardServiceProvider =
+                _visibleShardIdRepository.Value?.PassTo(_shardServiceProviders.GetOrDefault);
             var synchronizationClient = shardServiceProvider?.GetRequiredService<ISynchronizationClient>();
             var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
 
@@ -90,7 +94,7 @@ public sealed class DebugScreen
         _label.Text =
             $"""
              fps: {1 / delta :N0}
-             ping: {ToMillisecondsString(_networkDebugger.Ping(Const.TestShardId))}
+             ping: {ToMillisecondsString(_visibleShardIdRepository.Value?.PassTo(_networkDebugger.Ping))}
              sync latency: {ToMillisecondsString(synchronizationClient?.Latency)}
              wait frames: {synchronizationClient?.WaitFrameCount ?? 0 :N0}
              fast-forwards: {synchronizationClient?.FastForwardCount ?? 0 :N0}

@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Soteo.Core.Gameplay.Interfaces;
 
 /// <summary>
@@ -5,5 +7,6 @@ namespace Soteo.Core.Gameplay.Interfaces;
 /// </summary>
 public interface IEntityLocator
 {
-    T? FindEntity<T>(Guid entityId, out Guid? shardId) where T : class, IEntity;
+    bool TryFindEntity<T>(Guid entityId, [NotNullWhen(true)] out T? entity, [NotNullWhen(true)] out Guid? shardId)
+        where T : class, IEntity;
 }

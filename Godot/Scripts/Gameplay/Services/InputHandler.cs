@@ -70,8 +70,7 @@ public sealed class InputHandler : Node2D
     {
         if (_currentCharIdRepo.Value == null) return;
         _hud.TrySelectCurrentUnit();
-        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepo.Required, out _);
-        if (user == null) return;
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out UnitPuppet? user, out Guid? shardId)) return;
         
         UnitPuppet? targetUnit = GetUnitsUnderMouse()
             .FirstOrDefault(it => ValidateAbility(user, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
@@ -82,7 +81,7 @@ public sealed class InputHandler : Node2D
             _packetSender.SendReliable
             (
                 new UseAbilityPacket { UnitId = _currentCharIdRepo.Required, Command = command },
-                Const.TestShardId
+                shardId.Value
             );
         }
         else
@@ -94,7 +93,7 @@ public sealed class InputHandler : Node2D
                     UnitId = _currentCharIdRepo.Required,
                     Command = new MoveCommand(GetGlobalMousePosition().ToSys()),
                 },
-                Const.TestShardId
+                shardId.Value
             );
         }
     }
@@ -103,10 +102,11 @@ public sealed class InputHandler : Node2D
     {
         if (_currentCharIdRepo.Value == null) return;
         _hud.TrySelectCurrentUnit();
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out UnitPuppet? user, out Guid? shardId)) return;
         _packetSender.SendReliable
         (
             new StopPacket { UnitId = _currentCharIdRepo.Required, Command = new StopCommand() },
-            Const.TestShardId
+            shardId.Value
         );
     }
 
@@ -114,8 +114,8 @@ public sealed class InputHandler : Node2D
     {
         if (_currentCharIdRepo.Value == null) return;
         _hud.TrySelectCurrentUnit();
-        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepo.Required, out _);
-        if (user == null || !user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out UnitPuppet? user, out Guid? shardId)) return;
+        if (!user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
         UnitPuppet? targetUnit = null;
         Vector2? targetPosition = null;
@@ -140,7 +140,7 @@ public sealed class InputHandler : Node2D
                 UnitId = _currentCharIdRepo.Required,
                 Command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id) 
             },
-            Const.TestShardId
+            shardId.Value
         );
     }
 
@@ -159,8 +159,7 @@ public sealed class InputHandler : Node2D
         
         if (command.TargetUnitId != null)
         {
-            UnitPuppet? targetUnit = _entityLocator.FindEntity<UnitPuppet>(command.TargetUnitId.Value, out _);
-            if (targetUnit == null)
+            if (!_entityLocator.TryFindEntity(command.TargetUnitId.Value, out UnitPuppet? targetUnit, out _))
                 return AbilityValidationResult.InvalidTarget;
             if (targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(CanTarget.Ally))
                 return AbilityValidationResult.InvalidTarget;
