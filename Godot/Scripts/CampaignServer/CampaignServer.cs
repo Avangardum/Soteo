@@ -1,3 +1,5 @@
+using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.CampaignServer.Communicators;
@@ -27,6 +29,7 @@ public sealed class CampaignServer : Node
         RegisterServices(serviceCollection);
         IServiceProvider serviceProvider = serviceCollection.BuildAutofacServiceProvider();
         _communicator.Value = serviceProvider.GetRequiredService<ICommunicator>();
+        StartShardServers();
     }
 
     public override void _Process(float delta)
@@ -49,5 +52,24 @@ public sealed class CampaignServer : Node
         
         foreach (Type type in PacketHandler.TypesByPacketType.Values)
             services.AddTransient(type);
+    }
+    
+    private void StartShardServers()
+    {
+        ImmutableList<Guid> ids = 
+        [
+            Guid.Parse("00000000-0000-0000-0000-00000007e571"),
+            Guid.Parse("00000000-0000-0000-0000-00000007e572"),
+            Guid.Parse("00000000-0000-0000-0000-00000007e573"),
+        ];
+        
+        foreach (Guid id in ids)
+        {
+            var process = new Process();
+            process.StartInfo.FileName = "godot3.6.2.exe";
+            process.StartInfo.Arguments = $"--no-window --server {id}";
+            process.StartInfo.UseShellExecute = false;
+            process.Start();
+        }
     }
 }
