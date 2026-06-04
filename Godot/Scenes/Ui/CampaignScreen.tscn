@@ -97,9 +97,16 @@ margin_bottom = 112.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000deb09"
 
-[node name="DeployButton" type="Button" parent="."]
-margin_left = 436.0
+[node name="SpectateButton" type="Button" parent="."]
+margin_left = 501.0
 margin_top = 361.0
-margin_right = 571.0
+margin_right = 636.0
+margin_bottom = 438.0
+text = "Spectate"
+
+[node name="DeployButton" type="Button" parent="."]
+margin_left = 283.0
+margin_top = 361.0
+margin_right = 418.0
 margin_bottom = 438.0
 text = "Deploy"

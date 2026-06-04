@@ -42,6 +42,7 @@ public sealed class CampaignScreen
         
         campaignServerConnector.Connected += () => _node.Visible = true;
         node.GetNode<Button>("DeployButton").Connect("pressed", Deploy);
+        node.GetNode<Button>("SpectateButton").Connect("pressed", Spectate);
         
         foreach (Button button in _characterButtons)
             button.Connect("pressed", () => SelectCharacter(Guid.Parse(button.Text)));
@@ -79,6 +80,16 @@ public sealed class CampaignScreen
             },
             Const.CampaignServerId
         );
+        
+        _shardServerConnector.ConnectToShardServer(_selectedShardId.Value);
+        _shardLoader.LoadShard(_selectedShardId.Value);
+        _currentCharIdRepo.Value = _selectedCharacterId;
+        _node.Visible = false;
+    }
+    
+    private void Spectate()
+    {
+        if (_selectedShardId == null) return;
         
         _shardServerConnector.ConnectToShardServer(_selectedShardId.Value);
         _shardLoader.LoadShard(_selectedShardId.Value);
