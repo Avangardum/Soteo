@@ -6,10 +6,5 @@ namespace Soteo.Core.Shared.Packets;
 
 public abstract record Packet
 {
-    public PacketTypeCode TypeCode { get; }
-    
-    protected Packet()
-    {
-        TypeCode = GetType().GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;
-    }
+    public PacketTypeCode TypeCode => GetType().GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;
 }

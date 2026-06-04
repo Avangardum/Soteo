@@ -14,7 +14,7 @@ using Soteo.Util.Interfaces;
 
 namespace Soteo.Core.Gameplay.Entities;
 
-public abstract class Unit : UnitBase<IUnitNode>, IUnit
+public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;

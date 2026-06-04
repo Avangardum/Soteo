@@ -10,6 +10,8 @@ public abstract class CommandPacketHandler<TPacket, TCommand>(IEntityManager ent
 {
     protected override void Handle(TPacket packet, Guid senderId)
     {
-        entityManager.GetEntity<Unit>(packet.UnitId)?.SetCommand(packet.Command); // todo interface, validate senderId
+        ICommandableUnit? unit = entityManager.GetEntity<ICommandableUnit>(packet.UnitId);
+        if (unit != null && unit.ControllingPlayerIds.Contains(senderId))
+            unit.SetCommand(packet.Command);
     }
 }
