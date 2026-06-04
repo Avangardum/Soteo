@@ -10,6 +10,7 @@ using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
 using Soteo.Core.Shared;
 using Soteo.Util;
+using Soteo.Util.Interfaces;
 
 namespace Soteo.Core.Gameplay.Entities;
 
@@ -19,16 +20,32 @@ public abstract class Unit : UnitBase<IUnitNode>, IUnit
     private readonly IEntityManager _entityManager;
     
     private long _nextStatusOrdinal;
+    
     private readonly Queue<ICommand> _commands = [];
 
-    public Unit(Guid id, IUnitNode node, IServiceProvider serviceProvider) : base(id, node)
+    private Guid? _controllingPlayerId;
+    
+    public IReadOnlySet<Guid> ControllingPlayerIds
+    {
+        get
+        {
+            if (_controllingPlayerId == null)
+                return ReadOnlySetWrapper<Guid>.Empty;
+            else
+                return new ReadOnlySetWrapper<Guid>(new HashSet<Guid> { _controllingPlayerId.Value } );
+        }
+    }
+
+    private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
+    public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
+    
+    public Unit(Guid id, Guid controllingPlayerId, IUnitNode node, IServiceProvider serviceProvider) : base(id, node)
     {
         _serviceProvider = serviceProvider;
         _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
+        
+        _controllingPlayerId = controllingPlayerId;
     }
-    
-    private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
-    public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
     
     public override Vector2 Position
     {

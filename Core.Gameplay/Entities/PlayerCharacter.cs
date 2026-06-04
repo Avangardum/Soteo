@@ -6,7 +6,8 @@ namespace Soteo.Core.Gameplay.Entities;
 
 public sealed class PlayerCharacter : Unit
 {
-    public PlayerCharacter(Guid id, IUnitNode node, IServiceProvider serviceProvider) : base(id, node, serviceProvider)
+    public PlayerCharacter(Guid id, Guid controllingPlayerId, IUnitNode node, IServiceProvider serviceProvider) :
+        base(id, controllingPlayerId, node, serviceProvider)
     {
         SetAbility<BloodSacrificeAbility>(AbilitySlot.Class0, 1);
         SetAbility<HealAbility>(AbilitySlot.Class1, 1);

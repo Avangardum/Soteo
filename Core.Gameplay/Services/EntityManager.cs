@@ -103,8 +103,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         };
     }
     
-    public PlayerCharacter SpawnPlayerCharacter(Guid id) =>
-        Add(new PlayerCharacter(id, AddNode<IUnitNode>(id), _serviceProvider));
+    public PlayerCharacter SpawnPlayerCharacter(Guid id, Guid controllingPlayerId) =>
+        Add(new PlayerCharacter(id, controllingPlayerId, AddNode<IUnitNode>(id), _serviceProvider));
 
     public Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target)
     {

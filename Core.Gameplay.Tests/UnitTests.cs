@@ -128,7 +128,7 @@ public sealed class UnitTests : Tests
     private sealed class Sut : Unit
     {
         public Sut(Guid id, IUnitNode node, IServiceProvider serviceProvider) :
-            base(id, node, serviceProvider) { }
+            base(id, controllingPlayerId: id, node, serviceProvider) { }
         
         public new void SetAbility<T>(AbilitySlot slot, int level) where T : Ability =>
             base.SetAbility<T>(slot, level);

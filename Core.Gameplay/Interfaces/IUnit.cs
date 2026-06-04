@@ -3,6 +3,7 @@ using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
+using Soteo.Util.Interfaces;
 
 namespace Soteo.Core.Gameplay.Interfaces
 {
@@ -11,6 +12,7 @@ namespace Soteo.Core.Gameplay.Interfaces
         bool IsDead { get; }
         void Die();
     
+        IReadOnlySet<Guid> ControllingPlayerIds { get; }
         Faction Faction { get; }
         bool IsAlliedTo(IUnit other);
     
