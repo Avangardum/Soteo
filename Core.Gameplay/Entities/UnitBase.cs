@@ -30,7 +30,7 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEnti
         foreach (Stat stat in Stat.All)
             StatsInternal[stat] = StatConst[stat].Default;
         
-        Faction = Id.GetHashCode() % 2 == 0 ? Faction.Empire : Faction.Syndicate;
+        Faction = int.Parse(Id.ToString()[^1..]) % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
     
     public virtual bool IsDead { get; protected set; }

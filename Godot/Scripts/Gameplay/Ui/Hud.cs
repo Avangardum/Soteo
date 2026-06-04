@@ -22,7 +22,7 @@ public sealed class Hud : IHud
     private readonly ImmutableList<StatusIndicator> _statusIndicators;
     
     private readonly IEntityLocator _entityLocator;
-    private readonly ICurrentUserIdRepository _currentUserIdRepository;
+    private readonly ICurrentCharacterIdRepository _currentCharIdRepository;
     private readonly IPalette _palette;
     private readonly ITooltip _tooltip;
     private readonly ILocalizer _localizer;
@@ -33,14 +33,14 @@ public sealed class Hud : IHud
     (
         HudNode node,
         IEntityLocator entityLocator,
-        ICurrentUserIdRepository currentUserIdRepository,
+        ICurrentCharacterIdRepository currentCharIdRepository,
         IPalette palette,
         ITooltip tooltip,
         ILocalizer localizer
     )
     {
         _entityLocator = entityLocator;
-        _currentUserIdRepository = currentUserIdRepository;
+        _currentCharIdRepository = currentCharIdRepository;
         _palette = palette;
         _tooltip = tooltip;
         _localizer = localizer;
@@ -119,8 +119,8 @@ public sealed class Hud : IHud
 
     public void Process(double delta)
     {
-        if (_currentUserIdRepository.Value != null)
-            SelectedUnit ??= _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepository.Required, out _);
+        if (_currentCharIdRepository.Value != null)
+            SelectedUnit ??= _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepository.Required, out _);
         if (SelectedUnit == null)
         {
             _node.Visible = false;

@@ -37,6 +37,27 @@ margin_bottom = 83.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000000c3"
 
+[node name="Button4" type="Button" parent="CharacterButtons"]
+margin_top = 87.0
+margin_right = 350.0
+margin_bottom = 112.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-0000000000c4"
+
+[node name="Button5" type="Button" parent="CharacterButtons"]
+margin_top = 116.0
+margin_right = 350.0
+margin_bottom = 141.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-0000000000c5"
+
+[node name="Button6" type="Button" parent="CharacterButtons"]
+margin_top = 145.0
+margin_right = 350.0
+margin_bottom = 170.0
+toggle_mode = true
+text = "00000000-0000-0000-0000-0000000000c6"
+
 [node name="Label2" type="Label" parent="."]
 margin_left = 400.0
 margin_right = 750.0
