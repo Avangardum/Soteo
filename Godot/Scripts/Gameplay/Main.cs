@@ -198,6 +198,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
         services.AddSingletonNode<ITooltip>("Ui/TooltipLayer/Tooltip");
         services.AddSingleton<ILocalizer, Localizer>();
+        services.AddSingleton<ICurrentCharacterIdRepository, CurrentCharacterIdRepository>();
         
         if (Const.UseJsmq)
             services.AddSingleton<IShardServerConnector>(_ => _jsmqCommunicator.Required);

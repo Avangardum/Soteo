@@ -11,6 +11,8 @@ public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPack
 {
     protected override void SerializeInternal(UseAbilityPacket packet, Stream stream)
     {
+        SerializeGuid(packet.UnitId, stream);
+        
         SerializeEnum(packet.Command.Slot, stream);
         SerializeBool(packet.Command.Repeat, stream);
         
@@ -24,6 +26,7 @@ public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPack
     {
         return new UseAbilityPacket
         {
+            UnitId = DeserializeGuid(stream),
             Command = new UseAbilityCommand
             (
                 Slot: DeserializeEnum<AbilitySlot>(stream),

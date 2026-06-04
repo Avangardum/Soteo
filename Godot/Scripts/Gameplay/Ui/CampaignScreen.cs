@@ -11,6 +11,7 @@ public sealed class CampaignScreen
     private readonly IShardServerConnector _shardServerConnector;
     private readonly IPacketSender _packetSender;
     private readonly IShardLoader _shardLoader;
+    private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
     
     private readonly CampaignScreenNode _node;
     private readonly IReadOnlyList<Button> _characterButtons;
@@ -25,12 +26,14 @@ public sealed class CampaignScreen
         ICampaignServerConnector campaignServerConnector,
         IShardServerConnector shardServerConnector,
         IPacketSender packetSender,
-        IShardLoader shardLoader
+        IShardLoader shardLoader,
+        ICurrentCharacterIdRepository currentCharIdRepo
     )
     {
         _shardServerConnector = shardServerConnector;
         _packetSender = packetSender;
         _shardLoader = shardLoader;
+        _currentCharIdRepo = currentCharIdRepo;
         
         node.Visible = false;
         _node = node;
@@ -79,6 +82,7 @@ public sealed class CampaignScreen
         
         _shardServerConnector.ConnectToShardServer(_selectedShardId.Value);
         _shardLoader.LoadShard(_selectedShardId.Value);
+        _currentCharIdRepo.Value = _selectedCharacterId;
         _node.Visible = false;
     }
 }

@@ -22,20 +22,20 @@ public sealed class InputHandler : Node2D
     private readonly IPacketSender _packetSender;
     private readonly IHud _hud;
     private readonly IEntityLocator _entityLocator;
-    private readonly ICurrentUserIdRepository _currentUserIdRepo;
+    private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
     
     public InputHandler
     (
         IPacketSender packetSender,
         IHud hud,
         IEntityLocator entityLocator,
-        ICurrentUserIdRepository currentUserIdRepo
+        ICurrentCharacterIdRepository currentCharIdRepo
     )
     {
         _packetSender = packetSender;
         _hud = hud;
         _entityLocator = entityLocator;
-        _currentUserIdRepo = currentUserIdRepo;
+        _currentCharIdRepo = currentCharIdRepo;
         
         Name = nameof(InputHandler);
     }
@@ -47,7 +47,7 @@ public sealed class InputHandler : Node2D
         if (e.IsActionPressed("interact"))
             HandleInteract();
         if (e.IsActionPressed("stop"))
-            _packetSender.SendReliable(new StopPacket(), Const.TestShardId);
+            HandleStop();
         
         foreach (var slot in Enum.GetValues<AbilitySlot>().Distinct())
         {
@@ -68,8 +68,8 @@ public sealed class InputHandler : Node2D
     
     private void HandleInteract()
     {
-        if (_currentUserIdRepo.Value == null) return;
-        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.Required, out _);
+        if (_currentCharIdRepo.Value == null) return;
+        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepo.Required, out _);
         if (user == null) return;
         
         UnitPuppet? targetUnit = GetUnitsUnderMouse()
@@ -78,22 +78,39 @@ public sealed class InputHandler : Node2D
         if (targetUnit != null)
         {
             var command = new UseAbilityCommand(Slot: AbilitySlot.Attack, Repeat: true, TargetUnitId: targetUnit.Id);
-            _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
+            _packetSender.SendReliable
+            (
+                new UseAbilityPacket { UnitId = _currentCharIdRepo.Required, Command = command },
+                Const.TestShardId
+            );
         }
         else
         {
             _packetSender.SendReliable
             (
-                new MovePacket { Position = GetGlobalMousePosition().ToSys() },
+                new MovePacket
+                {
+                    UnitId = _currentCharIdRepo.Required,
+                    Command = new MoveCommand(GetGlobalMousePosition().ToSys()),
+                },
                 Const.TestShardId
             );
         }
     }
+    
+    private void HandleStop()
+    {
+        _packetSender.SendReliable
+        (
+            new StopPacket { UnitId = _currentCharIdRepo.Required, Command = new StopCommand() },
+            Const.TestShardId
+        );
+    }
 
     private void HandleUseAbility(AbilitySlot slot)
     {
-        if (_currentUserIdRepo.Value == null) return;
-        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentUserIdRepo.Required, out _);
+        if (_currentCharIdRepo.Value == null) return;
+        UnitPuppet? user = _entityLocator.FindEntity<UnitPuppet>(_currentCharIdRepo.Required, out _);
         if (user == null || !user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
         UnitPuppet? targetUnit = null;
@@ -112,8 +129,15 @@ public sealed class InputHandler : Node2D
             targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition().ToSys() : null;
         }
 
-        var command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id);
-        _packetSender.SendReliable(new UseAbilityPacket { Command = command }, Const.TestShardId);
+        _packetSender.SendReliable
+        (
+            new UseAbilityPacket
+            {
+                UnitId = _currentCharIdRepo.Required,
+                Command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id) 
+            },
+            Const.TestShardId
+        );
     }
 
     private AbilityValidationResult ValidateAbility(UnitPuppet user, AbilitySlot slot, UnitPuppet targetUnit) =>

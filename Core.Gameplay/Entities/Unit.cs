@@ -465,15 +465,10 @@ public abstract class Unit : UnitBase<IUnitNode>, IUnit
     public void SetCommand(ICommand command)
     {
         _commands.Clear();
-        _commands.Enqueue(command);
+        if (command is not StopCommand)
+            _commands.Enqueue(command);
         if (command is not UseAbilityCommand useAbilityCommand || useAbilityCommand.Slot != AbilityUseProgress?.Slot)
             AbilityUseProgress = null;
-    }
-    
-    public void Stop()
-    {
-        _commands.Clear();
-        AbilityUseProgress = null;
     }
     
     public void SpendHealth(double amount, Ability? sourceAbility)

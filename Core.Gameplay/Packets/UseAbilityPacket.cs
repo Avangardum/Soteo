@@ -6,7 +6,4 @@ using Soteo.Core.Shared.Packets;
 namespace Soteo.Core.Gameplay.Packets;
 
 [PacketTypeCode(PacketTypeCode.UseAbility)]
-public sealed record UseAbilityPacket : Packet
-{
-    public required UseAbilityCommand Command { get; init; }
-}
+public sealed record UseAbilityPacket : CommandPacket<UseAbilityCommand>;
