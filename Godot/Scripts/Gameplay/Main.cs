@@ -69,6 +69,102 @@ public sealed class Main : Node2D, IShardLoader
             LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
     }
     
+    private void RegisterServices(IServiceCollection services)
+    {
+        RegisterSharedServices(services);
+        
+        if (Const.IsServer)
+            RegisterServerServices(services);
+        else
+            RegisterClientServices(services);
+        
+        if (Const.UseJsmq)
+            RegisterJsmqServices(services);
+        else
+            RegisterWebServices(services);
+    }
+    
+    private void RegisterSharedServices(IServiceCollection services)
+    {
+        services.AddTransient(typeof(ServerDependency<>));
+        services.AddTransient(typeof(ClientDependency<>));
+        
+        services.AddSingleton(this);
+        services.AddSingleton<IShardLoader>(this);
+        services.AddSingleton<IShardServiceProviders>(new ShardServiceProviders(_shardServiceScopes));
+        services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
+        services.AddSingleton<IPacketHandler, GameplayRoutingPacketHandler>();
+        services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
+        services.AddSingleton<IEntityNodePool, EntityNodePool>();
+        services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
+        services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
+        
+        services.AddScoped<ShardNode>(
+            _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
+        services.AddAlias<IShard, ShardNode>();
+        services.AddScoped<EntityManager>();
+        services.AddAlias<IEntityManager, EntityManager>();
+        services.AddAlias<IEntitySnapshotManager, EntityManager>();
+        services.AddScoped<IEntityNodeManager, EntityNodeManager>();
+        
+        foreach (Type type in PacketHandler.TypesByPacketType.Values)
+            services.AddTransient(type);
+    }
+    
+    private void RegisterServerServices(IServiceCollection services)
+    {
+        services.AddScoped<ISynchronizationServer, SynchronizationServer>();
+    }
+    
+    private void RegisterClientServices(IServiceCollection services)
+    {
+        services.AddSingleton<LogInScreenNode>(_ => _logIScreenNode.Required);
+        services.AddSingleton<LogInScreen>();
+        services.AddScoped<ISynchronizationClient, SynchronizationClient>();
+        services.AddSingletonNode<ICamera>("Camera");
+        services.AddSingleton<HudNode>(_ => _hudNode.Required);
+        services.AddSingleton<IHud, Hud>();
+        services.AddSingleton<DebugScreenNode>(_ => _debugScreenNode.Required);
+        services.AddSingleton<DebugScreen>();
+        services.AddSingleton<CampaignScreenNode>(_ => _campaignScreenNode.Required);
+        services.AddSingleton<CampaignScreen>();
+        services.AddSingleton<IEntityLocator, EntityLocator>();
+        services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
+        services.AddSingletonNode<ITooltip>("Ui/TooltipLayer/Tooltip");
+        services.AddSingleton<ILocalizer, Localizer>();
+        services.AddSingleton<ICurrentCharacterIdRepository, CurrentCharacterIdRepository>();
+        services.AddSingleton<IVisibleShardIdRepository, VisibleShardIdRepository>();
+    }
+    
+    private void RegisterJsmqServices(IServiceCollection services)
+    {
+        services.AddSingleton<ICampaignServerConnector>(_ => _jsmqCommunicator.Required);
+        services.AddSingleton<ICampaignServerPacketSender>(_ => _jsmqCommunicator.Required);
+        services.AddSingleton<IPacketSender>(_ => _jsmqCommunicator.Required);
+        services.AddSingleton<INetworkDebugger>(_ => _jsmqCommunicator.Required);
+        services.AddSingleton<IConnectionNotifier>(_ => _jsmqCommunicator.Required);
+        services.AddSingleton<IShardServerConnector>(_ => _jsmqCommunicator.Required);
+    }
+    
+    private void RegisterWebServices(IServiceCollection services)
+    {
+        services.AddSingleton<ICampaignServerConnector>(_ => _webSocketCampaignServerCommunicator.Required);
+        services.AddSingleton<ICampaignServerPacketSender>(_ => _webSocketCampaignServerCommunicator.Required);
+        services.AddSingleton<IPacketSender>
+        (
+            _ => new RoutingPacketSender
+            (
+                _webSocketCampaignServerCommunicator.Required,
+                _webRtcGameplayCommunicator.Required
+            )
+        );
+        services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
+        services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
+        services.AddSingleton<IConnectionNotifier>(_ => _webRtcGameplayCommunicator.Required);
+        services.AddSingleton<IShardServerConnector>(_ => _webRtcGameplayCommunicator.Required);
+        services.AddSingleton<IChunkCollector, ChunkCollector>();
+    }
+    
     private void GetNodes()
     {
         _shardRoot = GetNode<Node2D>("Shards");
@@ -116,96 +212,16 @@ public sealed class Main : Node2D, IShardLoader
         }
     }
     
-    private void RegisterServices(IServiceCollection services)
+    private void CreateShardScopedNodes(ShardNode shard, IServiceProvider serviceProvider)
     {
-        RegisterSharedServices(services);
+        if (Const.IsServer) return;
+        shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
+    }
+    
+    private void CreateShardScopedServices(IServiceProvider serviceProvider)
+    {
         if (Const.IsServer)
-            RegisterServerServices(services);
-        else
-            RegisterClientServices(services);
-    }
-    
-    private void RegisterSharedServices(IServiceCollection services)
-    {
-        services.AddTransient(typeof(ServerDependency<>));
-        services.AddTransient(typeof(ClientDependency<>));
-        
-        services.AddSingleton(this);
-        services.AddSingleton<IShardLoader>(this);
-        services.AddSingleton<IShardServiceProviders>(new ShardServiceProviders(_shardServiceScopes));
-        services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
-        services.AddSingleton<IPacketHandler, GameplayRoutingPacketHandler>();
-        services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
-        services.AddSingleton<IEntityNodePool>(new EntityNodePool());
-        services.AddSingleton<IChunkCollector, ChunkCollector>();
-        services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
-        services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
-        
-        services.AddScoped<ShardNode>(
-            _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
-        services.AddAlias<IShard, ShardNode>();
-        services.AddScoped<EntityManager>();
-        services.AddAlias<IEntityManager, EntityManager>();
-        services.AddAlias<IEntitySnapshotManager, EntityManager>();
-        services.AddScoped<IEntityNodeManager, EntityNodeManager>();
-        
-        foreach (Type type in PacketHandler.TypesByPacketType.Values)
-            services.AddTransient(type);
-        
-        if (Const.UseJsmq)
-        {
-            services.AddSingleton<ICampaignServerConnector>(_ => _jsmqCommunicator.Required);
-            services.AddSingleton<ICampaignServerPacketSender>(_ => _jsmqCommunicator.Required);
-            services.AddSingleton<IPacketSender>(_ => _jsmqCommunicator.Required);
-            services.AddSingleton<INetworkDebugger>(_ => _jsmqCommunicator.Required);
-            services.AddSingleton<IConnectionNotifier>(_ => _jsmqCommunicator.Required);
-        }
-        else
-        {
-            services.AddSingleton<ICampaignServerConnector>(_ => _webSocketCampaignServerCommunicator.Required);
-            services.AddSingleton<ICampaignServerPacketSender>(_ => _webSocketCampaignServerCommunicator.Required);
-            services.AddSingleton<IPacketSender>
-            (
-                _ => new RoutingPacketSender
-                (
-                    _webSocketCampaignServerCommunicator.Required,
-                    _webRtcGameplayCommunicator.Required
-                )
-            );
-            services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
-            services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
-            services.AddSingleton<IConnectionNotifier>(_ => _webRtcGameplayCommunicator.Required);
-        }
-    }
-    
-    private void RegisterServerServices(IServiceCollection services)
-    {
-        services.AddScoped<ISynchronizationServer, SynchronizationServer>();
-    }
-    
-    private void RegisterClientServices(IServiceCollection services)
-    {
-        services.AddSingleton<LogInScreenNode>(_ => _logIScreenNode.Required);
-        services.AddSingleton<LogInScreen>();
-        services.AddScoped<ISynchronizationClient, SynchronizationClient>();
-        services.AddSingletonNode<ICamera>("Camera");
-        services.AddSingleton<HudNode>(_ => _hudNode.Required);
-        services.AddSingleton<IHud, Hud>();
-        services.AddSingleton<DebugScreenNode>(_ => _debugScreenNode.Required);
-        services.AddSingleton<DebugScreen>();
-        services.AddSingleton<CampaignScreenNode>(_ => _campaignScreenNode.Required);
-        services.AddSingleton<CampaignScreen>();
-        services.AddSingleton<IEntityLocator, EntityLocator>();
-        services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
-        services.AddSingletonNode<ITooltip>("Ui/TooltipLayer/Tooltip");
-        services.AddSingleton<ILocalizer, Localizer>();
-        services.AddSingleton<ICurrentCharacterIdRepository, CurrentCharacterIdRepository>();
-        services.AddSingleton<IVisibleShardIdRepository, VisibleShardIdRepository>();
-        
-        if (Const.UseJsmq)
-            services.AddSingleton<IShardServerConnector>(_ => _jsmqCommunicator.Required);
-        else
-            services.AddSingleton<IShardServerConnector>(_ => _webRtcGameplayCommunicator.Required);
+            serviceProvider.GetRequiredService<ISynchronizationServer>();
     }
     
     public void LoadShard(Guid id)
@@ -229,17 +245,5 @@ public sealed class Main : Node2D, IShardLoader
         CreateShardScopedNodes(shard, scope.ServiceProvider);
         CreateShardScopedServices(scope.ServiceProvider);
         _shardServiceScopes[id] = scope;
-    }
-    
-    private void CreateShardScopedNodes(ShardNode shard, IServiceProvider serviceProvider)
-    {
-        if (Const.IsServer) return;
-        shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
-    }
-    
-    private void CreateShardScopedServices(IServiceProvider serviceProvider)
-    {
-        if (Const.IsServer)
-            serviceProvider.GetRequiredService<ISynchronizationServer>();
     }
 }

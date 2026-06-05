@@ -41,10 +41,10 @@ See Architecture.md files in subfolders to learn about specific components.
 - [x] Status / ability tooltips
 - [x] Death
 - [x] Style convention
-- [ ] Testing
+- [x] Testing
 - [ ] Cluster startup / shutdown
 - [ ] Stress test / optimization
-- [ ] Manual character creation and spawning
+- [x] Manual character creation and spawning
 - [ ] Extra data dictionary
 - [ ] Shard limits
 - [ ] Travel between shards
