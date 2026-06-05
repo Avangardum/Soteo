@@ -8,7 +8,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Entities;
 
-public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
+public sealed class UnitPuppet : UnitBase<IUnitPuppetNode> // todo extract interface
 {
     private readonly ICamera _camera;
     
