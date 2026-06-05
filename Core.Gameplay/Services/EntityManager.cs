@@ -18,13 +18,31 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     private readonly IEntityNodeManager _entityNodeManager; 
     
     private readonly Dictionary<Guid, ISnapshottableEntity> _entities = [];
+    
+    /// <summary>
+    /// Removed entities are stored as WeakReference and are included in persistence snapshots as long as they are
+    /// referenced by any other object. That is required to replicate references to removed entities across restarts.
+    /// </summary>
+    private readonly Dictionary<Guid, WeakReference<ISnapshottableEntity>> _removedEntities = [];
+    private const int CleanupRemovedEntitiesEveryXRemovals = 1000;
+    private int _removalsUntilRemovedEntitiesCleanup = CleanupRemovedEntitiesEveryXRemovals;
+    
+    /// <summary>
+    /// When a unit dies, a puppet snapshot of it is created and sent to clients once to notify them that the unit died
+    /// and was not removed for any other reason
+    /// </summary>
     private readonly List<EntitySnapshot> _deadPuppetSnapshots = [];
     
-    public EntityManager(IServiceProvider serviceProvider)
+    public EntityManager
+    (
+        IServiceProvider serviceProvider,
+        ClientDependency<ICamera> camera,
+        IEntityNodeManager entityNodeManager
+    )
     {
         _serviceProvider = serviceProvider;
-        _camera = serviceProvider.GetRequiredService<ClientDependency<ICamera>>();
-        _entityNodeManager = serviceProvider.GetRequiredService<IEntityNodeManager>();
+        _camera = camera;
+        _entityNodeManager = entityNodeManager;
     }
     
     public IReadOnlyDictionary<Guid, IEntity> Entities =>
@@ -32,6 +50,20 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     
     public event Action<IEntity> EntityAdded = delegate { };
     public event Action<IEntity> EntityRemoved = delegate { };
+    
+    public IReadOnlyDictionary<Guid, EntitySnapshot> GetEntitySnapshots()
+    {
+        Dictionary<Guid, EntitySnapshot> snapshots = [];
+        
+        foreach ((Guid id, ISnapshottableEntity entity) in _entities)
+            snapshots[id] = entity.CreateSnapshot();
+        
+        foreach ((Guid id, WeakReference<ISnapshottableEntity> entityRef) in _removedEntities)
+            if (entityRef.TryGetTarget(out ISnapshottableEntity? entity))
+                snapshots[id] = entity.CreateSnapshot();
+        
+        return snapshots;
+    }
     
     public IReadOnlyDictionary<Guid, EntitySnapshot> GetEntityPuppetSnapshots()
     {
@@ -103,8 +135,37 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         };
     }
     
-    public PlayerCharacter SpawnPlayerCharacter(Guid id, Guid controllingPlayerId) =>
-        Add(new PlayerCharacter(id, controllingPlayerId, AddNode<IUnitNode>(id), _serviceProvider));
+    public PlayerCharacter SpawnPlayerCharacter(Guid id, Guid controllingPlayerId)
+    {
+        if (_entities.ContainsKey(id))
+            throw new InvalidOperationException("Entity with this id already exists");
+        
+        if
+        (
+            _removedEntities.TryGetValue(id, out WeakReference<ISnapshottableEntity> removedEntityRef) &&
+            removedEntityRef.TryGetTarget(out ISnapshottableEntity removedEntity)
+        )
+        {
+            if (removedEntity is not PlayerCharacter playerCharacter)
+            {
+                throw new InvalidOperationException
+                (
+                    "Attempted respawning a player character from a non player character entity"
+                );
+            }
+            
+            if (!playerCharacter.ControllingPlayerIds.SetEquals([controllingPlayerId]))
+                throw new InvalidOperationException("Player character control transfer is not supported");
+
+            playerCharacter.Respawn(AddNode<IUnitNode>(id));
+            Add(playerCharacter);
+            return playerCharacter;
+        }
+        else
+        {
+            return Add(new PlayerCharacter(id, controllingPlayerId, AddNode<IUnitNode>(id), this, _serviceProvider));
+        }
+    }
 
     public Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target)
     {
@@ -132,12 +193,22 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     {
         _entityNodeManager.RemoveNode(entity.Id);
         _entities.Remove(entity.Id);
+        _removedEntities[entity.Id] = new WeakReference<ISnapshottableEntity>(entity);
+        if (--_removalsUntilRemovedEntitiesCleanup == 0)
+            CleanupRemovedEntities();
         
-        // A final snapshot is sent when a unit dies to notify clients that it's removed due to its death and
-        // not for another reason like recall.
         if (entity is Unit { IsDead: true })
             _deadPuppetSnapshots.Add(entity.CreateSnapshot().ToPuppet());
         
         EntityRemoved(entity);
+    }
+    
+    private void CleanupRemovedEntities()
+    {
+        foreach ((Guid id, WeakReference<ISnapshottableEntity> reference) in _removedEntities.ToDictionary())
+            if (!reference.TryGetTarget(out _))
+                _removedEntities.Remove(id);
+        
+        _removalsUntilRemovedEntitiesCleanup = CleanupRemovedEntitiesEveryXRemovals;
     }
 }

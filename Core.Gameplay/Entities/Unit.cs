@@ -39,10 +39,17 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
     
-    public Unit(Guid id, Guid controllingPlayerId, IUnitNode node, IServiceProvider serviceProvider) : base(id, node)
+    public Unit
+    (
+        Guid id,
+        Guid controllingPlayerId,
+        IUnitNode node,
+        IEntityManager entityManager,
+        IServiceProvider serviceProvider
+    ) : base(id, node)
     {
         _serviceProvider = serviceProvider;
-        _entityManager = serviceProvider.GetRequiredService<IEntityManager>();
+        _entityManager = entityManager;
         
         _controllingPlayerId = controllingPlayerId;
     }

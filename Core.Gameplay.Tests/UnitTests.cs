@@ -26,7 +26,7 @@ public sealed class UnitTests : Tests
         _entityManager = Substitute.For<IEntityManager>();
         _node = Substitute.For<IUnitNode>();
         _serviceProvider = new ServiceCollection().AddSingleton(_entityManager).BuildServiceProvider();
-        _sut = new Sut(Guid.NewGuid(), _node, _serviceProvider);
+        _sut = new Sut(Guid.NewGuid(), _node, _entityManager, _serviceProvider);
     }
     
     [Fact]
@@ -127,8 +127,8 @@ public sealed class UnitTests : Tests
     
     private sealed class Sut : Unit
     {
-        public Sut(Guid id, IUnitNode node, IServiceProvider serviceProvider) :
-            base(id, controllingPlayerId: id, node, serviceProvider) { }
+        public Sut(Guid id, IUnitNode node, IEntityManager entityManager, IServiceProvider serviceProvider) :
+            base(id, controllingPlayerId: id, node, entityManager, serviceProvider) { }
         
         public new void SetAbility<T>(AbilitySlot slot, int level) where T : Ability =>
             base.SetAbility<T>(slot, level);

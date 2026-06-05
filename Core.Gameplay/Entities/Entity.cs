@@ -30,6 +30,7 @@ public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, 
         Position = snapshot.Position;
         Azimuth = snapshot.Azimuth;
         
+        // todo uncomment
         // if (snapshot.IsRemoved)
         //     Remove();
     }
@@ -49,6 +50,16 @@ public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, 
         Node.Entity = null;
         Node = null;
         Removed();
-        // Node is removed by EntityManager
+    }
+    
+    /// <summary>
+    /// Bring the removed node back to the active state
+    /// </summary>
+    public void Respawn(TNode node)
+    {
+        if (!IsRemoved) throw new InvalidOperationException("Only removed entities can be respawned");
+        Node = node;
+        node.Entity = this;
+        IsRemoved = false;
     }
 }

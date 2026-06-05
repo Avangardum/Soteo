@@ -7,6 +7,6 @@ public abstract class Tests
 {
     static Tests()
     {
-        TypeLocator.Init(Assembly.GetExecutingAssembly(), CoreGameplayAssembly.Value);
+        TypeLocator.Init(Assembly.GetExecutingAssembly(), CoreGameplayAssembly.Value, CoreSharedAssembly.Value);
     }
 }
