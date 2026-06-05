@@ -30,9 +30,8 @@ public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, 
         Position = snapshot.Position;
         Azimuth = snapshot.Azimuth;
         
-        // todo uncomment
-        // if (snapshot.IsRemoved)
-        //     Remove();
+        if (snapshot.IsRemoved)
+            Remove();
     }
     
     public virtual void ApplyDelta(EntitySnapshotDelta delta, double interpolationWeight)
