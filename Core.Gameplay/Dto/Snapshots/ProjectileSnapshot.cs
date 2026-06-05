@@ -11,6 +11,7 @@ public sealed record ProjectileSnapshot : EntitySnapshot<ProjectileSnapshot>
         return new ProjectilePuppetSnapshot
         {
             Id = Id,
+            IsRemoved = IsRemoved,
             Position = Position,
             Azimuth = Azimuth
         };

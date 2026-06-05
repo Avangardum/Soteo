@@ -17,6 +17,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
         return new UnitPuppetSnapshot
         {
             Id = Id,
+            IsRemoved = IsRemoved,
             Position = Position,
             Azimuth = Azimuth,
             IsDead = IsDead,

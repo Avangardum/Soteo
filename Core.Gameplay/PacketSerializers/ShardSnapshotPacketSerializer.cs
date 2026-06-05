@@ -65,6 +65,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     private void SerializeBaseEntity(EntitySnapshot entity, Stream stream)
     {
         SerializeGuid(entity.Id, stream);
+        SerializeBool(entity.IsRemoved, stream);
         SerializeVector2(entity.Position, stream);
         SerializeDouble(entity.Azimuth, stream);
     }
@@ -86,6 +87,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return new UnitSnapshot
         {
             Id = DeserializeGuid(stream),
+            IsRemoved = DeserializeBool(stream),
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream),
             IsDead = DeserializeBool(stream),
@@ -115,6 +117,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return new UnitPuppetSnapshot
         {
             Id = DeserializeGuid(stream),
+            IsRemoved = DeserializeBool(stream),
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream),
             IsDead = DeserializeBool(stream),
@@ -141,6 +144,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return new ProjectileSnapshot
         {
             Id = DeserializeGuid(stream),
+            IsRemoved = DeserializeBool(stream),
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream),
             Speed = DeserializeDouble(stream),
@@ -178,6 +182,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return new ProjectilePuppetSnapshot
         {
             Id = DeserializeGuid(stream),
+            IsRemoved = DeserializeBool(stream),
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream)
         };

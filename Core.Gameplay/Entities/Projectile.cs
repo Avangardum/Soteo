@@ -45,6 +45,7 @@ public sealed class Projectile : Entity<IProjectileNode>
         return new ProjectileSnapshot
         {
             Id = Id,
+            IsRemoved = IsRemoved,
             Position = Position,
             Azimuth = Azimuth,
             AbilityContext = _abilityContext.Deflate(),

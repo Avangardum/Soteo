@@ -62,6 +62,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         return new UnitSnapshot
         {
             Id = Id,
+            IsRemoved = IsRemoved,
             Position = Position,
             Azimuth = Azimuth,
             IsDead = IsDead,
@@ -86,7 +87,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
     }
 
-    public virtual void Tick(double delta)
+    public void Tick(double delta)
     {
         if (IsRemoved) return;
         
