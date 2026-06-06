@@ -19,6 +19,7 @@ config/icon="res://Textures/icon.png"
 AppDomainValidator="*res://Scripts/Shared/Nodes/Autoloads/AppDomainValidator.cs"
 AsyncExceptionCollectorNode="*res://Scripts/Shared/Nodes/Autoloads/AsyncExceptionCollectorNode.cs"
 SignalConnector="*res://Scripts/Shared/Nodes/Autoloads/SignalConnector.cs"
+PauseRepository="*res://Scripts/Shared/Nodes/Autoloads/PauseRepository.cs"
 
 [gdnative]
 

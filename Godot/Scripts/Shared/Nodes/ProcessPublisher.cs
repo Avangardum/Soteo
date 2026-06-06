@@ -13,25 +13,53 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
         Name = nameof(ProcessPublisher);
     }
 
-    public IDisposable SubscribeToProcess(Action<double> subscription, ProcessPriorityEnum priority) =>
-        Subscribe(it => it.Process, subscription, priority);
+    public IDisposable SubscribeToProcess(Action<double> handler, ProcessPriorityEnum priority, bool callWhenPaused)
+    {
+        return Subscribe(it => it.Process, handler, priority, callWhenPaused);
+    }
 
-    public IDisposable SubscribeToProcess(Action subscription, ProcessPriorityEnum priority) =>
-        SubscribeToProcess(_ => subscription(), priority);
+    public IDisposable SubscribeToProcess(Action handler, ProcessPriorityEnum priority, bool callWhenPaused)
+    {
+        return SubscribeToProcess(_ => handler(), priority, callWhenPaused);
+    }
 
-    public IDisposable SubscribeToPhysicsProcess(Action<double> subscription, ProcessPriorityEnum priority) =>
-        Subscribe(it => it.PhysicsProcess, subscription, priority);
+    public IDisposable SubscribeToPhysicsProcess
+    (
+        Action<double> handler,
+        ProcessPriorityEnum priority,
+        bool callWhenPaused
+    )
+    {
+        return Subscribe(it => it.PhysicsProcess, handler, priority, callWhenPaused);
+    }
 
-    public IDisposable SubscribeToPhysicsProcess(Action subscription, ProcessPriorityEnum priority) =>
-        SubscribeToPhysicsProcess(_ => subscription(), priority);
+    public IDisposable SubscribeToPhysicsProcess(Action handler, ProcessPriorityEnum priority, bool callWhenPaused)
+    {
+        return SubscribeToPhysicsProcess(_ => handler(), priority, callWhenPaused);
+    }
 
     private IDisposable Subscribe
     (
         Func<Subscriptions, List<Action<double>>> listSelector,
-        Action<double> subscription,
-        ProcessPriorityEnum priority
+        Action<double> handler,
+        ProcessPriorityEnum priority,
+        bool callWhenPaused
     )
     {
+        Action<double> processedHandler;
+        if (callWhenPaused)
+        {
+            processedHandler = handler;
+        }
+        else
+        {
+            processedHandler = it =>
+            {
+                if (!GetTree().Paused)
+                    handler(it);
+            };
+        }
+        
         if (!_subscriptionsByPriority.ContainsKey(priority))
         {
             var subscriptions = new Subscriptions([], []);
@@ -41,8 +69,8 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
         }
         
         List<Action<double>> list = listSelector(_subscriptionsByPriority[priority]);
-        list.Add(subscription);
-        return new DelegateDisposable(() => list.Remove(subscription));
+        list.Add(processedHandler);
+        return new DelegateDisposable(() => list.Remove(processedHandler));
     }
     
     private sealed record Subscriptions(List<Action<double>> Process, List<Action<double>> PhysicsProcess);
@@ -51,8 +79,9 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
     {
         public override void _Ready()
         {
-            ProcessPriority = (int)priority;
             Name = nameof(ProcessListener) + " " + priority;
+            ProcessPriority = (int)priority;
+            PauseMode = PauseModeEnum.Process;
         }
 
         public override void _Process(float delta)

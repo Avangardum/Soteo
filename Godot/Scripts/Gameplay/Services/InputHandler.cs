@@ -38,6 +38,7 @@ public sealed class InputHandler : Node2D
         _currentCharIdRepo = currentCharIdRepo;
         
         Name = nameof(InputHandler);
+        PauseMode = PauseModeEnum.Process;
     }
 
     public override void _UnhandledInput(InputEvent e)

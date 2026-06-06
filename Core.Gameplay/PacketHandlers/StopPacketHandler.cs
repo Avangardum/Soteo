@@ -4,9 +4,10 @@ using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
 using Soteo.Core.Shared;
 using Soteo.Core.Shared.Attributes;
+using Soteo.Core.Shared.Interfaces;
 
 namespace Soteo.Core.Gameplay.PacketHandlers;
 
 [AllowClientPackets]
-public sealed class StopPacketHandler(IEntityManager entityManager) :
-    CommandPacketHandler<StopPacket, StopCommand>(entityManager);
+public sealed class StopPacketHandler(IEntityManager entityManager, IPauseRepository pauseRepo) :
+    CommandPacketHandler<StopPacket, StopCommand>(entityManager, pauseRepo);

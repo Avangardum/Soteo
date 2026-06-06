@@ -98,6 +98,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IEntityNodePool, EntityNodePool>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
+        services.AddSingletonNode<IPauseRepository>("/root/PauseRepository");
         
         services.AddScoped<ShardNode>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));

@@ -11,6 +11,7 @@ bg_color = Color( 0.145098, 0.145098, 0.164706, 1 )
 bg_color = Color( 0.145098, 0.145098, 0.164706, 1 )
 
 [node name="OverheadUi" type="Control"]
+pause_mode = 2
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5

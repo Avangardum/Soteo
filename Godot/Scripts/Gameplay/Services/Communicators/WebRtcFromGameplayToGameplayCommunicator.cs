@@ -52,14 +52,13 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     )
     {
         _campaignServerPacketSender = campaignServerPacketSender;
-        
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
-        
         _chunkCollector = chunkCollector;
 
         Name = nameof(WebRtcFromGameplayToGameplayCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
+        PauseMode = PauseModeEnum.Process;
     }
 
     public override void _PhysicsProcess(float delta)

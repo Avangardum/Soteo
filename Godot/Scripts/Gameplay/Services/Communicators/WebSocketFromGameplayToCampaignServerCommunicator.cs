@@ -42,6 +42,8 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         _currentUserIdRepository = currentUserIdRepository;
         
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
+        ProcessPriority = (int)ProcessPriorityEnum.Communicator;
+        PauseMode = PauseModeEnum.Process;
     }
     
     public event Action Connected = delegate {};

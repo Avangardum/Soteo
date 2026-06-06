@@ -36,7 +36,8 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         _networkDebugger = networkDebugger;
         _packetSender = packetSender;
         
-        _processSubscription = processPublisher.SubscribeToProcess(Process, ProcessPriorityEnum.Default);
+        _processSubscription =
+            processPublisher.SubscribeToProcess(Process, ProcessPriorityEnum.Default, callWhenPaused: true);
     }
     
     public void Dispose()
@@ -58,8 +59,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         }
     }
     
-    public IReadOnlyList<double> ServerLoadHistory =>
-        _syncData.ServerLoadHistoryRing.UnrollRing((_syncData.LastDeltaTick ?? -1) + 1);
+    public double? ServerLoad => _syncData.ServerLoad;
     
     public double? Latency => (_syncData.ApproxServerTick - _syncData.Tick) / Const.TicksPerSecond;
     
@@ -181,7 +181,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         if (State == StateEnum.Desynchronized) return;
         
         _syncData.DeltaRing.RingSet(packet.Tick, packet.SnapshotDelta);
-        _syncData.ServerLoadHistoryRing.RingSet(packet.Tick, packet.ServerLoad);
+        _syncData.ServerLoad = packet.ServerLoad;
         _syncData.ApproxServerTick = packet.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
         _syncData.LastDeltaTick = packet.Tick;
     }
@@ -200,7 +200,6 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         public long? LastDeltaTick { get; set; }
         public ShardSnapshotPacket? LastSnapshotPacket { get; set; }
         public ShardSnapshotDelta?[] DeltaRing { get; } = new ShardSnapshotDelta[10 * Const.TicksPerSecond];
-        public double[] ServerLoadHistoryRing { get; } = new double[10 * Const.TicksPerSecond];
         
         // Stores minimal difference between _tick and _lastDeltaTick for every recent second. This number
         // shouldn't go below 0, or else synchronization will pause until the delta necessary to continue arrives.
@@ -212,5 +211,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         public double? Second => Tick / Const.TicksPerSecond;
         
         public long? DeltaRingEarliestValidTick => LastDeltaTick - DeltaRing.Length + 1;
+        
+        public double? ServerLoad { get; set; }
     }
 }

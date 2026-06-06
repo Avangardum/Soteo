@@ -9,6 +9,7 @@ using Soteo.Core.CampaignServer.Interfaces;
 using Soteo.Core.CampaignServer.PacketHandlers;
 using Soteo.Core.Shared;
 using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Shared.Packets;
 using Soteo.Core.Shared.PacketSerializers;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
@@ -20,6 +21,9 @@ namespace Soteo.CampaignServer;
 public sealed class CampaignServer : Node
 {
     private LateInit<ICommunicator> _communicator = new();
+    private LateInit<IServiceProvider> _serviceProvider = new();
+    
+    private IServiceProvider ServiceProvider => _serviceProvider.Value;
     
     public override void _Ready()
     {
@@ -27,9 +31,10 @@ public sealed class CampaignServer : Node
         TypeLocator.Init(CoreCampaignServerAssembly.Value, CoreSharedAssembly.Value);
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
-        IServiceProvider serviceProvider = serviceCollection.BuildAutofacServiceProvider();
-        _communicator.Value = serviceProvider.GetRequiredService<ICommunicator>();
+        _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
+        _communicator.Value = ServiceProvider.GetRequiredService<ICommunicator>();
         StartShardServers();
+        TestLifetimeAsync().CollectException();
     }
 
     public override void _Process(float delta)
@@ -71,5 +76,13 @@ public sealed class CampaignServer : Node
             process.StartInfo.UseShellExecute = false;
             process.Start();
         }
+    }
+    
+    private async Task TestLifetimeAsync()
+    {
+        await Task.Delay(TimeSpan.FromSeconds(30));
+        ServiceProvider.GetRequiredService<IPacketSender>().Broadcast(new PausePacket { Pause = true });
+        await Task.Delay(TimeSpan.FromSeconds(10));
+        ServiceProvider.GetRequiredService<IPacketSender>().Broadcast(new PausePacket { Pause = false });
     }
 }

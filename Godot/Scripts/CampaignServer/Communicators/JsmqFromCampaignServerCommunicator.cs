@@ -18,6 +18,8 @@ public sealed class JsmqFromCampaignServerCommunicator
     IUserRepository userRepo
 ) : GdObject, ICommunicator
 {
+    private readonly HashSet<Guid> _peerIds = [];
+    
     public void Poll()
     {
         while (true)
@@ -36,6 +38,7 @@ public sealed class JsmqFromCampaignServerCommunicator
                     [handshake.Token] = true,
                 };
                 userRepo.OnConnected(claims);
+                _peerIds.Add(senderId);
             }
             else
             {
@@ -49,6 +52,14 @@ public sealed class JsmqFromCampaignServerCommunicator
         byte[] bytes = [..Const.CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
         string base64 = Convert.ToBase64String(bytes);
         JavaScript.Eval($"""jsmq.send("{base64}", "{receiverId}");""");
+    }
+
+    public void Broadcast(Packet packet)
+    {
+        byte[] bytes = [..Const.CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
+        string base64 = Convert.ToBase64String(bytes);
+        foreach (Guid id in _peerIds)
+            JavaScript.Eval($"""jsmq.send("{base64}", "{id}");""");
     }
 
     public void RelayFrom(RelayedPacket packet, Guid senderId)

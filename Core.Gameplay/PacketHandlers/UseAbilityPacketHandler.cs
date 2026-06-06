@@ -4,9 +4,10 @@ using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
 using Soteo.Core.Shared;
 using Soteo.Core.Shared.Attributes;
+using Soteo.Core.Shared.Interfaces;
 
 namespace Soteo.Core.Gameplay.PacketHandlers;
 
 [AllowClientPackets]
-public sealed class UseAbilityPacketHandler(IEntityManager entityManager) :
-    CommandPacketHandler<UseAbilityPacket, UseAbilityCommand>(entityManager);
+public sealed class UseAbilityPacketHandler(IEntityManager entityManager, IPauseRepository pauseRepo) :
+    CommandPacketHandler<UseAbilityPacket, UseAbilityCommand>(entityManager, pauseRepo);

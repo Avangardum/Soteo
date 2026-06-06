@@ -11,10 +11,18 @@ public sealed class FrameStopwatch : IFrameStopwatch
 
     public FrameStopwatch(IProcessPublisher processPublisher)
     {
-        processPublisher
-            .SubscribeToProcess(_processStopwatch.Restart, ProcessPriorityEnum.FrameStopwatch);
-        processPublisher
-            .SubscribeToPhysicsProcess(_physicsProcessStopwatch.Restart, ProcessPriorityEnum.FrameStopwatch);
+        processPublisher.SubscribeToProcess
+        (
+            _processStopwatch.Restart,
+            ProcessPriorityEnum.FrameStopwatch,
+            callWhenPaused: true
+        );
+        processPublisher.SubscribeToPhysicsProcess
+        (
+            _physicsProcessStopwatch.Restart,
+            ProcessPriorityEnum.FrameStopwatch,
+            callWhenPaused: true
+        );
     }
     
     public double ElapsedSinceProcess => _processStopwatch.Elapsed.TotalSeconds;

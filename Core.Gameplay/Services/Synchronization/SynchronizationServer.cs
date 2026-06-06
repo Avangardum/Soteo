@@ -5,6 +5,7 @@ using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Interfaces;
 using Soteo.Util;
 
 namespace Soteo.Core.Gameplay.Services.Synchronization;
@@ -15,6 +16,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     private readonly IPacketSender _packetSender;
     private readonly IConnectionNotifier _connectionNotifier;
     private readonly IFrameStopwatch _frameStopwatch;
+    private readonly IPauseRepository _pauseRepo;
 
     private long _tick;
     private ShardSnapshot? _prevShardSnapshot;
@@ -27,17 +29,19 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         IPacketSender packetSender,
         IConnectionNotifier connectionNotifier,
         IProcessPublisher processPublisher,
-        IFrameStopwatch frameStopwatch
+        IFrameStopwatch frameStopwatch,
+        IPauseRepository pauseRepo
     )
     {
         _entitySnapshotManager = entitySnapshotManager;
         _packetSender = packetSender;
         _connectionNotifier = connectionNotifier;
         _frameStopwatch = frameStopwatch;
+        _pauseRepo = pauseRepo;
         
         connectionNotifier.PeerConnected += OnPeerConnected;
-        _physicsProcessSubscription =
-            processPublisher.SubscribeToPhysicsProcess(PhysicsProcess, ProcessPriorityEnum.SynchronizationServer);
+        _physicsProcessSubscription = processPublisher
+            .SubscribeToPhysicsProcess(Tick, ProcessPriorityEnum.SynchronizationServer, callWhenPaused: true);
     }
 
     public void Dispose()
@@ -45,8 +49,6 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         _connectionNotifier.PeerConnected -= OnPeerConnected;
         _physicsProcessSubscription.Dispose();
     }
-
-    
     
     private void OnPeerConnected(Guid peerId)
     {
@@ -54,7 +56,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
             _snapshotRequesters.Add(peerId);
     }
 
-    private void PhysicsProcess(double delta)
+    private void Tick(double delta)
     {
         var entitySnapshots = _entitySnapshotManager.GetEntityPuppetSnapshots();
         var shardSnapshot = new ShardSnapshot { Entities = entitySnapshots };
@@ -82,7 +84,8 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
             _packetSender.BroadcastReliable(shardSnapshotDeltaPacket);
         }
 
-        _tick++;
+        if (!_pauseRepo.Paused)
+            _tick++;
     }
 
     public void ReceiveSnapshotRequest(Guid clientId) => _snapshotRequesters.Add(clientId);

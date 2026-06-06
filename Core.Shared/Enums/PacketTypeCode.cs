@@ -7,6 +7,7 @@ public enum PacketTypeCode : byte
     Ok,
     BadInput,
     Ping,
+    Pause,
     // Campaign server <--> Client / Shard server
     CampaignServerHandshake,
     SpawnCharacter,

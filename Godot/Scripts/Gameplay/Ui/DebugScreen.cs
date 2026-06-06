@@ -13,9 +13,9 @@ public sealed class DebugScreen
 {
     private const int RingLength = 10 * Const.TicksPerSecond;
     private readonly double[] _fpsRing = new double[RingLength];
-    private readonly double[] _unrolledFpsRing = new double[RingLength];
     private readonly double[] _entityCountRing = new double[RingLength];
-    private readonly double[] _unrolledEntityCountRing = new double[RingLength];
+    private readonly double[] _serverLoadRing = new double[RingLength];
+    private readonly double[] _unrolledRing = new double[RingLength];
     private int _ringNextIndex;
     private int _pendingProcessCount;
     
@@ -43,6 +43,7 @@ public sealed class DebugScreen
 
         node.DebugScreen = this;
         node.Visible = false;
+        node.PauseMode = Node.PauseModeEnum.Process;
         _node = node;
         _label = node.GetNode<Label>("Label");
         _fpsGraph = node.GetNode<Graph>("FpsGraph");
@@ -68,8 +69,7 @@ public sealed class DebugScreen
             _ringNextIndex = (_ringNextIndex + 1) % RingLength;
             ProcessFpsGraph(delta);
             ProcessEntityCountGraph(entityManager);
-            if (synchronizationClient != null)
-                _serverLoadGraph.SetData(synchronizationClient.ServerLoadHistory, "N2", 0, 1);
+            ProcessServerLoadGraph(synchronizationClient);
 
             UpdateText(delta, synchronizationClient, entityManager);
         }
@@ -78,15 +78,22 @@ public sealed class DebugScreen
     private void ProcessFpsGraph(double delta)
     {
         _fpsRing[_ringNextIndex] = 1 / delta;
-        _fpsRing.UnrollRingTo(_unrolledFpsRing, _ringNextIndex + 1);
-        _fpsGraph.SetData(_unrolledFpsRing, "N0", 0);
+        _fpsRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
+        _fpsGraph.SetData(_unrolledRing, "N0", 0);
     }
     
     private void ProcessEntityCountGraph(IEntityManager? entityManager)
     {
         _entityCountRing[_ringNextIndex] = entityManager?.Entities.Count ?? 0;
-        _entityCountRing.UnrollRingTo(_unrolledEntityCountRing, _ringNextIndex + 1);
-        _entityCountGraph.SetData(_unrolledEntityCountRing, "N0", 0);
+        _entityCountRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
+        _entityCountGraph.SetData(_unrolledRing, "N0", 0);
+    }
+    
+    private void ProcessServerLoadGraph(ISynchronizationClient? syncClient)
+    {
+        _serverLoadRing[_ringNextIndex] = syncClient?.ServerLoad ?? 0;
+        _serverLoadRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
+        _serverLoadGraph.SetData(_unrolledRing, "N2", min: 0, max: 1);
     }
     
     private void UpdateText(double delta, ISynchronizationClient? synchronizationClient, IEntityManager? entityManager)

@@ -4,11 +4,11 @@ namespace Soteo.Core.Gameplay.Interfaces;
 
 public interface IProcessPublisher
 {
-    IDisposable SubscribeToProcess(Action<double> subscription, ProcessPriorityEnum priority);
+    IDisposable SubscribeToProcess(Action<double> handler, ProcessPriorityEnum priority, bool callWhenPaused);
 
-    IDisposable SubscribeToProcess(Action subscription, ProcessPriorityEnum priority);
+    IDisposable SubscribeToProcess(Action handler, ProcessPriorityEnum priority, bool callWhenPaused);
 
-    IDisposable SubscribeToPhysicsProcess(Action<double> subscription, ProcessPriorityEnum priority);
+    IDisposable SubscribeToPhysicsProcess(Action<double> handler, ProcessPriorityEnum priority, bool callWhenPaused);
 
-    IDisposable SubscribeToPhysicsProcess(Action subscription, ProcessPriorityEnum priority);
+    IDisposable SubscribeToPhysicsProcess(Action handler, ProcessPriorityEnum priority, bool callWhenPaused);
 }
