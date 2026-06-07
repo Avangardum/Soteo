@@ -5,5 +5,5 @@ namespace Soteo.Core.CampaignServer.Dto;
 public sealed record CampaignServerSnapshot
 {
     public required IReadOnlyDictionary<Guid, User> Users { get; init; }
-    public required IReadOnlyDictionary<Guid, Character> Characters { get; init; }
+    public required IReadOnlyDictionary<Guid, PlayerCharacter> Characters { get; init; }
 }

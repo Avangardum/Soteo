@@ -10,7 +10,7 @@ public sealed class PersistenceService
 (
     IPacketSender packetSender,
     IUserRepository userRepo,
-    ICharacterRepository charRepo
+    IPlayerCharacterRepository charRepo
 )
 {
     public async Task<CampaignSnapshot> SaveAsync()

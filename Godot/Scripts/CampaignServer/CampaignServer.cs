@@ -46,7 +46,7 @@ public sealed class CampaignServer : Node
     private void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton<IUserRepository, UserRepository>();
-        services.AddSingleton<ICharacterRepository, CharacterRepository>();
+        services.AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>();
         services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IPacketSender, ICommunicator>();

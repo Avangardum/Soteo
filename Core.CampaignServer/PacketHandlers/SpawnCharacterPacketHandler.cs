@@ -10,7 +10,7 @@ namespace Soteo.Core.CampaignServer.PacketHandlers;
 public sealed class SpawnCharacterPacketHandler
 (
     IUserRepository userRepo,
-    ICharacterRepository charRepo,
+    IPlayerCharacterRepository charRepo,
     IPacketSender packetSender
 ) : PacketHandler<SpawnCharacterPacket>
 {
@@ -23,9 +23,9 @@ public sealed class SpawnCharacterPacketHandler
             sender.IsPlayer && receiver.IsShard,
             "Spawn character packet should be sent from a player to a shard server"
         );
-        if (!charRepo.TryGetValue(packet.CharacterId, out Character? character))
+        if (!charRepo.TryGetValue(packet.CharacterId, out PlayerCharacter? character))
         {
-            character = new Character { Id = packet.CharacterId };
+            character = new PlayerCharacter { Id = packet.CharacterId };
             charRepo.Add(character);
         }
         if (character.ShardId != null) return;

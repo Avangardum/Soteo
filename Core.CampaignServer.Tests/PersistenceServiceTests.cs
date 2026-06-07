@@ -11,13 +11,13 @@ namespace Soteo.Core.CampaignServer.Tests;
 public sealed class PersistenceServiceTests
 {
     private readonly UserRepository _userRepo;
-    private readonly CharacterRepository _charRepo;
+    private readonly PlayerCharacterRepository _charRepo;
     private readonly PersistenceService _sut;
     
     public PersistenceServiceTests()
     {
         _userRepo = new UserRepository();
-        _charRepo = new CharacterRepository();
+        _charRepo = new PlayerCharacterRepository();
         _sut = new PersistenceService(Substitute.For<IPacketSender>(), _userRepo, _charRepo);
     }
 
@@ -50,8 +50,8 @@ public sealed class PersistenceServiceTests
     [Fact]
     public async Task SavedSnapshotContainsPlayerCharactersFromRepository()
     {
-        var char1 = new Character { Id = Guid.NewGuid(), ShardId = Guid.NewGuid() };
-        var char2 = new Character { Id = Guid.NewGuid(), ShardId = null };
+        var char1 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = Guid.NewGuid() };
+        var char2 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = null };
         _charRepo.Add(char1);
         _charRepo.Add(char2);
         
@@ -83,8 +83,8 @@ public sealed class PersistenceServiceTests
         _userRepo[user1.Id] = user1;
         _userRepo[user2.Id] = user2;
         
-        var char1 = new Character { Id = Guid.NewGuid(), ShardId = Guid.NewGuid() };
-        var char2 = new Character { Id = Guid.NewGuid(), ShardId = null };
+        var char1 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = Guid.NewGuid() };
+        var char2 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = null };
         _charRepo.Add(char1);
         _charRepo.Add(char2);
         
