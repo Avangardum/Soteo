@@ -20,6 +20,8 @@ namespace Soteo.CampaignServer;
 
 public sealed class CampaignServer : Node
 {
+    private readonly bool _useJsmq = OS.HasFeature("web") && OS.GetCmdlineArgs().Contains("--singleplayer");
+    
     private LateInit<ICommunicator> _communicator = new();
     private LateInit<IServiceProvider> _serviceProvider = new();
     
@@ -50,7 +52,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IPacketSender, ICommunicator>();
         
-        if (Const.UseJsmq)
+        if (_useJsmq)
             services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
         else
             services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();

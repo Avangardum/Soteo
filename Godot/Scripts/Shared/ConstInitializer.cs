@@ -12,8 +12,6 @@ public static class ConstInitializer
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
         
         Const.IsServer.Value = OS.GetCmdlineArgs().Contains("--server") || Main.EditorIsServer;
-        Const.IsSingleplayer.Value = OS.GetCmdlineArgs().Contains("--singleplayer");
-        Const.IsWeb.Value = OS.HasFeature("web");
         
         int physicsFps = (int)ProjectSettings.GetSetting("physics/common/physics_fps");
         if (physicsFps != Const.TicksPerSecond)

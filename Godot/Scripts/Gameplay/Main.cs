@@ -25,6 +25,8 @@ public sealed class Main : Node2D, IShardLoader
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
+    private readonly bool _useJsmq = OS.HasFeature("web") && OS.GetCmdlineArgs().Contains("--singleplayer");
+    
     private LogInScreenNode? _logIScreenNode;
     private HudNode? _hudNode;
     private DebugScreenNode? _debugScreenNode;
@@ -78,7 +80,7 @@ public sealed class Main : Node2D, IShardLoader
         else
             RegisterClientServices(services);
         
-        if (Const.UseJsmq)
+        if (_useJsmq)
             RegisterJsmqServices(services);
         else
             RegisterWebServices(services);
@@ -175,7 +177,7 @@ public sealed class Main : Node2D, IShardLoader
     {
         _processPublisher = new ProcessPublisher().Also(it => AddChild(it));
         
-        if (Const.UseJsmq)
+        if (_useJsmq)
         {
             _jsmqCommunicator = ActivatorUtilities
                 .CreateInstance<JsmqFromGameplayCommunicator>(_rootServiceProvider.Required)
