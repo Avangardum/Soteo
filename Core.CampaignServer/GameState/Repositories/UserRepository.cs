@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Soteo.Core.CampaignServer.Dto.Snapshots;
 using Soteo.Core.CampaignServer.GameState.DataObjects;
 using Soteo.Core.CampaignServer.Interfaces;
 
@@ -32,6 +33,6 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
             user.IsConnected = false;
     }
     
-    public IReadOnlyDictionary<Guid, User> CreateSnapshot() =>
-        this.ToImmutableDictionary(it => it.Key, it => it.Value with { });
+    public IReadOnlyDictionary<Guid, UserSnapshot> CreateSnapshot() =>
+        this.ToImmutableDictionary(it => it.Key, it => it.Value.CreateSnapshot());
 }

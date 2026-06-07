@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Soteo.Core.CampaignServer.Dto.Snapshots;
 using Soteo.Core.CampaignServer.GameState.DataObjects;
 using Soteo.Core.CampaignServer.Interfaces;
 
@@ -8,6 +9,6 @@ public sealed class PlayerCharacterRepository : Dictionary<Guid, PlayerCharacter
 {
     public void Add(PlayerCharacter playerCharacter) => Add(playerCharacter.Id, playerCharacter);
     
-    public IReadOnlyDictionary<Guid, PlayerCharacter> CreateSnapshot() =>
-        this.ToImmutableDictionary(it => it.Key, it => it.Value with { });
+    public IReadOnlyDictionary<Guid, PlayerCharacterSnapshot> CreateSnapshot() =>
+        this.ToImmutableDictionary(it => it.Key, it => it.Value.CreateSnapshot());
 }

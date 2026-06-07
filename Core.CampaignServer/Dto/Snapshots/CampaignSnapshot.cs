@@ -1,6 +1,6 @@
 using Soteo.Core.Shared.Dto.Snapshots;
 
-namespace Soteo.Core.CampaignServer.Dto;
+namespace Soteo.Core.CampaignServer.Dto.Snapshots;
 
 public sealed record CampaignSnapshot
 {

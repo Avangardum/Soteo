@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Soteo.Core.CampaignServer.Dto;
+using Soteo.Core.CampaignServer.Dto.Snapshots;
 using Soteo.Core.CampaignServer.GameState.DataObjects;
 using Soteo.Core.CampaignServer.Interfaces;
 using Soteo.Core.Shared.Dto.Snapshots;

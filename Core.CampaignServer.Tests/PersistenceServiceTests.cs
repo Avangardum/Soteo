@@ -1,6 +1,7 @@
 using AwesomeAssertions;
 using NSubstitute;
 using Soteo.Core.CampaignServer.Dto;
+using Soteo.Core.CampaignServer.Dto.Snapshots;
 using Soteo.Core.CampaignServer.GameState.DataObjects;
 using Soteo.Core.CampaignServer.GameState.Repositories;
 using Soteo.Core.CampaignServer.Interfaces;
@@ -43,8 +44,8 @@ public sealed class PersistenceServiceTests
         
         CampaignSnapshot snapshot = await _sut.SaveAsync();
         
-        snapshot.CampaignServer.Users[user1.Id].Should().Be(user1);
-        snapshot.CampaignServer.Users[user2.Id].Should().Be(user2);
+        snapshot.CampaignServer.Users[user1.Id].Should().Be(user1.CreateSnapshot());
+        snapshot.CampaignServer.Users[user2.Id].Should().Be(user2.CreateSnapshot());
     }
     
     [Fact]
@@ -57,8 +58,8 @@ public sealed class PersistenceServiceTests
         
         CampaignSnapshot snapshot = await _sut.SaveAsync();
         
-        snapshot.CampaignServer.Characters[char1.Id].Should().Be(char1);
-        snapshot.CampaignServer.Characters[char2.Id].Should().Be(char2);
+        snapshot.CampaignServer.Characters[char1.Id].Should().Be(char1.CreateSnapshot());
+        snapshot.CampaignServer.Characters[char2.Id].Should().Be(char2.CreateSnapshot());
     }
     
     [Fact]
@@ -77,14 +78,14 @@ public sealed class PersistenceServiceTests
         {
             Id = Guid.NewGuid(),
             IsConnected = true,
-            IsPlayer = false,
-            IsShard = true
+            IsPlayer = true,
+            IsShard = false
         };
         _userRepo[user1.Id] = user1;
         _userRepo[user2.Id] = user2;
         
         var char1 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = Guid.NewGuid() };
-        var char2 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = null };
+        var char2 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = null, Player = user2 };
         _charRepo.Add(char1);
         _charRepo.Add(char2);
         
