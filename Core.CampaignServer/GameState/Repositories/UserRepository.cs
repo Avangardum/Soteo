@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Soteo.Core.CampaignServer.GameState.DataObjects;
 using Soteo.Core.CampaignServer.Interfaces;
 
@@ -30,4 +31,7 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
         if (TryGetValue(id, out User? user))
             user.IsConnected = false;
     }
+    
+    public IReadOnlyDictionary<Guid, User> CreateSnapshot() =>
+        this.ToImmutableDictionary(it => it.Key, it => it.Value with { });
 }
