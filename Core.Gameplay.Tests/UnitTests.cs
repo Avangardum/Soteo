@@ -10,8 +10,8 @@ using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
 using Soteo.Core.Shared;
+using Soteo.TestUtil;
 using Soteo.Util;
-using TestUtil;
 
 namespace Soteo.Core.Gameplay.Tests;
 

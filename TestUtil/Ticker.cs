@@ -1,7 +1,7 @@
 using Soteo.Core.Shared;
 using Soteo.Util;
 
-namespace TestUtil;
+namespace Soteo.TestUtil;
 
 public static class Ticker
 {

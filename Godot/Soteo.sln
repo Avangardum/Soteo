@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Gameplay.Tests", "..\C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtil", "..\TestUtil\TestUtil.csproj", "{B238546E-DD07-4301-81F6-F51983F38868}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.CampaignServer.Tests", "..\Core.CampaignServer.Tests\Core.CampaignServer.Tests.csproj", "{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 	Debug|Any CPU = Debug|Any CPU
@@ -71,5 +73,11 @@ Global
 		{B238546E-DD07-4301-81F6-F51983F38868}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
 		{B238546E-DD07-4301-81F6-F51983F38868}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
 		{B238546E-DD07-4301-81F6-F51983F38868}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal
