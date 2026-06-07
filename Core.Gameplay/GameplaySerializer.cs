@@ -5,14 +5,15 @@ using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Interfaces;
 using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Core.Gameplay;
 
-public class GameplaySerializer : IGameplaySerializer
+public class GameplaySerializer(ITypeLocator typeLocator) : IGameplaySerializer
 {
-    private readonly ImmutableList<Type> _abilityTypes = TypeLocator.ConcreteSubclassesOf<Ability>();
-    private readonly ImmutableList<Type> _statusTypes = TypeLocator.ConcreteSubclassesOf<Status>();
+    private readonly IReadOnlyList<Type> _abilityTypes = typeLocator.ConcreteSubclassesOf<Ability>();
+    private readonly IReadOnlyList<Type> _statusTypes = typeLocator.ConcreteSubclassesOf<Status>();
 
     public void SerializeAbility(Ability value, Stream stream) =>
         SerializeInt(_abilityTypes.IndexOf(value.GetType()), stream);

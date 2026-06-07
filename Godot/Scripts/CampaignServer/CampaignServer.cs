@@ -29,8 +29,7 @@ public sealed class CampaignServer : Node
     
     public override void _Ready()
     {
-        ConstInitializer.Init();
-        TypeLocator.Init(CoreCampaignServerAssembly.Value, CoreSharedAssembly.Value);
+        GlobalInit.Init();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
@@ -52,12 +51,15 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IPacketSender, ICommunicator>();
         
+        var typeLocator = new TypeLocator(CoreCampaignServerAssembly.Value, CoreSharedAssembly.Value);
+        services.AddSingleton<ITypeLocator>(typeLocator);
+        
         if (_useJsmq)
             services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
         else
             services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
         
-        foreach (Type type in PacketHandler.TypesByPacketType.Values)
+        foreach (Type type in PacketHandler.AllTypes(typeLocator))
             services.AddTransient(type);
     }
     

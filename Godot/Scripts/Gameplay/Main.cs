@@ -58,8 +58,7 @@ public sealed class Main : Node2D, IShardLoader
 
     public override void _Ready()
     {
-        ConstInitializer.Init();
-        TypeLocator.Init(CoreGameplayAssembly.Value, CoreSharedAssembly.Value);
+        GlobalInit.Init();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
@@ -102,6 +101,9 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingletonNode<IPauseRepository>("/root/PauseRepository");
         services.AddSingleton<ISideDetector>(new SideDetector(_isServer));
         
+        var typeLocator = new TypeLocator(CoreGameplayAssembly.Value, CoreSharedAssembly.Value);
+        services.AddSingleton<ITypeLocator>(typeLocator);
+        
         services.AddScoped<ShardNode>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
         services.AddAlias<IShard, ShardNode>();
@@ -110,7 +112,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddAlias<IEntitySnapshotManager, EntityManager>();
         services.AddScoped<IEntityNodeManager, EntityNodeManager>();
         
-        foreach (Type type in PacketHandler.TypesByPacketType.Values)
+        foreach (Type type in PacketHandler.AllTypes(typeLocator))
             services.AddTransient(type);
     }
     

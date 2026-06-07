@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Soteo.CampaignServer;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Interfaces;
 using Soteo.Gameplay.Interfaces;
 
 namespace Soteo.Gameplay.Services;
@@ -10,10 +11,10 @@ public sealed class Localizer : ILocalizer
 {
     private readonly ImmutableDictionary<string, IPluralizer> _pluralizers;
 
-    public Localizer()
+    public Localizer(ITypeLocator typeLocator)
     {
         Dictionary<string, IPluralizer> pluralizers = [];
-        foreach (IPluralizer pluralizer in TypeLocator.InstanceSubclassesOf<IPluralizer>())
+        foreach (IPluralizer pluralizer in typeLocator.InstanceSubclassesOf<IPluralizer>())
         {
             foreach (string languageCode in pluralizer.LanguageCodes)
             {

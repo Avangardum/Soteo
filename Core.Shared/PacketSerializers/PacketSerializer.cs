@@ -11,11 +11,15 @@ namespace Soteo.Core.Shared.PacketSerializers;
 
 public static class PacketSerializer
 {
-    public static readonly ImmutableDictionary<PacketTypeCode, IPacketSerializer> InstancesByPacketType = TypeLocator
-        .InstanceSubclassesOf<IPacketSerializer>(where: it => it.BaseType.Required.IsGenericType)
-        .ToImmutableDictionary(it => it.GetType().GetPacketType(typeof(PacketSerializer<>)));
+    private static ImmutableDictionary<PacketTypeCode, IPacketSerializer>? _instancesByPacketType;
     
-    public static IPacketSerializer For(PacketTypeCode packetTypeCode) => InstancesByPacketType[packetTypeCode];
+    public static IPacketSerializer For(PacketTypeCode packetTypeCode, ITypeLocator typeLocator)
+    {
+        _instancesByPacketType ??= typeLocator
+            .InstanceSubclassesOf<IPacketSerializer>(where: it => it.BaseType.Required.IsGenericType)
+            .ToImmutableDictionary(it => it.GetType().GetPacketType(typeof(PacketSerializer<>)));
+        return _instancesByPacketType[packetTypeCode];
+    }
 }
 
 public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacket : Packet

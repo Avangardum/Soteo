@@ -1,19 +1,24 @@
 using System.Collections.Immutable;
 using System.Reflection;
+using Soteo.Core.Shared.Interfaces;
 using Soteo.Util;
 
 namespace Soteo.Core.Shared;
 
-public static class TypeLocator
+public class TypeLocator : ITypeLocator
 {
-    private static readonly LateInit<ImmutableList<Type>> LateInitTypes = new();
+    public IReadOnlyList<Type> Types { get; }
     
-    public static void Init(params IReadOnlyList<Assembly> assemblies) =>
-        LateInitTypes.Value = assemblies.SelectMany(it => it.ExportedTypes).ToImmutableList();
-
-    public static ImmutableList<Type> Types => LateInitTypes;
+    public TypeLocator(params IReadOnlyList<Type> types) : this([], types) { }
     
-    public static ImmutableList<Type> ConcreteSubclassesOf<T>(Func<Type, bool>? where = null) // todo return interface
+    public TypeLocator(params IReadOnlyList<Assembly> assemblies) : this(assemblies, []) { }
+    
+    public TypeLocator(IReadOnlyList<Assembly> assemblies, IReadOnlyList<Type> types)
+    {
+        Types = assemblies.SelectMany(it => it.ExportedTypes).Union(types).ToImmutableList();
+    }
+    
+    public IReadOnlyList<Type> ConcreteSubclassesOf<T>(Func<Type, bool>? where = null)
     {
         where ??= _ => true;
         return Types
@@ -23,7 +28,7 @@ public static class TypeLocator
             .ToImmutableList();
     }
     
-    public static ImmutableList<T> InstanceSubclassesOf<T>(Func<Type, bool>? where = null)
+    public IReadOnlyList<T> InstanceSubclassesOf<T>(Func<Type, bool>? where = null)
     {
         return ConcreteSubclassesOf<T>(where)
             .Select(it => (T)Activator.CreateInstance(it))

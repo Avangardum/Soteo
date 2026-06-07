@@ -28,7 +28,7 @@ public sealed class EntityManagerTests
     {
         _serviceProvider = Substitute.For<IServiceProvider>();
         _entityNodeManager = Substitute.For<IEntityNodeManager>();
-        _sut = new EntityManager(_serviceProvider, ClientDependency.From<ICamera>(null), _entityNodeManager);
+        _sut = new EntityManager(_serviceProvider, ClientDependency.Null<ICamera>(), _entityNodeManager);
 
         _projectileSourceChar = _sut.SpawnPlayerCharacter(Guid.NewGuid(), Guid.NewGuid());
         _projectileTargetChar = _sut.SpawnPlayerCharacter(Guid.NewGuid(), Guid.NewGuid());
