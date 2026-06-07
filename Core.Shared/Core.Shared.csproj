@@ -18,5 +18,9 @@
     <ItemGroup>
       <ProjectReference Include="..\Util\Util.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Dto\" />
+    </ItemGroup>
 
 </Project>

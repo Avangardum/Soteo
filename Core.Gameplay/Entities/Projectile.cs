@@ -2,6 +2,7 @@ using System.Numerics;
 using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Dto.Snapshots;
 using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Shared.Dto.Snapshots;
 
 namespace Soteo.Core.Gameplay.Entities;
 

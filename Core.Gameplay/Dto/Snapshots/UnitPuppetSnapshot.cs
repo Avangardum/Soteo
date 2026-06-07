@@ -1,4 +1,5 @@
 using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Shared.Dto.Snapshots;
 using static Soteo.Util.Maths;
 
 namespace Soteo.Core.Gameplay.Dto.Snapshots;

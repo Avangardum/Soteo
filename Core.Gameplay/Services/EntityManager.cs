@@ -6,6 +6,7 @@ using Soteo.Core.Gameplay.Dto.Snapshots;
 using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Dto.Snapshots;
 using Soteo.Util;
 using Soteo.Util.Interfaces;
 
