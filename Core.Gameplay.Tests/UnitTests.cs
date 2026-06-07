@@ -15,7 +15,7 @@ using TestUtil;
 
 namespace Soteo.Core.Gameplay.Tests;
 
-public sealed class UnitTests : CoreGameplayTests
+public sealed class UnitTests
 {
     private readonly Sut _sut;
     private readonly IEntityManager _entityManager;
@@ -131,7 +131,7 @@ public sealed class UnitTests : CoreGameplayTests
         public Sut(Guid id, IUnitNode node, IEntityManager entityManager, IServiceProvider serviceProvider) :
             base(id, controllingPlayerId: id, node, entityManager, serviceProvider) { }
         
-        public new void SetAbility<T>(AbilitySlot slot, int level) where T : Ability =>
+        public new void SetAbility<T>(AbilitySlot slot, int level) where T : Ability, new() =>
             base.SetAbility<T>(slot, level);
     }
     

@@ -528,7 +528,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
     
-    protected void SetAbility<T>(AbilitySlot slot, int level) where T : Ability =>
+    protected void SetAbility<T>(AbilitySlot slot, int level) where T : Ability, new() =>
         SetAbility(Ability.Instance<T>(), slot, level);
     
     protected void SetAbility(Ability ability, AbilitySlot slot, int level)

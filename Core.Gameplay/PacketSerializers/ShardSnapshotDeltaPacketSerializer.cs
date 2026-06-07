@@ -1,14 +1,16 @@
+using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Dto.Snapshots;
 using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
 using Soteo.Core.Shared.Dto.Snapshots;
 using Soteo.Core.Shared.PacketSerializers;
 using static Soteo.Core.Shared.SerializationHelper;
-using static Soteo.Core.Gameplay.GameplaySerializationHelper; 
 
 namespace Soteo.Core.Gameplay.PacketSerializers;
 
-public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardSnapshotDeltaPacket>
+public sealed class ShardSnapshotDeltaPacketSerializer(IGameplaySerializer gs) :
+    PacketSerializer<ShardSnapshotDeltaPacket>
 {
     protected override void SerializeInternal(ShardSnapshotDeltaPacket packet, Stream stream)
     {
@@ -75,9 +77,9 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
         SerializeDelta(delta.IsDead, SerializeBool, stream);
         SerializeDelta(delta.IsMoving, SerializeBool, stream);
         SerializeDictionaryDelta(delta.Stats, SerializeEnum, SerializeDouble, stream);
-        SerializeDictionaryDelta(delta.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
-        SerializeNullableClassDelta(delta.AbilityUseProgress, SerializeAbilityUseProgress, stream);
-        SerializeDictionaryDelta(delta.Statuses, SerializeGuid, SerializePuppetStatusContext, stream);
+        SerializeDictionaryDelta(delta.AbilitySlotStates, SerializeEnum, gs.SerializeAbilitySlotState, stream);
+        SerializeNullableClassDelta(delta.AbilityUseProgress, gs.SerializeAbilityUseProgress, stream);
+        SerializeDictionaryDelta(delta.Statuses, SerializeGuid, gs.SerializePuppetStatusContext, stream);
     }
 
     private UnitPuppetSnapshotDelta DeserializeUnitPuppetDelta(Stream stream)
@@ -91,9 +93,9 @@ public sealed class ShardSnapshotDeltaPacketSerializer : PacketSerializer<ShardS
             IsMoving = DeserializeDelta(DeserializeBool, stream),
             Stats = DeserializeDictionaryDelta(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilitySlotStates =
-                DeserializeDictionaryDelta(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
-            AbilityUseProgress = DeserializeNullableClassDelta(DeserializeAbilityUseProgress, stream),
-            Statuses = DeserializeDictionaryDelta(DeserializeGuid, DeserializePuppetStatusContext, stream)
+                DeserializeDictionaryDelta(DeserializeEnum<AbilitySlot>, gs.DeserializeAbilitySlotState, stream),
+            AbilityUseProgress = DeserializeNullableClassDelta(gs.DeserializeAbilityUseProgress, stream),
+            Statuses = DeserializeDictionaryDelta(DeserializeGuid, gs.DeserializePuppetStatusContext, stream)
         };
     }
 

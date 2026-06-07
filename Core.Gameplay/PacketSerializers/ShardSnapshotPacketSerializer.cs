@@ -2,15 +2,16 @@ using System.Collections.Immutable;
 using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Dto.Snapshots;
 using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
 using Soteo.Core.Shared.Dto.Snapshots;
 using Soteo.Core.Shared.PacketSerializers;
 using static Soteo.Core.Shared.SerializationHelper;
-using static Soteo.Core.Gameplay.GameplaySerializationHelper;
 
 namespace Soteo.Core.Gameplay.PacketSerializers;
 
-public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapshotPacket>
+public sealed class ShardSnapshotPacketSerializer(IGameplaySerializer gs) :
+    PacketSerializer<ShardSnapshotPacket>
 {
     protected override void SerializeInternal(ShardSnapshotPacket packet, Stream stream)
     {
@@ -78,8 +79,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeBool(unit.IsDead, stream);
         SerializeBool(unit.IsMoving, stream);
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeDouble, stream);
-        SerializeDictionary(unit.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
-        SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
+        SerializeDictionary(unit.AbilitySlotStates, SerializeEnum, gs.SerializeAbilitySlotState, stream);
+        SerializeNullableClass(unit.AbilityUseProgress, gs.SerializeAbilityUseProgress, stream);
         SerializeIndexedDictionary(unit.Statuses, SerializeStatusContext, stream);
     }
     
@@ -95,8 +96,8 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilitySlotStates =
-                DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
-            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
+                DeserializeDictionary(DeserializeEnum<AbilitySlot>, gs.DeserializeAbilitySlotState, stream),
+            AbilityUseProgress = DeserializeNullableClass(gs.DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializeStatusContext, it => it.Id, stream)
         };
     }
@@ -108,9 +109,9 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         SerializeBool(unitPuppet.IsDead, stream);
         SerializeBool(unitPuppet.IsMoving, stream);
         SerializeDictionary(unitPuppet.Stats, SerializeEnum, SerializeDouble, stream);
-        SerializeDictionary(unitPuppet.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
-        SerializeNullableClass(unitPuppet.AbilityUseProgress, SerializeAbilityUseProgress, stream);
-        SerializeIndexedDictionary(unitPuppet.Statuses, SerializePuppetStatusContext, stream);
+        SerializeDictionary(unitPuppet.AbilitySlotStates, SerializeEnum, gs.SerializeAbilitySlotState, stream);
+        SerializeNullableClass(unitPuppet.AbilityUseProgress, gs.SerializeAbilityUseProgress, stream);
+        SerializeIndexedDictionary(unitPuppet.Statuses, gs.SerializePuppetStatusContext, stream);
     }
     
     private UnitPuppetSnapshot DeserializeUnitPuppet(Stream stream)
@@ -125,9 +126,9 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilitySlotStates =
-                DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
-            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
-            Statuses = DeserializeIndexedDictionary(DeserializePuppetStatusContext, it => it.Id, stream)
+                DeserializeDictionary(DeserializeEnum<AbilitySlot>, gs.DeserializeAbilitySlotState, stream),
+            AbilityUseProgress = DeserializeNullableClass(gs.DeserializeAbilityUseProgress, stream),
+            Statuses = DeserializeIndexedDictionary(gs.DeserializePuppetStatusContext, it => it.Id, stream)
         };
     }
     
@@ -191,7 +192,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     
     private void SerializeAbilityContext(DeflatedAbilityContext context, Stream stream)
     {
-        SerializeAbility(context.Ability, stream);
+        gs.SerializeAbility(context.Ability, stream);
         SerializeInt(context.Level, stream);
         SerializeGuid(context.UserId, stream);
         SerializeDictionary(context.UserStats, SerializeEnum, SerializeDouble, stream);
@@ -205,7 +206,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     {
         return new DeflatedAbilityContext
         {
-            Ability = DeserializeAbility(stream),
+            Ability = gs.DeserializeAbility(stream),
             Level = DeserializeInt(stream),
             UserId = DeserializeGuid(stream),
             UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
@@ -219,7 +220,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
     private void SerializeStatusContext(DeflatedStatusContext value, Stream stream)
     {
         SerializeGuid(value.Id, stream);
-        SerializeStatus(value.Status, stream);
+        gs.SerializeStatus(value.Status, stream);
         SerializeNullableClass(value.AbilityContext, SerializeAbilityContext, stream);
         SerializeGuid(value.UnitId, stream);
         SerializeNullableStruct(value.SourceId, SerializeGuid, stream);
@@ -235,7 +236,7 @@ public sealed class ShardSnapshotPacketSerializer : PacketSerializer<ShardSnapsh
         return new DeflatedStatusContext
         {
             Id = DeserializeGuid(stream),
-            Status = DeserializeStatus(stream),
+            Status = gs.DeserializeStatus(stream),
             AbilityContext = DeserializeNullableClass(DeserializeAbilityContext, stream),
             UnitId = DeserializeGuid(stream),
             SourceId = DeserializeNullableStruct(DeserializeGuid, stream),

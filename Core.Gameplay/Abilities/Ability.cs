@@ -13,24 +13,37 @@ namespace Soteo.Core.Gameplay.Abilities;
 
 public abstract class Ability
 {
-    private static readonly ImmutableDictionary<Type, Ability> InstancesByType;
-
-    public static ImmutableList<Ability> All { get; }
-
-    public static T Instance<T>() where T : Ability
-    {
-        if (InstancesByType.TryGetValue(typeof(T), out Ability? instance))
-            return (T)instance;
-        throw ExceptionFactory.TypeNotFound(typeof(T));
-    }
-
-    static Ability()
-    {
-        All = TypeLocator.InstanceSubclassesOf<Ability>();
-        InstancesByType = All.ToImmutableDictionary(it => it.GetType(), it => it);
-    }
+    private static readonly Dictionary<Type, Ability> Instances = [];
     
-    public int Id => All.IndexOf(this);
+    private static Type? _currentlyConstructedType;
+    
+    public static T Instance<T>() where T : Ability, new() => (T)Instance(typeof(T));
+    
+    public static Ability Instance(Type type)
+    {
+        if (!type.IsAssignableTo(typeof(Ability)))
+            throw new ArgumentException($"{type} is not an ability");
+        
+        if (Instances.TryGetValue(type, out Ability existingInstance))
+            return existingInstance;
+        
+        _currentlyConstructedType = type;
+        var newInstance = (Ability)Activator.CreateInstance(type);
+        _currentlyConstructedType = null;
+        Instances[type] = newInstance;
+        return newInstance;
+    }
+
+    protected Ability()
+    {
+        if (GetType() != _currentlyConstructedType)
+        {
+            throw new InvalidOperationException
+            (
+                "Abilities should not be created with new, use Ability.Instance instead"
+            );
+        }
+    }
     
     public virtual string Name =>
         GetType().Name.ReplaceRegex("Ability$", "").PascalCaseToCapitalizedText();

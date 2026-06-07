@@ -14,7 +14,7 @@ public record AbilitySlotState
     /// </summary>
     public double MaxCooldown { get; init; }
     
-    public static AbilitySlotState New<T>(int level) where T : Ability =>
+    public static AbilitySlotState New<T>(int level) where T : Ability, new() =>
         new AbilitySlotState { Ability = Ability.Instance<T>(), Level = level };
     
     public static AbilitySlotState Interpolate(AbilitySlotState from, AbilitySlotState to, double weight) =>

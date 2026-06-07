@@ -61,12 +61,13 @@ namespace Soteo.Core.Gameplay.Extensions
                 double? tickInterval,
                 IUnit? sourceUnit,
                 AbilityContext? sourceAbilityContext
-            ) where T : Status
+            ) where T : Status, new()
             {
                 self.AddStatus(Status.Instance<T>(), time, tickInterval, sourceUnit, sourceAbilityContext);
             }
 
-            public void AddStatus<T>(double time, double? tickInterval, ISourceUnitAndAbility? source) where T : Status
+            public void AddStatus<T>(double time, double? tickInterval, ISourceUnitAndAbility? source)
+                where T : Status, new()
             {
                 self.AddStatus<T>(time, tickInterval, source?.Unit, source?.AbilityContext);
             }

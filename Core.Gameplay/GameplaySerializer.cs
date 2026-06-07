@@ -1,26 +1,32 @@
+using System.Collections.Immutable;
 using Soteo.Core.Gameplay.Abilities;
 using Soteo.Core.Gameplay.Dto;
 using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
+using Soteo.Core.Shared;
 using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Core.Gameplay;
 
-public static class GameplaySerializationHelper
+public class GameplaySerializer : IGameplaySerializer
 {
-    public static void SerializeAbility(Ability value, Stream stream) =>
-        SerializeInt(value.Id, stream);
+    private readonly ImmutableList<Type> _abilityTypes = TypeLocator.ConcreteSubclassesOf<Ability>();
+    private readonly ImmutableList<Type> _statusTypes = TypeLocator.ConcreteSubclassesOf<Status>();
+
+    public void SerializeAbility(Ability value, Stream stream) =>
+        SerializeInt(_abilityTypes.IndexOf(value.GetType()), stream);
     
-    public static Ability DeserializeAbility(Stream stream) =>
-        Ability.All[DeserializeInt(stream)];
+    public Ability DeserializeAbility(Stream stream) =>
+        Ability.Instance(_abilityTypes[DeserializeInt(stream)]);
     
-    public static void SerializeStatus(Status value, Stream stream) =>
-        SerializeInt(value.Id, stream);
+    public void SerializeStatus(Status value, Stream stream) =>
+        SerializeInt(_statusTypes.IndexOf(value.GetType()), stream);
     
-    public static Status DeserializeStatus(Stream stream) =>
-        Status.All[DeserializeInt(stream)];
+    public Status DeserializeStatus(Stream stream) =>
+        Status.Instance(_statusTypes[DeserializeInt(stream)]);
     
-    public static void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
+    public void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
     {
         SerializeGuid(value.Id, stream);
         SerializeStatus(value.Status, stream);
@@ -30,7 +36,7 @@ public static class GameplaySerializationHelper
         SerializeLong(value.Ordinal, stream);
     }
     
-    public static PuppetStatusContext DeserializePuppetStatusContext(Stream stream)
+    public PuppetStatusContext DeserializePuppetStatusContext(Stream stream)
     {
         return new PuppetStatusContext
         {
@@ -43,14 +49,14 @@ public static class GameplaySerializationHelper
         };
     }
     
-    public static void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream)
+    public void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream)
     {
         SerializeEnum(value.Slot, stream);
         SerializeDouble(value.ElapsedTime, stream);
         SerializeDouble(value.RemainingTime, stream);
     }
     
-    public static AbilityUseProgress DeserializeAbilityUseProgress(Stream stream)
+    public AbilityUseProgress DeserializeAbilityUseProgress(Stream stream)
     {
         return new AbilityUseProgress
         {
@@ -60,7 +66,7 @@ public static class GameplaySerializationHelper
         };
     }
     
-    public static void SerializeAbilitySlotState(AbilitySlotState value, Stream stream)
+    public void SerializeAbilitySlotState(AbilitySlotState value, Stream stream)
     {
         SerializeAbility(value.Ability, stream);
         SerializeInt(value.Level, stream);
@@ -68,7 +74,7 @@ public static class GameplaySerializationHelper
         SerializeDouble(value.MaxCooldown, stream);
     }
     
-    public static AbilitySlotState DeserializeAbilitySlotState(Stream stream)
+    public AbilitySlotState DeserializeAbilitySlotState(Stream stream)
     {
         return new AbilitySlotState
         {

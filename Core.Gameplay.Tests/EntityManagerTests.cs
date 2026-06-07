@@ -13,7 +13,7 @@ using Soteo.Core.Shared.Dto.Snapshots;
 
 namespace Soteo.Core.Gameplay.Tests;
 
-public sealed class EntityManagerTests : CoreGameplayTests
+public sealed class EntityManagerTests
 {
     private readonly EntityManager _sut;
     private readonly IServiceProvider _serviceProvider;

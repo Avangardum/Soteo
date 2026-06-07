@@ -13,7 +13,7 @@ public static class TypeLocator
 
     public static ImmutableList<Type> Types => LateInitTypes;
     
-    public static ImmutableList<Type> ConcreteSubclassesOf<T>(Func<Type, bool>? where = null)
+    public static ImmutableList<Type> ConcreteSubclassesOf<T>(Func<Type, bool>? where = null) // todo return interface
     {
         where ??= _ => true;
         return Types
