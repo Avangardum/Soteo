@@ -7,9 +7,9 @@ namespace Soteo.Gameplay.Services;
 
 public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
 {
-    public CurrentUserIdRepository()
+    public CurrentUserIdRepository(ISideDetector sideDetector)
     {
-        if (Const.IsServer)
+        if (sideDetector.IsServer)
             Value = GetLocalShardServerId();
     }
     
@@ -19,7 +19,6 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
     
     private Guid GetLocalShardServerId()
     {
-        if (!Const.IsServer) throw new InvalidOperationException();
         if (Main.EditorIsServer) return Main.EditorLocalShardServerId;
         
         string[] args = OS.GetCmdlineArgs();

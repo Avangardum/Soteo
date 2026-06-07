@@ -11,8 +11,6 @@ public static class ConstInitializer
     {
         CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
         
-        Const.IsServer.Value = OS.GetCmdlineArgs().Contains("--server") || Main.EditorIsServer;
-        
         int physicsFps = (int)ProjectSettings.GetSetting("physics/common/physics_fps");
         if (physicsFps != Const.TicksPerSecond)
         {

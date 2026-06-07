@@ -11,13 +11,14 @@ public sealed class GameplayRoutingPacketHandler
 (
     IServiceProvider rootServiceProvider,
     IShardServiceProviders shardServiceProviders,
-    ICurrentUserIdRepository currentUserIdRepository
+    ICurrentUserIdRepository currentUserIdRepository,
+    ISideDetector sideDetector
 ) : IPacketHandler
 {
     public async Task HandleAsync(Packet packet, Guid senderId)
     {
         IServiceProvider? serviceProvider =
-            Const.IsServer ? shardServiceProviders[currentUserIdRepository.Required] :
+            sideDetector.IsServer ? shardServiceProviders[currentUserIdRepository.Required] :
             senderId == Const.CampaignServerId ? rootServiceProvider :
             shardServiceProviders[senderId];
         if (serviceProvider == null) return;
@@ -27,7 +28,7 @@ public sealed class GameplayRoutingPacketHandler
         
         if
         (
-            Const.IsServer &&
+            sideDetector.IsServer &&
             senderId != Const.CampaignServerId &&
             !handler.GetType().HasAttribute<AllowClientPacketsAttribute>()
         )

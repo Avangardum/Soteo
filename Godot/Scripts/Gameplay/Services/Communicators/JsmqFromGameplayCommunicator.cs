@@ -26,6 +26,7 @@ public sealed class JsmqFromGameplayCommunicator :
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
+    private readonly ISideDetector _sideDetector;
     
     public event Action Connected = delegate { };
     public event Action<Guid> PeerConnected = delegate { };
@@ -37,12 +38,14 @@ public sealed class JsmqFromGameplayCommunicator :
     (
         ICurrentUserIdRepository currentUserIdRepository,
         IPacketSerializer packetSerializer,
-        IPacketHandler packetHandler
+        IPacketHandler packetHandler,
+        ISideDetector sideDetector
     )
     {
         _currentUserIdRepository = currentUserIdRepository;
         _packetSerializer = packetSerializer;
         _packetHandler = packetHandler;
+        _sideDetector = sideDetector;
         
         Name = nameof(JsmqFromGameplayCommunicator);
     }
@@ -50,19 +53,19 @@ public sealed class JsmqFromGameplayCommunicator :
     public override void _Ready()
     {
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        if (Const.IsServer) ConnectAsShardServer();
+        if (_sideDetector.IsServer) ConnectAsShardServer();
     }
 
     public override void _Process(float delta)
     {
         // Client polls in _Process to minimize latency
-        if (!Const.IsServer) Poll();
+        if (_sideDetector.IsClient) Poll();
     }
 
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (Const.IsServer) Poll();
+        if (_sideDetector.IsServer) Poll();
     }
 
     public void ConnectAsPlayer(string email, string password)
@@ -121,11 +124,7 @@ public sealed class JsmqFromGameplayCommunicator :
     public void SendUnreliable(Packet packet, IEnumerable<Guid> receiverIds) =>
         SendReliable(packet, receiverIds);
 
-    public void BroadcastReliable(Packet packet)
-    {
-        if (!Const.IsServer) throw new InvalidOperationException();
-        SendReliable(packet, Const.SingleplayerPlayerId);
-    }
+    public void BroadcastReliable(Packet packet) => SendReliable(packet, Const.SingleplayerPlayerId);
 
     public void BroadcastUnreliable(Packet packet) => BroadcastReliable(packet);
 

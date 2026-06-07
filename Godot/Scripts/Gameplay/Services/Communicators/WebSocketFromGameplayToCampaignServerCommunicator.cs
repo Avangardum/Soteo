@@ -19,11 +19,12 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     private const string AuthServerUrl = "https://localhost:3705";
 
     private readonly WebSocketClient _wsClient = new();
-    private readonly IPacketSerializer _packetSerializer;
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
+    
+    private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
-    private readonly IShardLoader _shardLoader;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
+    private readonly ISideDetector _sideDetector;
     
     private string? _token;
     private Status _status;
@@ -32,13 +33,13 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     (
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer,
-        IShardLoader shardLoader,
-        ICurrentUserIdRepository currentUserIdRepository
+        ICurrentUserIdRepository currentUserIdRepository,
+        ISideDetector sideDetector
     )
     {
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
-        _shardLoader = shardLoader;
+        _sideDetector = sideDetector;
         _currentUserIdRepository = currentUserIdRepository;
         
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
@@ -64,17 +65,17 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (Const.IsServer)
+        if (_sideDetector.IsServer)
             _wsClient.Poll();
     }
     
     public override void _Process(float delta)
     {
-        if (Const.IsServer && _status == Status.Disconnected)
+        if (_sideDetector.IsServer && _status == Status.Disconnected)
             ConnectAsShardServer();
         
         // Client polls in _Process to minimize latency
-        if (!Const.IsServer)
+        if (_sideDetector.IsClient)
             _wsClient.Poll();
     }
 
@@ -106,7 +107,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     
     public void ConnectAsPlayer(string email, string password)
     {
-        if (Const.IsServer) throw new InvalidOperationException();
+        if (_sideDetector.IsServer) throw new InvalidOperationException();
         if (_status != Status.Disconnected) return;
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
@@ -117,8 +118,9 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     
     public void ConnectAsShardServer()
     {
-        if (!Const.IsServer) throw new InvalidOperationException();
+        if (_sideDetector.IsClient) throw new InvalidOperationException();
         if (_status != Status.Disconnected) return;
+        
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         string intercomSecret = SysEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??

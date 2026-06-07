@@ -26,6 +26,7 @@ public sealed class Main : Node2D, IShardLoader
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
     private readonly bool _useJsmq = OS.HasFeature("web") && OS.GetCmdlineArgs().Contains("--singleplayer");
+    private bool _isServer = OS.GetCmdlineArgs().Contains("--server");
     
     private LogInScreenNode? _logIScreenNode;
     private HudNode? _hudNode;
@@ -52,6 +53,7 @@ public sealed class Main : Node2D, IShardLoader
     {
         EditorIsServer = _editorIsServer;
         EditorLocalShardServerId = Guid.Parse(_editorLocalShardServerId);
+        if (_editorIsServer) _isServer = true;
     }
 
     public override void _Ready()
@@ -67,7 +69,7 @@ public sealed class Main : Node2D, IShardLoader
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
-        if (Const.IsServer)
+        if (_isServer)
             LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
     }
     
@@ -75,7 +77,7 @@ public sealed class Main : Node2D, IShardLoader
     {
         RegisterSharedServices(services);
         
-        if (Const.IsServer)
+        if (_isServer)
             RegisterServerServices(services);
         else
             RegisterClientServices(services);
@@ -88,9 +90,6 @@ public sealed class Main : Node2D, IShardLoader
     
     private void RegisterSharedServices(IServiceCollection services)
     {
-        services.AddTransient(typeof(ServerDependency<>));
-        services.AddTransient(typeof(ClientDependency<>));
-        
         services.AddSingleton(this);
         services.AddSingleton<IShardLoader>(this);
         services.AddSingleton<IShardServiceProviders>(new ShardServiceProviders(_shardServiceScopes));
@@ -101,6 +100,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
         services.AddSingletonNode<IPauseRepository>("/root/PauseRepository");
+        services.AddSingleton<ISideDetector>(new SideDetector(_isServer));
         
         services.AddScoped<ShardNode>(
             _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
@@ -116,14 +116,19 @@ public sealed class Main : Node2D, IShardLoader
     
     private void RegisterServerServices(IServiceCollection services)
     {
+        services.AddTransient(typeof(ServerDependency<>), typeof(ServerDependency<>.NotNull));
+        services.AddTransient(typeof(ClientDependency<>), typeof(ClientDependency<>.Null));
+        
         services.AddScoped<ISynchronizationServer, SynchronizationServer>();
     }
     
     private void RegisterClientServices(IServiceCollection services)
     {
+        services.AddTransient(typeof(ServerDependency<>), typeof(ServerDependency<>.Null));
+        services.AddTransient(typeof(ClientDependency<>), typeof(ClientDependency<>.NotNull));
+        
         services.AddSingleton<LogInScreenNode>(_ => _logIScreenNode.Required);
         services.AddSingleton<LogInScreen>();
-        services.AddScoped<ISynchronizationClient, SynchronizationClient>();
         services.AddSingletonNode<ICamera>("Camera");
         services.AddSingleton<HudNode>(_ => _hudNode.Required);
         services.AddSingleton<IHud, Hud>();
@@ -137,6 +142,8 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<ILocalizer, Localizer>();
         services.AddSingleton<ICurrentCharacterIdRepository, CurrentCharacterIdRepository>();
         services.AddSingleton<IVisibleShardIdRepository, VisibleShardIdRepository>();
+        
+        services.AddScoped<ISynchronizationClient, SynchronizationClient>();
     }
     
     private void RegisterJsmqServices(IServiceCollection services)
@@ -193,7 +200,7 @@ public sealed class Main : Node2D, IShardLoader
                 .Also(it => AddChild(it));
         }
         
-        if (!Const.IsServer)
+        if (!_isServer)
         {
             var ui = GetNode<CanvasLayer>("Ui").Required;
             _hudNode = HudNode.Instance().Also(it => ui.AddChild(it));
@@ -206,7 +213,7 @@ public sealed class Main : Node2D, IShardLoader
     
     private void CreateSingletonServices(IServiceProvider serviceProvider)
     {
-        if (!Const.IsServer)
+        if (!_isServer)
         {
             serviceProvider.GetRequiredService<LogInScreen>();
             serviceProvider.GetRequiredService<DebugScreen>();
@@ -217,13 +224,13 @@ public sealed class Main : Node2D, IShardLoader
     
     private void CreateShardScopedNodes(ShardNode shard, IServiceProvider serviceProvider)
     {
-        if (Const.IsServer) return;
+        if (_isServer) return;
         shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
     }
     
     private void CreateShardScopedServices(IServiceProvider serviceProvider)
     {
-        if (Const.IsServer)
+        if (_isServer)
             serviceProvider.GetRequiredService<ISynchronizationServer>();
     }
     

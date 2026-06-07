@@ -39,6 +39,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     private readonly IChunkCollector _chunkCollector;
+    private readonly ISideDetector _sideDetector;
     
     public long BytesSent { get; private set; }
     public long BytesReceived { get; private set; }
@@ -48,13 +49,15 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         ICampaignServerPacketSender campaignServerPacketSender,
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer, 
-        IChunkCollector chunkCollector
+        IChunkCollector chunkCollector,
+        ISideDetector sideDetector
     )
     {
         _campaignServerPacketSender = campaignServerPacketSender;
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
         _chunkCollector = chunkCollector;
+        _sideDetector = sideDetector;
 
         Name = nameof(WebRtcFromGameplayToGameplayCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
@@ -67,7 +70,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         // _Process would be delayed to the next physics frame otherwise.
         Poll(delta);
         
-        if (Const.IsServer)
+        if (_sideDetector.IsServer)
         {
             while (_packetQueue.Count > 0)
             {
@@ -124,7 +127,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     private void ProcessPing(double delta)
     {
-        if (Const.IsServer) return;
+        if (_sideDetector.IsServer) return;
         _timeSinceLastPing += delta;
         if (_timeSinceLastPing >= PingInterval)
         {
@@ -166,7 +169,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             }
             
             // Server defers packet handling to _PhysicsProcess to ensure that all game logic is executed in it only
-            if (Const.IsServer)
+            if (_sideDetector.IsServer)
                 _packetQueue.Enqueue((packet, senderId));
             else
                 await _packetHandler.HandleAsync(packet, senderId);
@@ -181,7 +184,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         }
         catch (BadPacketException e)
         {
-            if (Const.IsServer)
+            if (_sideDetector.IsServer)
                 SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
             else
                 AsyncExceptionCollector.Collect(e);
@@ -209,7 +212,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     public void ConnectToShardServer(Guid id)
     {
-        if (Const.IsServer) throw new InvalidOperationException();
+        if (_sideDetector.IsServer) throw new InvalidOperationException();
         
         WebRTCPeerConnection connection = CreateConnection(id);
         connection.CreateOffer();
@@ -336,8 +339,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     public void ReceiveWebrtcSdpPacket(WebrtcSdpPacket packet)
     {
-        string type = Const.IsServer ? "offer" : "answer";
-        WebRTCPeerConnection? connection = Const.IsServer ? CreateConnection(packet.PeerId) :
+        string type = _sideDetector.IsServer ? "offer" : "answer";
+        WebRTCPeerConnection? connection = _sideDetector.IsServer ? CreateConnection(packet.PeerId) :
             _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         connection?.SetRemoteDescription(type, packet.Sdp);
     }
