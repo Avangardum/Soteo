@@ -3,9 +3,9 @@ using Soteo.Core.Shared;
 
 namespace Soteo.Core.Gameplay.Tests;
 
-public abstract class Tests
+public abstract class CoreGameplayTests
 {
-    static Tests()
+    static CoreGameplayTests()
     {
         TypeLocator.Init(Assembly.GetExecutingAssembly(), CoreGameplayAssembly.Value, CoreSharedAssembly.Value);
     }

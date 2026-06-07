@@ -11,10 +11,11 @@ using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Statuses;
 using Soteo.Core.Shared;
 using Soteo.Util;
+using TestUtil;
 
 namespace Soteo.Core.Gameplay.Tests;
 
-public sealed class UnitTests : Tests
+public sealed class UnitTests : CoreGameplayTests
 {
     private readonly Sut _sut;
     private readonly IEntityManager _entityManager;
