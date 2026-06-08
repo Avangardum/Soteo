@@ -61,6 +61,14 @@ public sealed class JsmqFromCampaignServerCommunicator
         foreach (Guid id in _peerIds)
             JavaScript.Eval($"""jsmq.send("{base64}", "{id}");""");
     }
+    
+    public void BroadcastToShardServers(Packet packet)
+    {
+        byte[] bytes = [..Const.CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
+        string base64 = Convert.ToBase64String(bytes);
+        foreach (Guid id in userRepo.Values.Where(it => it.IsShard).Select(it => it.Id))
+            JavaScript.Eval($"""jsmq.send("{base64}", "{id}");""");
+    }
 
     public void RelayFrom(RelayedPacket packet, Guid senderId)
     {

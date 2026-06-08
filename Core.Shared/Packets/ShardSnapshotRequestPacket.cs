@@ -1,8 +1,7 @@
 using Soteo.Core.Shared.Attributes;
 using Soteo.Core.Shared.Enums;
-using Soteo.Core.Shared.Packets;
 
-namespace Soteo.Core.Gameplay.Packets;
+namespace Soteo.Core.Shared.Packets;
 
 [PacketTypeCode(PacketTypeCode.ShardSnapshotRequest)]
 public sealed record ShardSnapshotRequestPacket : Packet;

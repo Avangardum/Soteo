@@ -4,6 +4,7 @@ using Soteo.Core.CampaignServer.Dto.Snapshots;
 using Soteo.Core.CampaignServer.GameState.DataObjects;
 using Soteo.Core.CampaignServer.Interfaces;
 using Soteo.Core.Shared.Dto.Snapshots;
+using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.CampaignServer.Services;
 
@@ -14,21 +15,37 @@ public sealed class PersistenceService
     IPlayerCharacterRepository charRepo
 )
 {
+    private readonly Dictionary<Guid, TaskCompletionSource<ShardSnapshot>> _shardSnapshotTcs = [];
+    
     public async Task<CampaignSnapshot> SaveAsync()
     {
+        var campaignServerSnapshot = new CampaignServerSnapshot
+        {
+            Characters = charRepo.CreateSnapshot(),
+            Users = userRepo.CreateSnapshot(),
+        };
+        
+        _shardSnapshotTcs.Clear();
+        foreach (UserSnapshot userSnapshot in campaignServerSnapshot.Users.Values)
+            if (userSnapshot.IsShard)
+                _shardSnapshotTcs[userSnapshot.Id] = new TaskCompletionSource<ShardSnapshot>();
+        packetSender.BroadcastToShardServers(new ShardSnapshotRequestPacket());
+        await Task.WhenAll(_shardSnapshotTcs.Values.Select(it => it.Task));
+        
         return new CampaignSnapshot
         {
-            CampaignServer = new CampaignServerSnapshot
-            {
-                Characters = charRepo.CreateSnapshot(),
-                Users = userRepo.CreateSnapshot(),
-            },
-            Shards = ImmutableDictionary<Guid, ShardSnapshot>.Empty,
+            CampaignServer = campaignServerSnapshot,
+            Shards = _shardSnapshotTcs.ToImmutableDictionary(it => it.Key, it => it.Value.Task.Result),
         };
     }
     
     public async Task LoadAsync(CampaignSnapshot snapshot)
     {
         throw new NotImplementedException();
+    }
+    
+    public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet, Guid senderId)
+    {
+        _shardSnapshotTcs[senderId].SetResult(packet.Snapshot);
     }
 }

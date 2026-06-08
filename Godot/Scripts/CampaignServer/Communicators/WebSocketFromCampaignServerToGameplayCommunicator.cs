@@ -66,6 +66,16 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         foreach (int wsPeerId in _userIdsByWsPeerId.Keys)
             _wsServer.GetPeer(wsPeerId).PutPacket(bytes);
     }
+    
+    public void BroadcastToShardServers(Packet packet)
+    {
+        byte[] bytes = _packetSerializer.Serialize(packet);
+        IEnumerable<int> wsPeerIds = _userRepo.Values
+            .Where(it => it.IsShard)
+            .Select(it => _userIdsByWsPeerId.Inverse[it.Id]);
+        foreach (int wsPeerId in wsPeerIds)
+            _wsServer.GetPeer(wsPeerId).PutPacket(bytes);
+    }
 
     public void RelayFrom(RelayedPacket packet, Guid senderId) =>
         SendTo(packet with { PeerId = senderId }, packet.PeerId);

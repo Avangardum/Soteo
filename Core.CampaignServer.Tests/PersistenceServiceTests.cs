@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using AwesomeAssertions;
 using NSubstitute;
 using Soteo.Core.CampaignServer.Dto;
@@ -15,14 +16,15 @@ public sealed class PersistenceServiceTests
 {
     private readonly UserRepository _userRepo;
     private readonly PlayerCharacterRepository _charRepo;
-    private readonly IPacketSender _packetSender;
+    private readonly FakePacketSender _packetSender;
     private readonly PersistenceService _sut;
     
     public PersistenceServiceTests()
     {
         _userRepo = new UserRepository();
         _charRepo = new PlayerCharacterRepository();
-        // _packetSender = new FakePacketSender();
+        _packetSender =
+            new FakePacketSender((packet, senderId) => _sut.Required.ReceiveShardSnapshotPacket(packet, senderId));
         _sut = new PersistenceService(_packetSender, _userRepo, _charRepo);
     }
 
@@ -40,8 +42,8 @@ public sealed class PersistenceServiceTests
         {
             Id = Guid.NewGuid(),
             IsConnected = true,
-            IsPlayer = false,
-            IsShard = true
+            IsPlayer = true,
+            IsShard = false
         };
         _userRepo[user1.Id] = user1;
         _userRepo[user2.Id] = user2;
@@ -66,32 +68,55 @@ public sealed class PersistenceServiceTests
         snapshot.CampaignServer.Characters[char2.Id].Should().Be(char2.CreateSnapshot());
     }
     
-    // [Fact]
-    // public async Task SavedSnapshotContainsShardSnapshotsSentByShardServers()
-    // {
-    //     var shard1 = new User{ Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
-    //     var shard2 = new User{ Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
-    //     
-    //     CampaignSnapshot snapshot = await _sut.SaveAsync();
-    //     
-    //     snapshot.Shards.Should().NotBeEmpty();
-    // }
-    
-    private sealed class FakePacketSender(Action<ShardSnapshot> callback) : IPacketSender
+    [Fact]
+    public async Task SavedSnapshotContainsShardSnapshotsSentByShardServers()
     {
-        public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; } =
+        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
+        var shard2 = shard1 with { Id = Guid.NewGuid() };
+        _userRepo[shard1.Id] = shard1;
+        _userRepo[shard2.Id] = shard2;
+        var shard1Snapshot = new ShardSnapshot
+        {
+            Tick = 111,
+            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+        };
+        var shard2Snapshot = new ShardSnapshot
+        {
+            Tick = 222,
+            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+        };
+        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
+        {
+            [shard1.Id] = shard1Snapshot,
+            [shard2.Id] = shard2Snapshot,
+        };
+        
+        CampaignSnapshot snapshot = await _sut.SaveAsync();
+        
+        snapshot.Shards[shard1.Id].Tick.Should().Be(111);
+        snapshot.Shards[shard2.Id].Tick.Should().Be(222);
+    }
+    
+    private sealed class FakePacketSender(Action<ShardSnapshotPacket, Guid> callback) : IPacketSender
+    {
+        public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; set; } =
             new Dictionary<Guid, ShardSnapshot>();
         
         public void SendTo(Packet packet, Guid receiverId)
         {
-            callback(ShardSnapshots[receiverId]);
+            if (packet is ShardSnapshotRequestPacket)
+                callback(new ShardSnapshotPacket { Snapshot = ShardSnapshots[receiverId] }, receiverId);
+            else
+                throw new NotSupportedException();
         }
 
-        public void Broadcast(Packet packet)
+        public void BroadcastToShardServers(Packet packet)
         {
             foreach (Guid id in ShardSnapshots.Keys)
                 SendTo(packet, id);
         }
+        
+        public void Broadcast(Packet packet) => BroadcastToShardServers(packet);
 
         public void RelayFrom(RelayedPacket packet, Guid senderId) =>
             throw new NotSupportedException();
