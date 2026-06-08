@@ -7,5 +7,5 @@ public interface IEntitySnapshotManager
 {
     IReadOnlyDictionary<Guid, EntitySnapshot> GetEntityPuppetSnapshots();
     void ReplicateEntitySnapshots(IReadOnlyDictionary<Guid, EntitySnapshot> snapshot);
-    void ApplyDelta(ShardSnapshotDelta delta, double lerpWeight);
+    void ApplyDelta(SynchronizationShardSnapshotDelta delta, double lerpWeight);
 }

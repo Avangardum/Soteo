@@ -109,7 +109,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
 
         if (_syncData.Tick % 1 > 0)
         {
-            ShardSnapshotDelta partialDelta = _syncData.DeltaRing.RingGet(lastFullDeltaTick + 1).Required;
+            SynchronizationShardSnapshotDelta partialDelta = _syncData.DeltaRing.RingGet(lastFullDeltaTick + 1).Required;
             if ((long)prevTick < (long)_syncData.Tick)
             {
                 double interpolationWeight = _syncData.Tick.Value % 1;
@@ -177,7 +177,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         State = StateEnum.Synchronizing;
     }
 
-    public void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet)
+    public void ReceiveShardSnapshotDeltaPacket(SynchronizationShardSnapshotDeltaPacket packet)
     {
         if (State == StateEnum.Desynchronized) return;
         
@@ -200,7 +200,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         public double? ApproxServerTick { get; set; }
         public long? LastDeltaTick { get; set; }
         public SynchronizationShardSnapshotPacket? LastSnapshotPacket { get; set; }
-        public ShardSnapshotDelta?[] DeltaRing { get; } = new ShardSnapshotDelta[10 * Const.TicksPerSecond];
+        public SynchronizationShardSnapshotDelta?[] DeltaRing { get; } = new SynchronizationShardSnapshotDelta[10 * Const.TicksPerSecond];
         
         // Stores minimal difference between _tick and _lastDeltaTick for every recent second. This number
         // shouldn't go below 0, or else synchronization will pause until the delta necessary to continue arrives.
