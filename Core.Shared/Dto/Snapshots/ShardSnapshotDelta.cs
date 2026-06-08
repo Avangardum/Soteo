@@ -2,13 +2,13 @@ using System.Collections.Immutable;
 
 namespace Soteo.Core.Shared.Dto.Snapshots;
 
-public sealed record SynchronizationShardSnapshotDelta
+public sealed record ShardSnapshotDelta
 {
     public required DictionaryDelta<Guid, EntitySnapshotDelta> Entities { get; init; }
     
-    public static SynchronizationShardSnapshotDelta Between(SynchronizationShardSnapshot from, SynchronizationShardSnapshot to)
+    public static ShardSnapshotDelta Between(SynchronizationShardSnapshot from, SynchronizationShardSnapshot to)
     {
-        return new SynchronizationShardSnapshotDelta
+        return new ShardSnapshotDelta
         {
             Entities = new DictionaryDelta<Guid, EntitySnapshotDelta>
             {

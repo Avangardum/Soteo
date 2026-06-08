@@ -28,5 +28,5 @@ public enum PacketTypeCode : byte
     
     // Shard server --> Client
     SynchronizationShardSnapshot,
-    SynchronizationShardSnapshotDelta,
+    ShardSnapshotDelta,
 }

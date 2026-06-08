@@ -9,23 +9,23 @@ using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Core.Gameplay.PacketSerializers;
 
-public sealed class SynchronizationShardSnapshotDeltaPacketSerializer(IGameplaySerializer gs) :
-    PacketSerializer<SynchronizationShardSnapshotDeltaPacket>
+public sealed class ShardSnapshotDeltaPacketSerializer(IGameplaySerializer gs) :
+    PacketSerializer<ShardSnapshotDeltaPacket>
 {
-    protected override void SerializeInternal(SynchronizationShardSnapshotDeltaPacket packet, Stream stream)
+    protected override void SerializeInternal(ShardSnapshotDeltaPacket packet, Stream stream)
     {
         SerializeLong(packet.Tick, stream);
         SerializeDouble(packet.ServerLoad, stream);
         SerializeIndexedDictionaryDelta(packet.SnapshotDelta.Entities, SerializeGuid, SerializeEntityDelta, stream);
     }
 
-    protected override SynchronizationShardSnapshotDeltaPacket DeserializeInternal(Stream stream)
+    protected override ShardSnapshotDeltaPacket DeserializeInternal(Stream stream)
     {
-        return new SynchronizationShardSnapshotDeltaPacket
+        return new ShardSnapshotDeltaPacket
         {
             Tick = DeserializeLong(stream),
             ServerLoad = DeserializeDouble(stream),
-            SnapshotDelta = new SynchronizationShardSnapshotDelta
+            SnapshotDelta = new ShardSnapshotDelta
             {
                 Entities = DeserializeIndexedDictionaryDelta
                 (

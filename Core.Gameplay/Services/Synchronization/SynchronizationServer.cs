@@ -62,8 +62,8 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         var entitySnapshots = _entitySnapshotManager.GetEntityPuppetSnapshots();
         var shardSnapshot = new SynchronizationShardSnapshot { Entities = entitySnapshots };
         
-        SynchronizationShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
-            SynchronizationShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
+        ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
+            ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
         _prevShardSnapshot = shardSnapshot;
         double serverLoad = _frameStopwatch.ElapsedSincePhysicsProcess * Const.TicksPerSecond;
 
@@ -76,7 +76,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 
         if (shardSnapshotDelta != null)
         {
-            var shardSnapshotDeltaPacket = new SynchronizationShardSnapshotDeltaPacket
+            var shardSnapshotDeltaPacket = new ShardSnapshotDeltaPacket
             {
                 Tick = _tick,
                 ServerLoad = serverLoad,

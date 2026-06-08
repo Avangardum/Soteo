@@ -97,7 +97,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         }
     }
 
-    public void ApplyDelta(SynchronizationShardSnapshotDelta delta, double lerpWeight)
+    public void ApplyDelta(ShardSnapshotDelta delta, double lerpWeight)
     {
         foreach (EntitySnapshotDelta entityDelta in delta.Entities.Changes.Values)
         {
