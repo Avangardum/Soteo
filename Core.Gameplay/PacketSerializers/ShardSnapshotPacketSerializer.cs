@@ -5,6 +5,7 @@ using Soteo.Core.Gameplay.Enums;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
 using Soteo.Core.Shared.Dto.Snapshots;
+using Soteo.Core.Shared.Packets;
 using Soteo.Core.Shared.PacketSerializers;
 using static Soteo.Core.Shared.SerializationHelper;
 

@@ -22,7 +22,7 @@ public sealed class PersistenceServiceTests
     {
         _userRepo = new UserRepository();
         _charRepo = new PlayerCharacterRepository();
-        _packetSender = new FakePacketSender();
+        // _packetSender = new FakePacketSender();
         _sut = new PersistenceService(_packetSender, _userRepo, _charRepo);
     }
 
@@ -77,14 +77,14 @@ public sealed class PersistenceServiceTests
         snapshot.Shards.Should().NotBeEmpty();
     }
     
-    private sealed class FakePacketSender() : IPacketSender
+    private sealed class FakePacketSender(Action<ShardSnapshot> callback) : IPacketSender
     {
         public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; } =
             new Dictionary<Guid, ShardSnapshot>();
         
         public void SendTo(Packet packet, Guid receiverId)
         {
-            throw new NotImplementedException();
+            callback(ShardSnapshots[receiverId]);
         }
 
         public void Broadcast(Packet packet)

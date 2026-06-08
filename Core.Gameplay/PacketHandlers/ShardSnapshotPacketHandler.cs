@@ -1,6 +1,7 @@
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.PacketHandlers;
 
