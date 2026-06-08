@@ -4,6 +4,6 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.Packets;
 
-[PacketTypeCode(PacketTypeCode.SynchronizationShardSnapshotRequest)]
-public sealed record SynchronizationShardSnapshotRequestPacket : Packet;
+[PacketTypeCode(PacketTypeCode.ShardSnapshotRequest)]
+public sealed record ShardSnapshotRequestPacket : Packet;
 

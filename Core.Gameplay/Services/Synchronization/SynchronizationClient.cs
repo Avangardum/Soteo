@@ -124,7 +124,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
     }
 
     private void RequestSnapshot() =>
-        _packetSender.SendReliable(new SynchronizationShardSnapshotRequestPacket(), _shard.Id);
+        _packetSender.SendReliable(new ShardSnapshotRequestPacket(), _shard.Id);
 
     private bool TrySynchronize()
     {
@@ -169,7 +169,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         FastForwardCount++;
     }
     
-    public void ReceiveShardSnapshotPacket(SynchronizationShardSnapshotPacket packet)
+    public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet)
     {
         if (State != StateEnum.Desynchronized) return;
         
@@ -199,7 +199,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         public double? Tick { get; set; }
         public double? ApproxServerTick { get; set; }
         public long? LastDeltaTick { get; set; }
-        public SynchronizationShardSnapshotPacket? LastSnapshotPacket { get; set; }
+        public ShardSnapshotPacket? LastSnapshotPacket { get; set; }
         public ShardSnapshotDelta?[] DeltaRing { get; } = new ShardSnapshotDelta[10 * Const.TicksPerSecond];
         
         // Stores minimal difference between _tick and _lastDeltaTick for every recent second. This number

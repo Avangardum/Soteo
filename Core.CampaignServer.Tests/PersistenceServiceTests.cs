@@ -63,8 +63,48 @@ public sealed class PersistenceServiceTests
     }
     
     [Fact]
-    public async Task SavedSnapshotContainsShardSnapshotsSentByShardServers()
+    public async Task SavedSnapshotDoesNotChangeWhenRepositoryStateChanges()
     {
+        // Arrange
         
+        var user1 = new User
+        {
+            Id = Guid.NewGuid(),
+            IsConnected = false,
+            IsPlayer = true,
+            IsShard = false
+        };
+        var user2 = new User
+        {
+            Id = Guid.NewGuid(),
+            IsConnected = true,
+            IsPlayer = true,
+            IsShard = false
+        };
+        _userRepo[user1.Id] = user1;
+        _userRepo[user2.Id] = user2;
+        
+        var char1 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = Guid.NewGuid() };
+        var char2 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = null, Player = user2 };
+        _charRepo.Add(char1);
+        _charRepo.Add(char2);
+        
+        // Act
+        
+        CampaignSnapshot snapshot = await _sut.SaveAsync();
+        
+        _userRepo.Remove(user1.Id);
+        _userRepo[user2.Id].IsConnected = false;
+        
+        _charRepo.Remove(char1.Id);
+        _charRepo[char2.Id].ShardId = Guid.NewGuid();
+        
+        // Assert
+        
+        snapshot.CampaignServer.Users.Should().ContainKey(user1.Id);
+        snapshot.CampaignServer.Users[user2.Id].IsConnected.Should().BeTrue();
+        
+        snapshot.CampaignServer.Characters.Should().ContainKey(char1.Id);
+        snapshot.CampaignServer.Characters[char2.Id].ShardId.Should().BeNull();
     }
 }

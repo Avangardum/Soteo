@@ -6,7 +6,7 @@ public sealed record ShardSnapshotDelta
 {
     public required DictionaryDelta<Guid, EntitySnapshotDelta> Entities { get; init; }
     
-    public static ShardSnapshotDelta Between(SynchronizationShardSnapshot from, SynchronizationShardSnapshot to)
+    public static ShardSnapshotDelta Between(ShardSnapshot from, ShardSnapshot to)
     {
         return new ShardSnapshotDelta
         {

@@ -5,9 +5,9 @@ using Soteo.Core.Shared;
 namespace Soteo.Core.Gameplay.PacketHandlers;
 
 public sealed class ShardSnapshotPacketHandler(ISynchronizationClient synchronizationClient) :
-    PacketHandler<SynchronizationShardSnapshotPacket>
+    PacketHandler<ShardSnapshotPacket>
 {
-    protected override void Handle(SynchronizationShardSnapshotPacket packet, Guid senderId)
+    protected override void Handle(ShardSnapshotPacket packet, Guid senderId)
     {
         synchronizationClient.ReceiveShardSnapshotPacket(packet);
     }
