@@ -12,7 +12,9 @@ public sealed class PersistenceService
 (
     IPacketSender packetSender,
     IUserRepository userRepo,
-    IPlayerCharacterRepository charRepo
+    IPlayerCharacterRepository charRepo,
+    TimeProvider timeProvider,
+    PersistenceService.Options options
 )
 {
     private readonly Dictionary<Guid, TaskCompletionSource<ShardSnapshot>> _shardSnapshotTcs = [];
@@ -30,8 +32,17 @@ public sealed class PersistenceService
             if (userSnapshot.IsShard)
                 _shardSnapshotTcs[userSnapshot.Id] = new TaskCompletionSource<ShardSnapshot>();
         packetSender.BroadcastToShardServers(new ShardSnapshotRequestPacket());
-        await Task.WhenAll(_shardSnapshotTcs.Values.Select(it => it.Task));
-        
+        Task timeout = timeProvider.Delay(TimeSpan.FromSeconds(options.ShardServerSnapshotRequestTimeout));
+        Task completedTask = await Task.WhenAny(timeout, Task.WhenAll(_shardSnapshotTcs.Values.Select(it => it.Task)));
+        if (completedTask == timeout)
+        {
+            string timedOutShardIds = _shardSnapshotTcs
+                .Where(it => !it.Value.Task.IsCompleted)
+                .Select(it => it.Key)
+                .JoinToString(", ");
+            throw new TimeoutException($"The following shard servers did not respond: {timedOutShardIds}");
+        }
+
         var result = new CampaignSnapshot
         {
             CampaignServer = campaignServerSnapshot,
@@ -51,5 +62,10 @@ public sealed class PersistenceService
         if (!_shardSnapshotTcs.TryGetValue(senderId, out TaskCompletionSource<ShardSnapshot>? tcs))
             throw new InvalidOperationException();
         tcs.SetResult(packet.Snapshot);
+    }
+    
+    public sealed record Options
+    {
+        public double ShardServerSnapshotRequestTimeout { get; init; } = 10;
     }
 }

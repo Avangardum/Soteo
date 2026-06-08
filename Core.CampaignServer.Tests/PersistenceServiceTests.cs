@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using AwesomeAssertions;
+using Microsoft.Extensions.Time.Testing;
 using NSubstitute;
 using Soteo.Core.CampaignServer.Dto;
 using Soteo.Core.CampaignServer.Dto.Snapshots;
@@ -17,6 +18,8 @@ public sealed class PersistenceServiceTests
     private readonly UserRepository _userRepo;
     private readonly PlayerCharacterRepository _charRepo;
     private readonly FakePacketSender _packetSender;
+    private readonly FakeTimeProvider _timeProvider;
+    private readonly PersistenceService.Options _options;
     private readonly PersistenceService _sut;
     
     public PersistenceServiceTests()
@@ -25,7 +28,9 @@ public sealed class PersistenceServiceTests
         _charRepo = new PlayerCharacterRepository();
         _packetSender =
             new FakePacketSender((packet, senderId) => _sut.Required.ReceiveShardSnapshotPacket(packet, senderId));
-        _sut = new PersistenceService(_packetSender, _userRepo, _charRepo);
+        _timeProvider = new FakeTimeProvider();
+        _options = new PersistenceService.Options();
+        _sut = new PersistenceService(_packetSender, _userRepo, _charRepo, _timeProvider, _options);
     }
 
     [Fact]
@@ -136,6 +141,28 @@ public sealed class PersistenceServiceTests
         await _sut.Awaiting(it => it.SaveAsync()).Should().ThrowAsync<InvalidOperationException>(); 
     }
     
+    [Fact]
+    public async Task NotReceivingAllShardSnapshotsInTimeThrows()
+    {
+        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
+        var shard2 = shard1 with { Id = Guid.NewGuid() };
+        _userRepo[shard1.Id] = shard1;
+        _userRepo[shard2.Id] = shard2;
+        var shard1Snapshot = new ShardSnapshot
+        {
+            Tick = 111,
+            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+        };
+        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
+        {
+            [shard1.Id] = shard1Snapshot,
+        };
+        
+        var assertTask = FluentActions.Awaiting(_sut.SaveAsync).Should().ThrowAsync<TimeoutException>();
+        _timeProvider.Advance(TimeSpan.FromSeconds(_options.ShardServerSnapshotRequestTimeout * 1.1));
+        await assertTask;
+    }
+    
     private sealed class FakePacketSender(Action<ShardSnapshotPacket, Guid> callback) : IPacketSender
     {
         public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; set; } =
@@ -146,9 +173,9 @@ public sealed class PersistenceServiceTests
         public void SendTo(Packet packet, Guid receiverId)
         {
             if (packet is not ShardSnapshotRequestPacket) return;
-            callback(new ShardSnapshotPacket { Snapshot = ShardSnapshots[receiverId] }, receiverId);
-            if (DuplicateResponse)
-                callback(new ShardSnapshotPacket { Snapshot = ShardSnapshots[receiverId] }, receiverId);
+            if (!ShardSnapshots.TryGetValue(receiverId, out ShardSnapshot? snapshot)) return;
+            for (int i = 0; i < (DuplicateResponse ? 2 : 1); i++)
+                callback(new ShardSnapshotPacket { Snapshot = snapshot }, receiverId);
         }
 
         public void BroadcastToShardServers(Packet packet)
