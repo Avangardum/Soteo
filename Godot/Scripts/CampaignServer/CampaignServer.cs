@@ -7,6 +7,8 @@ using Soteo.Core.CampaignServer;
 using Soteo.Core.CampaignServer.GameState.Repositories;
 using Soteo.Core.CampaignServer.Interfaces;
 using Soteo.Core.CampaignServer.PacketHandlers;
+using Soteo.Core.Gameplay;
+using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.Packets;
@@ -50,6 +52,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IPacketSender, ICommunicator>();
+        services.AddSingleton<IGameplaySerializer, GameplaySerializer>();
         
         var typeLocator = new TypeLocator(CoreCampaignServerAssembly.Value, CoreSharedAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
@@ -59,12 +62,16 @@ public sealed class CampaignServer : Node
         else
             services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
         
+        foreach (Type type in PacketSerializer.AllTypes(typeLocator))
+            services.AddSingleton(type);
+        
         foreach (Type type in PacketHandler.AllTypes(typeLocator))
-            services.AddTransient(type);
+            services.AddSingleton(type);
     }
     
     private void StartShardServers()
     {
+        // todo redirect output
         ImmutableList<Guid> ids = 
         [
             Guid.Parse("00000000-0000-0000-0000-00000007e571"),

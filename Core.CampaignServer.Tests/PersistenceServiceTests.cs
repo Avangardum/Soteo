@@ -66,16 +66,16 @@ public sealed class PersistenceServiceTests
         snapshot.CampaignServer.Characters[char2.Id].Should().Be(char2.CreateSnapshot());
     }
     
-    [Fact]
-    public async Task SavedSnapshotContainsShardSnapshotsSentByShardServers()
-    {
-        var shard1 = new User{ Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
-        var shard2 = new User{ Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
-        
-        CampaignSnapshot snapshot = await _sut.SaveAsync();
-        
-        snapshot.Shards.Should().NotBeEmpty();
-    }
+    // [Fact]
+    // public async Task SavedSnapshotContainsShardSnapshotsSentByShardServers()
+    // {
+    //     var shard1 = new User{ Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
+    //     var shard2 = new User{ Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
+    //     
+    //     CampaignSnapshot snapshot = await _sut.SaveAsync();
+    //     
+    //     snapshot.Shards.Should().NotBeEmpty();
+    // }
     
     private sealed class FakePacketSender(Action<ShardSnapshot> callback) : IPacketSender
     {

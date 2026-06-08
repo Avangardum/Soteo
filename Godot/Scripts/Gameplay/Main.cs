@@ -100,6 +100,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
         services.AddSingletonNode<IPauseRepository>("/root/PauseRepository");
         services.AddSingleton<ISideDetector>(new SideDetector(_isServer));
+        services.AddSingleton<IGameplaySerializer, GameplaySerializer>();
         
         var typeLocator = new TypeLocator(CoreGameplayAssembly.Value, CoreSharedAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
@@ -112,8 +113,11 @@ public sealed class Main : Node2D, IShardLoader
         services.AddAlias<IEntitySnapshotManager, EntityManager>();
         services.AddScoped<IEntityNodeManager, EntityNodeManager>();
         
+        foreach (Type type in PacketSerializer.AllTypes(typeLocator))
+            services.AddSingleton(type);
+        
         foreach (Type type in PacketHandler.AllTypes(typeLocator))
-            services.AddTransient(type);
+            services.AddScoped(type);
     }
     
     private void RegisterServerServices(IServiceCollection services)
