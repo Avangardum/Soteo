@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Soteo.Core.CampaignServer.Dto;
 using Soteo.Core.CampaignServer.Dto.Snapshots;
 using Soteo.Core.CampaignServer.GameState.DataObjects;
@@ -19,7 +20,7 @@ public sealed class PersistenceServiceTests
     private readonly PlayerCharacterRepository _charRepo;
     private readonly FakePacketSender _packetSender;
     private readonly FakeTimeProvider _timeProvider;
-    private readonly PersistenceService.Options _options;
+    private readonly FakeConsistencyValidator _consistencyValidator;
     private readonly PersistenceService _sut;
     
     public PersistenceServiceTests()
@@ -29,8 +30,8 @@ public sealed class PersistenceServiceTests
         _packetSender =
             new FakePacketSender((packet, senderId) => _sut.Required.ReceiveShardSnapshotPacket(packet, senderId));
         _timeProvider = new FakeTimeProvider();
-        _options = new PersistenceService.Options();
-        _sut = new PersistenceService(_packetSender, _userRepo, _charRepo, _timeProvider, _options);
+        _consistencyValidator = new FakeConsistencyValidator();
+        _sut = new PersistenceService(_packetSender, _userRepo, _charRepo, _timeProvider, _consistencyValidator);
     }
 
     [Fact]
@@ -159,8 +160,54 @@ public sealed class PersistenceServiceTests
         };
         
         var assertTask = FluentActions.Awaiting(_sut.SaveAsync).Should().ThrowAsync<TimeoutException>();
-        _timeProvider.Advance(TimeSpan.FromSeconds(_options.ShardServerSnapshotRequestTimeout * 1.1));
+        _timeProvider.Advance(TimeSpan.FromSeconds(PersistenceService.ShardServerSnapshotRequestTimeout * 1.1));
         await assertTask;
+    }
+    
+    [Fact]
+    public async Task AlwaysFailingConsistencyValidationThrows()
+    {
+        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
+        _userRepo[shard1.Id] = shard1;
+        var shard1Snapshot = new ShardSnapshot
+        {
+            Tick = 111,
+            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+        };
+        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
+        {
+            [shard1.Id] = shard1Snapshot,
+        };
+        _consistencyValidator.FailuresRemaining = int.MaxValue;
+        
+        var assertTask = FluentActions.Awaiting(_sut.SaveAsync).Should().ThrowAsync<Exception>();
+        _timeProvider.Advance(TimeSpan.FromDays(228));
+    }
+    
+    [Fact]
+    public async Task FailingConsistencyValidationRetriesAfterDelayUntilSuccess()
+    {
+        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
+        _userRepo[shard1.Id] = shard1;
+        var shard1Snapshot = new ShardSnapshot
+        {
+            Tick = 111,
+            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+        };
+        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
+        {
+            [shard1.Id] = shard1Snapshot,
+        };
+        _consistencyValidator.FailuresRemaining = 2;
+
+        Task actTask = _sut.SaveAsync();
+        
+        _consistencyValidator.FailuresRemaining.Should().Be(1);
+        _timeProvider.Advance(TimeSpan.FromSeconds(PersistenceService.InconsistencyRetryDelay * 1.1));
+        _consistencyValidator.FailuresRemaining.Should().Be(0);
+        _timeProvider.Advance(TimeSpan.FromSeconds(PersistenceService.InconsistencyRetryDelay * 1.1));
+        _consistencyValidator.FailuresRemaining.Should().Be(-1);
+        actTask.Status.Should().Be(TaskStatus.RanToCompletion);
     }
     
     private sealed class FakePacketSender(Action<ShardSnapshotPacket, Guid> callback) : IPacketSender
@@ -188,5 +235,12 @@ public sealed class PersistenceServiceTests
 
         public void RelayFrom(RelayedPacket packet, Guid senderId) =>
             throw new NotSupportedException();
+    }
+    
+    private sealed class FakeConsistencyValidator : ICampaignSnapshotCrossServerConsistencyValidator
+    {
+        public int FailuresRemaining { get; set; }
+        
+        public bool IsConsistent(CampaignSnapshot snapshot) => FailuresRemaining-- <= 0;
     }
 }
