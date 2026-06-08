@@ -97,17 +97,58 @@ public sealed class PersistenceServiceTests
         snapshot.Shards[shard2.Id].Tick.Should().Be(222);
     }
     
+    [Fact]
+    public async Task ReceivingUnrequestedShardSnapshotPacketThrows()
+    {
+        _sut.Invoking
+        (
+            it => it.ReceiveShardSnapshotPacket
+            (
+                new ShardSnapshotPacket
+                {
+                    Snapshot = new ShardSnapshot
+                    {
+                        Tick = 123,
+                        Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+                    }
+                },
+                Guid.NewGuid()
+            )
+        ).Should().Throw<InvalidOperationException>();
+    }
+    
+    [Fact]
+    public async Task ReceivingDuplicatedShardSnapshotPacketThrows()
+    {
+        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
+        _userRepo[shard1.Id] = shard1;
+        var shard1Snapshot = new ShardSnapshot
+        {
+            Tick = 111,
+            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+        };
+        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
+        {
+            [shard1.Id] = shard1Snapshot,
+        };
+        _packetSender.DuplicateResponse = true;
+        
+        await _sut.Awaiting(it => it.SaveAsync()).Should().ThrowAsync<InvalidOperationException>(); 
+    }
+    
     private sealed class FakePacketSender(Action<ShardSnapshotPacket, Guid> callback) : IPacketSender
     {
         public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; set; } =
             new Dictionary<Guid, ShardSnapshot>();
         
+        public bool DuplicateResponse { get; set; }
+        
         public void SendTo(Packet packet, Guid receiverId)
         {
-            if (packet is ShardSnapshotRequestPacket)
+            if (packet is not ShardSnapshotRequestPacket) return;
+            callback(new ShardSnapshotPacket { Snapshot = ShardSnapshots[receiverId] }, receiverId);
+            if (DuplicateResponse)
                 callback(new ShardSnapshotPacket { Snapshot = ShardSnapshots[receiverId] }, receiverId);
-            else
-                throw new NotSupportedException();
         }
 
         public void BroadcastToShardServers(Packet packet)

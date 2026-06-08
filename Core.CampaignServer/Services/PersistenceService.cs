@@ -32,11 +32,13 @@ public sealed class PersistenceService
         packetSender.BroadcastToShardServers(new ShardSnapshotRequestPacket());
         await Task.WhenAll(_shardSnapshotTcs.Values.Select(it => it.Task));
         
-        return new CampaignSnapshot
+        var result = new CampaignSnapshot
         {
             CampaignServer = campaignServerSnapshot,
             Shards = _shardSnapshotTcs.ToImmutableDictionary(it => it.Key, it => it.Value.Task.Result),
         };
+        _shardSnapshotTcs.Clear();
+        return result;
     }
     
     public async Task LoadAsync(CampaignSnapshot snapshot)
@@ -46,6 +48,8 @@ public sealed class PersistenceService
     
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet, Guid senderId)
     {
-        _shardSnapshotTcs[senderId].SetResult(packet.Snapshot);
+        if (!_shardSnapshotTcs.TryGetValue(senderId, out TaskCompletionSource<ShardSnapshot>? tcs))
+            throw new InvalidOperationException();
+        tcs.SetResult(packet.Snapshot);
     }
 }
