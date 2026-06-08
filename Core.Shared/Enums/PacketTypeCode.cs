@@ -8,18 +8,25 @@ public enum PacketTypeCode : byte
     BadInput,
     Ping,
     Pause,
-    // Campaign server <--> Client / Shard server
     CampaignServerHandshake,
     SpawnCharacter,
-    CharacterRecalled,
     WebrtcSdp,
     WebrtcIceCandidate,
+    
+    // Campaign server --> Shard server
+    PersistenceShardSnapshotRequest,
+    
+    // Shard server --> Campaign server
+    PersistenceShardSnapshot,
+    CharacterRecalled,
+    
     // Client --> Shard server
     Move,
     UseAbility,
     Stop,
-    ShardSnapshotRequest,
-    // Shard Server --> Client
-    ShardSnapshot,
+    SynchronizationShardSnapshotRequest,
+    
+    // Shard server --> Client
+    SynchronizationShardSnapshot,
     ShardSnapshotDelta,
 }

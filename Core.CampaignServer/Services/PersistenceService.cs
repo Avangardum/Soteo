@@ -23,7 +23,7 @@ public sealed class PersistenceService
                 Characters = charRepo.CreateSnapshot(),
                 Users = userRepo.CreateSnapshot(),
             },
-            Shards = ImmutableDictionary<Guid, ShardSnapshot>.Empty,
+            Shards = ImmutableDictionary<Guid, PersistenceShardSnapshot>.Empty,
         };
     }
     

@@ -9,6 +9,6 @@ public interface ISynchronizationClient
     int FastForwardCount { get; }
     double? ServerLoad { get; }
     
-    void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet);
+    void ReceiveShardSnapshotPacket(SynchronizationShardSnapshotPacket packet);
     void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet);
 }

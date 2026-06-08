@@ -10,21 +10,21 @@ using static Soteo.Core.Shared.SerializationHelper;
 
 namespace Soteo.Core.Gameplay.PacketSerializers;
 
-public sealed class ShardSnapshotPacketSerializer(IGameplaySerializer gs) :
-    PacketSerializer<ShardSnapshotPacket>
+public sealed class SynchronizationShardSnapshotPacketSerializer(IGameplaySerializer gs) :
+    PacketSerializer<SynchronizationShardSnapshotPacket>
 {
-    protected override void SerializeInternal(ShardSnapshotPacket packet, Stream stream)
+    protected override void SerializeInternal(SynchronizationShardSnapshotPacket packet, Stream stream)
     {
         SerializeLong(packet.Tick, stream);
         SerializeIndexedDictionary(packet.Snapshot.Entities, SerializeEntity, stream);
     }
     
-    protected override ShardSnapshotPacket DeserializeInternal(Stream stream)
+    protected override SynchronizationShardSnapshotPacket DeserializeInternal(Stream stream)
     {
-        return new ShardSnapshotPacket
+        return new SynchronizationShardSnapshotPacket
         {
             Tick = DeserializeLong(stream),
-            Snapshot = new ShardSnapshot
+            Snapshot = new SynchronizationShardSnapshot
             {
                 Entities = DeserializeIndexedDictionary(DeserializeEntity, it => it.Id, stream),
             },

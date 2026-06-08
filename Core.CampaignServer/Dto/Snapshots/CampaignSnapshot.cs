@@ -5,5 +5,5 @@ namespace Soteo.Core.CampaignServer.Dto.Snapshots;
 public sealed record CampaignSnapshot
 {
     public required CampaignServerSnapshot CampaignServer { get; init; }
-    public required IReadOnlyDictionary<Guid, ShardSnapshot> Shards { get; init; }
+    public required IReadOnlyDictionary<Guid, PersistenceShardSnapshot> Shards { get; init; }
 }
