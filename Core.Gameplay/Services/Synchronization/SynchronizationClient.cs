@@ -183,10 +183,10 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
     {
         if (State == StateEnum.Desynchronized) return;
         
-        _syncData.DeltaRing.RingSet(packet.Tick, packet.SnapshotDelta);
+        _syncData.DeltaRing.RingSet(packet.SnapshotDelta.Tick, packet.SnapshotDelta);
         _syncData.ServerLoad = packet.ServerLoad;
-        _syncData.ApproxServerTick = packet.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
-        _syncData.LastDeltaTick = packet.Tick;
+        _syncData.ApproxServerTick = packet.SnapshotDelta.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
+        _syncData.LastDeltaTick = packet.SnapshotDelta.Tick;
     }
     
     private enum StateEnum

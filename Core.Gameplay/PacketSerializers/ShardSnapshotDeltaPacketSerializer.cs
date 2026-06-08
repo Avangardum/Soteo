@@ -14,8 +14,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer(IGameplaySerializer gs) :
 {
     protected override void SerializeInternal(ShardSnapshotDeltaPacket packet, Stream stream)
     {
-        SerializeLong(packet.Tick, stream);
         SerializeDouble(packet.ServerLoad, stream);
+        SerializeLong(packet.SnapshotDelta.Tick, stream);
         SerializeIndexedDictionaryDelta(packet.SnapshotDelta.Entities, SerializeGuid, SerializeEntityDelta, stream);
     }
 
@@ -23,10 +23,10 @@ public sealed class ShardSnapshotDeltaPacketSerializer(IGameplaySerializer gs) :
     {
         return new ShardSnapshotDeltaPacket
         {
-            Tick = DeserializeLong(stream),
             ServerLoad = DeserializeDouble(stream),
             SnapshotDelta = new ShardSnapshotDelta
             {
+                Tick = DeserializeLong(stream),
                 Entities = DeserializeIndexedDictionaryDelta
                 (
                     DeserializeGuid,

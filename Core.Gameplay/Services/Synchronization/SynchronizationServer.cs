@@ -79,7 +79,6 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         {
             var shardSnapshotDeltaPacket = new ShardSnapshotDeltaPacket
             {
-                Tick = _tick,
                 ServerLoad = serverLoad,
                 SnapshotDelta = shardSnapshotDelta
             };
