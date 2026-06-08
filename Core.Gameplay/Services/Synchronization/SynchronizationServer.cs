@@ -61,7 +61,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     private void Tick(double delta)
     {
         var entitySnapshots = _entitySnapshotManager.GetEntityPuppetSnapshots();
-        var shardSnapshot = new ShardSnapshot { Entities = entitySnapshots };
+        var shardSnapshot = new ShardSnapshot { Tick = _tick, Entities = entitySnapshots };
         
         ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
             ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
@@ -70,7 +70,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 
         if (_snapshotRequesters.Count > 0)
         {
-            var shardSnapshotPacket = new ShardSnapshotPacket { Tick = _tick, Snapshot = shardSnapshot };
+            var shardSnapshotPacket = new ShardSnapshotPacket { Snapshot = shardSnapshot };
             _packetSender.SendReliable(shardSnapshotPacket, _snapshotRequesters);
             _snapshotRequesters.Clear();
         }

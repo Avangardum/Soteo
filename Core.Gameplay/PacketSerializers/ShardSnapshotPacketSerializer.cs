@@ -16,7 +16,7 @@ public sealed class ShardSnapshotPacketSerializer(IGameplaySerializer gs) :
 {
     protected override void SerializeInternal(ShardSnapshotPacket packet, Stream stream)
     {
-        SerializeLong(packet.Tick, stream);
+        SerializeLong(packet.Snapshot.Tick, stream);
         SerializeIndexedDictionary(packet.Snapshot.Entities, SerializeEntity, stream);
     }
     
@@ -24,9 +24,9 @@ public sealed class ShardSnapshotPacketSerializer(IGameplaySerializer gs) :
     {
         return new ShardSnapshotPacket
         {
-            Tick = DeserializeLong(stream),
             Snapshot = new ShardSnapshot
             {
+                Tick = DeserializeLong(stream),
                 Entities = DeserializeIndexedDictionary(DeserializeEntity, it => it.Id, stream),
             },
         };

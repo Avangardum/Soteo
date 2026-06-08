@@ -131,18 +131,19 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
     {
         if (State != StateEnum.Synchronizing) return false;
         
-        bool isLastSnapshotStale = _syncData.DeltaRingEarliestValidTick > _syncData.LastSnapshotPacket?.Tick + 1;
+        bool isLastSnapshotStale =
+            _syncData.DeltaRingEarliestValidTick > _syncData.LastSnapshotPacket?.Snapshot.Tick + 1;
         if (isLastSnapshotStale)
         {
             State = StateEnum.Desynchronized;
             return false;
         }
 
-        bool canSynchronize = _syncData.LastDeltaTick >= _syncData.LastSnapshotPacket?.Tick + 2;
+        bool canSynchronize = _syncData.LastDeltaTick >= _syncData.LastSnapshotPacket?.Snapshot.Tick + 2;
         if (!canSynchronize) return false;
         
         _entitySnapshotManager.ReplicateEntitySnapshots(_syncData.LastSnapshotPacket.Required.Snapshot.Entities);
-        _syncData.Tick = _syncData.LastSnapshotPacket.Tick;
+        _syncData.Tick = _syncData.LastSnapshotPacket.Snapshot.Tick;
         State = StateEnum.Synchronized;
         return true;
     }

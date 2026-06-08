@@ -7,6 +7,5 @@ namespace Soteo.Core.Shared.Packets;
 [PacketTypeCode(PacketTypeCode.ShardSnapshot)]
 public sealed record ShardSnapshotPacket : Packet
 {
-    public required long Tick { get; init; }
     public required ShardSnapshot Snapshot { get; init; }
 }
