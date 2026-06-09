@@ -29,50 +29,64 @@ public sealed class PersistenceService
         if (_isSaving)
             throw new InvalidOperationException("Save is already in progress");
         _isSaving = true;
-        
-        for (int i = 0; i < InconsistencyRetryMaxCount; i++)
+
+        try
         {
-            var campaignServerSnapshot = new CampaignServerSnapshot
+            for (int i = 0; i < InconsistencyRetryMaxCount; i++)
             {
-                Characters = charRepo.CreateSnapshot(),
-                Users = userRepo.CreateSnapshot(),
-            };
-
-            _shardSnapshotTcs.Clear();
-            foreach (UserSnapshot userSnapshot in campaignServerSnapshot.Users.Values)
-                if (userSnapshot.IsShard)
-                    _shardSnapshotTcs[userSnapshot.Id] = new TaskCompletionSource<ShardSnapshot>();
-            packetSender.BroadcastToShardServers(new ShardSnapshotRequestPacket());
-            Task timeout = timeProvider.Delay(TimeSpan.FromSeconds(ShardServerSnapshotRequestTimeout));
-            Task completedTask =
-                await Task.WhenAny(timeout, Task.WhenAll(_shardSnapshotTcs.Values.Select(it => it.Task)));
-            if (completedTask == timeout)
-            {
-                string timedOutShardIds = _shardSnapshotTcs
-                    .Where(it => !it.Value.Task.IsCompleted)
-                    .Select(it => it.Key)
-                    .JoinToString(", ");
-                throw new TimeoutException($"The following shard servers did not respond: {timedOutShardIds}");
+                CampaignSnapshot snapshot = await CreateUnvalidatedCampaignSnapshot();
+                if (consistencyValidator.IsConsistent(snapshot)) return snapshot;
+                await timeProvider.Delay(TimeSpan.FromSeconds(InconsistencyRetryDelay));
             }
 
-            var campaignSnapshot = new CampaignSnapshot
-            {
-                CampaignServer = campaignServerSnapshot,
-                Shards = _shardSnapshotTcs.ToImmutableDictionary(it => it.Key, it => it.Value.Task.Result),
-            };
-            
-            _shardSnapshotTcs.Clear();
-            
-            if (consistencyValidator.IsConsistent(campaignSnapshot))
-            {
-                _isSaving = false;
-                return campaignSnapshot;
-            }
-
-            await timeProvider.Delay(TimeSpan.FromSeconds(InconsistencyRetryDelay));
+            throw new Exception("Failed to create a consistent snapshot");
         }
-        
-        throw new Exception("Failed to create a consistent snapshot");
+        finally
+        {
+            _isSaving = false;
+            _shardSnapshotTcs.Clear();
+        }
+    }
+    
+    private async Task<CampaignSnapshot> CreateUnvalidatedCampaignSnapshot()
+    {
+        var campaignServerSnapshot = new CampaignServerSnapshot
+        {
+            Characters = charRepo.CreateSnapshot(),
+            Users = userRepo.CreateSnapshot(),
+        };
+
+        return new CampaignSnapshot
+        {
+            CampaignServer = campaignServerSnapshot,
+            Shards = await GetShardSnapshotsAsync(campaignServerSnapshot),
+        };
+    }
+    
+    private async Task<IReadOnlyDictionary<Guid, ShardSnapshot>> GetShardSnapshotsAsync
+    (
+        CampaignServerSnapshot campaignServerSnapshot
+    )
+    {
+        _shardSnapshotTcs.Clear();
+        foreach (UserSnapshot userSnapshot in campaignServerSnapshot.Users.Values)
+            if (userSnapshot.IsShard)
+                _shardSnapshotTcs[userSnapshot.Id] = new TaskCompletionSource<ShardSnapshot>();
+        packetSender.BroadcastToShardServers(new ShardSnapshotRequestPacket());
+        Task timeout = timeProvider.Delay(TimeSpan.FromSeconds(ShardServerSnapshotRequestTimeout));
+        Task completedTask =
+            await Task.WhenAny(timeout, Task.WhenAll(_shardSnapshotTcs.Values.Select(it => it.Task)));
+        if (completedTask == timeout) throw ShardSnapshotTimeoutException();
+        return _shardSnapshotTcs.ToImmutableDictionary(it => it.Key, it => it.Value.Task.Result);
+    }
+    
+    private Exception ShardSnapshotTimeoutException()
+    {
+        string timedOutShardIds = _shardSnapshotTcs
+            .Where(it => !it.Value.Task.IsCompleted)
+            .Select(it => it.Key)
+            .JoinToString(", ");
+        return new TimeoutException($"The following shard servers did not respond: {timedOutShardIds}");
     }
     
     public async Task LoadAsync(CampaignSnapshot snapshot)
@@ -83,7 +97,8 @@ public sealed class PersistenceService
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet, Guid senderId)
     {
         if (!_shardSnapshotTcs.TryGetValue(senderId, out TaskCompletionSource<ShardSnapshot>? tcs))
-            throw new InvalidOperationException();
-        tcs.SetResult(packet.Snapshot);
+            throw new InvalidOperationException($"No packet was requested from {senderId}");
+        if (!tcs.TrySetResult(packet.Snapshot))
+            throw new InvalidOperationException($"Duplicate packet from {senderId}");
     }
 }
