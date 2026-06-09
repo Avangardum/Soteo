@@ -22,9 +22,14 @@ public sealed class PersistenceService
     public const int InconsistencyRetryDelay = 5;
     
     private readonly Dictionary<Guid, TaskCompletionSource<ShardSnapshot>> _shardSnapshotTcs = [];
+    private bool _isSaving;
     
     public async Task<CampaignSnapshot> SaveAsync()
     {
+        if (_isSaving)
+            throw new InvalidOperationException("Save is already in progress");
+        _isSaving = true;
+        
         for (int i = 0; i < InconsistencyRetryMaxCount; i++)
         {
             var campaignServerSnapshot = new CampaignServerSnapshot
@@ -59,8 +64,11 @@ public sealed class PersistenceService
             _shardSnapshotTcs.Clear();
             
             if (consistencyValidator.IsConsistent(campaignSnapshot))
+            {
+                _isSaving = false;
                 return campaignSnapshot;
-            
+            }
+
             await timeProvider.Delay(TimeSpan.FromSeconds(InconsistencyRetryDelay));
         }
         

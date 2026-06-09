@@ -1,9 +1,6 @@
 using System.Collections.Immutable;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
-using NSubstitute;
-using NSubstitute.ExceptionExtensions;
-using Soteo.Core.CampaignServer.Dto;
 using Soteo.Core.CampaignServer.Dto.Snapshots;
 using Soteo.Core.CampaignServer.GameState.DataObjects;
 using Soteo.Core.CampaignServer.GameState.Repositories;
@@ -37,22 +34,8 @@ public sealed class PersistenceServiceTests
     [Fact]
     public async Task SavedSnapshotContainsUsersFromRepository()
     {
-        var user1 = new User
-        {
-            Id = Guid.NewGuid(),
-            IsConnected = false,
-            IsPlayer = true,
-            IsShard = false
-        };
-        var user2 = new User
-        {
-            Id = Guid.NewGuid(),
-            IsConnected = true,
-            IsPlayer = true,
-            IsShard = false
-        };
-        _userRepo[user1.Id] = user1;
-        _userRepo[user2.Id] = user2;
+        User user1 = CreatePlayer();
+        User user2 = CreatePlayer();
         
         CampaignSnapshot snapshot = await _sut.SaveAsync();
         
@@ -63,10 +46,8 @@ public sealed class PersistenceServiceTests
     [Fact]
     public async Task SavedSnapshotContainsPlayerCharactersFromRepository()
     {
-        var char1 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = Guid.NewGuid() };
-        var char2 = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = null };
-        _charRepo.Add(char1);
-        _charRepo.Add(char2);
+        var char1 = CreatePlayerCharacterInShard(Guid.NewGuid());
+        var char2 = CreatePlayerCharacterInShard(null);
         
         CampaignSnapshot snapshot = await _sut.SaveAsync();
         
@@ -77,30 +58,13 @@ public sealed class PersistenceServiceTests
     [Fact]
     public async Task SavedSnapshotContainsShardSnapshotsSentByShardServers()
     {
-        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
-        var shard2 = shard1 with { Id = Guid.NewGuid() };
-        _userRepo[shard1.Id] = shard1;
-        _userRepo[shard2.Id] = shard2;
-        var shard1Snapshot = new ShardSnapshot
-        {
-            Tick = 111,
-            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
-        };
-        var shard2Snapshot = new ShardSnapshot
-        {
-            Tick = 222,
-            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
-        };
-        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
-        {
-            [shard1.Id] = shard1Snapshot,
-            [shard2.Id] = shard2Snapshot,
-        };
+        var shard1 = CreateShard();
+        var shard2 = CreateShard();
         
         CampaignSnapshot snapshot = await _sut.SaveAsync();
         
-        snapshot.Shards[shard1.Id].Tick.Should().Be(111);
-        snapshot.Shards[shard2.Id].Tick.Should().Be(222);
+        snapshot.Shards[shard1.Id].Tick.Should().Be(shard1.Id.ToString()[^1]);
+        snapshot.Shards[shard2.Id].Tick.Should().Be(shard2.Id.ToString()[^1]);
     }
     
     [Fact]
@@ -126,17 +90,8 @@ public sealed class PersistenceServiceTests
     [Fact]
     public async Task ReceivingDuplicatedShardSnapshotPacketThrows()
     {
-        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
-        _userRepo[shard1.Id] = shard1;
-        var shard1Snapshot = new ShardSnapshot
-        {
-            Tick = 111,
-            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
-        };
-        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
-        {
-            [shard1.Id] = shard1Snapshot,
-        };
+        var shard = CreateShard();
+        
         _packetSender.DuplicateResponse = true;
         
         await _sut.Awaiting(it => it.SaveAsync()).Should().ThrowAsync<InvalidOperationException>(); 
@@ -145,19 +100,8 @@ public sealed class PersistenceServiceTests
     [Fact]
     public async Task NotReceivingAllShardSnapshotsInTimeThrows()
     {
-        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
-        var shard2 = shard1 with { Id = Guid.NewGuid() };
-        _userRepo[shard1.Id] = shard1;
-        _userRepo[shard2.Id] = shard2;
-        var shard1Snapshot = new ShardSnapshot
-        {
-            Tick = 111,
-            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
-        };
-        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
-        {
-            [shard1.Id] = shard1Snapshot,
-        };
+        CreateShard();
+        CreateUnresponsiveShard();
         
         var assertTask = FluentActions.Awaiting(_sut.SaveAsync).Should().ThrowAsync<TimeoutException>();
         _timeProvider.Advance(TimeSpan.FromSeconds(PersistenceService.ShardServerSnapshotRequestTimeout * 1.1));
@@ -167,37 +111,19 @@ public sealed class PersistenceServiceTests
     [Fact]
     public async Task AlwaysFailingConsistencyValidationThrows()
     {
-        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
-        _userRepo[shard1.Id] = shard1;
-        var shard1Snapshot = new ShardSnapshot
-        {
-            Tick = 111,
-            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
-        };
-        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
-        {
-            [shard1.Id] = shard1Snapshot,
-        };
+        CreateShard();
         _consistencyValidator.FailuresRemaining = int.MaxValue;
         
         var assertTask = FluentActions.Awaiting(_sut.SaveAsync).Should().ThrowAsync<Exception>();
-        _timeProvider.Advance(TimeSpan.FromDays(228));
+        for (int i = 0; i < 510; i++)
+            _timeProvider.Advance(TimeSpan.FromDays(365));
+        await assertTask;
     }
     
     [Fact]
     public async Task FailingConsistencyValidationRetriesAfterDelayUntilSuccess()
     {
-        var shard1 = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
-        _userRepo[shard1.Id] = shard1;
-        var shard1Snapshot = new ShardSnapshot
-        {
-            Tick = 111,
-            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
-        };
-        _packetSender.ShardSnapshots = new Dictionary<Guid, ShardSnapshot>
-        {
-            [shard1.Id] = shard1Snapshot,
-        };
+        CreateShard();
         _consistencyValidator.FailuresRemaining = 2;
 
         Task actTask = _sut.SaveAsync();
@@ -210,9 +136,64 @@ public sealed class PersistenceServiceTests
         actTask.Status.Should().Be(TaskStatus.RanToCompletion);
     }
     
+    [Fact]
+    public async Task CocurrentSaveThrows()
+    {
+        CreateUnresponsiveShard();
+        _ = _sut.SaveAsync();
+        await FluentActions.Awaiting(_sut.SaveAsync).Should().ThrowAsync<InvalidOperationException>();
+    }
+    
+    [Fact]
+    public async Task SequentialSaveDoesNotThrow()
+    {
+        CreateShard();
+        await _sut.SaveAsync();
+        await _sut.SaveAsync();
+    }
+    
+    private User CreatePlayer()
+    {
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            IsConnected = false,
+            IsPlayer = true,
+            IsShard = false
+        };
+        _userRepo[user.Id] = user;
+        return user;
+    }
+    
+    private User CreateShard()
+    {
+        var shard = CreateUnresponsiveShard();
+        var shard1Snapshot = new ShardSnapshot
+        {
+            Tick = shard.Id.ToString()[^1],
+            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+        };
+        _packetSender.ShardSnapshots[shard.Id] = shard1Snapshot;
+        return shard;
+    }
+    
+    private User CreateUnresponsiveShard()
+    {
+        var shard = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
+        _userRepo[shard.Id] = shard;
+        return shard;
+    }
+    
+    private PlayerCharacter CreatePlayerCharacterInShard(Guid? shardId)
+    {
+        var character = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = shardId };
+        _charRepo.Add(character);
+        return character;
+    }
+    
     private sealed class FakePacketSender(Action<ShardSnapshotPacket, Guid> callback) : IPacketSender
     {
-        public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; set; } =
+        public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; } =
             new Dictionary<Guid, ShardSnapshot>();
         
         public bool DuplicateResponse { get; set; }
