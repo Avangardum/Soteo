@@ -18,8 +18,8 @@ public sealed class JsmqFromGameplayCommunicator :
     Node,
     IShardServerConnector,
     ICampaignServerConnector,
-    IPacketSender,
-    ICampaignServerPacketSender,
+    IFromGameplayPacketSender,
+    IFromGameplayToCampaignServerPacketSender,
     INetworkDebugger,
     IConnectionNotifier
 {
@@ -128,7 +128,7 @@ public sealed class JsmqFromGameplayCommunicator :
 
     public void BroadcastUnreliable(Packet packet) => BroadcastReliable(packet);
 
-    void ICampaignServerPacketSender.SendPacket(Packet packet) =>
+    void IFromGameplayToCampaignServerPacketSender.SendPacket(Packet packet) =>
         SendReliable(packet, Const.CampaignServerId);
 
     public long BytesSent => 0;

@@ -6,5 +6,5 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.CampaignServer.PacketHandlers;
 
-public sealed class WebrtcIceCandidatePacketHandler(IPacketSender packetSender, IUserRepository userRepo) :
+public sealed class WebrtcIceCandidatePacketHandler(IFromCampaignServerPacketSender packetSender, IUserRepository userRepo) :
     WebrtcPacketHandler<WebrtcIceCandidatePacket>(packetSender, userRepo);

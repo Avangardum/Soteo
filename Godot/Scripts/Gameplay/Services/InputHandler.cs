@@ -19,14 +19,14 @@ namespace Soteo.Gameplay.Services;
 
 public sealed class InputHandler : Node2D
 {
-    private readonly IPacketSender _packetSender;
+    private readonly IFromGameplayPacketSender _packetSender;
     private readonly IHud _hud;
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
     
     public InputHandler
     (
-        IPacketSender packetSender,
+        IFromGameplayPacketSender packetSender,
         IHud hud,
         IEntityLocator entityLocator,
         ICurrentCharacterIdRepository currentCharIdRepo

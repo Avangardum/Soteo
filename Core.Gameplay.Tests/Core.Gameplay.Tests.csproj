@@ -21,7 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Core.Gameplay\Core.Gameplay.csproj" />
       <ProjectReference Include="..\TestUtil\TestUtil.csproj" />
     </ItemGroup>
 

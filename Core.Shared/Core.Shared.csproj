@@ -20,8 +20,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <Folder Include="Dto\" />
-      <Folder Include="PacketHandlers\" />
+      <Folder Include="PacketHandlers\Gameplay\" />
     </ItemGroup>
 
 </Project>

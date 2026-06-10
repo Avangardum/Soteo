@@ -19,7 +19,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
     private readonly IEntitySnapshotManager _entitySnapshotManager;
     private readonly IShard _shard;
     private readonly INetworkDebugger _networkDebugger;
-    private readonly IPacketSender _packetSender;
+    private readonly IFromGameplayPacketSender _packetSender;
     private readonly IDisposable _processSubscription;
 
     private SynchronizationData _syncData = new();
@@ -29,7 +29,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         IEntitySnapshotManager entitySnapshotManager,
         IShard shard,
         INetworkDebugger networkDebugger,
-        IPacketSender packetSender,
+        IFromGameplayPacketSender packetSender,
         IProcessPublisher processPublisher
     )
     {

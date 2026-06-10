@@ -2,7 +2,7 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.Interfaces;
 
-public interface IPacketSender
+public interface IFromGameplayPacketSender
 {
     void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds);
     void SendUnreliable(Packet packet, params IEnumerable<Guid> receiverIds);

@@ -10,7 +10,7 @@ namespace Soteo.Core.CampaignServer.Services;
 
 public sealed class PersistenceService
 (
-    IPacketSender packetSender,
+    IFromCampaignServerPacketSender packetSender,
     IUserRepository userRepo,
     IPlayerCharacterRepository charRepo,
     TimeProvider timeProvider,

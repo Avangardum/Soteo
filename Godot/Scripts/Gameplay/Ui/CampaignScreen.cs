@@ -9,7 +9,7 @@ namespace Soteo.Gameplay.Ui;
 public sealed class CampaignScreen
 {
     private readonly IShardServerConnector _shardServerConnector;
-    private readonly IPacketSender _packetSender;
+    private readonly IFromGameplayPacketSender _packetSender;
     private readonly IShardLoader _shardLoader;
     private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
     private readonly IVisibleShardIdRepository _visibleShardIdRepo;
@@ -26,7 +26,7 @@ public sealed class CampaignScreen
         CampaignScreenNode node,
         ICampaignServerConnector campaignServerConnector,
         IShardServerConnector shardServerConnector,
-        IPacketSender packetSender,
+        IFromGameplayPacketSender packetSender,
         IShardLoader shardLoader,
         ICurrentCharacterIdRepository currentCharIdRepo,
         IVisibleShardIdRepository visibleShardIdRepo

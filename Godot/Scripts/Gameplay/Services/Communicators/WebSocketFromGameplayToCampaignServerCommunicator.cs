@@ -13,7 +13,7 @@ using Soteo.Util;
 namespace Soteo.Gameplay.Services.Communicators;
 
 public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
-    Node, ICampaignServerPacketSender, ICampaignServerConnector
+    Node, IFromGameplayToCampaignServerPacketSender, ICampaignServerConnector
 {
     private const string CampaignServerUrl = "wss://localhost:3706";
     private const string AuthServerUrl = "https://localhost:3705";

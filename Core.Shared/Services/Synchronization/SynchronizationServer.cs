@@ -15,7 +15,7 @@ namespace Soteo.Core.Gameplay.Services.Synchronization;
 public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 {
     private readonly IEntitySnapshotManager _entitySnapshotManager;
-    private readonly IPacketSender _packetSender;
+    private readonly IFromGameplayPacketSender _packetSender;
     private readonly IConnectionNotifier _connectionNotifier;
     private readonly IFrameStopwatch _frameStopwatch;
     private readonly IPauseRepository _pauseRepo;
@@ -28,7 +28,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     public SynchronizationServer
     (
         IEntitySnapshotManager entitySnapshotManager,
-        IPacketSender packetSender,
+        IFromGameplayPacketSender packetSender,
         IConnectionNotifier connectionNotifier,
         IProcessPublisher processPublisher,
         IFrameStopwatch frameStopwatch,

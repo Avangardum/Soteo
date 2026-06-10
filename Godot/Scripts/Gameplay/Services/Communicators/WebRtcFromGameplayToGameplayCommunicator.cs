@@ -13,7 +13,7 @@ namespace Soteo.Gameplay.Services.Communicators;
 /// Communicates between clients and shard servers
 /// </summary>
 public sealed class WebRtcFromGameplayToGameplayCommunicator :
-    Node, IShardServerConnector, IPacketSender, IWebrtcPacketReceiver, INetworkDebugger, IConnectionNotifier
+    Node, IShardServerConnector, IFromGameplayPacketSender, IWebrtcPacketReceiver, INetworkDebugger, IConnectionNotifier
 {
     private const double PingInterval = 1;
     
@@ -35,7 +35,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
     
-    private readonly ICampaignServerPacketSender _campaignServerPacketSender;
+    private readonly IFromGameplayToCampaignServerPacketSender _campaignServerPacketSender;
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     private readonly IChunkCollector _chunkCollector;
@@ -46,7 +46,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     public WebRtcFromGameplayToGameplayCommunicator
     (
-        ICampaignServerPacketSender campaignServerPacketSender,
+        IFromGameplayToCampaignServerPacketSender campaignServerPacketSender,
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer, 
         IChunkCollector chunkCollector,

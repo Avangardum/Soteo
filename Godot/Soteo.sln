@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo", "Soteo.csproj", "{D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServer", "..\AuthServer\AuthServer.csproj", "{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Gameplay", "..\Core.Gameplay\Core.Gameplay.csproj", "{723D47C6-B56E-43DC-A1E1-C4EDC5F265C4}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Util", "..\Util\Util.csproj", "{9101DF23-CB1E-471D-9A12-A1F3DF44032E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Shared", "..\Core.Shared\Core.Shared.csproj", "{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}"
@@ -35,12 +33,6 @@ Global
 		{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
 		{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
 		{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
-		{723D47C6-B56E-43DC-A1E1-C4EDC5F265C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{723D47C6-B56E-43DC-A1E1-C4EDC5F265C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{723D47C6-B56E-43DC-A1E1-C4EDC5F265C4}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
-		{723D47C6-B56E-43DC-A1E1-C4EDC5F265C4}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
-		{723D47C6-B56E-43DC-A1E1-C4EDC5F265C4}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
-		{723D47C6-B56E-43DC-A1E1-C4EDC5F265C4}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 		{9101DF23-CB1E-471D-9A12-A1F3DF44032E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9101DF23-CB1E-471D-9A12-A1F3DF44032E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9101DF23-CB1E-471D-9A12-A1F3DF44032E}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU

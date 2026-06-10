@@ -17,7 +17,6 @@ using Soteo.Core.Shared.PacketSerializers;
 using Soteo.Gameplay.Interfaces;
 using Soteo.Shared;
 using Soteo.Util;
-using IPacketSender = Soteo.Core.CampaignServer.Interfaces.IPacketSender;
 
 namespace Soteo.CampaignServer;
 
@@ -52,7 +51,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>();
         services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
-        services.AddAlias<IPacketSender, ICommunicator>();
+        services.AddAlias<IFromCampaignServerPacketSender, ICommunicator>();
         services.AddSingleton<IGameplaySerializer, GameplaySerializer>();
         
         var typeLocator = new TypeLocator(CoreSharedAssembly.Value);
@@ -93,8 +92,8 @@ public sealed class CampaignServer : Node
     private async Task TestLifetimeAsync()
     {
         await Task.Delay(TimeSpan.FromSeconds(30));
-        ServiceProvider.GetRequiredService<IPacketSender>().Broadcast(new PausePacket { Pause = true });
+        ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>().Broadcast(new PausePacket { Pause = true });
         await Task.Delay(TimeSpan.FromSeconds(10));
-        ServiceProvider.GetRequiredService<IPacketSender>().Broadcast(new PausePacket { Pause = false });
+        ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>().Broadcast(new PausePacket { Pause = false });
     }
 }

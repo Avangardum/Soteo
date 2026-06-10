@@ -1,6 +1,6 @@
 namespace Soteo.Core.CampaignServer.Interfaces;
 
-public interface ICommunicator : IPacketSender
+public interface ICommunicator : IFromCampaignServerPacketSender
 {
     void Poll();
 }

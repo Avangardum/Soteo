@@ -2,7 +2,7 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.Interfaces;
 
-public interface ICampaignServerPacketSender
+public interface IFromGameplayToCampaignServerPacketSender
 {
     void SendPacket(Packet packet);
 }

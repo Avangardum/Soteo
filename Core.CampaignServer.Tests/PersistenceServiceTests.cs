@@ -191,7 +191,7 @@ public sealed class PersistenceServiceTests
         return character;
     }
     
-    private sealed class FakePacketSender(Action<ShardSnapshotPacket, Guid> callback) : IPacketSender
+    private sealed class FakePacketSender(Action<ShardSnapshotPacket, Guid> callback) : IFromCampaignServerPacketSender
     {
         public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; } =
             new Dictionary<Guid, ShardSnapshot>();

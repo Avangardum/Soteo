@@ -103,7 +103,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<ISideDetector>(new SideDetector(_isServer));
         services.AddSingleton<IGameplaySerializer, GameplaySerializer>();
         
-        var typeLocator = new TypeLocator(CoreGameplayAssembly.Value, CoreSharedAssembly.Value);
+        var typeLocator = new TypeLocator(CoreSharedAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
         
         services.AddScoped<ShardNode>(
@@ -156,8 +156,8 @@ public sealed class Main : Node2D, IShardLoader
     private void RegisterJsmqServices(IServiceCollection services)
     {
         services.AddSingleton<ICampaignServerConnector>(_ => _jsmqCommunicator.Required);
-        services.AddSingleton<ICampaignServerPacketSender>(_ => _jsmqCommunicator.Required);
-        services.AddSingleton<IPacketSender>(_ => _jsmqCommunicator.Required);
+        services.AddSingleton<IFromGameplayToCampaignServerPacketSender>(_ => _jsmqCommunicator.Required);
+        services.AddSingleton<IFromGameplayPacketSender>(_ => _jsmqCommunicator.Required);
         services.AddSingleton<INetworkDebugger>(_ => _jsmqCommunicator.Required);
         services.AddSingleton<IConnectionNotifier>(_ => _jsmqCommunicator.Required);
         services.AddSingleton<IShardServerConnector>(_ => _jsmqCommunicator.Required);
@@ -166,8 +166,8 @@ public sealed class Main : Node2D, IShardLoader
     private void RegisterWebServices(IServiceCollection services)
     {
         services.AddSingleton<ICampaignServerConnector>(_ => _webSocketCampaignServerCommunicator.Required);
-        services.AddSingleton<ICampaignServerPacketSender>(_ => _webSocketCampaignServerCommunicator.Required);
-        services.AddSingleton<IPacketSender>
+        services.AddSingleton<IFromGameplayToCampaignServerPacketSender>(_ => _webSocketCampaignServerCommunicator.Required);
+        services.AddSingleton<IFromGameplayPacketSender>
         (
             _ => new RoutingPacketSender
             (

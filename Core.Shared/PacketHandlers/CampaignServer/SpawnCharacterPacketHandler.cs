@@ -12,7 +12,7 @@ public sealed class SpawnCharacterPacketHandler
 (
     IUserRepository userRepo,
     IPlayerCharacterRepository charRepo,
-    IPacketSender packetSender
+    IFromCampaignServerPacketSender packetSender
 ) : PacketHandler<SpawnCharacterPacket>
 {
     protected override void Handle(SpawnCharacterPacket packet, Guid senderId)

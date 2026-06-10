@@ -8,9 +8,9 @@ namespace Soteo.Core.Gameplay.Services;
 
 public sealed class RoutingPacketSender
 (
-    ICampaignServerPacketSender campaignServerSender,
-    IPacketSender gameplaySender
-) : IPacketSender
+    IFromGameplayToCampaignServerPacketSender campaignServerSender,
+    IFromGameplayPacketSender gameplaySender
+) : IFromGameplayPacketSender
 {
     public void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds)
     {
