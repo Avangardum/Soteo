@@ -10,6 +10,7 @@ using Soteo.Core.CampaignServer.PacketHandlers;
 using Soteo.Core.Gameplay;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Attributes;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.Packets;
 using Soteo.Core.Shared.PacketSerializers;
@@ -65,7 +66,7 @@ public sealed class CampaignServer : Node
         foreach (Type type in PacketSerializer.AllTypes(typeLocator))
             services.AddSingleton(type);
         
-        foreach (Type type in PacketHandler.AllTypes(typeLocator))
+        foreach (Type type in PacketHandlerLocator<CampaignServerPacketHandlerAttribute>.AllTypes(typeLocator))
             services.AddSingleton(type);
     }
     

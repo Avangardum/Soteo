@@ -9,10 +9,11 @@ public static class ServiceProviderExtensions
 {
     extension (IServiceProvider self)
     {
-        public IPacketHandler? GetPacketHandlerFor(PacketTypeCode packetTypeCode)
+        public IPacketHandler? GetPacketHandlerFor<TAttribute>(PacketTypeCode packetTypeCode)
+            where TAttribute : Attribute
         {
             var typeLocator = self.GetRequiredService<ITypeLocator>();
-            return (IPacketHandler?)PacketHandler.TypeFor(packetTypeCode, typeLocator)
+            return (IPacketHandler?)PacketHandlerLocator<TAttribute>.TypeFor(packetTypeCode, typeLocator)
                 ?.PassTo(self.GetRequiredService);
         }
         

@@ -6,6 +6,7 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.CampaignServer.PacketHandlers;
 
+[CampaignServerPacketHandler]
 [AllowClientPackets]
 public sealed class SpawnCharacterPacketHandler
 (

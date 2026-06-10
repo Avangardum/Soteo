@@ -8,6 +8,7 @@ using Soteo.Core.Shared.Interfaces;
 
 namespace Soteo.Core.Gameplay.PacketHandlers;
 
+[GameplayPacketHandler]
 [AllowClientPackets]
 public sealed class UseAbilityPacketHandler(IEntityManager entityManager, IPauseRepository pauseRepo) :
     CommandPacketHandler<UseAbilityPacket, UseAbilityCommand>(entityManager, pauseRepo);

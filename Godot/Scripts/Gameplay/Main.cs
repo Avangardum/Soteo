@@ -6,6 +6,7 @@ using Soteo.Core.Gameplay.Services;
 using Soteo.Core.Gameplay.Services.Repositiories;
 using Soteo.Core.Gameplay.Services.Synchronization;
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Attributes;
 using Soteo.Core.Shared.Interfaces;
 using Soteo.Core.Shared.PacketSerializers;
 using Soteo.Gameplay.Interfaces;
@@ -116,7 +117,7 @@ public sealed class Main : Node2D, IShardLoader
         foreach (Type type in PacketSerializer.AllTypes(typeLocator))
             services.AddSingleton(type);
         
-        foreach (Type type in PacketHandler.AllTypes(typeLocator))
+        foreach (Type type in PacketHandlerLocator<GameplayPacketHandlerAttribute>.AllTypes(typeLocator))
             services.AddScoped(type);
     }
     

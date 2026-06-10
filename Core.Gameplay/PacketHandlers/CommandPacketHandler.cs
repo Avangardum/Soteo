@@ -2,10 +2,12 @@ using Soteo.Core.Gameplay.Entities;
 using Soteo.Core.Gameplay.Interfaces;
 using Soteo.Core.Gameplay.Packets;
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Attributes;
 using Soteo.Core.Shared.Interfaces;
 
 namespace Soteo.Core.Gameplay.PacketHandlers;
 
+[GameplayPacketHandler]
 public abstract class CommandPacketHandler<TPacket, TCommand>
 (
     IEntityManager entityManager,

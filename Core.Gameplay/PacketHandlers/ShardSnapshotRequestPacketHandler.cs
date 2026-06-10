@@ -6,6 +6,7 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.PacketHandlers;
 
+[GameplayPacketHandler]
 [AllowClientPackets]
 public sealed class ShardSnapshotRequestPacketHandler(ISynchronizationServer synchronizationServer) :
     PacketHandler<ShardSnapshotRequestPacket>

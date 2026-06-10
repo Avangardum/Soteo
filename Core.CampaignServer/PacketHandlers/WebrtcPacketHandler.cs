@@ -6,6 +6,7 @@ using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.CampaignServer.PacketHandlers;
 
+[CampaignServerPacketHandler]
 [AllowClientPackets]
 public abstract class WebrtcPacketHandler<TPacket>(IPacketSender packetSender, IUserRepository userRepo) :
     PacketHandler<TPacket> where TPacket : RelayedPacket

@@ -1,9 +1,11 @@
 using Soteo.Core.Shared;
+using Soteo.Core.Shared.Attributes;
 using Soteo.Core.Shared.Exceptions;
 using Soteo.Core.Shared.Packets;
 
 namespace Soteo.Core.Gameplay.PacketHandlers;
 
+[GameplayPacketHandler]
 public class BadInputPacketHandler : PacketHandler<BadInputPacket>
 {
     protected override void Handle(BadInputPacket packet, Guid senderId)
