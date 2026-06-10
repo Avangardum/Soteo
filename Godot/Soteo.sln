@@ -4,15 +4,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo", "Soteo.csproj", "{D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServer", "..\AuthServer\AuthServer.csproj", "{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Util", "..\Util\Util.csproj", "{9101DF23-CB1E-471D-9A12-A1F3DF44032E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo.Util", "..\Soteo.Util\Soteo.Util.csproj", "{9101DF23-CB1E-471D-9A12-A1F3DF44032E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Shared", "..\Core.Shared\Core.Shared.csproj", "{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo.Core", "..\Soteo.Core\Soteo.Core.csproj", "{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Gameplay.Tests", "..\Core.Gameplay.Tests\Core.Gameplay.Tests.csproj", "{7B55DAA4-B02C-45FE-B72D-D67544AD3A74}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo.TestUtil", "..\Soteo.TestUtil\Soteo.TestUtil.csproj", "{B238546E-DD07-4301-81F6-F51983F38868}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtil", "..\TestUtil\TestUtil.csproj", "{B238546E-DD07-4301-81F6-F51983F38868}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.CampaignServer.Tests", "..\Core.CampaignServer.Tests\Core.CampaignServer.Tests.csproj", "{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo.Core.Tests", "..\Soteo.Core.Tests\Soteo.Core.Tests.csproj", "{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,12 +43,6 @@ Global
 		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
 		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
 		{972191D9-C7C3-4D64-87E4-2C5EBBEF3A7A}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
-		{7B55DAA4-B02C-45FE-B72D-D67544AD3A74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B55DAA4-B02C-45FE-B72D-D67544AD3A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B55DAA4-B02C-45FE-B72D-D67544AD3A74}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B55DAA4-B02C-45FE-B72D-D67544AD3A74}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
-		{7B55DAA4-B02C-45FE-B72D-D67544AD3A74}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B55DAA4-B02C-45FE-B72D-D67544AD3A74}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 		{B238546E-DD07-4301-81F6-F51983F38868}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B238546E-DD07-4301-81F6-F51983F38868}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B238546E-DD07-4301-81F6-F51983F38868}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU

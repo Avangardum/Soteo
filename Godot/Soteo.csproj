@@ -15,6 +15,8 @@
             -->
             CS0649,
         </NoWarn>
+
+        <RootNamespace>Soteo.Main</RootNamespace>
     </PropertyGroup>
     
     <ItemGroup>
@@ -34,7 +36,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\Core.Shared\Core.Shared.csproj" />
+      <ProjectReference Include="..\Soteo.Core\Soteo.Core.csproj" />
     </ItemGroup>
     
 </Project>

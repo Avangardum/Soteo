@@ -5,7 +5,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <RootNamespace>Soteo.Core.CampaignServer.Tests</RootNamespace>
         <LangVersion>14</LangVersion>
     </PropertyGroup>
 
@@ -21,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TestUtil\TestUtil.csproj" />
+      <ProjectReference Include="..\Soteo.TestUtil\Soteo.TestUtil.csproj" />
     </ItemGroup>
 
 </Project>

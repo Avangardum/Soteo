@@ -15,8 +15,8 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\Core.Shared\Core.Shared.csproj" />
-      <ProjectReference Include="..\Util\Util.csproj" />
+      <ProjectReference Include="..\Soteo.Core\Soteo.Core.csproj" />
+      <ProjectReference Include="..\Soteo.Util\Soteo.Util.csproj" />
     </ItemGroup>
 
 </Project>
