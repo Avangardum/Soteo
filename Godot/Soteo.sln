@@ -2,7 +2,7 @@
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo", "Soteo.csproj", "{DEA7FE1B-2B44-47EB-8362-A1C9F5E0564E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthServer", "..\AuthServer\AuthServer.csproj", "{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo.AuthServer", "..\Soteo.AuthServer\Soteo.AuthServer.csproj", "{9BB6D8BC-C302-4E30-8AD1-8DCBCAC26617}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo.Util", "..\Soteo.Util\Soteo.Util.csproj", "{9101DF23-CB1E-471D-9A12-A1F3DF44032E}"
 EndProject
