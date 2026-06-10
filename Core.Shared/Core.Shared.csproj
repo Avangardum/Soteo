@@ -21,6 +21,7 @@
     
     <ItemGroup>
       <Folder Include="Dto\" />
+      <Folder Include="PacketHandlers\" />
     </ItemGroup>
 
 </Project>

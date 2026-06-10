@@ -55,7 +55,7 @@ public sealed class CampaignServer : Node
         services.AddAlias<IPacketSender, ICommunicator>();
         services.AddSingleton<IGameplaySerializer, GameplaySerializer>();
         
-        var typeLocator = new TypeLocator(CoreCampaignServerAssembly.Value, CoreSharedAssembly.Value);
+        var typeLocator = new TypeLocator(CoreSharedAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
         
         if (_useJsmq)

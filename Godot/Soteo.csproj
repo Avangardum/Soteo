@@ -34,7 +34,6 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\Core.CampaignServer\Core.CampaignServer.csproj" />
       <ProjectReference Include="..\Core.Gameplay\Core.Gameplay.csproj" />
     </ItemGroup>
     

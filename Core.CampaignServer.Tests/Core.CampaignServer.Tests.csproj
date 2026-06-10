@@ -21,7 +21,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Core.CampaignServer\Core.CampaignServer.csproj" />
       <ProjectReference Include="..\TestUtil\TestUtil.csproj" />
     </ItemGroup>
 
