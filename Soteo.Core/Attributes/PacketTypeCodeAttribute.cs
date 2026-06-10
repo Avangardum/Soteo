@@ -1,6 +1,6 @@
-using Soteo.Core.Shared.Enums;
+using Soteo.Core.Enums;
 
-namespace Soteo.Core.Shared.Attributes;
+namespace Soteo.Core.Attributes;
 
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class PacketTypeCodeAttribute(PacketTypeCode typeCode) : Attribute

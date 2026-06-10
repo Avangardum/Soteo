@@ -1,3 +1,3 @@
-namespace Soteo.Core.Shared.Attributes;
+namespace Soteo.Core.Attributes;
 
 public sealed class GameplayPacketHandlerAttribute : Attribute;

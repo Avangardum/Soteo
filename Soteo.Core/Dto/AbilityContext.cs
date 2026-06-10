@@ -1,10 +1,9 @@
 using System.Numerics;
-using Soteo.Core.Gameplay.Abilities;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Abilities;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Dto;
+namespace Soteo.Core.Dto;
 
 public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
 {

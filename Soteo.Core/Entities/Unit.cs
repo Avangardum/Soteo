@@ -1,19 +1,16 @@
 using System.Collections.Immutable;
 using System.Numerics;
-using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Gameplay.Abilities;
-using Soteo.Core.Gameplay.Commands;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Dto.Snapshots;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Statuses;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Dto.Snapshots;
+using Soteo.Core.Abilities;
+using Soteo.Core.Commands;
+using Soteo.Core.Dto;
+using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Statuses;
 using Soteo.Util;
 using Soteo.Util.Interfaces;
 
-namespace Soteo.Core.Gameplay.Entities;
+namespace Soteo.Core.Entities;
 
 public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 {

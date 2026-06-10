@@ -1,12 +1,9 @@
 using System.Collections.Immutable;
-using Soteo.Core.CampaignServer.Dto;
-using Soteo.Core.CampaignServer.Dto.Snapshots;
-using Soteo.Core.CampaignServer.GameState.DataObjects;
-using Soteo.Core.CampaignServer.Interfaces;
-using Soteo.Core.Shared.Dto.Snapshots;
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.CampaignServer.Services;
+namespace Soteo.Core.Services;
 
 public sealed class PersistenceService
 (

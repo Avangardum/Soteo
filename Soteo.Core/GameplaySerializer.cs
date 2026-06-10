@@ -1,14 +1,11 @@
-using System.Collections.Immutable;
-using Soteo.Core.Gameplay.Abilities;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Statuses;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Interfaces;
-using static Soteo.Core.Shared.SerializationHelper;
+using Soteo.Core.Abilities;
+using Soteo.Core.Dto;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Statuses;
+using static Soteo.Core.SerializationHelper;
 
-namespace Soteo.Core.Gameplay;
+namespace Soteo.Core;
 
 public class GameplaySerializer(ITypeLocator typeLocator) : IGameplaySerializer
 {

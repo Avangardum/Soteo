@@ -1,4 +1,4 @@
-namespace Soteo.Core.Shared.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 public interface ITypeLocator
 {

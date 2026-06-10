@@ -1,6 +1,6 @@
 using Soteo.Util;
 
-namespace Soteo.Shared.Nodes.Autoloads;
+namespace Soteo.Main.Shared.Nodes.Autoloads;
 
 public sealed class AsyncExceptionCollectorNode : Node
 {

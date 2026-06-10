@@ -1,23 +1,21 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Gameplay;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.PacketHandlers;
-using Soteo.Core.Gameplay.Services;
-using Soteo.Core.Gameplay.Services.Repositiories;
-using Soteo.Core.Gameplay.Services.Synchronization;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Attributes;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.PacketSerializers;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Gameplay.Resources;
-using Soteo.Gameplay.Services;
-using Soteo.Gameplay.Services.Communicators;
-using Soteo.Gameplay.Ui;
-using Soteo.Shared;
-using Soteo.Shared.Nodes;
+using Soteo.Core;
+using Soteo.Core.Attributes;
+using Soteo.Core.Interfaces;
+using Soteo.Core.PacketHandlers.Gameplay.PacketHandlers;
+using Soteo.Core.PacketSerializers;
+using Soteo.Core.Services;
+using Soteo.Core.Services.Repositiories;
+using Soteo.Core.Services.Synchronization;
+using Soteo.Main.Gameplay.Interfaces;
+using Soteo.Main.Gameplay.Resources;
+using Soteo.Main.Gameplay.Services;
+using Soteo.Main.Gameplay.Services.Communicators;
+using Soteo.Main.Gameplay.Ui;
+using Soteo.Main.Shared;
+using Soteo.Main.Shared.Nodes;
 
-namespace Soteo.Gameplay;
+namespace Soteo.Main.Gameplay;
 
 public sealed class Main : Node2D, IShardLoader
 {
@@ -103,7 +101,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<ISideDetector>(new SideDetector(_isServer));
         services.AddSingleton<IGameplaySerializer, GameplaySerializer>();
         
-        var typeLocator = new TypeLocator(CoreSharedAssembly.Value);
+        var typeLocator = new TypeLocator(SoteoSharedAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
         
         services.AddScoped<ShardNode>(

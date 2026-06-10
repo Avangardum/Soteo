@@ -1,10 +1,9 @@
 using NSubstitute;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.PacketHandlers;
-using Soteo.Core.Gameplay.Packets;
-using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Interfaces;
+using Soteo.Core.PacketHandlers.Gameplay.PacketHandlers;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.Gameplay.Tests;
+namespace Soteo.Core.Tests;
 
 public sealed class CommandPacketHandlerTests
 {

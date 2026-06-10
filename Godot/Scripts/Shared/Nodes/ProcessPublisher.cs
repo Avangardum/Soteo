@@ -1,8 +1,8 @@
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
 using Soteo.Util;
 
-namespace Soteo.Shared.Nodes;
+namespace Soteo.Main.Shared.Nodes;
 
 public sealed class ProcessPublisher : Node, IProcessPublisher
 {

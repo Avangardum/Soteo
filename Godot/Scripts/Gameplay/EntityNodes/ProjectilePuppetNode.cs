@@ -1,7 +1,7 @@
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Entities;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Gameplay.EntityNodes;
+namespace Soteo.Main.Gameplay.EntityNodes;
 
 public sealed class ProjectilePuppetNode : Node2D, IProjectilePuppetNode
 {

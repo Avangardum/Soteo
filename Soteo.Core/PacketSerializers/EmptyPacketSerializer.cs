@@ -1,6 +1,6 @@
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.Shared.PacketSerializers;
+namespace Soteo.Core.PacketSerializers;
 
 public abstract class EmptyPacketSerializer<TPacket> : PacketSerializer<TPacket> where TPacket : Packet, new()
 {

@@ -1,12 +1,8 @@
-using Soteo.Core.CampaignServer.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.Packets;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
-using Soteo.Util;
+using Soteo.Core;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 
-namespace Soteo.CampaignServer.Communicators;
+namespace Soteo.Main.CampaignServer.Communicators;
 
 /// <summary>
 /// Communicator using the JavaScript message queue instead of WebSockets. Used for singleplayer in browser.

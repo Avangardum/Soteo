@@ -1,13 +1,12 @@
 using System.Numerics;
-using Soteo.Core.Gameplay.Abilities;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Dto.Snapshots;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared.Dto.Snapshots;
+using Soteo.Core.Abilities;
+using Soteo.Core.Dto;
+using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
 using Soteo.Util;
 
-namespace Soteo.Core.Gameplay.Entities;
+namespace Soteo.Core.Entities;
 
 public sealed class UnitPuppet : UnitBase<IUnitPuppetNode> // todo extract interface
 {

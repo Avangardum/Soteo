@@ -1,6 +1,6 @@
-using Soteo.Shared.Nodes.Autoloads;
+using Soteo.Main.Shared.Nodes.Autoloads;
 
-namespace Soteo.Shared.Extensions;
+namespace Soteo.Main.Shared.Extensions;
 
 public static class GdObjectExtensions
 {

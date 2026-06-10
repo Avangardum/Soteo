@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Services;
+namespace Soteo.Core.Services;
 
 /// <inheritdoc />
 public sealed class EntityLocator(IShardServiceProviders shardServiceProviders) : IEntityLocator

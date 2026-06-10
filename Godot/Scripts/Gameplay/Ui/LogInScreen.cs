@@ -1,8 +1,6 @@
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared.Extensions;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Gameplay.Ui;
+namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class LogInScreen
 {

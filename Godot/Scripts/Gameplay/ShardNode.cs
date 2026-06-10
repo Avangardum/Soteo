@@ -1,7 +1,7 @@
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 using Soteo.Util;
 
-namespace Soteo.Gameplay;
+namespace Soteo.Main.Gameplay;
 
 public sealed class ShardNode : Node2D, IShard
 {

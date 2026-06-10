@@ -1,8 +1,8 @@
 using System.Numerics;
-using Soteo.Core.Shared.Exceptions;
-using static Soteo.Core.Shared.SerializationHelper;
+using Soteo.Core.Exceptions;
+using static Soteo.Core.SerializationHelper;
 
-namespace Soteo.Core.Gameplay.Dto;
+namespace Soteo.Core.Dto;
 
 public sealed class ExtraData
 {

@@ -1,9 +1,8 @@
 using System.Collections.Immutable;
 using System.Reflection;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Util;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Shared;
+namespace Soteo.Core;
 
 public class TypeLocator : ITypeLocator
 {

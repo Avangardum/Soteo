@@ -1,6 +1,6 @@
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Services;
+namespace Soteo.Core.Services;
 
 public sealed class SideDetector : ISideDetector
 {

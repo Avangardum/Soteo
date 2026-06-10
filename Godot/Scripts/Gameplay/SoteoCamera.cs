@@ -1,8 +1,8 @@
-using Soteo.Core.Gameplay;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core;
+using Soteo.Core.Interfaces;
 using Soteo.Util;
 
-namespace Soteo.Gameplay;
+namespace Soteo.Main.Gameplay;
 
 public sealed class SoteoCamera : Camera2D, ICamera
 {

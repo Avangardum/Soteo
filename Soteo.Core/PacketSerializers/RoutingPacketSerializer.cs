@@ -1,10 +1,9 @@
-using Soteo.Core.Shared.Enums;
-using Soteo.Core.Shared.Exceptions;
-using Soteo.Core.Shared.Extensions;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Enums;
+using Soteo.Core.Exceptions;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.Shared.PacketSerializers;
+namespace Soteo.Core.PacketSerializers;
 
 public sealed class RoutingPacketSerializer(IServiceProvider serviceProvider) : IPacketSerializer
 {

@@ -1,7 +1,8 @@
 global using Godot;
 global using System;
 global using Soteo.Util.Extensions;
-global using Soteo.Shared.Extensions;
+global using Soteo.Core.Extensions;
+global using Soteo.Main.Shared.Extensions;
 global using SysEnvironment = System.Environment;
 global using GdEnvironment = Godot.Environment;
 global using SysThread = System.Threading.Thread;

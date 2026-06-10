@@ -1,7 +1,7 @@
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Gameplay.Interfaces;
+using Soteo.Core.Enums;
+using Soteo.Main.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Resources;
+namespace Soteo.Main.Gameplay.Resources;
 
 public sealed class Palette : Resource, IPalette
 {

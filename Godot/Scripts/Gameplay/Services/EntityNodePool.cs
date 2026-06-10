@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
+using Soteo.Main.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Services;
+namespace Soteo.Main.Gameplay.Services;
 
 public sealed class EntityNodePool : IEntityNodePool
 {

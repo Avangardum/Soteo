@@ -1,17 +1,13 @@
 using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
-using Soteo.Core.CampaignServer.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Exceptions;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.Packets;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
-using Soteo.Shared.Nodes.Autoloads;
+using Soteo.Core;
+using Soteo.Core.Exceptions;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 using Soteo.Util;
 
-namespace Soteo.CampaignServer.Communicators;
+namespace Soteo.Main.CampaignServer.Communicators;
 
 public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject, ICommunicator
 {

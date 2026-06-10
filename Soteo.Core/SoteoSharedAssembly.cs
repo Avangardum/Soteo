@@ -1,8 +1,8 @@
 using System.Reflection;
 
-namespace Soteo.Core.Shared;
+namespace Soteo.Core;
 
-public static class CoreSharedAssembly
+public static class SoteoSharedAssembly
 {
     public static readonly Assembly Value = Assembly.GetExecutingAssembly();
 }

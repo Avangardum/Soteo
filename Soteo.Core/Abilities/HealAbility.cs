@@ -1,8 +1,7 @@
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Util;
+using Soteo.Core.Dto;
+using Soteo.Core.Enums;
 
-namespace Soteo.Core.Gameplay.Abilities;
+namespace Soteo.Core.Abilities;
 
 public sealed class HealAbility : Ability
 {

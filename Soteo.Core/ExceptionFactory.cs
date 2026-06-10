@@ -1,7 +1,7 @@
-using Soteo.Core.Shared.Enums;
-using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Enums;
+using Soteo.Core.Exceptions;
 
-namespace Soteo.Core.Shared;
+namespace Soteo.Core;
 
 public static class ExceptionFactory
 {

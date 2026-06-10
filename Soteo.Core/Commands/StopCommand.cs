@@ -1,5 +1,5 @@
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Commands;
+namespace Soteo.Core.Commands;
 
 public sealed record StopCommand : ICommand;

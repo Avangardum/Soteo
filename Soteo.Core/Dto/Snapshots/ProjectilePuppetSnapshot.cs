@@ -1,6 +1,4 @@
-using Soteo.Core.Shared.Dto.Snapshots;
-
-namespace Soteo.Core.Gameplay.Dto.Snapshots;
+namespace Soteo.Core.Dto.Snapshots;
 
 public sealed record ProjectilePuppetSnapshot : EntitySnapshot<ProjectilePuppetSnapshot>
 {

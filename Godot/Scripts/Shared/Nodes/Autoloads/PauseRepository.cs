@@ -1,6 +1,6 @@
-using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Shared.Nodes.Autoloads;
+namespace Soteo.Main.Shared.Nodes.Autoloads;
 
 public sealed class PauseRepository : Node, IPauseRepository
 {

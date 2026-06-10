@@ -1,15 +1,10 @@
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Packets;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.Packets;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
-using Soteo.Shared.Extensions;
-using Soteo.Util;
+using Soteo.Core;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
+using Soteo.Main.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Services.Communicators;
+namespace Soteo.Main.Gameplay.Services.Communicators;
 
 /// <summary>
 /// Communicator using the JavaScript message queue instead of WebSockets / WebRTC. Used for singleplayer in browser.

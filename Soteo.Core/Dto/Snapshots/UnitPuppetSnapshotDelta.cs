@@ -1,7 +1,6 @@
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Shared.Dto.Snapshots;
+using Soteo.Core.Enums;
 
-namespace Soteo.Core.Gameplay.Dto.Snapshots;
+namespace Soteo.Core.Dto.Snapshots;
 
 public sealed record UnitPuppetSnapshotDelta : EntitySnapshotDelta
 {

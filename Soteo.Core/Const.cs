@@ -1,6 +1,4 @@
-using Soteo.Util;
-
-namespace Soteo.Core.Shared;
+namespace Soteo.Core;
 
 public static class Const
 {

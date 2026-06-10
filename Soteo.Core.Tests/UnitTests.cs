@@ -2,18 +2,17 @@ using System.Collections.Immutable;
 using AwesomeAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
-using Soteo.Core.Gameplay.Abilities;
-using Soteo.Core.Gameplay.Commands;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Statuses;
-using Soteo.Core.Shared;
+using Soteo.Core.Abilities;
+using Soteo.Core.Commands;
+using Soteo.Core.Dto;
+using Soteo.Core.Entities;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Statuses;
 using Soteo.TestUtil;
 using Soteo.Util;
 
-namespace Soteo.Core.Gameplay.Tests;
+namespace Soteo.Core.Tests;
 
 public sealed class UnitTests
 {

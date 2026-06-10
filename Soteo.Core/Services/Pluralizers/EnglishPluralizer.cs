@@ -1,6 +1,6 @@
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Services.Pluralizers;
+namespace Soteo.Core.Services.Pluralizers;
 
 public sealed class EnglishPluralizer : IPluralizer
 {

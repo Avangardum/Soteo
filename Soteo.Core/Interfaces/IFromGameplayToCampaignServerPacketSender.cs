@@ -1,6 +1,6 @@
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.Gameplay.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 public interface IFromGameplayToCampaignServerPacketSender
 {

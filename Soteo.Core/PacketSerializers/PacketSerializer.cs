@@ -1,13 +1,12 @@
 ﻿using System.Collections.Immutable;
-using Soteo.Core.Shared.Attributes;
-using Soteo.Core.Shared.Enums;
-using Soteo.Core.Shared.Exceptions;
-using Soteo.Core.Shared.Extensions;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.Packets;
-using static Soteo.Core.Shared.SerializationHelper;
+using Soteo.Core.Attributes;
+using Soteo.Core.Enums;
+using Soteo.Core.Exceptions;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
+using static Soteo.Core.SerializationHelper;
 
-namespace Soteo.Core.Shared.PacketSerializers;
+namespace Soteo.Core.PacketSerializers;
 
 public static class PacketSerializer
 {
@@ -29,7 +28,7 @@ public static class PacketSerializer
     {
         return typeLocator
             .ConcreteSubclassesOf<IPacketSerializer>(where: it => it.BaseType.Required.IsGenericType)
-            .ToImmutableDictionary(it => it.GetPacketType(typeof(PacketSerializer<>)));
+            .ToImmutableDictionary<Type, PacketTypeCode>(it => it.GetPacketType(typeof(PacketSerializer<>)));
     }
 }
 

@@ -1,17 +1,17 @@
 using System.Collections.Immutable;
 using AwesomeAssertions;
 using NSubstitute;
-using Soteo.Core.Gameplay.Abilities;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Dto.Snapshots;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Services;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Dto.Snapshots;
+using Soteo.Core.Abilities;
+using Soteo.Core.Dto;
+using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Entities;
+using Soteo.Core.Enums;
+using Soteo.Core.Services;
+using ICamera = Soteo.Core.Interfaces.ICamera;
+using IEntityNodeManager = Soteo.Core.Interfaces.IEntityNodeManager;
+using IUnit = Soteo.Core.Interfaces.IUnit;
 
-namespace Soteo.Core.Gameplay.Tests;
+namespace Soteo.Core.Tests;
 
 public sealed class EntityManagerTests
 {

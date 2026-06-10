@@ -1,7 +1,7 @@
-using Soteo.Gameplay.Interfaces;
+using Soteo.Main.Gameplay.Interfaces;
 using Soteo.Util;
 
-namespace Soteo.Gameplay.Ui;
+namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class Tooltip : Control, ITooltip
 {

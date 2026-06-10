@@ -1,7 +1,7 @@
-using Soteo.Core.Shared.Packets;
-using Soteo.Gameplay.Interfaces;
+using Soteo.Core.Packets;
+using Soteo.Main.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Services.Communicators;
+namespace Soteo.Main.Gameplay.Services.Communicators;
 
 public sealed class ChunkCollector : IChunkCollector
 {

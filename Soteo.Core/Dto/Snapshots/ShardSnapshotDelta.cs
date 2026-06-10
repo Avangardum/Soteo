@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Soteo.Core.Shared.Dto.Snapshots;
+namespace Soteo.Core.Dto.Snapshots;
 
 public sealed record ShardSnapshotDelta
 {

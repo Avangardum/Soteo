@@ -1,7 +1,7 @@
-using Soteo.Shared;
+using Soteo.Main.Shared.Extensions;
 using Soteo.Util;
 
-namespace Soteo.Gameplay.Ui;
+namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class Graph : Control
 {

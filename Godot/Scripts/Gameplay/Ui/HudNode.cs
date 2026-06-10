@@ -1,4 +1,4 @@
-namespace Soteo.Gameplay.Ui;
+namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class HudNode : Control
 {

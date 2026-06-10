@@ -1,9 +1,8 @@
 using System.Collections.Immutable;
-using Soteo.Core.Shared.Enums;
-using Soteo.Core.Shared.Extensions;
-using Soteo.Core.Shared.Interfaces;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Shared;
+namespace Soteo.Core;
 
 public static class PacketHandlerLocator<TAttribute> where TAttribute : Attribute
 {
@@ -25,6 +24,6 @@ public static class PacketHandlerLocator<TAttribute> where TAttribute : Attribut
     {
         return typeLocator
             .ConcreteSubclassesOf<IPacketHandler>(where: it => it.HasAttribute<TAttribute>())
-            .ToImmutableDictionary(it => it.GetPacketType(typeof(PacketHandler<>)));
+            .ToImmutableDictionary<Type, PacketTypeCode>(it => it.GetPacketType(typeof(PacketHandler<>)));
     }
 }

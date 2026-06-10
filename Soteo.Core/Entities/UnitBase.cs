@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Dto;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Entities;
+namespace Soteo.Core.Entities;
 
 public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEntityNode
 {

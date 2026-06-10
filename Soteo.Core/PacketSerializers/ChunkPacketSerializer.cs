@@ -1,7 +1,7 @@
-using Soteo.Core.Shared.Packets;
-using static Soteo.Core.Shared.SerializationHelper;
+using Soteo.Core.Packets;
+using static Soteo.Core.SerializationHelper;
 
-namespace Soteo.Core.Shared.PacketSerializers;
+namespace Soteo.Core.PacketSerializers;
 
 public sealed class ChunkPacketSerializer : PacketSerializer<ChunkPacket>
 {

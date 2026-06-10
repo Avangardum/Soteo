@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Shared.Enums;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.PacketSerializers;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.PacketSerializers;
 
-namespace Soteo.Core.Shared.Extensions;
+namespace Soteo.Core.Extensions;
 
 public static class ServiceProviderExtensions
 {

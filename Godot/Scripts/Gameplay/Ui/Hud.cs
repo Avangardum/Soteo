@@ -1,16 +1,15 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Statuses;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
+using Soteo.Core.Dto;
+using Soteo.Core.Entities;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Statuses;
+using Soteo.Main.Gameplay.Interfaces;
+using Soteo.Main.Shared.Extensions;
 using Soteo.Util;
-using Soteo.Util.Extensions;
 
-namespace Soteo.Gameplay.Ui;
+namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class Hud : IHud
 {

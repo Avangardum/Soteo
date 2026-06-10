@@ -1,8 +1,8 @@
 using AwesomeAssertions;
-using Soteo.Core.Gameplay.Abilities;
-using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Abilities;
+using Soteo.Core.Enums;
 
-namespace Soteo.Core.Gameplay.Tests;
+namespace Soteo.Core.Tests;
 
 public sealed class AbilityTests
 {

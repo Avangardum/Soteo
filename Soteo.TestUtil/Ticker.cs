@@ -1,4 +1,4 @@
-using Soteo.Core.Shared;
+using Soteo.Core;
 using Soteo.Util;
 
 namespace Soteo.TestUtil;

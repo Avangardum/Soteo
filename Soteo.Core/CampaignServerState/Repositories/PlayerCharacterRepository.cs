@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
-using Soteo.Core.CampaignServer.Dto.Snapshots;
-using Soteo.Core.CampaignServer.GameState.DataObjects;
-using Soteo.Core.CampaignServer.Interfaces;
+using Soteo.Core.CampaignServerState.DataObjects;
+using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.CampaignServer.GameState.Repositories;
+namespace Soteo.Core.CampaignServerState.Repositories;
 
 public sealed class PlayerCharacterRepository : Dictionary<Guid, PlayerCharacter>, IPlayerCharacterRepository
 {

@@ -1,4 +1,4 @@
-namespace Soteo.Shared.Nodes.Autoloads;
+namespace Soteo.Main.Shared.Nodes.Autoloads;
 
 public sealed class AppDomainValidator : Node
 {

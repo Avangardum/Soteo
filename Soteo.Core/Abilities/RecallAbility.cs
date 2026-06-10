@@ -1,12 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Packets;
-using Soteo.Util;
+using Soteo.Core.Dto;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.Gameplay.Abilities;
+namespace Soteo.Core.Abilities;
 
 public sealed class RecallAbility : Ability
 {

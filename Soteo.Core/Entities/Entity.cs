@@ -1,11 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using Soteo.Core.Gameplay.Dto.Snapshots;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared.Dto.Snapshots;
+using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Interfaces;
 using Soteo.Util;
 
-namespace Soteo.Core.Gameplay.Entities;
+namespace Soteo.Core.Entities;
 
 public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, IEntityNode
 {

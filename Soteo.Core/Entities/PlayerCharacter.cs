@@ -1,8 +1,8 @@
-using Soteo.Core.Gameplay.Abilities;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Abilities;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Entities;
+namespace Soteo.Core.Entities;
 
 public sealed class PlayerCharacter : Unit
 {

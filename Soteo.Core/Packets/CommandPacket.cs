@@ -1,7 +1,6 @@
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Packets;
+namespace Soteo.Core.Packets;
 
 public abstract record CommandPacket<T> : Packet where T : ICommand
 {

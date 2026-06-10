@@ -1,6 +1,6 @@
-using Soteo.Core.Gameplay.Enums;
+using Soteo.Core.Enums;
 
-namespace Soteo.Gameplay.Interfaces;
+namespace Soteo.Main.Gameplay.Interfaces;
 
 public interface IPalette
 {

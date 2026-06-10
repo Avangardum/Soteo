@@ -1,11 +1,8 @@
-using System.Collections.Immutable;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
+using Soteo.Core.Dto;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Statuses;
+namespace Soteo.Core.Statuses;
 
 public abstract class Status
 {

@@ -1,6 +1,6 @@
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Gameplay.Interfaces;
+namespace Soteo.Main.Gameplay.Interfaces;
 
 /// <summary>
 /// Normally entity nodes are removed immediately when their entity is removed.

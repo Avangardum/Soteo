@@ -1,9 +1,6 @@
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Util;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Gameplay.Services;
+namespace Soteo.Main.Gameplay.Services;
 
 public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
 {

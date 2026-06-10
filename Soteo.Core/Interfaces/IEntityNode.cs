@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace Soteo.Core.Gameplay.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 public interface IEntityNode
 {

@@ -1,4 +1,4 @@
-namespace Soteo.Core.Gameplay.Enums;
+namespace Soteo.Core.Enums;
 
 [Flags]
 public enum CanTarget

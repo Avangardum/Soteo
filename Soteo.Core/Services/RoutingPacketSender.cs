@@ -1,10 +1,8 @@
 using System.Collections.Immutable;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Packets;
-using Soteo.Util;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.Gameplay.Services;
+namespace Soteo.Core.Services;
 
 public sealed class RoutingPacketSender
 (

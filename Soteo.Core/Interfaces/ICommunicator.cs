@@ -1,4 +1,4 @@
-namespace Soteo.Core.CampaignServer.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 public interface ICommunicator : IFromCampaignServerPacketSender
 {

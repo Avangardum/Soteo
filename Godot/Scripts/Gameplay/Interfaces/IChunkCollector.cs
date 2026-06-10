@@ -1,6 +1,6 @@
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Packets;
 
-namespace Soteo.Gameplay.Interfaces;
+namespace Soteo.Main.Gameplay.Interfaces;
 
 public interface IChunkCollector
 {

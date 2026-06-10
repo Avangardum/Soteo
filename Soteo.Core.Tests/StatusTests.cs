@@ -1,8 +1,8 @@
 using AwesomeAssertions;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Statuses;
+using Soteo.Core.Enums;
+using Soteo.Core.Statuses;
 
-namespace Soteo.Core.Gameplay.Tests;
+namespace Soteo.Core.Tests;
 
 public sealed class StatusTests
 {

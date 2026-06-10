@@ -1,4 +1,4 @@
-namespace Soteo.Core.Gameplay.Enums;
+namespace Soteo.Core.Enums;
 
 public enum AbilityValidationResult
 {

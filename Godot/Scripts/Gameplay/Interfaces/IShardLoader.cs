@@ -1,4 +1,4 @@
-namespace Soteo.Gameplay.Interfaces;
+namespace Soteo.Main.Gameplay.Interfaces;
 
 public interface IShardLoader
 {

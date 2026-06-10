@@ -1,15 +1,11 @@
-using System.Collections.Immutable;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Dto.Snapshots;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Packets;
-using Soteo.Core.Shared.Dto.Snapshots;
-using Soteo.Core.Shared.Packets;
-using Soteo.Core.Shared.PacketSerializers;
-using static Soteo.Core.Shared.SerializationHelper;
+using Soteo.Core.Dto;
+using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
+using static Soteo.Core.SerializationHelper;
 
-namespace Soteo.Core.Gameplay.PacketSerializers;
+namespace Soteo.Core.PacketSerializers;
 
 public sealed class ShardSnapshotPacketSerializer(IGameplaySerializer gs) :
     PacketSerializer<ShardSnapshotPacket>

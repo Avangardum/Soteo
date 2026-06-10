@@ -1,6 +1,6 @@
-using Soteo.Core.Gameplay.Dto;
+using Soteo.Core.Dto;
 
-namespace Soteo.Core.Gameplay.Abilities;
+namespace Soteo.Core.Abilities;
 
 public sealed class MeleeAttackAbility : AttackAbility
 {

@@ -1,7 +1,4 @@
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
-
-namespace Soteo.Core.Gameplay;
+namespace Soteo.Core;
 
 public static class ClientDependency
 {

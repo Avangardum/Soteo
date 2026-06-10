@@ -1,6 +1,6 @@
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.Shared.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 public interface IPacketSerializer
 {

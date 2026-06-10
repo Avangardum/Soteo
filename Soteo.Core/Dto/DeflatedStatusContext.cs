@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Statuses;
+using Soteo.Core.Entities;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Statuses;
 
-namespace Soteo.Core.Gameplay.Dto;
+namespace Soteo.Core.Dto;
 
 public sealed record DeflatedStatusContext
 {

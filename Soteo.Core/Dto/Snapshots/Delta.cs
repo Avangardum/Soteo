@@ -1,4 +1,4 @@
-namespace Soteo.Core.Shared.Dto.Snapshots;
+namespace Soteo.Core.Dto.Snapshots;
 
 public static class Delta
 {

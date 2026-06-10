@@ -1,15 +1,12 @@
-using System.Collections.Immutable;
 using System.Globalization;
 using System.Numerics;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Statuses;
-using Soteo.Core.Shared;
+using Soteo.Core.Dto;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Statuses;
 using Soteo.Util;
 
-namespace Soteo.Core.Gameplay.Abilities;
+namespace Soteo.Core.Abilities;
 
 public abstract class Ability
 {

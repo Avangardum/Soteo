@@ -1,8 +1,7 @@
-using Soteo.Core.Shared.Attributes;
-using Soteo.Core.Shared.Enums;
-using Soteo.Util.Extensions;
+using Soteo.Core.Attributes;
+using Soteo.Core.Enums;
 
-namespace Soteo.Core.Shared.Packets;
+namespace Soteo.Core.Packets;
 
 public abstract record Packet
 {

@@ -1,13 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
-using Soteo.Shared.Extensions;
-using Soteo.Util;
+using Soteo.Core;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Gameplay.Ui;
+namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class DebugScreen
 {

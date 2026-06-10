@@ -1,7 +1,6 @@
-using Soteo.Core.Gameplay.Dto.Snapshots;
-using Soteo.Core.Shared.Dto.Snapshots;
+using Soteo.Core.Dto.Snapshots;
 
-namespace Soteo.Core.Gameplay.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 internal interface ISnapshottableEntity : IEntity
 {

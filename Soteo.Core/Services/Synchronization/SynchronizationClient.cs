@@ -1,13 +1,10 @@
-using Soteo.Core.Gameplay.Dto.Snapshots;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Packets;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Dto.Snapshots;
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 using Soteo.Util;
 
-namespace Soteo.Core.Gameplay.Services.Synchronization;
+namespace Soteo.Core.Services.Synchronization;
 
 public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
 {

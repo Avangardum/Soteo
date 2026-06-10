@@ -1,6 +1,6 @@
-using Soteo.Core.CampaignServer.Dto.Snapshots;
+using Soteo.Core.Dto.Snapshots;
 
-namespace Soteo.Core.CampaignServer.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 public interface ICampaignSnapshotCrossServerConsistencyValidator
 {

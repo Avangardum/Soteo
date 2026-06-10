@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Immutable;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using Soteo.Util;
 
-namespace Soteo.Core.Gameplay.Dto;
+namespace Soteo.Core.Dto;
 
 public abstract class Scalable
 {

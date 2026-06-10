@@ -1,10 +1,9 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Gameplay;
-using Soteo.Gameplay.Interfaces;
+using Soteo.Main.Gameplay;
 
-namespace Soteo.Shared.Extensions;
+namespace Soteo.Main.Shared.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -26,7 +25,7 @@ public static class ServiceCollectionExtensions
             self.AddTransient<TAlias>(sp => sp.GetService<TRefersTo>()!);
         
         public IServiceCollection AddSingletonNode<TService>(string path) where TService : class =>
-            self.AddSingleton<TService>(sp => sp.GetRequiredService<Main>().GetNode<TService>(path));
+            self.AddSingleton<TService>(sp => sp.GetRequiredService<Gameplay.Main>().GetNode<TService>(path));
         
         public IServiceCollection AddSingletonNode<TService, TImplementation>()
             where TImplementation : class, TService

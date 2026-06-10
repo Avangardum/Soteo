@@ -1,4 +1,4 @@
-namespace Soteo.Core.Shared.Exceptions;
+namespace Soteo.Core.Exceptions;
 
 public sealed class BadPacketException(string reason) : Exception(reason)
 {

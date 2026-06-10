@@ -1,21 +1,16 @@
 using System.Collections.Immutable;
 using Godot.Collections;
-using Soteo.Core.Gameplay.Commands;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Gameplay.Packets;
-using Soteo.Core.Shared;
-using Soteo.Gameplay.EntityNodes;
-using Soteo.Gameplay.Enums;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
-using Soteo.Shared.Extensions;
-using Soteo.Util;
-using Soteo.Util.Extensions;
+using Soteo.Core.Commands;
+using Soteo.Core.Dto;
+using Soteo.Core.Entities;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
+using Soteo.Main.Gameplay.EntityNodes;
+using Soteo.Main.Gameplay.Enums;
+using Soteo.Main.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Services;
+namespace Soteo.Main.Gameplay.Services;
 
 public sealed class InputHandler : Node2D
 {

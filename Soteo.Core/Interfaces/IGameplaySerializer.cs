@@ -1,8 +1,8 @@
-using Soteo.Core.Gameplay.Abilities;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Gameplay.Statuses;
+using Soteo.Core.Abilities;
+using Soteo.Core.Dto;
+using Soteo.Core.Statuses;
 
-namespace Soteo.Core.Gameplay.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 public interface IGameplaySerializer
 {

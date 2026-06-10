@@ -1,11 +1,7 @@
 using System.Collections.Immutable;
-using Soteo.CampaignServer;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Gameplay.Services;
+namespace Soteo.Main.Gameplay.Services;
 
 public sealed class Localizer : ILocalizer
 {

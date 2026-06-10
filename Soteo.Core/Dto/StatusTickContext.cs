@@ -1,4 +1,4 @@
-namespace Soteo.Core.Gameplay.Dto;
+namespace Soteo.Core.Dto;
 
 public sealed record StatusTickContext
 {

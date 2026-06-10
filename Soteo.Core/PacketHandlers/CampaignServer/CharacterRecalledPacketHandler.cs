@@ -1,9 +1,8 @@
-using Soteo.Core.CampaignServer.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Attributes;
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Attributes;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.CampaignServer.PacketHandlers;
+namespace Soteo.Core.PacketHandlers.CampaignServer;
 
 [CampaignServerPacketHandler]
 public sealed class CharacterRecalledPacketHandler(IPlayerCharacterRepository playerCharRepository) :

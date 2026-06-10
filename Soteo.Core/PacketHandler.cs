@@ -1,10 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
-using Soteo.Core.Shared.Attributes;
-using Soteo.Core.Shared.Exceptions;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.Exceptions;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.Shared;
+namespace Soteo.Core;
 
 public abstract class PacketHandler<T> : IPacketHandler where T : Packet
 {

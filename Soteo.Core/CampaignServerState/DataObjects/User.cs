@@ -1,6 +1,6 @@
-using Soteo.Core.CampaignServer.Dto.Snapshots;
+using Soteo.Core.Dto.Snapshots;
 
-namespace Soteo.Core.CampaignServer.GameState.DataObjects;
+namespace Soteo.Core.CampaignServerState.DataObjects;
 
 public sealed record User
 {

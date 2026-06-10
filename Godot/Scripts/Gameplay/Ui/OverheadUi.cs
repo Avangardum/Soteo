@@ -1,9 +1,9 @@
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Gameplay.Interfaces;
+using Soteo.Core.Entities;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Main.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Ui;
+namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class OverheadUi
 {

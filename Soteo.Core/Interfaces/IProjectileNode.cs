@@ -1,3 +1,3 @@
-namespace Soteo.Core.Gameplay.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 public interface IProjectileNode : IEntityNode;

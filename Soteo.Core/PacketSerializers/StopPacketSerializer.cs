@@ -1,9 +1,8 @@
-using Soteo.Core.Gameplay.Commands;
-using Soteo.Core.Gameplay.Packets;
-using Soteo.Core.Shared.PacketSerializers;
-using static Soteo.Core.Shared.SerializationHelper;
+using Soteo.Core.Commands;
+using Soteo.Core.Packets;
+using static Soteo.Core.SerializationHelper;
 
-namespace Soteo.Core.Gameplay.PacketSerializers;
+namespace Soteo.Core.PacketSerializers;
 
 public sealed class StopPacketSerializer : PacketSerializer<StopPacket>
 {

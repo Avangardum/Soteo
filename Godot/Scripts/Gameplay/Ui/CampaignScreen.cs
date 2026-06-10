@@ -1,10 +1,10 @@
 using System.Collections.Immutable;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Packets;
-using Soteo.Gameplay.Interfaces;
+using Soteo.Core;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
+using Soteo.Main.Gameplay.Interfaces;
 
-namespace Soteo.Gameplay.Ui;
+namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class CampaignScreen
 {

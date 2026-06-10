@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Gameplay.Services;
+namespace Soteo.Main.Gameplay.Services;
 
 public sealed class ShardServiceProviders(IReadOnlyDictionary<Guid, IServiceScope> scopes) : IShardServiceProviders
 {

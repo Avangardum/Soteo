@@ -1,10 +1,9 @@
 using System.Numerics;
 using AwesomeAssertions;
-using Soteo.Core.Gameplay.Dto;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Exceptions;
+using Soteo.Core.Dto;
+using Soteo.Core.Exceptions;
 
-namespace Soteo.Core.Gameplay.Tests;
+namespace Soteo.Core.Tests;
 
 public sealed class ExtraDataTests
 {

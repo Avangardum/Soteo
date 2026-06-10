@@ -1,6 +1,6 @@
 using System.Numerics;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Commands;
+namespace Soteo.Core.Commands;
 
 public record LookCommand(Vector2 Position) : ICommand;

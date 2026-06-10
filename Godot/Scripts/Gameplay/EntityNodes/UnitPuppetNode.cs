@@ -1,9 +1,9 @@
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Gameplay.Interfaces;
+using Soteo.Core.Entities;
+using Soteo.Core.Interfaces;
+using Soteo.Main.Gameplay.Interfaces;
 using Soteo.Util;
 
-namespace Soteo.Gameplay.EntityNodes;
+namespace Soteo.Main.Gameplay.EntityNodes;
 
 public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPuppetNode
 {

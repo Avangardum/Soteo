@@ -1,4 +1,4 @@
-namespace Soteo.Core.Gameplay.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 internal interface ICommandableUnit : IUnit
 {

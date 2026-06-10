@@ -1,9 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Dto;
+namespace Soteo.Core.Dto;
 
 public class ProjectileTarget
 {

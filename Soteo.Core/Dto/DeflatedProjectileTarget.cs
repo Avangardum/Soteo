@@ -1,10 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Gameplay.Entities;
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Dto;
+namespace Soteo.Core.Dto;
 
 public class DeflatedProjectileTarget
 {

@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
-using Soteo.Core.Gameplay.Entities;
+using Soteo.Core.Entities;
 
-namespace Soteo.Gameplay.Interfaces;
+namespace Soteo.Main.Gameplay.Interfaces;
 
 public interface IHud
 {

@@ -1,16 +1,11 @@
 using System.Text;
 using JWT.Builder;
-using Soteo.Core.Gameplay.Enums;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.Packets;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
-using Soteo.Shared.Extensions;
-using Soteo.Util;
+using Soteo.Core;
+using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
 
-namespace Soteo.Gameplay.Services.Communicators;
+namespace Soteo.Main.Gameplay.Services.Communicators;
 
 public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     Node, IFromGameplayToCampaignServerPacketSender, ICampaignServerConnector

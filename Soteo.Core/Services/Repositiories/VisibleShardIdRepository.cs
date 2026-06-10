@@ -1,6 +1,6 @@
-using Soteo.Core.Gameplay.Interfaces;
+using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Gameplay.Services.Repositiories;
+namespace Soteo.Core.Services.Repositiories;
 
 public sealed class VisibleShardIdRepository : IVisibleShardIdRepository
 {

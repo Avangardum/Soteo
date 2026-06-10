@@ -1,7 +1,5 @@
-using Soteo.Core.Gameplay.Packets;
-using Soteo.Core.Shared.Packets;
-using Soteo.Core.Shared.PacketSerializers;
+using Soteo.Core.Packets;
 
-namespace Soteo.Core.Gameplay.PacketSerializers;
+namespace Soteo.Core.PacketSerializers;
 
 public sealed class ShardSnapshotRequestPacketSerializer : EmptyPacketSerializer<ShardSnapshotRequestPacket>;

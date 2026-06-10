@@ -1,15 +1,14 @@
 using System.Collections.Immutable;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
-using Soteo.Core.CampaignServer.Dto.Snapshots;
-using Soteo.Core.CampaignServer.GameState.DataObjects;
-using Soteo.Core.CampaignServer.GameState.Repositories;
-using Soteo.Core.CampaignServer.Interfaces;
-using Soteo.Core.CampaignServer.Services;
-using Soteo.Core.Shared.Dto.Snapshots;
-using Soteo.Core.Shared.Packets;
+using Soteo.Core.CampaignServerState.DataObjects;
+using Soteo.Core.CampaignServerState.Repositories;
+using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
+using Soteo.Core.Services;
 
-namespace Soteo.Core.CampaignServer.Tests;
+namespace Soteo.Core.Tests;
 
 public sealed class PersistenceServiceTests
 {

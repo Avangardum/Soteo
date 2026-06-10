@@ -1,24 +1,18 @@
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.CampaignServer.Communicators;
-using Soteo.Core.CampaignServer;
-using Soteo.Core.CampaignServer.GameState.Repositories;
-using Soteo.Core.CampaignServer.Interfaces;
-using Soteo.Core.CampaignServer.PacketHandlers;
-using Soteo.Core.Gameplay;
-using Soteo.Core.Gameplay.Interfaces;
-using Soteo.Core.Shared;
-using Soteo.Core.Shared.Attributes;
-using Soteo.Core.Shared.Interfaces;
-using Soteo.Core.Shared.Packets;
-using Soteo.Core.Shared.PacketSerializers;
-using Soteo.Gameplay.Interfaces;
-using Soteo.Shared;
+using Soteo.Core;
+using Soteo.Core.Attributes;
+using Soteo.Core.CampaignServerState.Repositories;
+using Soteo.Core.Interfaces;
+using Soteo.Core.PacketHandlers.CampaignServer;
+using Soteo.Core.Packets;
+using Soteo.Core.PacketSerializers;
+using Soteo.Main.CampaignServer.Communicators;
+using Soteo.Main.Shared;
 using Soteo.Util;
 
-namespace Soteo.CampaignServer;
+namespace Soteo.Main.CampaignServer;
 
 public sealed class CampaignServer : Node
 {
@@ -54,7 +48,7 @@ public sealed class CampaignServer : Node
         services.AddAlias<IFromCampaignServerPacketSender, ICommunicator>();
         services.AddSingleton<IGameplaySerializer, GameplaySerializer>();
         
-        var typeLocator = new TypeLocator(CoreSharedAssembly.Value);
+        var typeLocator = new TypeLocator(SoteoSharedAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
         
         if (_useJsmq)

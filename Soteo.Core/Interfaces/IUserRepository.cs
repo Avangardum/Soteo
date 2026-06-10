@@ -1,7 +1,7 @@
-using Soteo.Core.CampaignServer.Dto.Snapshots;
-using Soteo.Core.CampaignServer.GameState.DataObjects;
+using Soteo.Core.CampaignServerState.DataObjects;
+using Soteo.Core.Dto.Snapshots;
 
-namespace Soteo.Core.CampaignServer.Interfaces;
+namespace Soteo.Core.Interfaces;
 
 public interface IUserRepository : IDictionary<Guid, User>
 {
