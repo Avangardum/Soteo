@@ -10,5 +10,14 @@
             -->
             CS9107,
         </NoWarn>
+        
+        <!--
+        This suppresses warnings like when using Microsoft.Extensions.TimeProvider.Testing with net472 because
+        the packet doesnt specify net472 specifically as a target framework, but only specifies net462. This is a
+        false alarm, since a package targeting net462 techincally can be used in net472 and doesn't seem to be an
+        unsupported use case just because a newer .NET Framework version is used.
+        -->
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+        
     </PropertyGroup>
 </Project>
