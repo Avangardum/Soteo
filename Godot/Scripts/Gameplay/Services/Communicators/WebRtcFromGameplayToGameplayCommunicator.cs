@@ -23,6 +23,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private double _timeSinceLastPing;
     private Guid? _lastPingId;
     private bool _didPollThisFrame;
+    private bool _isPhysicsProcess;
     
     private readonly Dictionary<Guid, PeerConnectionAndChannels> _peerConnectionsAndChannels = [];
     private readonly Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
@@ -64,6 +65,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     public override void _PhysicsProcess(float delta)
     {
+        _isPhysicsProcess = true;
+        
         // Poll() is duplicated in _PhysicsProcess because it runs before _Process, so any packets received during
         // _Process would be delayed to the next physics frame otherwise.
         Poll(delta);
@@ -76,6 +79,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
                 HandlePacket(packet, senderId);
             }
         }
+        
+        _isPhysicsProcess = false;
     }
 
     public override void _Process(float delta)
@@ -190,7 +195,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             }
             
             // Server defers packet handling to _PhysicsProcess to ensure that all game logic is executed in it only
-            if (_sideDetector.IsServer)
+            if (_sideDetector.IsServer && !_isPhysicsProcess)
                 _packetQueue.Enqueue((packet, senderId));
             else
                 await _packetHandler.HandleAsync(packet, senderId);
