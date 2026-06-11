@@ -70,7 +70,7 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
         }
         catch (BadSerializedDataException e)
         {
-            throw new AggregateException($"Bad packet\n{BitConverter.ToString(bytes.ToArray())}\n", e);
+            throw new BadSerializedDataException($"Bad packet\n{BitConverter.ToString(bytes.ToArray())}\n{e.Message}");
         }
     }
     
