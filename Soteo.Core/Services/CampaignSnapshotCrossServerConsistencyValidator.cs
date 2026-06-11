@@ -14,7 +14,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
     private bool DoPlayerCharactersWithShardIdExistInCorrespondingShardSnapshots(CampaignSnapshot snapshot)
     {
         IEnumerable<PlayerCharacterSnapshot> deployedPlayerCharacters =
-            snapshot.CampaignServer.Characters.Values.Where(it => it.ShardId != null);
+            snapshot.CampaignServer.PlayerCharacters.Values.Where(it => it.ShardId != null);
         foreach (PlayerCharacterSnapshot character in deployedPlayerCharacters)
         {
             ShardSnapshot shard = snapshot.Shards[character.ShardId.Required];
@@ -31,7 +31,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
         {
             foreach (UnitSnapshot unit in shard.Entities.Values.OfType<UnitSnapshot>())
             {
-                if (!snapshot.CampaignServer.Characters.TryGetValue(unit.Id, out PlayerCharacterSnapshot? character))
+                if (!snapshot.CampaignServer.PlayerCharacters.TryGetValue(unit.Id, out PlayerCharacterSnapshot? character))
                     return false;
                 if (character.ShardId != shardId)
                     return false;

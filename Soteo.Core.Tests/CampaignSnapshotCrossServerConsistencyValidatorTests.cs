@@ -35,7 +35,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 [Shard2Id] = CreateShardUserSnapshot(Shard2Id),
                 [Shard3Id] = CreateShardUserSnapshot(Shard3Id),
             }.ToImmutableDictionary(),
-            Characters = new Dictionary<Guid, PlayerCharacterSnapshot>
+            PlayerCharacters = new Dictionary<Guid, PlayerCharacterSnapshot>
             {
                 [Char1Id] = new()
                 {
@@ -168,11 +168,11 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
         {
             CampaignServer = ConsistentSnapshot.CampaignServer with
             {
-                Characters = ConsistentSnapshot.CampaignServer.Characters.With
+                PlayerCharacters = ConsistentSnapshot.CampaignServer.PlayerCharacters.With
                 (
                     new Dictionary<Guid, PlayerCharacterSnapshot>
                     {
-                        [Char1Id] = ConsistentSnapshot.CampaignServer.Characters[Char1Id] with { ShardId = null }
+                        [Char1Id] = ConsistentSnapshot.CampaignServer.PlayerCharacters[Char1Id] with { ShardId = null }
                     }
                 )
             },
