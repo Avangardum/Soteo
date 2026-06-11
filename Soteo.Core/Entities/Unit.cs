@@ -101,7 +101,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         UpdateStats();
         DecreaseCooldowns(delta);
         ApplyRegen(delta);
-        ExecuteCommands(Node.Required, delta);
+        ExecuteCommands(Node.Required, delta); // todo Required throws when status tick kills the unit
     }
     
     private void DecreaseCooldowns(double delta)

@@ -197,20 +197,19 @@ public sealed class PersistenceServiceTests
         
         public bool DuplicateResponse { get; set; }
         
-        public void SendTo(Packet packet, Guid receiverId)
+        public void SendTo(Packet packet, params IEnumerable<Guid> receiverIds)
         {
             if (packet is not ShardSnapshotRequestPacket) return;
-            if (!ShardSnapshots.TryGetValue(receiverId, out ShardSnapshot? snapshot)) return;
-            for (int i = 0; i < (DuplicateResponse ? 2 : 1); i++)
-                callback(new ShardSnapshotPacket { Snapshot = snapshot }, receiverId);
+            foreach (Guid id in receiverIds)
+            {
+                if (!ShardSnapshots.TryGetValue(id, out ShardSnapshot? snapshot)) return;
+                for (int i = 0; i < (DuplicateResponse ? 2 : 1); i++)
+                    callback(new ShardSnapshotPacket { Snapshot = snapshot }, id);
+            }
         }
 
-        public void BroadcastToShardServers(Packet packet)
-        {
-            foreach (Guid id in ShardSnapshots.Keys)
-                SendTo(packet, id);
-        }
-        
+        public void BroadcastToShardServers(Packet packet) => SendTo(packet, ShardSnapshots.Keys);
+
         public void BroadcastToShardServersAndClients(Packet packet) => throw new NotSupportedException();
         public void BroadcastToClients(Packet packet) => throw new NotSupportedException();
         public void RelayFrom(RelayedPacket packet, Guid senderId) => throw new NotSupportedException();

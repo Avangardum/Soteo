@@ -43,10 +43,11 @@ public sealed class JsmqFromCampaignServerCommunicator
         }
     }
     
-    public void SendTo(Packet packet, Guid receiverId)
+    public void SendTo(Packet packet, params IEnumerable<Guid> receiverIds)
     {
         string base64 = ToBase64(packet);
-        JavaScript.Eval($"""jsmq.send("{base64}", "{receiverId}");""");
+        foreach (Guid id in receiverIds)
+            JavaScript.Eval($"""jsmq.send("{base64}", "{id}");""");
     }
 
     public void BroadcastToShardServersAndClients(Packet packet)

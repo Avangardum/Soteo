@@ -48,13 +48,12 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         _wsServer.Connect("data_received", this, nameof(OnDataReceived));
     }
     
-    public void SendTo(Packet packet, Guid receiverId)
+    public void SendTo(Packet packet, params IEnumerable<Guid> receiverIds)
     {
-        if (_userIdsByWsPeerId.Inverse.TryGetValue(receiverId, out int wsPeerId))
-        {
-            byte[] bytes = _packetSerializer.Serialize(packet);
-            _wsServer.GetPeer(wsPeerId).PutPacket(bytes);
-        }
+        byte[] bytes = _packetSerializer.Serialize(packet);
+        foreach (Guid id in receiverIds)
+            if (_userIdsByWsPeerId.Inverse.TryGetValue(id, out int wsPeerId))
+                _wsServer.GetPeer(wsPeerId).PutPacket(bytes);
     }
     
     public void BroadcastToShardServersAndClients(Packet packet)
