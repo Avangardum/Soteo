@@ -4,7 +4,6 @@ using Soteo.Core.Enums;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Packets;
-using static Soteo.Core.SerializationHelper;
 
 namespace Soteo.Core.PacketSerializers;
 
@@ -32,7 +31,7 @@ public static class PacketSerializer
     }
 }
 
-public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacket : Packet
+public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Packet
 {
     public static readonly PacketTypeCode PacketTypeCode =
         typeof(TPacket).GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;
@@ -42,7 +41,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacke
     public byte[] Serialize(TPacket packet)
     {
         var stream = new MemoryStream();
-        SerializeEnum(packet.TypeCode, stream);
+        s.SerializeEnum(packet.TypeCode, stream);
         SerializeInternal(packet, stream);
         return stream.ToArray();
     }
@@ -56,7 +55,7 @@ public abstract class PacketSerializer<TPacket> : IPacketSerializer where TPacke
         try
         {
             var stream = new MemoryStream(bytes.ToArray());
-            var typeCode = DeserializeEnum<PacketTypeCode>(stream);
+            var typeCode = s.DeserializeEnum<PacketTypeCode>(stream);
             if (typeCode != PacketTypeCode)
                 throw new InvalidOperationException("Wrong serializer");
             TPacket packet = DeserializeInternal(stream);

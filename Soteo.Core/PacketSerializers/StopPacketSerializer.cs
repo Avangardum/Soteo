@@ -1,21 +1,22 @@
 using Soteo.Core.Commands;
+using Soteo.Core.Interfaces;
 using Soteo.Core.Packets;
 using static Soteo.Core.SerializationHelper;
 
 namespace Soteo.Core.PacketSerializers;
 
-public sealed class StopPacketSerializer : PacketSerializer<StopPacket>
+public sealed class StopPacketSerializer(ISerializationHelper s) : PacketSerializer<StopPacket>(s)
 {
     protected override void SerializeInternal(StopPacket packet, Stream stream)
     {
-        SerializeGuid(packet.UnitId, stream);
+        s.SerializeGuid(packet.UnitId, stream);
     }
 
     protected override StopPacket DeserializeInternal(Stream stream)
     {
         return new StopPacket
         {
-            UnitId = DeserializeGuid(stream),
+            UnitId = s.DeserializeGuid(stream),
             Command = new StopCommand(),
         };
     }

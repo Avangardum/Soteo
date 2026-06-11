@@ -99,7 +99,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
         services.AddSingletonNode<IPauseRepository>("/root/PauseRepository");
         services.AddSingleton<ISideDetector>(new SideDetector(_isServer));
-        services.AddSingleton<IGameplaySerializer, GameplaySerializer>();
+        services.AddSingleton<ISerializationHelper, SerializationHelper>();
         
         var typeLocator = new TypeLocator(SoteoSharedAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);

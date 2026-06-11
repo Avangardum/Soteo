@@ -1,26 +1,19 @@
 using System.Numerics;
 using Soteo.Core.Exceptions;
-using static Soteo.Core.SerializationHelper;
+using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Dto;
 
-public sealed class ExtraData
+public sealed class ExtraData(object?[] values, ISerializationHelper s)
 {
-    private readonly object?[] _values;
-    
-    private ExtraData(object?[] values)
-    {
-        _values = values;
-    }
-    
     public void Set<T>(Key<T> key, T value)
     {
-        _values[key.Index] = value;
+        values[key.Index] = value;
     }
 
     public T Get<T>(Key<T> key)
     {
-        object? value = _values[key.Index];
+        object? value = values[key.Index];
         if (value == null)
         {
             if (key.IsNullable) return default!;
@@ -31,33 +24,33 @@ public sealed class ExtraData
     
     public void Serialize(Stream stream)
     {
-        SerializeInt(_values.Length, stream);
-        foreach (object? value in _values)
+        s.SerializeInt(values.Length, stream);
+        foreach (object? value in values)
         {
             switch (value)
             {
                 case null:
-                    SerializeEnum(TypeCode.Null, stream);
+                    s.SerializeEnum(TypeCode.Null, stream);
                     break;
                 case int i:
-                    SerializeEnum(TypeCode.Int, stream);
-                    SerializeInt(i, stream);
+                    s.SerializeEnum(TypeCode.Int, stream);
+                    s.SerializeInt(i, stream);
                     break;
                 case long l:
-                    SerializeEnum(TypeCode.Long, stream);
-                    SerializeLong(l, stream);
+                    s.SerializeEnum(TypeCode.Long, stream);
+                    s.SerializeLong(l, stream);
                     break;
                 case double d:
-                    SerializeEnum(TypeCode.Double, stream);
-                    SerializeDouble(d, stream);
+                    s.SerializeEnum(TypeCode.Double, stream);
+                    s.SerializeDouble(d, stream);
                     break;
                 case Guid g:
-                    SerializeEnum(TypeCode.Guid, stream);
-                    SerializeGuid(g, stream);
+                    s.SerializeEnum(TypeCode.Guid, stream);
+                    s.SerializeGuid(g, stream);
                     break;
                 case Vector2 v:
-                    SerializeEnum(TypeCode.Vector2, stream);
-                    SerializeVector2(v, stream);
+                    s.SerializeEnum(TypeCode.Vector2, stream);
+                    s.SerializeVector2(v, stream);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -67,25 +60,26 @@ public sealed class ExtraData
     
     public static ExtraData Deserialize(Stream stream)
     {
-        int count = DeserializeInt(stream);
+        var s = new SerializationHelper(TypeLocator.Empty);
+        int count = s.DeserializeInt(stream);
         if (count < 0 || count > stream.Length - stream.Position)
             throw new BadPacketException("Invalid ExtraData count");
         var values = new object?[count];
         for (int i = 0; i < count; i++)
         {
-            var typeCode = DeserializeEnum<TypeCode>(stream);
+            var typeCode = s.DeserializeEnum<TypeCode>(stream);
             values[i] = typeCode switch
             {
                 TypeCode.Null => null,
-                TypeCode.Int => DeserializeInt(stream),
-                TypeCode.Long => DeserializeLong(stream),
-                TypeCode.Double => DeserializeDouble(stream),
-                TypeCode.Guid => DeserializeGuid(stream),
-                TypeCode.Vector2 => DeserializeVector2(stream),
+                TypeCode.Int => s.DeserializeInt(stream),
+                TypeCode.Long => s.DeserializeLong(stream),
+                TypeCode.Double => s.DeserializeDouble(stream),
+                TypeCode.Guid => s.DeserializeGuid(stream),
+                TypeCode.Vector2 => s.DeserializeVector2(stream),
                 _ => throw new ArgumentOutOfRangeException(),
             };
         }
-        return new ExtraData(values);
+        return new ExtraData(values, s);
     }
     
     public sealed class Schema
@@ -120,7 +114,7 @@ public sealed class ExtraData
         public ExtraData Instance()
         {
             _isInstanced = true;
-            return new ExtraData(_values.ToArray());
+            return new ExtraData(_values.ToArray(), new SerializationHelper(TypeLocator.Empty));
         }
 
         private Key<T> Add<T>(bool isNullable)

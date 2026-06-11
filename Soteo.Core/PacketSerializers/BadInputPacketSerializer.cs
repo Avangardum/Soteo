@@ -1,17 +1,17 @@
+using Soteo.Core.Interfaces;
 using Soteo.Core.Packets;
-using static Soteo.Core.SerializationHelper;
 
 namespace Soteo.Core.PacketSerializers;
 
-public sealed class BadInputPacketSerializer : PacketSerializer<BadInputPacket>
+public sealed class BadInputPacketSerializer(ISerializationHelper s) : PacketSerializer<BadInputPacket>(s)
 {
     protected override void SerializeInternal(BadInputPacket packet, Stream stream)
     {
-        SerializeString(packet.Reason, stream);
+        s.SerializeString(packet.Reason, stream);
     }
 
     protected override BadInputPacket DeserializeInternal(Stream stream)
     {
-        return new BadInputPacket { Reason = DeserializeString(stream) };
+        return new BadInputPacket { Reason = s.DeserializeString(stream) };
     }
 }

@@ -2,24 +2,28 @@ using System.Buffers.Binary;
 using System.Collections.Immutable;
 using System.Numerics;
 using System.Text;
+using Soteo.Core.Abilities;
+using Soteo.Core.Dto;
+using Soteo.Core.Enums;
 using Soteo.Core.Exceptions;
+using Soteo.Core.Interfaces;
+using Soteo.Core.Statuses;
 
 namespace Soteo.Core;
 
-public static class SerializationHelper
+public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelper
 {
-    public delegate TElement Deserializer<out TElement>(Stream stream);
-    
-    public delegate void Serializer<in TElement>(TElement value, Stream stream);
-    
-    public static void SerializeByte(byte value, Stream stream) => stream.WriteByte(value);
+    private readonly IReadOnlyList<Type> _abilityTypes = typeLocator.ConcreteSubclassesOf<Ability>();
+    private readonly IReadOnlyList<Type> _statusTypes = typeLocator.ConcreteSubclassesOf<Status>();
 
-    public static byte DeserializeByte(Stream stream) => stream.ReadExactlyByte();
+    public void SerializeByte(byte value, Stream stream) => stream.WriteByte(value);
 
-    public static void SerializeBool(bool value, Stream stream) =>
+    public byte DeserializeByte(Stream stream) => stream.ReadExactlyByte();
+
+    public void SerializeBool(bool value, Stream stream) =>
         SerializeByte(value ? (byte)1 : (byte)0, stream);
     
-    public static bool DeserializeBool(Stream stream)
+    public bool DeserializeBool(Stream stream)
     {
         return DeserializeByte(stream) switch
         {
@@ -29,56 +33,56 @@ public static class SerializationHelper
         };
     }
 
-    public static void SerializeInt(int value, Stream stream)
+    public void SerializeInt(int value, Stream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(int)];
         BinaryPrimitives.WriteInt32BigEndian(buffer, value);
         stream.Write(buffer);
     }
 
-    public static int DeserializeInt(Stream stream)
+    public int DeserializeInt(Stream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(int)];
         stream.ReadExactly(buffer);
         return BinaryPrimitives.ReadInt32BigEndian(buffer);
     }
     
-    public static void SerializeLong(long value, Stream stream)
+    public void SerializeLong(long value, Stream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(long)];
         BinaryPrimitives.WriteInt64BigEndian(buffer, value);
         stream.Write(buffer);
     }
 
-    public static long DeserializeLong(Stream stream)
+    public long DeserializeLong(Stream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(long)];
         stream.ReadExactly(buffer);
         return BinaryPrimitives.ReadInt64BigEndian(buffer);
     }
 
-    public static void SerializeUShort(ushort value, Stream stream)
+    public void SerializeUShort(ushort value, Stream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(ushort)];
         BinaryPrimitives.WriteUInt16BigEndian(buffer, value);
         stream.Write(buffer);
     }
 
-    public static ushort DeserializeUShort(Stream stream)
+    public ushort DeserializeUShort(Stream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(ushort)];
         stream.ReadExactly(buffer);
         return BinaryPrimitives.ReadUInt16BigEndian(buffer);
     }
 
-    public static void SerializeFloat(float value, Stream stream)
+    public void SerializeFloat(float value, Stream stream)
     {
         byte[] buffer = BitConverter.GetBytes(value);
         if (BitConverter.IsLittleEndian) buffer.Reverse();
         stream.Write(buffer);
     }
 
-    public static float DeserializeFloat(Stream stream)
+    public float DeserializeFloat(Stream stream)
     {
         byte[] buffer = new byte[sizeof(float)];
         stream.ReadExactly(buffer);
@@ -86,14 +90,14 @@ public static class SerializationHelper
         return BitConverter.ToSingle(buffer, 0);
     }
     
-    public static void SerializeDouble(double value, Stream stream)
+    public void SerializeDouble(double value, Stream stream)
     {
         byte[] buffer = BitConverter.GetBytes(value);
         if (BitConverter.IsLittleEndian) buffer.Reverse();
         stream.Write(buffer);
     }
     
-    public static double DeserializeDouble(Stream stream)
+    public double DeserializeDouble(Stream stream)
     {
         byte[] buffer = new byte[sizeof(double)];
         stream.ReadExactly(buffer);
@@ -101,32 +105,32 @@ public static class SerializationHelper
         return BitConverter.ToDouble(buffer, 0);
     }
 
-    public static void SerializeVector2(Vector2 value, Stream stream)
+    public void SerializeVector2(Vector2 value, Stream stream)
     {
         SerializeFloat(value.X, stream);
         SerializeFloat(value.Y, stream);
     }
 
-    public static Vector2 DeserializeVector2(Stream stream)
+    public Vector2 DeserializeVector2(Stream stream)
     {
         float x = DeserializeFloat(stream);
         float y = DeserializeFloat(stream);
         return new(x, y);
     }
 
-    public static void SerializeGuid(Guid value, Stream stream)
+    public void SerializeGuid(Guid value, Stream stream)
     {
         stream.Write(value.ToByteArray());
     }
 
-    public static Guid DeserializeGuid(Stream stream)
+    public Guid DeserializeGuid(Stream stream)
     {
         byte[] buffer = new byte[Const.BytesInGuid];
         stream.ReadExactly(buffer);
         return new Guid(buffer);
     }
 
-    public static void SerializeEnum<TEnum>(TEnum value, Stream stream) where TEnum : Enum
+    public void SerializeEnum<TEnum>(TEnum value, Stream stream) where TEnum : Enum
     {
         Type underlyingType = Enum.GetUnderlyingType(typeof(TEnum));
         if (underlyingType == typeof(byte))
@@ -139,7 +143,7 @@ public static class SerializationHelper
             throw new NotSupportedException();
     }
 
-    public static TEnum DeserializeEnum<TEnum>(Stream stream) where TEnum : Enum
+    public TEnum DeserializeEnum<TEnum>(Stream stream) where TEnum : Enum
     {
         TEnum value = DeserializeEnumWithoutValidation<TEnum>(stream);
         if (!Enum.IsDefined(typeof(TEnum), value) && !typeof(TEnum).HasAttribute<FlagsAttribute>())
@@ -147,7 +151,7 @@ public static class SerializationHelper
         return value;
     }
 
-    public static TEnum DeserializeEnumWithoutValidation<TEnum>(Stream stream) where TEnum : Enum
+    public TEnum DeserializeEnumWithoutValidation<TEnum>(Stream stream) where TEnum : Enum
     {
         Type underlyingType = Enum.GetUnderlyingType(typeof(TEnum));
         if (underlyingType == typeof(byte))
@@ -159,10 +163,10 @@ public static class SerializationHelper
         throw new NotSupportedException();
     }
 
-    public static void SerializeList<TElement>
+    public void SerializeList<TElement>
     (
         IReadOnlyCollection<TElement> value,
-        Serializer<TElement> serializeElement,
+        ISerializationHelper.Serializer<TElement> serializeElement,
         Stream stream
     )
     {
@@ -179,9 +183,9 @@ public static class SerializationHelper
         }
     }
 
-    public static TElement[] DeserializeList<TElement>
+    public TElement[] DeserializeList<TElement>
     (
-        Deserializer<TElement> deserializeElement,
+        ISerializationHelper.Deserializer<TElement> deserializeElement,
         Stream stream
     )
     {
@@ -201,13 +205,13 @@ public static class SerializationHelper
         return result;
     }
 
-    public static void SerializeString(string value, Stream stream)
+    public void SerializeString(string value, Stream stream)
     {
         SerializeInt(Encoding.UTF8.GetByteCount(value), stream);
         stream.Write(Encoding.UTF8.GetBytes(value));
     }
 
-    public static string DeserializeString(Stream stream)
+    public string DeserializeString(Stream stream)
     {
         int byteCount = DeserializeInt(stream);
         if (byteCount < 0 || byteCount > stream.Length - stream.Position)
@@ -217,7 +221,7 @@ public static class SerializationHelper
         return Encoding.UTF8.GetString(buffer);
     }
     
-    public static void SerializeNullableStruct<T>(T? nullable, Serializer<T> serializer, Stream stream)
+    public void SerializeNullableStruct<T>(T? nullable, ISerializationHelper.Serializer<T> serializer, Stream stream)
         where T : struct
     {
         SerializeBool(nullable != null, stream);
@@ -225,14 +229,14 @@ public static class SerializationHelper
             serializer(nullable.Value, stream);
     }
     
-    public static T? DeserializeNullableStruct<T>(Deserializer<T> deserializer, Stream stream)
+    public T? DeserializeNullableStruct<T>(ISerializationHelper.Deserializer<T> deserializer, Stream stream)
         where T : struct
     {
         bool hasValue = DeserializeBool(stream);
         return hasValue ? deserializer(stream) : null;
     }
     
-    public static void SerializeNullableClass<T>(T? nullable, Serializer<T> serializer, Stream stream)
+    public void SerializeNullableClass<T>(T? nullable, ISerializationHelper.Serializer<T> serializer, Stream stream)
         where T : class
     {
         SerializeBool(nullable != null, stream);
@@ -240,18 +244,18 @@ public static class SerializationHelper
             serializer(nullable, stream);
     }
     
-    public static T? DeserializeNullableClass<T>(Deserializer<T> deserializer, Stream stream)
+    public T? DeserializeNullableClass<T>(ISerializationHelper.Deserializer<T> deserializer, Stream stream)
         where T : class
     {
         bool hasValue = DeserializeBool(stream);
         return hasValue ? deserializer(stream) : null;
     }
 
-    public static void SerializeDictionary<TKey, TValue>
+    public void SerializeDictionary<TKey, TValue>
     (
         IReadOnlyDictionary<TKey, TValue> dictionary,
-        Serializer<TKey> serializeKey,
-        Serializer<TValue> serializeValue,
+        ISerializationHelper.Serializer<TKey> serializeKey,
+        ISerializationHelper.Serializer<TValue> serializeValue,
         Stream stream
     )
     {
@@ -262,10 +266,10 @@ public static class SerializationHelper
         }, stream);
     }
 
-    public static ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue> 
+    public ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue> 
     (
-        Deserializer<TKey> deserializeKey,
-        Deserializer<TValue> deserializeValue,
+        ISerializationHelper.Deserializer<TKey> deserializeKey,
+        ISerializationHelper.Deserializer<TValue> deserializeValue,
         Stream stream
     ) where TKey : notnull
     {
@@ -279,10 +283,10 @@ public static class SerializationHelper
     /// <summary>
     /// Serialize a dictionary where keys are derived from values
     /// </summary>
-    public static void SerializeIndexedDictionary<TKey, TValue>
+    public void SerializeIndexedDictionary<TKey, TValue>
     (
         IReadOnlyDictionary<TKey, TValue> dictionary,
-        Serializer<TValue> serializeValue,
+        ISerializationHelper.Serializer<TValue> serializeValue,
         Stream stream
     )
     {
@@ -292,13 +296,84 @@ public static class SerializationHelper
     /// <summary>
     /// Deserialize a dictionary where keys are derived from values
     /// </summary>
-    public static ImmutableDictionary<TKey, TValue> DeserializeIndexedDictionary<TKey, TValue>
+    public ImmutableDictionary<TKey, TValue> DeserializeIndexedDictionary<TKey, TValue>
     (
-        Deserializer<TValue> deserializeValue,
+        ISerializationHelper.Deserializer<TValue> deserializeValue,
         Func<TValue, TKey> keySelector,
         Stream stream
-    ) where TKey: notnull
+    ) where TKey : notnull
     {
         return DeserializeList(deserializeValue, stream).ToImmutableDictionary(keySelector, it => it);
+    }
+    
+    public void SerializeAbility(Ability value, Stream stream) =>
+        SerializeInt(_abilityTypes.IndexOf(value.GetType()), stream);
+    
+    public Ability DeserializeAbility(Stream stream) =>
+        Ability.Instance(_abilityTypes[DeserializeInt(stream)]);
+    
+    public void SerializeStatus(Status value, Stream stream) =>
+        SerializeInt(_statusTypes.IndexOf(value.GetType()), stream);
+    
+    public Status DeserializeStatus(Stream stream) =>
+        Status.Instance(_statusTypes[DeserializeInt(stream)]);
+    
+    public void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
+    {
+        SerializeGuid(value.Id, stream);
+        SerializeStatus(value.Status, stream);
+        SerializeNullableClass(value.Ability, SerializeAbility, stream);
+        SerializeDouble(value.DisplayElapsedTime, stream);
+        SerializeDouble(value.RemainingTime, stream);
+        SerializeLong(value.Ordinal, stream);
+    }
+    
+    public PuppetStatusContext DeserializePuppetStatusContext(Stream stream)
+    {
+        return new PuppetStatusContext
+        {
+            Id = DeserializeGuid(stream),
+            Status = DeserializeStatus(stream),
+            Ability = DeserializeNullableClass(DeserializeAbility, stream),
+            DisplayElapsedTime = DeserializeDouble(stream),
+            RemainingTime = DeserializeDouble(stream),
+            Ordinal = DeserializeLong(stream),
+        };
+    }
+    
+    public void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream)
+    {
+        SerializeEnum(value.Slot, stream);
+        SerializeDouble(value.ElapsedTime, stream);
+        SerializeDouble(value.RemainingTime, stream);
+    }
+    
+    public AbilityUseProgress DeserializeAbilityUseProgress(Stream stream)
+    {
+        return new AbilityUseProgress
+        {
+            Slot = DeserializeEnum<AbilitySlot>(stream),
+            ElapsedTime = DeserializeDouble(stream),
+            RemainingTime = DeserializeDouble(stream),
+        };
+    }
+    
+    public void SerializeAbilitySlotState(AbilitySlotState value, Stream stream)
+    {
+        SerializeAbility(value.Ability, stream);
+        SerializeInt(value.Level, stream);
+        SerializeDouble(value.Cooldown, stream);
+        SerializeDouble(value.MaxCooldown, stream);
+    }
+    
+    public AbilitySlotState DeserializeAbilitySlotState(Stream stream)
+    {
+        return new AbilitySlotState
+        {
+            Ability = DeserializeAbility(stream),
+            Level = DeserializeInt(stream),
+            Cooldown = DeserializeDouble(stream),
+            MaxCooldown = DeserializeDouble(stream),
+        };
     }
 }

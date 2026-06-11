@@ -1,22 +1,23 @@
+using Soteo.Core.Interfaces;
 using Soteo.Core.Packets;
-using static Soteo.Core.SerializationHelper;
 
 namespace Soteo.Core.PacketSerializers;
 
-public sealed class CampaignServerHandshakePacketSerializer : PacketSerializer<CampaignServerHandshakePacket>
+public sealed class CampaignServerHandshakePacketSerializer(ISerializationHelper s) :
+    PacketSerializer<CampaignServerHandshakePacket>(s)
 {
     protected override void SerializeInternal(CampaignServerHandshakePacket packet, Stream stream)
     {
-        SerializeString(packet.Token, stream);
-        SerializeString(packet.Version, stream);
+        s.SerializeString(packet.Token, stream);
+        s.SerializeString(packet.Version, stream);
     }
 
     protected override CampaignServerHandshakePacket DeserializeInternal(Stream stream)
     {
         return new CampaignServerHandshakePacket
         {
-            Token = DeserializeString(stream),
-            Version = DeserializeString(stream),
+            Token = s.DeserializeString(stream),
+            Version = s.DeserializeString(stream),
         };
     }
 }

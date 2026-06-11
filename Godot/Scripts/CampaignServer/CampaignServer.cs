@@ -46,7 +46,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IFromCampaignServerPacketSender, ICommunicator>();
-        services.AddSingleton<IGameplaySerializer, GameplaySerializer>();
+        services.AddSingleton<ISerializationHelper, SerializationHelper>();
         
         var typeLocator = new TypeLocator(SoteoSharedAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);

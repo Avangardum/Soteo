@@ -1,26 +1,27 @@
+using Soteo.Core.Interfaces;
 using Soteo.Core.Packets;
 using static Soteo.Core.SerializationHelper;
 
 namespace Soteo.Core.PacketSerializers;
 
-public sealed class ChunkPacketSerializer : PacketSerializer<ChunkPacket>
+public sealed class ChunkPacketSerializer(ISerializationHelper s) : PacketSerializer<ChunkPacket>(s)
 {
     protected override void SerializeInternal(ChunkPacket packet, Stream stream)
     {
-        SerializeGuid(packet.GroupId, stream);
-        SerializeInt(packet.Index, stream);
-        SerializeBool(packet.IsLast, stream);
-        SerializeList(packet.Bytes, SerializeByte, stream);
+        s.SerializeGuid(packet.GroupId, stream);
+        s.SerializeInt(packet.Index, stream);
+        s.SerializeBool(packet.IsLast, stream);
+        s.SerializeList(packet.Bytes, s.SerializeByte, stream);
     }
 
     protected override ChunkPacket DeserializeInternal(Stream stream)
     {
         return new ChunkPacket
         {
-            GroupId = DeserializeGuid(stream),
-            Index = DeserializeInt(stream),
-            IsLast = DeserializeBool(stream),
-            Bytes = DeserializeList(DeserializeByte, stream),
+            GroupId = s.DeserializeGuid(stream),
+            Index = s.DeserializeInt(stream),
+            IsLast = s.DeserializeBool(stream),
+            Bytes = s.DeserializeList(s.DeserializeByte, stream),
         };
     }
 }

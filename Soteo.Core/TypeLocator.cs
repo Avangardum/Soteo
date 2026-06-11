@@ -6,6 +6,8 @@ namespace Soteo.Core;
 
 public class TypeLocator : ITypeLocator
 {
+    public static readonly TypeLocator Empty = new([], []);
+    
     public IReadOnlyList<Type> Types { get; }
     
     public TypeLocator(params IReadOnlyList<Type> types) : this([], types) { }

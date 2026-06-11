@@ -1,38 +1,39 @@
 using Soteo.Core.Commands;
 using Soteo.Core.Enums;
+using Soteo.Core.Interfaces;
 using Soteo.Core.Packets;
 using static Soteo.Core.SerializationHelper;
 
 namespace Soteo.Core.PacketSerializers;
 
-public sealed class UseAbilityPacketSerializer : PacketSerializer<UseAbilityPacket>
+public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketSerializer<UseAbilityPacket>(s)
 {
     protected override void SerializeInternal(UseAbilityPacket packet, Stream stream)
     {
-        SerializeGuid(packet.UnitId, stream);
+        s.SerializeGuid(packet.UnitId, stream);
         
-        SerializeEnum(packet.Command.Slot, stream);
-        SerializeBool(packet.Command.Repeat, stream);
+        s.SerializeEnum(packet.Command.Slot, stream);
+        s.SerializeBool(packet.Command.Repeat, stream);
         
-        SerializeNullableStruct(packet.Command.TargetPosition, SerializeVector2, stream);
-        SerializeNullableStruct(packet.Command.TargetUnitId, SerializeGuid, stream);
-        SerializeNullableStruct(packet.Command.TargetDirection, SerializeVector2, stream);
-        SerializeNullableStruct(packet.Command.TargetShardId, SerializeGuid, stream);
+        s.SerializeNullableStruct(packet.Command.TargetPosition, s.SerializeVector2, stream);
+        s.SerializeNullableStruct(packet.Command.TargetUnitId, s.SerializeGuid, stream);
+        s.SerializeNullableStruct(packet.Command.TargetDirection, s.SerializeVector2, stream);
+        s.SerializeNullableStruct(packet.Command.TargetShardId, s.SerializeGuid, stream);
     }
 
     protected override UseAbilityPacket DeserializeInternal(Stream stream)
     {
         return new UseAbilityPacket
         {
-            UnitId = DeserializeGuid(stream),
+            UnitId = s.DeserializeGuid(stream),
             Command = new UseAbilityCommand
             (
-                Slot: DeserializeEnum<AbilitySlot>(stream),
-                Repeat: DeserializeBool(stream),
-                TargetPosition: DeserializeNullableStruct(DeserializeVector2, stream),
-                TargetUnitId: DeserializeNullableStruct(DeserializeGuid, stream),
-                TargetDirection: DeserializeNullableStruct(DeserializeVector2, stream),
-                TargetShardId: DeserializeNullableStruct(DeserializeGuid, stream)
+                Slot: s.DeserializeEnum<AbilitySlot>(stream),
+                Repeat: s.DeserializeBool(stream),
+                TargetPosition: s.DeserializeNullableStruct(s.DeserializeVector2, stream),
+                TargetUnitId: s.DeserializeNullableStruct(s.DeserializeGuid, stream),
+                TargetDirection: s.DeserializeNullableStruct(s.DeserializeVector2, stream),
+                TargetShardId: s.DeserializeNullableStruct(s.DeserializeGuid, stream)
             ),
         };
     }
