@@ -48,7 +48,7 @@ public static class DictionaryExtensions
         /// <summary>
         /// Create a copy of this dictionary with the specified keys removed
         /// </summary>
-        public IReadOnlyDictionary<TKey, TValue> Without(IEnumerable<TKey> keys)
+        public IReadOnlyDictionary<TKey, TValue> Without(params IEnumerable<TKey> keys)
         {
             Dictionary<TKey, TValue> dict = self.ToDictionary();
             foreach (TKey key in keys)

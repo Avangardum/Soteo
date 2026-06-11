@@ -22,6 +22,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
     private static readonly Guid Shard3Id = Guid.NewGuid(); 
     private static readonly Guid ProjectileId = Guid.NewGuid(); 
     
+    // todo add non-player units after they are introduced
     private static readonly CampaignSnapshot ConsistentSnapshot = new()
     {
         CampaignServer = new CampaignServerSnapshot
@@ -176,6 +177,34 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                     }
                 )
             },
+        };
+        
+        sut.IsConsistent(snapshot).Should().BeFalse();
+    }
+    
+    [Fact]
+    public void SnapshotWithMissingShardSnapshotFailsValidation()
+    {
+        var sut = new CampaignSnapshotCrossServerConsistencyValidator();
+        CampaignSnapshot snapshot = ConsistentSnapshot with
+        {
+            Shards = ConsistentSnapshot.Shards.Without(Shard3Id),
+        };
+        
+        sut.IsConsistent(snapshot).Should().BeFalse();
+    }
+    
+    [Fact]
+    public void SnapshotWithExtraShardSnapshotFailsValidation()
+    {
+        var sut = new CampaignSnapshotCrossServerConsistencyValidator();
+        var extraShardId = Guid.NewGuid();
+        CampaignSnapshot snapshot = ConsistentSnapshot with
+        {
+            Shards = ConsistentSnapshot.Shards.With(new Dictionary<Guid, ShardSnapshot>
+            {
+                [extraShardId] = ConsistentSnapshot.Shards[Shard3Id],
+            }),
         };
         
         sut.IsConsistent(snapshot).Should().BeFalse();

@@ -7,10 +7,20 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
 {
     public bool IsConsistent(CampaignSnapshot snapshot)
     {
-        return DoPlayerCharactersWithShardIdExistInCorrespondingShardSnapshots(snapshot) &&
+        return
+            DoShardUsersMatchShardSnapshots(snapshot) &&
+            DoPlayerCharactersWithShardIdExistInCorrespondingShardSnapshots(snapshot) &&
             DoPlayerCharactersInShardSnapshotsHaveCorrespondingShardId(snapshot);
     }
 
+    private bool DoShardUsersMatchShardSnapshots(CampaignSnapshot snapshot)
+    {
+        IEnumerable<Guid> shardUserIds =
+            snapshot.CampaignServer.Users.Where(it => it.Value.IsShard).Select(it => it.Key);
+        IEnumerable<Guid> shardSnapshotIds = snapshot.Shards.Keys;
+        return shardUserIds.SequenceEqual(shardSnapshotIds);
+    }
+    
     private bool DoPlayerCharactersWithShardIdExistInCorrespondingShardSnapshots(CampaignSnapshot snapshot)
     {
         IEnumerable<PlayerCharacterSnapshot> deployedPlayerCharacters =
