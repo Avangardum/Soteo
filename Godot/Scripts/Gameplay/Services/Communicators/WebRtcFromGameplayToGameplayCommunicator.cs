@@ -73,7 +73,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             while (_packetQueue.Count > 0)
             {
                 (Packet packet, Guid senderId) = _packetQueue.Dequeue();
-                Try(senderId, () => _packetHandler.HandleAsync(packet, senderId));
+                HandlePacket(packet, senderId);
             }
         }
     }
@@ -110,8 +110,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
                 PeerConnected(peerId);
             }
 
-            HandlePackets(peerConnectionAndChannels.ReliableChannel, peerId, delta);
-            HandlePackets(peerConnectionAndChannels.UnreliableChannel, peerId, delta);
+            DeserializeAndHandlePackets(peerConnectionAndChannels.ReliableChannel, peerId);
+            DeserializeAndHandlePackets(peerConnectionAndChannels.UnreliableChannel, peerId);
         }
     }
     
@@ -138,21 +138,44 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         }
     }
     
-    private void HandlePackets(WebRTCDataChannel channel, Guid senderId, double delta)
+    private void DeserializeAndHandlePackets(WebRTCDataChannel channel, Guid senderId)
     {
         while (channel.GetAvailablePacketCount() > 0)
         {
             byte[] bytes = channel.GetPacket();
             BytesReceived += bytes.Length;
-            HandlePacket(bytes, senderId);
+            DeserializeAndHandlePacket(bytes, senderId);
         }
     }
     
-    private void HandlePacket(byte[] bytes, Guid senderId)
+    private void DeserializeAndHandlePacket(byte[] bytes, Guid senderId)
     {
-        Try(senderId, async () =>
+        Packet? packet = DeserializePacket(bytes, senderId);
+        if (packet == null) return;
+        HandlePacket(packet, senderId);
+    }
+    
+    private Packet? DeserializePacket(byte[] bytes, Guid senderId)
+    {
+        try
         {
-            Packet packet = _packetSerializer.Deserialize(bytes);
+            return _packetSerializer.Deserialize(bytes);
+        }
+        catch (BadSerializedDataException e)
+        {
+            if (_sideDetector.IsServer)
+            {
+                SendReliable(new BadInputPacket { Reason = e.Message }, senderId);
+                return null;
+            }
+            throw;
+        }
+    }
+    
+    private async void HandlePacket(Packet packet, Guid senderId)
+    {
+        try
+        {
             if (packet is PingPacket pingPacket)
             {
                 HandlePingPacket(pingPacket, senderId);
@@ -162,7 +185,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             {
                 byte[]? restoredPacketBytes = _chunkCollector.AddChunk(chunkPacket, senderId);
                 if (restoredPacketBytes != null)
-                    HandlePacket(restoredPacketBytes, senderId);
+                    DeserializeAndHandlePacket(restoredPacketBytes, senderId);
                 return;
             }
             
@@ -171,19 +194,11 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
                 _packetQueue.Enqueue((packet, senderId));
             else
                 await _packetHandler.HandleAsync(packet, senderId);
-        });
-    }
-    
-    private async void Try(Guid senderId, Func<Task> func)
-    {
-        try
-        {
-            await func();
         }
         catch (BadPacketException e)
         {
             if (_sideDetector.IsServer)
-                SendReliable(new BadInputPacket { Reason = e.Reason }, senderId);
+                SendReliable(new BadInputPacket { Reason = e.Message }, senderId);
             else
                 AsyncExceptionCollector.Collect(e);
         }

@@ -11,7 +11,7 @@ public static class ExceptionFactory
         return new Exception(message);
     }
     
-    public static Exception PacketHandlerNotFound(PacketTypeCode packetTypeCode, Type requiredAttributeType)
+    public static BadPacketException PacketHandlerNotFound(PacketTypeCode packetTypeCode, Type requiredAttributeType)
     {
         var message = $"Packet handler for packet type {packetTypeCode} was not found. " +
             $"Make sure the handler exists, is public, decorated with {requiredAttributeType.Name} " +
@@ -19,7 +19,7 @@ public static class ExceptionFactory
         return new BadPacketException(message);
     }
     
-    public static Exception ClientPacketsNotAllowed(Type handlerType)
+    public static BadPacketException ClientPacketsNotAllowed(Type handlerType)
     {
         var message = $"{handlerType} does not allow client packets. Add [AllowClientPackets] if it should allow them.";
         return new BadPacketException(message);

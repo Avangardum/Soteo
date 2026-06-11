@@ -29,7 +29,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         {
             0 => false,
             1 => true,
-            _ => throw new BadPacketException("Invalid bool")
+            _ => throw new BadSerializedDataException("Invalid bool")
         };
     }
 
@@ -147,7 +147,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     {
         TEnum value = DeserializeEnumWithoutValidation<TEnum>(stream);
         if (!Enum.IsDefined(typeof(TEnum), value) && !typeof(TEnum).HasAttribute<FlagsAttribute>())
-            throw new BadPacketException($"Invalid {typeof(TEnum)} value {value}");
+            throw new BadSerializedDataException($"Invalid {typeof(TEnum)} value {value}");
         return value;
     }
 
@@ -191,7 +191,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     {
         int length = DeserializeInt(stream);
         if (length < 0 || length > stream.Length - stream.Position)
-            throw new BadPacketException("Invalid list length");
+            throw new BadSerializedDataException("Invalid list length");
         var result = new TElement[length];
         if (typeof(TElement) == typeof(byte))
         {
@@ -215,7 +215,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     {
         int byteCount = DeserializeInt(stream);
         if (byteCount < 0 || byteCount > stream.Length - stream.Position)
-            throw new BadPacketException("Invalid string length");
+            throw new BadSerializedDataException("Invalid string length");
         byte[] buffer = new byte[byteCount];
         stream.ReadExactly(buffer);
         return Encoding.UTF8.GetString(buffer);

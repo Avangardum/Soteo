@@ -141,7 +141,7 @@ public sealed class ExtraDataTests
         new SerializationHelper(TypeLocator.Empty).SerializeInt(count, stream);
         stream.Position = 0;
         
-        FluentActions.Invoking(() => ExtraData.Deserialize(stream)).Should().Throw<BadPacketException>();
+        FluentActions.Invoking(() => ExtraData.Deserialize(stream)).Should().Throw<BadSerializedDataException>();
     }
     
     [Fact]

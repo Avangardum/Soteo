@@ -61,14 +61,14 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
             TPacket packet = DeserializeInternal(stream);
             if (stream.Position != bytes.Length)
             {
-                throw new BadPacketException
+                throw new BadSerializedDataException
                 (
                     $"Packet deserialized as {packet}, but contains {bytes.Length - stream.Position} extra bytes"
                 );
             }
             return packet;
         }
-        catch (BadPacketException e)
+        catch (BadSerializedDataException e)
         {
             throw new AggregateException($"Bad packet\n{BitConverter.ToString(bytes.ToArray())}\n", e);
         }

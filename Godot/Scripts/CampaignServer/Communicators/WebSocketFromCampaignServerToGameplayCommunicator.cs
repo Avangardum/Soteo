@@ -117,9 +117,9 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         {
             return _packetSerializer.Deserialize(bytes);
         }
-        catch (BadPacketException e)
+        catch (BadSerializedDataException e)
         {
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = e.Reason } ));
+            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = e.Message } ));
             return null;
         }
     }
@@ -169,7 +169,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         }
         catch (BadPacketException e)
         {
-            SendTo(new BadInputPacket { Reason = e.Reason}, senderId);
+            SendTo(new BadInputPacket { Reason = e.Message }, senderId);
         }
         catch (Exception e)
         {

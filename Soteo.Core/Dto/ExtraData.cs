@@ -63,7 +63,7 @@ public sealed class ExtraData(object?[] values, ISerializationHelper s)
         var s = new SerializationHelper(TypeLocator.Empty);
         int count = s.DeserializeInt(stream);
         if (count < 0 || count > stream.Length - stream.Position)
-            throw new BadPacketException("Invalid ExtraData count");
+            throw new BadSerializedDataException("Invalid ExtraData count");
         var values = new object?[count];
         for (int i = 0; i < count; i++)
         {
