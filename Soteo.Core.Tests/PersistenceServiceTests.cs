@@ -211,10 +211,9 @@ public sealed class PersistenceServiceTests
                 SendTo(packet, id);
         }
         
-        public void Broadcast(Packet packet) => BroadcastToShardServers(packet);
-
-        public void RelayFrom(RelayedPacket packet, Guid senderId) =>
-            throw new NotSupportedException();
+        public void BroadcastToShardServersAndClients(Packet packet) => throw new NotSupportedException();
+        public void BroadcastToClients(Packet packet) => throw new NotSupportedException();
+        public void RelayFrom(RelayedPacket packet, Guid senderId) => throw new NotSupportedException();
     }
     
     private sealed class FakeConsistencyValidator : ICampaignSnapshotCrossServerConsistencyValidator

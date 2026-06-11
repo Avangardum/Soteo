@@ -86,8 +86,8 @@ public sealed class CampaignServer : Node
     private async Task TestLifetimeAsync()
     {
         await Task.Delay(TimeSpan.FromSeconds(30));
-        ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>().Broadcast(new PausePacket { Pause = true });
+        ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>().BroadcastToShardServersAndClients(new PausePacket { Pause = true });
         await Task.Delay(TimeSpan.FromSeconds(10));
-        ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>().Broadcast(new PausePacket { Pause = false });
+        ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>().BroadcastToShardServersAndClients(new PausePacket { Pause = false });
     }
 }

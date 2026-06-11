@@ -45,27 +45,37 @@ public sealed class JsmqFromCampaignServerCommunicator
     
     public void SendTo(Packet packet, Guid receiverId)
     {
-        byte[] bytes = [..Const.CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
-        string base64 = Convert.ToBase64String(bytes);
+        string base64 = ToBase64(packet);
         JavaScript.Eval($"""jsmq.send("{base64}", "{receiverId}");""");
     }
 
-    public void Broadcast(Packet packet)
+    public void BroadcastToShardServersAndClients(Packet packet)
     {
-        byte[] bytes = [..Const.CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
-        string base64 = Convert.ToBase64String(bytes);
+        string base64 = ToBase64(packet);
         foreach (Guid id in _peerIds)
             JavaScript.Eval($"""jsmq.send("{base64}", "{id}");""");
     }
     
     public void BroadcastToShardServers(Packet packet)
     {
-        byte[] bytes = [..Const.CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
-        string base64 = Convert.ToBase64String(bytes);
+        string base64 = ToBase64(packet);
         foreach (Guid id in userRepo.Values.Where(it => it.IsShard).Select(it => it.Id))
             JavaScript.Eval($"""jsmq.send("{base64}", "{id}");""");
     }
+    
+    public void BroadcastToClients(Packet packet)
+    {
+        string base64 = ToBase64(packet);
+        foreach (Guid id in userRepo.Values.Where(it => it.IsPlayer).Select(it => it.Id))
+            JavaScript.Eval($"""jsmq.send("{base64}", "{id}");""");
+    }
 
+    private string ToBase64(Packet packet)
+    {
+        byte[] bytes = [..Const.CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
+        return Convert.ToBase64String(bytes);
+    }
+    
     public void RelayFrom(RelayedPacket packet, Guid senderId)
     {
         SendTo(packet with { PeerId = senderId }, packet.PeerId);

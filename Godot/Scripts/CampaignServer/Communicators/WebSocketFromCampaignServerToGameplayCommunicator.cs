@@ -2,6 +2,7 @@ using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
 using Soteo.Core;
+using Soteo.Core.CampaignServerState.DataObjects;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Packets;
@@ -56,23 +57,29 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         }
     }
     
-    public void Broadcast(Packet packet)
+    public void BroadcastToShardServersAndClients(Packet packet)
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
         foreach (int wsPeerId in _userIdsByWsPeerId.Keys)
             _wsServer.GetPeer(wsPeerId).PutPacket(bytes);
     }
     
-    public void BroadcastToShardServers(Packet packet)
+    public void BroadcastToShardServers(Packet packet) =>
+        BroadcastToUsersWhere(packet, it => it.IsShard);
+    
+    public void BroadcastToClients(Packet packet) =>
+        BroadcastToUsersWhere(packet, it => it.IsPlayer);
+    
+    private void BroadcastToUsersWhere(Packet packet, Func<User, bool> predicate)
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
-        IEnumerable<int> wsPeerIds = _userRepo.Values
-            .Where(it => it.IsShard)
-            .Select(it => _userIdsByWsPeerId.Inverse[it.Id]);
+        IEnumerable<int> wsPeerIds = _userIdsByWsPeerId
+            .Where(it => _userRepo.TryGetValue(it.Value, out User user) && predicate(user))
+            .Select(it => it.Key);
         foreach (int wsPeerId in wsPeerIds)
             _wsServer.GetPeer(wsPeerId).PutPacket(bytes);
     }
-
+    
     public void RelayFrom(RelayedPacket packet, Guid senderId) =>
         SendTo(packet with { PeerId = senderId }, packet.PeerId);
 
