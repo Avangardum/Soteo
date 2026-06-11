@@ -1,8 +1,11 @@
 using System.Collections.Immutable;
-using Soteo.Core.CampaignServerState.DataObjects;
+using System.Numerics;
+using AwesomeAssertions;
+using Soteo.Core.Abilities;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
+using Soteo.Core.Services;
 
 namespace Soteo.Core.CampaignServer.Tests;
 
@@ -17,6 +20,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
     private static readonly Guid Shard1Id = Guid.NewGuid(); 
     private static readonly Guid Shard2Id = Guid.NewGuid(); 
     private static readonly Guid Shard3Id = Guid.NewGuid(); 
+    private static readonly Guid ProjectileId = Guid.NewGuid(); 
     
     private static readonly CampaignSnapshot ConsistentSnapshot = new()
     {
@@ -60,7 +64,8 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 Tick = 0,
                 Entities = new Dictionary<Guid, EntitySnapshot>
                 {
-                    [Char1Id] = CreatePlayerCharacterEntitySnapshot(Char1Id)
+                    [Char1Id] = CreatePlayerCharacterEntitySnapshot(Char1Id),
+                    [ProjectileId] = CreateProjectileEntitySnapshot(ProjectileId), 
                 }.ToImmutableDictionary(),
             },
             [Shard2Id] = new()
@@ -79,11 +84,102 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
         }.ToImmutableDictionary(),
     };
     
-    // [Fact]
-    // public void ConsistentSnapshotPassesValidation()
-    // {
-    //     
-    // }
+    [Fact]
+    public void ConsistentSnapshotPassesValidation()
+    {
+        var sut = new CampaignSnapshotCrossServerConsistencyValidator();
+        sut.IsConsistent(ConsistentSnapshot).Should().BeTrue();
+    }
+    
+    [Fact]
+    public void SnapshotWhereShardSnapshotMissesPlayerCharacterFailsValidation()
+    {
+        var sut = new CampaignSnapshotCrossServerConsistencyValidator();
+        var snapshot = ConsistentSnapshot with
+        {
+            Shards = ConsistentSnapshot.Shards.With
+            (
+                new Dictionary<Guid, ShardSnapshot>
+                {
+                    [Shard1Id] = ConsistentSnapshot.Shards[Shard1Id] with
+                    {
+                        Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+                    },
+                }
+            ),
+        };
+        
+        sut.IsConsistent(snapshot).Should().BeFalse();
+    }
+    
+    [Fact]
+    public void SnapshotWherePlayerCharacterIsInWrongShardSnapshotFailsValidation()
+    {
+        var sut = new CampaignSnapshotCrossServerConsistencyValidator();
+        var snapshot = ConsistentSnapshot with
+        {
+            Shards = ConsistentSnapshot.Shards.With
+            (
+                new Dictionary<Guid, ShardSnapshot>
+                {
+                    [Shard1Id] = ConsistentSnapshot.Shards[Shard1Id] with
+                    {
+                        Entities = ConsistentSnapshot.Shards[Shard2Id].Entities,
+                    },
+                    [Shard2Id] = ConsistentSnapshot.Shards[Shard2Id] with
+                    {
+                        Entities = ConsistentSnapshot.Shards[Shard1Id].Entities,
+                    },
+                }
+            ),
+        };
+        
+        sut.IsConsistent(snapshot).Should().BeFalse();
+    }
+    
+    [Fact]
+    public void SnapshotWherePlayerCharacterIsInManyShardSnapshotsFailsValidation()
+    {
+        var sut = new CampaignSnapshotCrossServerConsistencyValidator();
+        var snapshot = ConsistentSnapshot with
+        {
+            Shards = ConsistentSnapshot.Shards.With
+            (
+                new Dictionary<Guid, ShardSnapshot>
+                {
+                    [Shard1Id] = ConsistentSnapshot.Shards[Shard1Id] with
+                    {
+                        Entities = ConsistentSnapshot.Shards[Shard1Id].Entities
+                            .Concat(ConsistentSnapshot.Shards[Shard2Id].Entities)
+                            .ToImmutableDictionary(),
+                    },
+                }
+            ),
+        };
+        
+        sut.IsConsistent(snapshot).Should().BeFalse();
+    }
+    
+    [Fact]
+    public void SnapshotWhereUndeployedCharacterIsInShardSnapshotFailsValidation()
+    {
+        var sut = new CampaignSnapshotCrossServerConsistencyValidator();
+        CampaignSnapshot snapshot = ConsistentSnapshot with
+        {
+            CampaignServer = ConsistentSnapshot.CampaignServer with
+            {
+                Characters = ConsistentSnapshot.CampaignServer.Characters.With
+                (
+                    new Dictionary<Guid, PlayerCharacterSnapshot>
+                    {
+                        [Char1Id] = ConsistentSnapshot.CampaignServer.Characters[Char1Id] with { ShardId = null }
+                    }
+                )
+            },
+        };
+        
+        sut.IsConsistent(snapshot).Should().BeFalse();
+    }
     
     private static UserSnapshot CreatePlayerUserSnapshot(Guid id)
     {
@@ -121,6 +217,26 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             IsRemoved = false,
             Position = default,
             Azimuth = 0,
+        };
+    }
+    
+    private static ProjectileSnapshot CreateProjectileEntitySnapshot(Guid id)
+    {
+        return new()
+        {
+            Id = id,
+            AbilityContext = new DeflatedAbilityContext
+            {
+                Ability = Ability.Instance<RangedAttackAbility>(),
+                Level = 1,
+                UserId = Player1Id,
+                UserStats = ImmutableDictionary<Stat, double>.Empty
+            },
+            Speed = 0,
+            Target = Vector2.Zero,
+            IsRemoved = false,
+            Position = Vector2.Zero,
+            Azimuth = 0
         };
     }
 }

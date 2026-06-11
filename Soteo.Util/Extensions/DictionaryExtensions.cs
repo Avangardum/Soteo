@@ -33,6 +33,28 @@ public static class DictionaryExtensions
         
         public TValue? GetOrDefault(TKey key) =>
             self.TryGetValue(key, out TValue? value) ? value : default;
+        
+        /// <summary>
+        /// Create a copy of this dictionary with the specified values added / updated
+        /// </summary>
+        public IReadOnlyDictionary<TKey, TValue> With(IReadOnlyDictionary<TKey, TValue> values)
+        {
+            Dictionary<TKey, TValue> dict = self.ToDictionary();
+            foreach ((TKey key, TValue value) in values)
+                dict[key] = value;
+            return dict;
+        }
+        
+        /// <summary>
+        /// Create a copy of this dictionary with the specified keys removed
+        /// </summary>
+        public IReadOnlyDictionary<TKey, TValue> Without(IEnumerable<TKey> keys)
+        {
+            Dictionary<TKey, TValue> dict = self.ToDictionary();
+            foreach (TKey key in keys)
+                dict.Remove(key);
+            return dict;
+        }
     }
 
     extension<TKey, TValue, TTarget>(IReadOnlyDictionary<TKey, TValue> self) where TValue : TTarget
