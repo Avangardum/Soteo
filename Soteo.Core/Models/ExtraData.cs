@@ -4,7 +4,11 @@ using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Dto;
 
-public sealed class ExtraData(object?[] values, ISerializationHelper s)
+/// <summary>
+/// Serializable data container included in AbilityContext / StatusContext
+/// for storing data specific to a concrete ability / status.
+/// </summary>
+public sealed class ExtraData(object?[] values, ISerializationHelper s) // todo this is not a DTO
 {
     public void Set<T>(Key<T> key, T value)
     {
