@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core.Abilities;
+using Soteo.Core.Entities;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Statuses;
 
@@ -42,6 +44,26 @@ public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
             DisplayElapsedTime = DisplayElapsedTime,
             RemainingTime = RemainingTime,
             Ordinal = Ordinal
+        };
+    }
+    
+    public static StatusContext FromSnapshot(StatusContextSnapshot snapshot, IServiceProvider serviceProvider)
+    {
+        var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
+        return new StatusContext
+        {
+            Id = snapshot.Id,
+            Status = snapshot.Status,
+            SourceAbilityContext =
+                snapshot.AbilityContext?.PassTo(it => AbilityContext.FromSnapshot(it, serviceProvider)),
+            Unit = entityManager.GetEntity<Unit>(snapshot.UnitId).Required,
+            SourceUnit = snapshot.SourceId?.PassTo(it => entityManager.GetEntity<Unit>(it).Required),
+            Tick = snapshot.Tick,
+            ElapsedTime = snapshot.ElapsedTime,
+            DisplayElapsedTime = snapshot.DisplayElapsedTime,
+            RemainingTime = snapshot.RemainingTime,
+            Ordinal = snapshot.Ordinal,
+            ServiceProvider = serviceProvider
         };
     }
 }

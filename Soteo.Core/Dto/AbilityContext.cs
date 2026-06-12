@@ -1,5 +1,7 @@
 using System.Numerics;
+using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core.Abilities;
+using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 
@@ -39,7 +41,25 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
             TargetPosition = TargetPosition,
             TargetUnitId = TargetUnit?.Id,
             TargetDirection = TargetDirection,
-            TargetShardId = TargetShardId
+            TargetShardId = TargetShardId,
+        };
+    }
+    
+    public static AbilityContext FromSnapshot(AbilityContextSnapshot snapshot, IServiceProvider serviceProvider)
+    {
+        var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
+        return new AbilityContext
+        {
+            Ability = snapshot.Ability,
+            Level = snapshot.Level,
+            User = entityManager.GetEntity<Unit>(snapshot.UserId).Required,
+            UserStats = snapshot.UserStats,
+            ServiceProvider = serviceProvider,
+            TargetPosition = snapshot.TargetPosition,
+            TargetUnit = snapshot.TargetUnitId == null ? null :
+                entityManager.GetEntity<Unit>(snapshot.TargetUnitId.Value).Required,
+            TargetDirection = snapshot.TargetDirection,
+            TargetShardId = snapshot.TargetShardId,
         };
     }
 }

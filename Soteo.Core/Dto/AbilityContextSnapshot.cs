@@ -17,21 +17,4 @@ public sealed record AbilityContextSnapshot
     public Guid? TargetUnitId { get; init; }
     public Vector2? TargetDirection { get; init; }
     public Guid? TargetShardId { get; init; }
-    
-    public AbilityContext Inflate(IServiceProvider serviceProvider)
-    {
-        var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
-        return new AbilityContext
-        {
-            Ability = Ability,
-            Level = Level,
-            User = entityManager.GetEntity<Unit>(UserId).Required,
-            UserStats = UserStats,
-            ServiceProvider = serviceProvider,
-            TargetPosition = TargetPosition,
-            TargetUnit = TargetUnitId == null ? null : entityManager.GetEntity<Unit>(TargetUnitId.Value).Required,
-            TargetDirection = TargetDirection,
-            TargetShardId = TargetShardId
-        };
-    }
 }

@@ -58,9 +58,9 @@ public sealed class Projectile : Entity<IProjectileNode>
     {
         base.ReplicateSnapshot(snapshot);
         var s = (ProjectileSnapshot)snapshot;
-        _abilityContext = s.AbilityContext.Inflate(_serviceProvider);
+        _abilityContext = AbilityContext.FromSnapshot(s.AbilityContext, _serviceProvider);
         _speed = s.Speed;
-        _target = s.Target.Inflate(_serviceProvider);
+        _target = ProjectileTarget.FromSnapshot(s.Target, _serviceProvider);
     }
 
     public void Tick(double delta)

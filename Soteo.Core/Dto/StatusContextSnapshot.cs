@@ -18,25 +18,6 @@ public sealed record StatusContextSnapshot
     public required double RemainingTime { get; init; }
     public required long Ordinal { get; init; }
     
-    public StatusContext Inflate(IServiceProvider serviceProvider)
-    {
-        var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
-        return new StatusContext
-        {
-            Id = Id,
-            Status = Status,
-            SourceAbilityContext = AbilityContext?.Inflate(serviceProvider),
-            Unit = entityManager.GetEntity<Unit>(UnitId).Required,
-            SourceUnit = SourceId == null ? null : entityManager.GetEntity<Unit>(SourceId.Value).Required,
-            Tick = Tick,
-            ElapsedTime = ElapsedTime,
-            DisplayElapsedTime = DisplayElapsedTime,
-            RemainingTime = RemainingTime,
-            Ordinal = Ordinal,
-            ServiceProvider = serviceProvider
-        };
-    }
-    
     public PuppetStatusContext ToPuppet()
     {
         return new PuppetStatusContext

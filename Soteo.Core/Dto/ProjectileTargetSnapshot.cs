@@ -19,14 +19,4 @@ public class ProjectileTargetSnapshot
     [MemberNotNullWhen(true, nameof(UnitId))]
     [MemberNotNullWhen(false, nameof(Position))]
     public bool IsUnit => UnitId != null;
-    
-    public ProjectileTarget Inflate(IServiceProvider serviceProvider)
-    {
-        if (IsUnit)
-        {
-            var target = serviceProvider.GetRequiredService<IEntityManager>().GetEntity<IUnit>(UnitId.Value).Required;
-            return new ProjectileTarget(target);
-        }
-        return Position;
-    }
 }
