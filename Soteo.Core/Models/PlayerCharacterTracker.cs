@@ -2,7 +2,7 @@ using Soteo.Core.Dto.Snapshots;
 
 namespace Soteo.Core.CampaignServerState.DataObjects;
 
-public sealed record PlayerCharacter
+public sealed record PlayerCharacterTracker
 {
     public required Guid Id { get; init; }
     public User? Player { get; set; } // todo make required

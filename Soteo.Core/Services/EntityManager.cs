@@ -131,7 +131,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         };
     }
     
-    public PlayerCharacter SpawnPlayerCharacter(Guid id, Guid controllingPlayerId)
+    public PlayerCharacterEntity SpawnPlayerCharacter(Guid id, Guid controllingPlayerId)
     {
         if (_entities.ContainsKey(id))
             throw new InvalidOperationException("Entity with this id already exists");
@@ -142,7 +142,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
             removedEntityRef.TryGetTarget(out ISnapshottableEntity removedEntity)
         )
         {
-            if (removedEntity is not PlayerCharacter playerCharacter)
+            if (removedEntity is not PlayerCharacterEntity playerCharacter)
             {
                 throw new InvalidOperationException
                 (
@@ -159,7 +159,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         }
         else
         {
-            return Add(new PlayerCharacter(id, controllingPlayerId, AddNode<IUnitNode>(id), this, _serviceProvider));
+            return Add(new PlayerCharacterEntity(id, controllingPlayerId, AddNode<IUnitNode>(id), this, _serviceProvider));
         }
     }
 

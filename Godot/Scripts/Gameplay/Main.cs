@@ -101,7 +101,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<ISideDetector>(new SideDetector(_isServer));
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         
-        var typeLocator = new TypeLocator(SoteoSharedAssembly.Value);
+        var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
         
         services.AddScoped<ShardNode>(

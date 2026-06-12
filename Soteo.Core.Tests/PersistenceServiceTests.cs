@@ -13,7 +13,7 @@ namespace Soteo.Core.Tests;
 public sealed class PersistenceServiceTests
 {
     private readonly UserRepository _userRepo;
-    private readonly PlayerCharacterRepository _charRepo;
+    private readonly PlayerCharacterDsoRepository _charRepo;
     private readonly FakePacketSender _packetSender;
     private readonly FakeTimeProvider _timeProvider;
     private readonly FakeConsistencyValidator _consistencyValidator;
@@ -22,7 +22,7 @@ public sealed class PersistenceServiceTests
     public PersistenceServiceTests()
     {
         _userRepo = new UserRepository();
-        _charRepo = new PlayerCharacterRepository();
+        _charRepo = new PlayerCharacterDsoRepository();
         _packetSender =
             new FakePacketSender((packet, senderId) => _sut.Required.ReceiveShardSnapshotPacket(packet, senderId));
         _timeProvider = new FakeTimeProvider();
@@ -183,9 +183,9 @@ public sealed class PersistenceServiceTests
         return shard;
     }
     
-    private PlayerCharacter CreatePlayerCharacterInShard(Guid? shardId)
+    private PlayerCharacterTracker CreatePlayerCharacterInShard(Guid? shardId)
     {
-        var character = new PlayerCharacter { Id = Guid.NewGuid(), ShardId = shardId };
+        var character = new PlayerCharacterTracker { Id = Guid.NewGuid(), ShardId = shardId };
         _charRepo.Add(character);
         return character;
     }

@@ -17,9 +17,5 @@
     <ItemGroup>
       <ProjectReference Include="..\Soteo.Util\Soteo.Util.csproj" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Folder Include="PacketHandlers\Gameplay\" />
-    </ItemGroup>
 
 </Project>

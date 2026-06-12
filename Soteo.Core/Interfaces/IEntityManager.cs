@@ -10,6 +10,6 @@ public interface IEntityManager
     event Action<IEntity> EntityAdded;
     event Action<IEntity> EntityRemoved;
         
-    PlayerCharacter SpawnPlayerCharacter(Guid id, Guid controllingPlayerId);
+    PlayerCharacterEntity SpawnPlayerCharacter(Guid id, Guid controllingPlayerId);
     Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target); 
 }

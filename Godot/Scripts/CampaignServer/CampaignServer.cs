@@ -42,13 +42,13 @@ public sealed class CampaignServer : Node
     private void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton<IUserRepository, UserRepository>();
-        services.AddSingleton<IPlayerCharacterRepository, PlayerCharacterRepository>();
+        services.AddSingleton<IPlayerCharacterRepository, PlayerCharacterDsoRepository>();
         services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IFromCampaignServerPacketSender, ICommunicator>();
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         
-        var typeLocator = new TypeLocator(SoteoSharedAssembly.Value);
+        var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
         
         if (_useJsmq)
