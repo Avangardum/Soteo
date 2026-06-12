@@ -3,10 +3,13 @@ using System.Collections.Immutable;
 using System.Numerics;
 using System.Text;
 using Soteo.Core.Abilities;
+using Soteo.Core.Delegates;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
+using Soteo.Core.PacketSerializers;
 using Soteo.Core.Statuses;
 
 namespace Soteo.Core;
@@ -166,7 +169,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public void SerializeList<TElement>
     (
         IReadOnlyCollection<TElement> value,
-        ISerializationHelper.Serializer<TElement> serializeElement,
+        Serializer<TElement> serializeElement,
         Stream stream
     )
     {
@@ -185,7 +188,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 
     public TElement[] DeserializeList<TElement>
     (
-        ISerializationHelper.Deserializer<TElement> deserializeElement,
+        Deserializer<TElement> deserializeElement,
         Stream stream
     )
     {
@@ -221,7 +224,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         return Encoding.UTF8.GetString(buffer);
     }
     
-    public void SerializeNullableStruct<T>(T? nullable, ISerializationHelper.Serializer<T> serializer, Stream stream)
+    public void SerializeNullableStruct<T>(T? nullable, Serializer<T> serializer, Stream stream)
         where T : struct
     {
         SerializeBool(nullable != null, stream);
@@ -229,14 +232,14 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             serializer(nullable.Value, stream);
     }
     
-    public T? DeserializeNullableStruct<T>(ISerializationHelper.Deserializer<T> deserializer, Stream stream)
+    public T? DeserializeNullableStruct<T>(Deserializer<T> deserializer, Stream stream)
         where T : struct
     {
         bool hasValue = DeserializeBool(stream);
         return hasValue ? deserializer(stream) : null;
     }
     
-    public void SerializeNullableClass<T>(T? nullable, ISerializationHelper.Serializer<T> serializer, Stream stream)
+    public void SerializeNullableClass<T>(T? nullable, Serializer<T> serializer, Stream stream)
         where T : class
     {
         SerializeBool(nullable != null, stream);
@@ -244,7 +247,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             serializer(nullable, stream);
     }
     
-    public T? DeserializeNullableClass<T>(ISerializationHelper.Deserializer<T> deserializer, Stream stream)
+    public T? DeserializeNullableClass<T>(Deserializer<T> deserializer, Stream stream)
         where T : class
     {
         bool hasValue = DeserializeBool(stream);
@@ -254,8 +257,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public void SerializeDictionary<TKey, TValue>
     (
         IReadOnlyDictionary<TKey, TValue> dictionary,
-        ISerializationHelper.Serializer<TKey> serializeKey,
-        ISerializationHelper.Serializer<TValue> serializeValue,
+        Serializer<TKey> serializeKey,
+        Serializer<TValue> serializeValue,
         Stream stream
     )
     {
@@ -268,8 +271,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 
     public ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue> 
     (
-        ISerializationHelper.Deserializer<TKey> deserializeKey,
-        ISerializationHelper.Deserializer<TValue> deserializeValue,
+        Deserializer<TKey> deserializeKey,
+        Deserializer<TValue> deserializeValue,
         Stream stream
     ) where TKey : notnull
     {
@@ -286,7 +289,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public void SerializeIndexedDictionary<TKey, TValue>
     (
         IReadOnlyDictionary<TKey, TValue> dictionary,
-        ISerializationHelper.Serializer<TValue> serializeValue,
+        Serializer<TValue> serializeValue,
         Stream stream
     )
     {
@@ -298,7 +301,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     /// </summary>
     public ImmutableDictionary<TKey, TValue> DeserializeIndexedDictionary<TKey, TValue>
     (
-        ISerializationHelper.Deserializer<TValue> deserializeValue,
+        Deserializer<TValue> deserializeValue,
         Func<TValue, TKey> keySelector,
         Stream stream
     ) where TKey : notnull
@@ -374,6 +377,240 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Level = DeserializeInt(stream),
             Cooldown = DeserializeDouble(stream),
             MaxCooldown = DeserializeDouble(stream),
+        };
+    }
+
+    public void SerializeEntitySnapshot(EntitySnapshot entity, Stream stream)
+    {
+        switch (entity)
+        {
+            case UnitSnapshot unit:
+                SerializeUnitSnapshot(unit, stream);
+                break;
+            case ProjectileSnapshot projectile:
+                SerializeProjectileSnapshot(projectile, stream);
+                break;
+            case UnitPuppetSnapshot unitPuppet:
+                SerializeUnitPuppetSnapshot(unitPuppet, stream);
+                break;
+            case ProjectilePuppetSnapshot projectilePuppet:
+                SerializeProjectilePuppetSnapshot(projectilePuppet, stream);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    public EntitySnapshot DeserializeEntitySnapshot(Stream stream)
+    {
+        return DeserializeEnum<EntityKind>(stream) switch
+        {
+            EntityKind.Unit => DeserializeUnitSnapshot(stream),
+            EntityKind.Projectile => DeserializeProjectileSnapshot(stream),
+            EntityKind.UnitPuppet => DeserializeUnitPuppetSnapshot(stream),
+            EntityKind.ProjectilePuppet => DeserializeProjectilePuppetSnapshot(stream),
+            _ => throw new ArgumentOutOfRangeException(),
+        };
+    }
+    
+    private void SerializeBaseEntitySnapshot(EntitySnapshot entity, Stream stream)
+    {
+        SerializeGuid(entity.Id, stream);
+        SerializeBool(entity.IsRemoved, stream);
+        SerializeVector2(entity.Position, stream);
+        SerializeDouble(entity.Azimuth, stream);
+    }
+
+    public void SerializeUnitSnapshot(UnitSnapshot unit, Stream stream)
+    {
+        SerializeEnum(EntityKind.Unit, stream);
+        SerializeBaseEntitySnapshot(unit, stream);
+        SerializeBool(unit.IsDead, stream);
+        SerializeBool(unit.IsMoving, stream);
+        SerializeDictionary(unit.Stats, SerializeEnum, SerializeDouble, stream);
+        SerializeDictionary(unit.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
+        SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
+        SerializeIndexedDictionary(unit.Statuses, SerializeDeflatedStatusContext, stream);
+    }
+
+    public UnitSnapshot DeserializeUnitSnapshot(Stream stream)
+    {
+        return new UnitSnapshot
+        {
+            Id = DeserializeGuid(stream),
+            IsRemoved = DeserializeBool(stream),
+            Position = DeserializeVector2(stream),
+            Azimuth = DeserializeDouble(stream),
+            IsDead = DeserializeBool(stream),
+            IsMoving = DeserializeBool(stream),
+            Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
+            AbilitySlotStates =
+                DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
+            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
+            Statuses = DeserializeIndexedDictionary(DeserializeDeflatedStatusContext, it => it.Id, stream)
+        };
+    }
+
+    public void SerializeUnitPuppetSnapshot(UnitPuppetSnapshot unitPuppet, Stream stream)
+    {
+        SerializeEnum(EntityKind.UnitPuppet, stream);
+        SerializeBaseEntitySnapshot(unitPuppet, stream);
+        SerializeBool(unitPuppet.IsDead, stream);
+        SerializeBool(unitPuppet.IsMoving, stream);
+        SerializeDictionary(unitPuppet.Stats, SerializeEnum, SerializeDouble, stream);
+        SerializeDictionary(unitPuppet.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
+        SerializeNullableClass(unitPuppet.AbilityUseProgress, SerializeAbilityUseProgress, stream);
+        SerializeIndexedDictionary(unitPuppet.Statuses, SerializePuppetStatusContext, stream);
+    }
+
+    public UnitPuppetSnapshot DeserializeUnitPuppetSnapshot(Stream stream)
+    {
+        return new UnitPuppetSnapshot
+        {
+            Id = DeserializeGuid(stream),
+            IsRemoved = DeserializeBool(stream),
+            Position = DeserializeVector2(stream),
+            Azimuth = DeserializeDouble(stream),
+            IsDead = DeserializeBool(stream),
+            IsMoving = DeserializeBool(stream),
+            Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
+            AbilitySlotStates =
+                DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
+            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
+            Statuses = DeserializeIndexedDictionary(DeserializePuppetStatusContext, it => it.Id, stream)
+        };
+    }
+
+    public void SerializeProjectileSnapshot(ProjectileSnapshot projectile, Stream stream)
+    {
+        SerializeEnum(EntityKind.Projectile, stream);
+        SerializeBaseEntitySnapshot(projectile, stream);
+        SerializeDouble(projectile.Speed, stream);
+        SerializeDeflatedAbilityContext(projectile.AbilityContext, stream);
+        SerializeProjectileTarget(projectile.Target, stream);
+    }
+
+    public ProjectileSnapshot DeserializeProjectileSnapshot(Stream stream)
+    {
+        return new ProjectileSnapshot
+        {
+            Id = DeserializeGuid(stream),
+            IsRemoved = DeserializeBool(stream),
+            Position = DeserializeVector2(stream),
+            Azimuth = DeserializeDouble(stream),
+            Speed = DeserializeDouble(stream),
+            AbilityContext = DeserializeDeflatedAbilityContext(stream),
+            Target = DeserializeProjectileTarget(stream),
+        };
+    }
+
+    public void SerializeProjectileTarget(DeflatedProjectileTarget value, Stream stream)
+    {
+        SerializeBool(value.IsUnit, stream);
+        if (value.IsUnit)
+            SerializeGuid(value.UnitId.Value, stream);
+        else
+            SerializeVector2(value.Position.Value, stream);
+    }
+
+    public DeflatedProjectileTarget DeserializeProjectileTarget(Stream stream)
+    {
+        bool isUnit = DeserializeBool(stream);
+        if (isUnit)
+            return DeserializeGuid(stream);
+        else
+            return DeserializeVector2(stream);
+    }
+
+    public void SerializeProjectilePuppetSnapshot(ProjectilePuppetSnapshot projectilePuppet, Stream stream)
+    {
+        SerializeEnum(EntityKind.ProjectilePuppet, stream);
+        SerializeBaseEntitySnapshot(projectilePuppet, stream);
+    }
+
+    public ProjectilePuppetSnapshot DeserializeProjectilePuppetSnapshot(Stream stream)
+    {
+        return new ProjectilePuppetSnapshot
+        {
+            Id = DeserializeGuid(stream),
+            IsRemoved = DeserializeBool(stream),
+            Position = DeserializeVector2(stream),
+            Azimuth = DeserializeDouble(stream)
+        };
+    }
+
+    public void SerializeDeflatedAbilityContext(DeflatedAbilityContext context, Stream stream)
+    {
+        SerializeAbility(context.Ability, stream);
+        SerializeInt(context.Level, stream);
+        SerializeGuid(context.UserId, stream);
+        SerializeDictionary(context.UserStats, SerializeEnum, SerializeDouble, stream);
+        SerializeNullableStruct(context.TargetPosition, SerializeVector2, stream);
+        SerializeNullableStruct(context.TargetUnitId, SerializeGuid, stream);
+        SerializeNullableStruct(context.TargetDirection, SerializeVector2, stream);
+        SerializeNullableStruct(context.TargetShardId, SerializeGuid, stream);
+    }
+
+    public DeflatedAbilityContext DeserializeDeflatedAbilityContext(Stream stream)
+    {
+        return new DeflatedAbilityContext
+        {
+            Ability = DeserializeAbility(stream),
+            Level = DeserializeInt(stream),
+            UserId = DeserializeGuid(stream),
+            UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
+            TargetPosition = DeserializeNullableStruct(DeserializeVector2, stream),
+            TargetUnitId = DeserializeNullableStruct(DeserializeGuid, stream),
+            TargetDirection = DeserializeNullableStruct(DeserializeVector2, stream),
+            TargetShardId = DeserializeNullableStruct(DeserializeGuid, stream)
+        };
+    }
+
+    public void SerializeDeflatedStatusContext(DeflatedStatusContext value, Stream stream)
+    {
+        SerializeGuid(value.Id, stream);
+        SerializeStatus(value.Status, stream);
+        SerializeNullableClass(value.AbilityContext, SerializeDeflatedAbilityContext, stream);
+        SerializeGuid(value.UnitId, stream);
+        SerializeNullableStruct(value.SourceId, SerializeGuid, stream);
+        SerializeNullableClass(value.Tick, SerializeStatusTickContext, stream);
+        SerializeDouble(value.ElapsedTime, stream);
+        SerializeDouble(value.DisplayElapsedTime, stream);
+        SerializeDouble(value.RemainingTime, stream);
+        SerializeLong(value.Ordinal, stream);
+    }
+
+    public DeflatedStatusContext DeserializeDeflatedStatusContext(Stream stream)
+    {
+        return new DeflatedStatusContext
+        {
+            Id = DeserializeGuid(stream),
+            Status = DeserializeStatus(stream),
+            AbilityContext = DeserializeNullableClass(DeserializeDeflatedAbilityContext, stream),
+            UnitId = DeserializeGuid(stream),
+            SourceId = DeserializeNullableStruct(DeserializeGuid, stream),
+            Tick = DeserializeNullableClass(DeserializeStatusTickContext, stream),
+            ElapsedTime = DeserializeDouble(stream),
+            DisplayElapsedTime = DeserializeDouble(stream),
+            RemainingTime = DeserializeDouble(stream),
+            Ordinal = DeserializeLong(stream),
+        };
+    }
+
+    public void SerializeStatusTickContext(StatusTickContext value, Stream stream)
+    {
+        SerializeDouble(value.Interval, stream);
+        SerializeDouble(value.Countdown, stream);
+    }
+
+    public StatusTickContext DeserializeStatusTickContext(Stream stream)
+    {
+        double interval = DeserializeDouble(stream);
+        double countdown = DeserializeDouble(stream);
+        return new StatusTickContext
+        {
+            Interval = interval,
+            Countdown = countdown,
         };
     }
 }

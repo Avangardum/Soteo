@@ -1,3 +1,4 @@
+using Soteo.Core.Delegates;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
@@ -111,19 +112,19 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         };
     }
 
-    private void SerializeDelta<T>(Delta<T> delta, ISerializationHelper.Serializer<T> serializer, Stream stream)
+    private void SerializeDelta<T>(Delta<T> delta, Serializer<T> serializer, Stream stream)
     {
         s.SerializeBool(delta.HasChanged, stream);
         if (delta.HasChanged)
             serializer(delta.NewValue, stream);
     }
 
-    private Delta<T> DeserializeDelta<T>(ISerializationHelper.Deserializer<T> deserializer, Stream stream)
+    private Delta<T> DeserializeDelta<T>(Deserializer<T> deserializer, Stream stream)
     {
         return s.DeserializeBool(stream) ? deserializer(stream) : Delta<T>.Unchanged;
     }
 
-    private void SerializeNullableClassDelta<T>(Delta<T?> delta, ISerializationHelper.Serializer<T> serializer, Stream stream)
+    private void SerializeNullableClassDelta<T>(Delta<T?> delta, Serializer<T> serializer, Stream stream)
         where T : class
     {
         s.SerializeBool(delta.HasChanged, stream);
@@ -131,7 +132,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
             s.SerializeNullableClass(delta.NewValue, serializer, stream);
     }
     
-    private Delta<T?> DeserializeNullableClassDelta<T>(ISerializationHelper.Deserializer<T> deserializer, Stream stream)
+    private Delta<T?> DeserializeNullableClassDelta<T>(Deserializer<T> deserializer, Stream stream)
         where T : class
     {
         return s.DeserializeBool(stream) ? s.DeserializeNullableClass(deserializer, stream) : Delta<T?>.Unchanged;
@@ -140,8 +141,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
     private void SerializeDictionaryDelta<TKey, TValue>
     (
         DictionaryDelta<TKey, TValue> delta,
-        ISerializationHelper.Serializer<TKey> serializeKey,
-        ISerializationHelper.Serializer<TValue> serializeValue,
+        Serializer<TKey> serializeKey,
+        Serializer<TValue> serializeValue,
         Stream stream
     ) where TKey : notnull
     {
@@ -151,8 +152,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
 
     private DictionaryDelta<TKey, TValue> DeserializeDictionaryDelta<TKey, TValue>
     (
-        ISerializationHelper.Deserializer<TKey> deserializeKey,
-        ISerializationHelper.Deserializer<TValue> deserializeValue,
+        Deserializer<TKey> deserializeKey,
+        Deserializer<TValue> deserializeValue,
         Stream stream
     ) where TKey : notnull
     {
@@ -164,8 +165,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
     private void SerializeIndexedDictionaryDelta<TKey, TValue>
     (
         DictionaryDelta<TKey, TValue> delta,
-        ISerializationHelper.Serializer<TKey> serializeKey,
-        ISerializationHelper.Serializer<TValue> serializeValue,
+        Serializer<TKey> serializeKey,
+        Serializer<TValue> serializeValue,
         Stream stream
     ) where TKey : notnull
     {
@@ -175,8 +176,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
     
     private DictionaryDelta<TKey, TValue> DeserializeIndexedDictionaryDelta<TKey, TValue>
     (
-        ISerializationHelper.Deserializer<TKey> deserializeKey,
-        ISerializationHelper.Deserializer<TValue> deserializeValue,
+        Deserializer<TKey> deserializeKey,
+        Deserializer<TValue> deserializeValue,
         Func<TValue, TKey> keySelector,
         Stream stream
     ) where TKey : notnull
@@ -184,11 +185,5 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         var changes = s.DeserializeIndexedDictionary(deserializeValue, keySelector, stream);
         var removedKeys = s.DeserializeList(deserializeKey, stream);
         return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
-    }
-    
-    private enum EntityKind : byte
-    {
-        UnitPuppet,
-        ProjectilePuppet
     }
 }

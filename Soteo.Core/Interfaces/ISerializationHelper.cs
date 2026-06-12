@@ -1,16 +1,15 @@
 using System.Collections.Immutable;
 using System.Numerics;
 using Soteo.Core.Abilities;
+using Soteo.Core.Delegates;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Statuses;
 
 namespace Soteo.Core.Interfaces;
 
 public interface ISerializationHelper
 {
-    delegate TElement Deserializer<out TElement>(Stream stream);
-    delegate void Serializer<in TElement>(TElement value, Stream stream);
-
     void SerializeByte(byte value, Stream stream);
     byte DeserializeByte(Stream stream);
     void SerializeBool(bool value, Stream stream);
@@ -102,4 +101,22 @@ public interface ISerializationHelper
     AbilityUseProgress DeserializeAbilityUseProgress(Stream stream);
     void SerializeAbilitySlotState(AbilitySlotState value, Stream stream);
     AbilitySlotState DeserializeAbilitySlotState(Stream stream);
+    void SerializeEntitySnapshot(EntitySnapshot entity, Stream stream);
+    EntitySnapshot DeserializeEntitySnapshot(Stream stream);
+    void SerializeUnitSnapshot(UnitSnapshot unit, Stream stream);
+    UnitSnapshot DeserializeUnitSnapshot(Stream stream);
+    void SerializeUnitPuppetSnapshot(UnitPuppetSnapshot unitPuppet, Stream stream);
+    UnitPuppetSnapshot DeserializeUnitPuppetSnapshot(Stream stream);
+    void SerializeProjectileSnapshot(ProjectileSnapshot projectile, Stream stream);
+    ProjectileSnapshot DeserializeProjectileSnapshot(Stream stream);
+    void SerializeProjectileTarget(DeflatedProjectileTarget value, Stream stream);
+    DeflatedProjectileTarget DeserializeProjectileTarget(Stream stream);
+    void SerializeProjectilePuppetSnapshot(ProjectilePuppetSnapshot projectilePuppet, Stream stream);
+    ProjectilePuppetSnapshot DeserializeProjectilePuppetSnapshot(Stream stream);
+    void SerializeDeflatedAbilityContext(DeflatedAbilityContext context, Stream stream);
+    DeflatedAbilityContext DeserializeDeflatedAbilityContext(Stream stream);
+    void SerializeDeflatedStatusContext(DeflatedStatusContext value, Stream stream);
+    DeflatedStatusContext DeserializeDeflatedStatusContext(Stream stream);
+    void SerializeStatusTickContext(StatusTickContext value, Stream stream);
+    StatusTickContext DeserializeStatusTickContext(Stream stream);
 }
