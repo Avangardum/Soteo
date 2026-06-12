@@ -5,16 +5,16 @@ using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Dto;
 
-public class DeflatedProjectileTarget
+public class ProjectileTargetSnapshot
 {
     public Guid? UnitId { get; }
     public Vector2? Position { get; }
     
-    public DeflatedProjectileTarget(Guid unitId) => UnitId = unitId;
-    public DeflatedProjectileTarget(Vector2 position) => Position = position;
+    public ProjectileTargetSnapshot(Guid unitId) => UnitId = unitId;
+    public ProjectileTargetSnapshot(Vector2 position) => Position = position;
     
-    public static implicit operator DeflatedProjectileTarget(Guid unitId) => new(unitId);
-    public static implicit operator DeflatedProjectileTarget(Vector2 position) => new(position);
+    public static implicit operator ProjectileTargetSnapshot(Guid unitId) => new(unitId);
+    public static implicit operator ProjectileTargetSnapshot(Vector2 position) => new(position);
     
     [MemberNotNullWhen(true, nameof(UnitId))]
     [MemberNotNullWhen(false, nameof(Position))]

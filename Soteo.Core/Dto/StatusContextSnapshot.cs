@@ -5,11 +5,11 @@ using Soteo.Core.Statuses;
 
 namespace Soteo.Core.Dto;
 
-public sealed record DeflatedStatusContext
+public sealed record StatusContextSnapshot
 {
     public required Guid Id { get; init; }
     public required Status Status { get; init; }
-    public required DeflatedAbilityContext? AbilityContext { get; init; }
+    public required AbilityContextSnapshot? AbilityContext { get; init; }
     public required Guid UnitId { get; init; }
     public required Guid? SourceId { get; init; }
     public required StatusTickContext? Tick { get; init; }

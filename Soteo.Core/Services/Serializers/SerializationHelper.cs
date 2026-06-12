@@ -504,7 +504,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         };
     }
 
-    public void SerializeProjectileTarget(DeflatedProjectileTarget value, Stream stream)
+    public void SerializeProjectileTarget(ProjectileTargetSnapshot value, Stream stream)
     {
         SerializeBool(value.IsUnit, stream);
         if (value.IsUnit)
@@ -513,7 +513,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             SerializeVector2(value.Position.Value, stream);
     }
 
-    public DeflatedProjectileTarget DeserializeProjectileTarget(Stream stream)
+    public ProjectileTargetSnapshot DeserializeProjectileTarget(Stream stream)
     {
         bool isUnit = DeserializeBool(stream);
         if (isUnit)
@@ -539,7 +539,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         };
     }
 
-    public void SerializeDeflatedAbilityContext(DeflatedAbilityContext context, Stream stream)
+    public void SerializeDeflatedAbilityContext(AbilityContextSnapshot context, Stream stream)
     {
         SerializeAbility(context.Ability, stream);
         SerializeInt(context.Level, stream);
@@ -551,9 +551,9 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeNullableStruct(context.TargetShardId, SerializeGuid, stream);
     }
 
-    public DeflatedAbilityContext DeserializeDeflatedAbilityContext(Stream stream)
+    public AbilityContextSnapshot DeserializeDeflatedAbilityContext(Stream stream)
     {
-        return new DeflatedAbilityContext
+        return new AbilityContextSnapshot
         {
             Ability = DeserializeAbility(stream),
             Level = DeserializeInt(stream),
@@ -566,7 +566,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         };
     }
 
-    public void SerializeDeflatedStatusContext(DeflatedStatusContext value, Stream stream)
+    public void SerializeDeflatedStatusContext(StatusContextSnapshot value, Stream stream)
     {
         SerializeGuid(value.Id, stream);
         SerializeStatus(value.Status, stream);
@@ -580,9 +580,9 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeLong(value.Ordinal, stream);
     }
 
-    public DeflatedStatusContext DeserializeDeflatedStatusContext(Stream stream)
+    public StatusContextSnapshot DeserializeDeflatedStatusContext(Stream stream)
     {
-        return new DeflatedStatusContext
+        return new StatusContextSnapshot
         {
             Id = DeserializeGuid(stream),
             Status = DeserializeStatus(stream),

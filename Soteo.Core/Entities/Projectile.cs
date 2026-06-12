@@ -48,9 +48,9 @@ public sealed class Projectile : Entity<IProjectileNode>
             IsRemoved = IsRemoved,
             Position = Position,
             Azimuth = Azimuth,
-            AbilityContext = _abilityContext.Deflate(),
+            AbilityContext = _abilityContext.ToSnapshot(),
             Speed = _speed,
-            Target = _target.Deflate(),
+            Target = _target.ToSnapshot(),
         };
     }
 

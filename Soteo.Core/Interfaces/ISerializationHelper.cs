@@ -109,14 +109,14 @@ public interface ISerializationHelper
     UnitPuppetSnapshot DeserializeUnitPuppetSnapshot(Stream stream);
     void SerializeProjectileSnapshot(ProjectileSnapshot projectile, Stream stream);
     ProjectileSnapshot DeserializeProjectileSnapshot(Stream stream);
-    void SerializeProjectileTarget(DeflatedProjectileTarget value, Stream stream);
-    DeflatedProjectileTarget DeserializeProjectileTarget(Stream stream);
+    void SerializeProjectileTarget(ProjectileTargetSnapshot value, Stream stream);
+    ProjectileTargetSnapshot DeserializeProjectileTarget(Stream stream);
     void SerializeProjectilePuppetSnapshot(ProjectilePuppetSnapshot projectilePuppet, Stream stream);
     ProjectilePuppetSnapshot DeserializeProjectilePuppetSnapshot(Stream stream);
-    void SerializeDeflatedAbilityContext(DeflatedAbilityContext context, Stream stream);
-    DeflatedAbilityContext DeserializeDeflatedAbilityContext(Stream stream);
-    void SerializeDeflatedStatusContext(DeflatedStatusContext value, Stream stream);
-    DeflatedStatusContext DeserializeDeflatedStatusContext(Stream stream);
+    void SerializeDeflatedAbilityContext(AbilityContextSnapshot context, Stream stream);
+    AbilityContextSnapshot DeserializeDeflatedAbilityContext(Stream stream);
+    void SerializeDeflatedStatusContext(StatusContextSnapshot value, Stream stream);
+    StatusContextSnapshot DeserializeDeflatedStatusContext(Stream stream);
     void SerializeStatusTickContext(StatusTickContext value, Stream stream);
     StatusTickContext DeserializeStatusTickContext(Stream stream);
 }

@@ -27,9 +27,10 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
     
     public object? GetService(Type serviceType) => ServiceProvider.GetService(serviceType);
     
-    public DeflatedAbilityContext Deflate()
+    // todo rename CreateSnapshot to ToSnapshot globally
+    public AbilityContextSnapshot ToSnapshot()
     {
-        return new DeflatedAbilityContext
+        return new AbilityContextSnapshot
         {
             Ability = Ability,
             Level = Level,

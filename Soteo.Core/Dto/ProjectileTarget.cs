@@ -18,5 +18,5 @@ public class ProjectileTarget
     [MemberNotNullWhen(false, nameof(Position))]
     public bool IsUnit => Unit != null;
     
-    public DeflatedProjectileTarget Deflate() => IsUnit ? Unit.Id : Position;
+    public ProjectileTargetSnapshot ToSnapshot() => IsUnit ? Unit.Id : Position;
 }

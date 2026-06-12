@@ -7,7 +7,7 @@ using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Dto;
 
-public sealed record DeflatedAbilityContext
+public sealed record AbilityContextSnapshot
 {
     public required Ability Ability { get; init; }
     public required int Level { get; init; }

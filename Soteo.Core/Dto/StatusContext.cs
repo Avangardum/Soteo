@@ -28,13 +28,13 @@ public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
     [MemberNotNull(nameof(SourceAbilityContext))]
     public T SourceAbilityAs<T>() where T : Ability => (T)SourceAbilityContext.Required.Ability;
     
-    public DeflatedStatusContext Deflate()
+    public StatusContextSnapshot ToSnapshot()
     {
-        return new DeflatedStatusContext
+        return new StatusContextSnapshot
         {
             Id = Id,
             Status = Status,
-            AbilityContext = SourceAbilityContext?.Deflate(),
+            AbilityContext = SourceAbilityContext?.ToSnapshot(),
             UnitId = Unit.Id,
             SourceId = SourceUnit?.Id,
             Tick = Tick,

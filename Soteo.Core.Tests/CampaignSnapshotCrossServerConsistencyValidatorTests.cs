@@ -242,7 +242,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             Stats = ImmutableDictionary<Stat, double>.Empty,
             AbilitySlotStates = ImmutableDictionary<AbilitySlot, AbilitySlotState>.Empty,
             AbilityUseProgress = null,
-            Statuses = ImmutableDictionary<Guid, DeflatedStatusContext>.Empty,
+            Statuses = ImmutableDictionary<Guid, StatusContextSnapshot>.Empty,
             IsRemoved = false,
             Position = default,
             Azimuth = 0,
@@ -254,7 +254,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
         return new()
         {
             Id = id,
-            AbilityContext = new DeflatedAbilityContext
+            AbilityContext = new AbilityContextSnapshot
             {
                 Ability = Ability.Instance<RangedAttackAbility>(),
                 Level = 1,

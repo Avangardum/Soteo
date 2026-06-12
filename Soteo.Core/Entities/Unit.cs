@@ -75,7 +75,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             Stats = Stats.ToImmutableDictionary(),
             AbilitySlotStates = AbilitySlotStatesInternal.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress,
-            Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.Deflate())
+            Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot())
         };
     }
 
