@@ -8,7 +8,7 @@ namespace Soteo.Core.Dto;
 /// Serializable data container included in AbilityContext / StatusContext
 /// for storing data specific to a concrete ability / status.
 /// </summary>
-public sealed class ExtraData(object?[] values, ISerializationHelper s) // todo this is not a DTO
+public sealed class ExtraData(object?[] values, ISerializationHelper s)
 {
     public void Set<T>(Key<T> key, T value)
     {
