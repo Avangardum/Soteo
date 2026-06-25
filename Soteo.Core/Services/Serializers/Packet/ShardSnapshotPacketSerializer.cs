@@ -8,21 +8,9 @@ namespace Soteo.Core.PacketSerializers;
 
 public sealed class ShardSnapshotPacketSerializer(ISerializationHelper s) : PacketSerializer<ShardSnapshotPacket>(s)
 {
-    protected override void SerializeInternal(ShardSnapshotPacket packet, Stream stream)
-    {
-        s.SerializeLong(packet.Snapshot.Tick, stream);
-        s.SerializeIndexedDictionary(packet.Snapshot.Entities, s.SerializeEntitySnapshot, stream);
-    }
-    
-    protected override ShardSnapshotPacket DeserializeInternal(Stream stream)
-    {
-        return new ShardSnapshotPacket
-        {
-            Snapshot = new ShardSnapshot
-            {
-                Tick = s.DeserializeLong(stream),
-                Entities = s.DeserializeIndexedDictionary(s.DeserializeEntitySnapshot, it => it.Id, stream),
-            },
-        };
-    }
+    protected override void SerializeInternal(ShardSnapshotPacket packet, Stream stream) =>
+        s.SerializeShardSnapshot(packet.Snapshot, stream);
+
+    protected override ShardSnapshotPacket DeserializeInternal(Stream stream) =>
+        new() { Snapshot = s.DeserializeShardSnapshot(stream) };
 }

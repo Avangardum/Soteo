@@ -613,4 +613,19 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Countdown = countdown,
         };
     }
+    
+    public void SerializeShardSnapshot(ShardSnapshot value, Stream stream)
+    {
+        SerializeLong(value.Tick, stream);
+        SerializeIndexedDictionary(value.Entities, SerializeEntitySnapshot, stream);
+    }
+    
+    public ShardSnapshot DeserializeShardSnapshot(Stream stream)
+    {
+        return new ShardSnapshot
+        {
+            Tick = DeserializeLong(stream),
+            Entities = DeserializeIndexedDictionary(DeserializeEntitySnapshot, it => it.Id, stream),
+        };
+    }
 }

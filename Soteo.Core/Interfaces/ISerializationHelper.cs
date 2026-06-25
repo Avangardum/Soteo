@@ -119,4 +119,6 @@ public interface ISerializationHelper
     StatusContextSnapshot DeserializeDeflatedStatusContext(Stream stream);
     void SerializeStatusTickContext(StatusTickContext value, Stream stream);
     StatusTickContext DeserializeStatusTickContext(Stream stream);
+    void SerializeShardSnapshot(ShardSnapshot value, Stream stream);
+    ShardSnapshot DeserializeShardSnapshot(Stream stream);
 }
