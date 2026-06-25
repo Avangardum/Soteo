@@ -8,6 +8,7 @@ using Soteo.Core.Dto;
 using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
+using Soteo.Core.StaticHelpers;
 using Soteo.Core.Statuses;
 using Soteo.TestUtil;
 using Soteo.Util;

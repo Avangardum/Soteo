@@ -1,10 +1,7 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
 
-namespace Soteo.Core.PacketSerializers;
+namespace Soteo.Core.Services.Serializers.Packet;
 
 public sealed class ShardSnapshotPacketSerializer(ISerializationHelper s) : PacketSerializer<ShardSnapshotPacket>(s)
 {

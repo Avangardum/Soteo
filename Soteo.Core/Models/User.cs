@@ -1,6 +1,6 @@
 using Soteo.Core.Dto.Snapshots;
 
-namespace Soteo.Core.CampaignServerState.DataObjects;
+namespace Soteo.Core.Models;
 
 public sealed record User
 {

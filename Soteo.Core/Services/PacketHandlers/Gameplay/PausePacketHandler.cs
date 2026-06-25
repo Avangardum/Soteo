@@ -1,8 +1,8 @@
 using Soteo.Core.Attributes;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
 
-namespace Soteo.Core.PacketHandlers.Gameplay.PacketHandlers;
+namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
 [GameplayPacketHandler]
 public sealed class PausePacketHandler(IPauseRepository pauseRepo) : PacketHandler<PausePacket>

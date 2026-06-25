@@ -1,10 +1,9 @@
 using Soteo.Core.Commands;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
-using static Soteo.Core.SerializationHelper;
 
-namespace Soteo.Core.PacketSerializers;
+namespace Soteo.Core.Services.Serializers.Packet;
 
 public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketSerializer<UseAbilityPacket>(s)
 {

@@ -1,4 +1,4 @@
-using Soteo.Core.Packets;
+using Soteo.Core.Dto.Packets;
 
 namespace Soteo.Main.Gameplay.Interfaces;
 

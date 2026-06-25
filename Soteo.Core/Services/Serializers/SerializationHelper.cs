@@ -9,10 +9,10 @@ using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
-using Soteo.Core.PacketSerializers;
+using Soteo.Core.StaticHelpers;
 using Soteo.Core.Statuses;
 
-namespace Soteo.Core;
+namespace Soteo.Core.Services.Serializers;
 
 public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelper
 {

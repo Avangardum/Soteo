@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core;
 using Soteo.Core.Interfaces;
+using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Main.Gameplay.Ui;
 

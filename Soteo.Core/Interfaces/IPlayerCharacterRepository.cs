@@ -1,5 +1,5 @@
-using Soteo.Core.CampaignServerState.DataObjects;
 using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Models;
 
 namespace Soteo.Core.Interfaces;
 

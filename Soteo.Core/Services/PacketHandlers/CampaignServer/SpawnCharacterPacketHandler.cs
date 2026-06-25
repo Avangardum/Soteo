@@ -1,9 +1,9 @@
 using Soteo.Core.Attributes;
-using Soteo.Core.CampaignServerState.DataObjects;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
+using Soteo.Core.Models;
 
-namespace Soteo.Core.PacketHandlers.CampaignServer;
+namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
 
 [CampaignServerPacketHandler]
 [AllowClientPackets]

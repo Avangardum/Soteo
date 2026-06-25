@@ -4,6 +4,7 @@ using Soteo.Core.Dto;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
+using Soteo.Core.StaticHelpers;
 using Soteo.Util;
 
 namespace Soteo.Core.Entities;

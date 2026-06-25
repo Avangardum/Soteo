@@ -1,7 +1,7 @@
 using NSubstitute;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
-using Soteo.Core.PacketHandlers.Gameplay.PacketHandlers;
-using Soteo.Core.Packets;
+using Soteo.Core.Services.PacketHandlers.Gameplay;
 
 namespace Soteo.Core.Tests;
 

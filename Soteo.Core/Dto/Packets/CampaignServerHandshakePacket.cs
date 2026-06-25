@@ -1,7 +1,7 @@
 using Soteo.Core.Attributes;
 using Soteo.Core.Enums;
 
-namespace Soteo.Core.Packets;
+namespace Soteo.Core.Dto.Packets;
 
 [PacketTypeCode(PacketTypeCode.CampaignServerHandshake)]
 public sealed record CampaignServerHandshakePacket : Packet

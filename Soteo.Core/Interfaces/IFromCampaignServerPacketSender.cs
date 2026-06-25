@@ -1,4 +1,4 @@
-using Soteo.Core.Packets;
+using Soteo.Core.Dto.Packets;
 using Soteo.Util.Interfaces;
 
 namespace Soteo.Core.Interfaces;

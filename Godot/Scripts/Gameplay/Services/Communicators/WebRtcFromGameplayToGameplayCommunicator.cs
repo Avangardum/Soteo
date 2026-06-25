@@ -1,7 +1,7 @@
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
 using Soteo.Main.Gameplay.Interfaces;
 using Soteo.Util;
 

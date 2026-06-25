@@ -1,8 +1,7 @@
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
-using static Soteo.Core.SerializationHelper;
 
-namespace Soteo.Core.PacketSerializers;
+namespace Soteo.Core.Services.Serializers.Packet;
 
 public sealed class WebrtcSdpPacketSerializer(ISerializationHelper s) : PacketSerializer<WebrtcSdpPacket>(s)
 {

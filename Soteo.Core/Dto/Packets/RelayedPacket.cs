@@ -1,4 +1,4 @@
-namespace Soteo.Core.Packets;
+namespace Soteo.Core.Dto.Packets;
 
 /// <summary>
 /// Packet sent to the campaign server, which relays it to the target receiver

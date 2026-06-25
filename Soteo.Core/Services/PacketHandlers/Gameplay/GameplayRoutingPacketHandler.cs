@@ -1,8 +1,9 @@
 using Soteo.Core.Attributes;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
+using Soteo.Core.StaticHelpers;
 
-namespace Soteo.Core.PacketHandlers.Gameplay.PacketHandlers;
+namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
 public sealed class GameplayRoutingPacketHandler
 (

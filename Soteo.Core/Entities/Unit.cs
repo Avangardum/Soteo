@@ -6,6 +6,7 @@ using Soteo.Core.Dto;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
+using Soteo.Core.StaticHelpers;
 using Soteo.Core.Statuses;
 using Soteo.Util;
 using Soteo.Util.Interfaces;

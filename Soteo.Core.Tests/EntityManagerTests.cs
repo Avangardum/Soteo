@@ -7,6 +7,7 @@ using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Services;
+using Soteo.Core.SidedDependencies;
 using ICamera = Soteo.Core.Interfaces.ICamera;
 using IEntityNodeManager = Soteo.Core.Interfaces.IEntityNodeManager;
 using IUnit = Soteo.Core.Interfaces.IUnit;

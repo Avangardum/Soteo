@@ -1,6 +1,7 @@
 using System.Numerics;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
+using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Core.Entities;
 

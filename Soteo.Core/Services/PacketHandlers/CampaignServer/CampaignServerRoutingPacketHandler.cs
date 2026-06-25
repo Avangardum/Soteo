@@ -1,10 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core.Attributes;
-using Soteo.Core.CampaignServerState.DataObjects;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
+using Soteo.Core.Models;
+using Soteo.Core.StaticHelpers;
 
-namespace Soteo.Core.PacketHandlers.CampaignServer;
+namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
 
 public sealed class CampaignServerRoutingPacketHandler(IServiceProvider serviceProvider) : IPacketHandler
 {

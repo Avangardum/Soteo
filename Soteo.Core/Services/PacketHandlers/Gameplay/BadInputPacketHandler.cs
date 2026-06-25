@@ -1,8 +1,8 @@
 using Soteo.Core.Attributes;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Exceptions;
-using Soteo.Core.Packets;
 
-namespace Soteo.Core.PacketHandlers.Gameplay.PacketHandlers;
+namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
 [GameplayPacketHandler]
 public class BadInputPacketHandler : PacketHandler<BadInputPacket>

@@ -7,7 +7,7 @@ using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Services;
 
-namespace Soteo.Core.CampaignServer.Tests;
+namespace Soteo.Core.Tests;
 
 public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
 {

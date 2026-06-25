@@ -1,9 +1,9 @@
 using System.Collections.Immutable;
-using Soteo.Core.CampaignServerState.DataObjects;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
+using Soteo.Core.Models;
 
-namespace Soteo.Core.CampaignServerState.Repositories;
+namespace Soteo.Core.Services.Repositiories;
 
 public class UserRepository : Dictionary<Guid, User>, IUserRepository
 {

@@ -1,12 +1,12 @@
 using System.Collections.Immutable;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
-using Soteo.Core.CampaignServerState.DataObjects;
-using Soteo.Core.CampaignServerState.Repositories;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
+using Soteo.Core.Models;
 using Soteo.Core.Services;
+using Soteo.Core.Services.Repositiories;
 
 namespace Soteo.Core.Tests;
 

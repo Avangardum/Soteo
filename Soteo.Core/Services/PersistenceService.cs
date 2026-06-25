@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
 
 namespace Soteo.Core.Services;
 

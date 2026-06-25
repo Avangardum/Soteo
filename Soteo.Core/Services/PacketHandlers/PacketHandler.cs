@@ -1,9 +1,9 @@
 using System.Diagnostics.CodeAnalysis;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Packets;
 
-namespace Soteo.Core;
+namespace Soteo.Core.Services.PacketHandlers;
 
 public abstract class PacketHandler<T> : IPacketHandler where T : Packet
 {

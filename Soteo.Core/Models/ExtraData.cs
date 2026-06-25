@@ -1,8 +1,10 @@
 using System.Numerics;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
+using Soteo.Core.Services;
+using Soteo.Core.Services.Serializers;
 
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Models;
 
 /// <summary>
 /// Serializable data container included in AbilityContext / StatusContext
