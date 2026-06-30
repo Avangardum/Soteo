@@ -5,7 +5,8 @@ using Soteo.Core.Models;
 
 namespace Soteo.Core.Services.Repositiories;
 
-public sealed class PlayerCharacterTrackerRepository : Dictionary<Guid, PlayerCharacterTracker>, IPlayerCharacterRepository
+public sealed class PlayerCharacterTrackerRepository :
+    Dictionary<Guid, PlayerCharacterTracker>, IPlayerCharacterRepository
 {
     public void Add(PlayerCharacterTracker playerCharacter) => Add(playerCharacter.Id, playerCharacter);
     
