@@ -8,9 +8,9 @@ public sealed record PlayerCharacterTracker
     public User? Player { get; set; } // todo make required
     public Guid? ShardId { get; set; }
     
-    public PlayerCharacterSnapshot CreateSnapshot()
+    public PlayerCharacterTrackerSnapshot CreateSnapshot()
     {
-        return new PlayerCharacterSnapshot
+        return new PlayerCharacterTrackerSnapshot
         {
             Id = Id,
             PlayerId = Player?.Id,

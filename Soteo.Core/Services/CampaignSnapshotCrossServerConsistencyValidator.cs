@@ -9,8 +9,8 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
     {
         return
             DoShardUsersMatchShardSnapshots(snapshot) &&
-            DoPlayerCharactersWithShardIdExistInCorrespondingShardSnapshots(snapshot) &&
-            DoPlayerCharactersInShardSnapshotsHaveCorrespondingShardId(snapshot);
+            DoPlayerCharacterTrackersWithShardIdHaveCorrespondingCharsInShardSnapshots(snapshot) &&
+            DoPlayerCharactersInShardSnapshotsHaveCorrespondingTrackers(snapshot);
     }
 
     private bool DoShardUsersMatchShardSnapshots(CampaignSnapshot snapshot)
@@ -21,27 +21,26 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
         return shardUserIds.SequenceEqual(shardSnapshotIds);
     }
     
-    private bool DoPlayerCharactersWithShardIdExistInCorrespondingShardSnapshots(CampaignSnapshot snapshot)
+    private bool DoPlayerCharacterTrackersWithShardIdHaveCorrespondingCharsInShardSnapshots(CampaignSnapshot snapshot)
     {
-        IEnumerable<PlayerCharacterSnapshot> deployedPlayerCharacters =
-            snapshot.CampaignServer.PlayerCharacters.Values.Where(it => it.ShardId != null);
-        foreach (PlayerCharacterSnapshot character in deployedPlayerCharacters)
+        IEnumerable<PlayerCharacterTrackerSnapshot> deployedPlayerCharacters =
+            snapshot.CampaignServer.PlayerCharacterTrackers.Values.Where(it => it.ShardId != null);
+        foreach (PlayerCharacterTrackerSnapshot character in deployedPlayerCharacters)
         {
             ShardSnapshot shard = snapshot.Shards[character.ShardId.Required];
-            if (!shard.Entities.ContainsKey(character.Id))
-                return false;
+            if (!shard.Entities.ContainsKey(character.Id)) return false;
         }
         
         return true;
     }
     
-    private bool DoPlayerCharactersInShardSnapshotsHaveCorrespondingShardId(CampaignSnapshot snapshot)
+    private bool DoPlayerCharactersInShardSnapshotsHaveCorrespondingTrackers(CampaignSnapshot snapshot)
     {
         foreach ((Guid shardId, ShardSnapshot shard) in snapshot.Shards)
         {
             foreach (UnitSnapshot unit in shard.Entities.Values.OfType<UnitSnapshot>())
             {
-                if (!snapshot.CampaignServer.PlayerCharacters.TryGetValue(unit.Id, out PlayerCharacterSnapshot? character))
+                if (!snapshot.CampaignServer.PlayerCharacterTrackers.TryGetValue(unit.Id, out var character))
                     return false;
                 if (character.ShardId != shardId)
                     return false;

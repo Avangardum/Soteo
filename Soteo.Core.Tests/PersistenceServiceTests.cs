@@ -50,8 +50,8 @@ public sealed class PersistenceServiceTests
         
         CampaignSnapshot snapshot = await _sut.SaveAsync();
         
-        snapshot.CampaignServer.PlayerCharacters[char1.Id].Should().Be(char1.CreateSnapshot());
-        snapshot.CampaignServer.PlayerCharacters[char2.Id].Should().Be(char2.CreateSnapshot());
+        snapshot.CampaignServer.PlayerCharacterTrackers[char1.Id].Should().Be(char1.CreateSnapshot());
+        snapshot.CampaignServer.PlayerCharacterTrackers[char2.Id].Should().Be(char2.CreateSnapshot());
     }
     
     [Fact]

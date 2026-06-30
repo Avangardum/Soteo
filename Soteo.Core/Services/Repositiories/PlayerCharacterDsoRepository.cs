@@ -9,6 +9,6 @@ public sealed class PlayerCharacterDsoRepository : Dictionary<Guid, PlayerCharac
 {
     public void Add(PlayerCharacterTracker playerCharacter) => Add(playerCharacter.Id, playerCharacter);
     
-    public IReadOnlyDictionary<Guid, PlayerCharacterSnapshot> CreateSnapshot() =>
+    public IReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot> CreateSnapshot() =>
         this.ToImmutableDictionary(it => it.Key, it => it.Value.CreateSnapshot());
 }

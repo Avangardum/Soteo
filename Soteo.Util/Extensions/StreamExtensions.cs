@@ -37,5 +37,12 @@ public static class StreamExtensions
             foreach (byte b in buffer)
                 self.WriteByte(b);
         }
+        
+        public void ShouldBeEndOfStream()
+        {
+            long extraBytes = self.Length - self.Position;
+            if (extraBytes > 0)
+                throw new InvalidOperationException($"Expected end of stream, found {extraBytes} extra bytes");
+        }
     }
 }

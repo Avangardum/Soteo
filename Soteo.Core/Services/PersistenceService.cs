@@ -49,7 +49,7 @@ public sealed class PersistenceService
     {
         var campaignServerSnapshot = new CampaignServerSnapshot
         {
-            PlayerCharacters = charRepo.CreateSnapshot(),
+            PlayerCharacterTrackers = charRepo.CreateSnapshot(),
             Users = userRepo.CreateSnapshot(),
         };
 
