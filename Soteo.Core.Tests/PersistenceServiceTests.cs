@@ -13,7 +13,7 @@ namespace Soteo.Core.Tests;
 public sealed class PersistenceServiceTests
 {
     private readonly UserRepository _userRepo;
-    private readonly PlayerCharacterDsoRepository _charRepo;
+    private readonly PlayerCharacterTrackerRepository _charRepo;
     private readonly FakePacketSender _packetSender;
     private readonly FakeTimeProvider _timeProvider;
     private readonly FakeConsistencyValidator _consistencyValidator;
@@ -22,7 +22,7 @@ public sealed class PersistenceServiceTests
     public PersistenceServiceTests()
     {
         _userRepo = new UserRepository();
-        _charRepo = new PlayerCharacterDsoRepository();
+        _charRepo = new PlayerCharacterTrackerRepository();
         _packetSender =
             new FakePacketSender((packet, senderId) => _sut.Required.ReceiveShardSnapshotPacket(packet, senderId));
         _timeProvider = new FakeTimeProvider();
