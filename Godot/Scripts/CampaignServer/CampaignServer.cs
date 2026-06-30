@@ -7,7 +7,7 @@ using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Services;
 using Soteo.Core.Services.PacketHandlers.CampaignServer;
-using Soteo.Core.Services.Repositiories;
+using Soteo.Core.Services.Repositories;
 using Soteo.Core.Services.Serializers;
 using Soteo.Core.Services.Serializers.Packet;
 using Soteo.Core.StaticHelpers;

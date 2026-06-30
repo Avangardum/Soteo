@@ -4,7 +4,7 @@ using Soteo.Core.Attributes;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Services;
 using Soteo.Core.Services.PacketHandlers.Gameplay;
-using Soteo.Core.Services.Repositiories;
+using Soteo.Core.Services.Repositories;
 using Soteo.Core.Services.Serializers;
 using Soteo.Core.Services.Serializers.Packet;
 using Soteo.Core.Services.Synchronization;

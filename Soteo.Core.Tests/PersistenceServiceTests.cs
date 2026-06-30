@@ -6,7 +6,7 @@ using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Models;
 using Soteo.Core.Services;
-using Soteo.Core.Services.Repositiories;
+using Soteo.Core.Services.Repositories;
 
 namespace Soteo.Core.Tests;
 

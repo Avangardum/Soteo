@@ -3,7 +3,7 @@ using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Models;
 
-namespace Soteo.Core.Services.Repositiories;
+namespace Soteo.Core.Services.Repositories;
 
 public class UserRepository : Dictionary<Guid, User>, IUserRepository
 {

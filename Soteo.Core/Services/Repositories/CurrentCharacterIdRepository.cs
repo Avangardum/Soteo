@@ -1,6 +1,6 @@
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.Repositiories;
+namespace Soteo.Core.Services.Repositories;
 
 public sealed class CurrentCharacterIdRepository : ICurrentCharacterIdRepository
 {
