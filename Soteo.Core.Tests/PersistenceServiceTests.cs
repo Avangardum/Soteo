@@ -210,7 +210,7 @@ public sealed class PersistenceServiceTests
 
         public void BroadcastToShardServers(Packet packet) => SendTo(packet, ShardSnapshots.Keys);
 
-        public void BroadcastToShardServersAndClients(Packet packet) => throw new NotSupportedException();
+        public void BroadcastToAll(Packet packet) => throw new NotSupportedException();
         public void BroadcastToClients(Packet packet) => throw new NotSupportedException();
         public void RelayFrom(RelayedPacket packet, Guid senderId) => throw new NotSupportedException();
     }
