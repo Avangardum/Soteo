@@ -7,7 +7,7 @@ public static class ExceptionFactory
 {
     public static Exception TypeNotFound(Type type)
     {
-        var message = $"{type} was not found. Make sure it's public and its assembly is passed to TypeLocator.Init.";
+        var message = $"{type} was not found. Make sure it's public and its assembly is passed to TypeLocator.";
         return new Exception(message);
     }
     
@@ -15,7 +15,7 @@ public static class ExceptionFactory
     {
         var message = $"Packet handler for packet type {packetTypeCode} was not found. " +
             $"Make sure the handler exists, is public, decorated with {requiredAttributeType.Name} " +
-            $"and its assembly is passed to TypeLocator.Init.";
+            $"and its assembly is passed to TypeLocator.";
         return new BadPacketException(message);
     }
     

@@ -9,6 +9,7 @@ public class BadInputPacketHandler : PacketHandler<BadInputPacket>
 {
     protected override void Handle(BadInputPacket packet, Guid senderId)
     {
-        throw new BadPacketException(packet.Reason);
+        var message = $"Received {nameof(BadInputPacket)} from {senderId} with reason:\n{packet.Reason}";
+        throw new BadPacketException(message);
     }
 }
