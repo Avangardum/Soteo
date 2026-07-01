@@ -12,7 +12,7 @@ public sealed class PersistenceService
     IPlayerCharacterRepository charRepo,
     TimeProvider timeProvider,
     ICampaignSnapshotCrossServerConsistencyValidator consistencyValidator
-)
+) : IShardSnapshotPacketReceiver
 {
     public const double ShardServerSnapshotRequestTimeout = 10;
     public const int InconsistencyRetryMaxCount = 10;
@@ -85,17 +85,17 @@ public sealed class PersistenceService
             .JoinToString(", ");
         return new TimeoutException($"The following shard servers did not respond: {timedOutShardIds}");
     }
-    
-    public async Task LoadAsync(CampaignSnapshot snapshot)
-    {
-        throw new NotImplementedException();
-    }
-    
+
     public void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet, Guid senderId)
     {
         if (!_shardSnapshotTcs.TryGetValue(senderId, out TaskCompletionSource<ShardSnapshot>? tcs))
             throw new InvalidOperationException($"No packet was requested from {senderId}");
         if (!tcs.TrySetResult(packet.Snapshot))
             throw new InvalidOperationException($"Duplicate packet from {senderId}");
+    }
+
+    public async Task LoadAsync(CampaignSnapshot snapshot)
+    {
+        throw new NotImplementedException();
     }
 }

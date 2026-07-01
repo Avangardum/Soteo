@@ -53,6 +53,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         services.AddSingleton<ITypeLocator>(new TypeLocator(SoteoCoreAssembly.Value));
         services.AddSingleton<PersistenceService>();
+        services.AddAlias<IShardSnapshotPacketReceiver, PersistenceService>();
         services.AddSingleton
         <
             ICampaignSnapshotCrossServerConsistencyValidator,
@@ -100,7 +101,6 @@ public sealed class CampaignServer : Node
         packetSender.BroadcastToAll(new PausePacket { Pause = true });
         var persistenceService = ServiceProvider.GetRequiredService<PersistenceService>();
         CampaignSnapshot snapshot = await persistenceService.SaveAsync();
-        GD.Print("Snapshot created!");
-        GetTree().Quit();
+        GD.Print("Snapshot created");
     }
 }
