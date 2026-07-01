@@ -78,7 +78,8 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     public void OnConnectionClosed(bool wasCleanClose)
     {
         _status = Status.Disconnected;
-        _currentUserIdRepository.Value = null;
+        if (_sideDetector.IsClient)
+            _currentUserIdRepository.Value = null;
     }
     
     public void OnConnectionError()

@@ -11,6 +11,7 @@ public sealed class ShardSnapshotRequestPacketHandler(ISynchronizationServer syn
 {
     protected override void Handle(ShardSnapshotRequestPacket packet, Guid senderId)
     {
+        //Console.WriteLine($"Snapshot request from {senderId}");
         synchronizationServer.ReceiveSnapshotRequest(senderId);
     }
 }

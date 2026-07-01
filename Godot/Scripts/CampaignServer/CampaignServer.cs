@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core;
 using Soteo.Core.Attributes;
 using Soteo.Core.Dto.Packets;
+using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Services;
 using Soteo.Core.Services.PacketHandlers.CampaignServer;
@@ -50,19 +51,24 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IFromCampaignServerPacketSender, ICommunicator>();
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
-        
-        var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
-        services.AddSingleton<ITypeLocator>(typeLocator);
+        services.AddSingleton<ITypeLocator>(new TypeLocator(SoteoCoreAssembly.Value));
+        services.AddSingleton<PersistenceService>();
+        services.AddSingleton
+        <
+            ICampaignSnapshotCrossServerConsistencyValidator,
+            CampaignSnapshotCrossServerConsistencyValidator
+        >();
+        services.AddSingleton(TimeProvider.System);
         
         if (_useJsmq)
             services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
         else
             services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
         
-        foreach (Type type in PacketSerializer.AllTypes(typeLocator))
+        foreach (Type type in PacketSerializer.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
             services.AddSingleton(type);
         
-        foreach (Type type in PacketHandlerLocator<CampaignServerPacketHandlerAttribute>.AllTypes(typeLocator))
+        foreach (Type type in PacketHandlerLocator<CampaignServerPacketHandlerAttribute>.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
             services.AddSingleton(type);
     }
     
@@ -92,5 +98,9 @@ public sealed class CampaignServer : Node
         IFromCampaignServerPacketSender packetSender =
             ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>();
         packetSender.BroadcastToAll(new PausePacket { Pause = true });
+        var persistenceService = ServiceProvider.GetRequiredService<PersistenceService>();
+        CampaignSnapshot snapshot = await persistenceService.SaveAsync();
+        GD.Print("Snapshot created!");
+        GetTree().Quit();
     }
 }
