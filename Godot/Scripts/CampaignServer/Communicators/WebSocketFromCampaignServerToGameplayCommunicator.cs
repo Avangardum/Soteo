@@ -54,14 +54,14 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         byte[] bytes = _packetSerializer.Serialize(packet);
         foreach (Guid id in receiverIds)
             if (_userIdsByWsPeerId.Inverse.TryGetValue(id, out int wsPeerId))
-                _wsServer.GetPeer(wsPeerId).PutPacket(bytes);
+                _wsServer.GetPeer(wsPeerId).PutPacket(bytes).ThrowIfError();
     }
     
     public void BroadcastToAll(Packet packet)
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
         foreach (int wsPeerId in _userIdsByWsPeerId.Keys)
-            _wsServer.GetPeer(wsPeerId).PutPacket(bytes);
+            _wsServer.GetPeer(wsPeerId).PutPacket(bytes).ThrowIfError();
     }
     
     public void BroadcastToShardServers(Packet packet) =>
@@ -77,7 +77,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
             .Where(it => _userRepo.TryGetValue(it.Value, out User user) && predicate(user))
             .Select(it => it.Key);
         foreach (int wsPeerId in wsPeerIds)
-            _wsServer.GetPeer(wsPeerId).PutPacket(bytes);
+            _wsServer.GetPeer(wsPeerId).PutPacket(bytes).ThrowIfError();
     }
     
     public void RelayFrom(RelayedPacket packet, Guid senderId) =>
@@ -120,7 +120,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         }
         catch (BadSerializedDataException e)
         {
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = e.Message } ));
+            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = e.Message } )).ThrowIfError();
             return null;
         }
     }
@@ -129,12 +129,14 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
     {
         if (packet is not CampaignServerHandshakePacket handshake)
         {
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Handshake expected" } ));
+            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Handshake expected" } ))
+                .ThrowIfError();
             return;
         }
         if (handshake.Version != Const.Version)
         {
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Version mismatch" } ));
+            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Version mismatch" } ))
+                .ThrowIfError();
             return;
         }
         
@@ -147,7 +149,8 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         {
             if (e is not (TokenNotYetValidException or TokenExpiredException or SignatureVerificationException))
                 throw;
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Invalid token" } ));
+            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Invalid token" } ))
+                .ThrowIfError();
             return;
         }
         var userId = Guid.Parse((string)claims["sub"]);

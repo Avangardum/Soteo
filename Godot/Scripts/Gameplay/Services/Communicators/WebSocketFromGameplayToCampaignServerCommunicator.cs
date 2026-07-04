@@ -163,8 +163,10 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     public void SendPacket(Packet packet)
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
-        _wsClient.GetPeer(1).PutPacket(bytes);
+        _wsClient.GetPeer(1).PutPacket(bytes).ThrowIfError();
     }
     
     private enum Status { Disconnected, Connecting, Connected }
 }
+
+// TODO Godot errors don't show in console until an exception is thrown

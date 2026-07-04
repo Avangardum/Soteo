@@ -330,7 +330,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         if (!_peerConnectionsAndChannels.TryGetValue(receiverId, out var connectionAndChannels)) return;
         WebRTCDataChannel channel = channelSelector(connectionAndChannels);
         if (channel.GetReadyState() != WebRTCDataChannel.ChannelState.Open) return;
-        channel.PutPacket(bytes);
+        channel.PutPacket(bytes).ThrowIfError();
         BytesSent += bytes.Length;
     }
     
