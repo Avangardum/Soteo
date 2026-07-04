@@ -15,6 +15,7 @@ using Soteo.Core.StaticHelpers;
 using Soteo.Main.CampaignServer.Communicators;
 using Soteo.Main.Shared;
 using Soteo.Util;
+using File = System.IO.File;
 
 namespace Soteo.Main.CampaignServer;
 
@@ -60,6 +61,7 @@ public sealed class CampaignServer : Node
             CampaignSnapshotCrossServerConsistencyValidator
         >();
         services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<ICampaignSnapshotSerializer, CampaignSnapshotSerializer>();
         
         if (_useJsmq)
             services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
@@ -91,16 +93,19 @@ public sealed class CampaignServer : Node
             process.StartInfo.UseShellExecute = false;
             process.Start();
         }
+        
+        // TODO if the campaign server crashes, child processes are not terminated and interfere with future runs
     }
     
     private async Task TestLifetimeAsync()
     {
         await Task.Delay(TimeSpan.FromSeconds(30));
-        IFromCampaignServerPacketSender packetSender =
-            ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>();
+        var packetSender = ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>();
         packetSender.BroadcastToAll(new PausePacket { Pause = true });
         var persistenceService = ServiceProvider.GetRequiredService<PersistenceService>();
         CampaignSnapshot snapshot = await persistenceService.SaveAsync();
-        GD.Print("Snapshot created");
+        var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
+        var bytes = snapshotSerializer.Serialize(snapshot);
+        File.WriteAllBytes("C:/Users/yuryk/TestCampaignSnapshot", bytes);
     }
 }
