@@ -107,5 +107,6 @@ public sealed class CampaignServer : Node
         var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
         var bytes = snapshotSerializer.Serialize(snapshot);
         File.WriteAllBytes("C:/Users/yuryk/TestCampaignSnapshot", bytes);
+        // TODO extract paths to env
     }
 }
