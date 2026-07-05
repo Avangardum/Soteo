@@ -4,9 +4,9 @@ using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Entities;
 
-public sealed class PlayerCharacterEntity : Unit
+public sealed class PlayerCharacter : Unit
 {
-    public PlayerCharacterEntity
+    public PlayerCharacter
     (
         Guid id,
         Guid controllingPlayerId,
