@@ -128,6 +128,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddTransient(typeof(ClientDependency<>), typeof(ClientDependency<>.Null));
         
         services.AddScoped<ISynchronizationServer, SynchronizationServer>();
+        services.AddScoped<ICurrentTickRepository, CurrentTickRepository>();
     }
     
     private void RegisterClientServices(IServiceCollection services)

@@ -12,7 +12,8 @@ public sealed class ShardSnapshotRequestPacketHandler
 (
     ISynchronizationServer synchronizationServer,
     IEntitySnapshotManager entitySnapshotManager,
-    IFromGameplayPacketSender packetSender
+    IFromGameplayPacketSender packetSender,
+    ICurrentTickRepository tickRepo
 ) : PacketHandler<ShardSnapshotRequestPacket>
 {
     protected override void Handle(ShardSnapshotRequestPacket packet, Guid senderId)
@@ -29,7 +30,7 @@ public sealed class ShardSnapshotRequestPacketHandler
         {
             Snapshot = new ShardSnapshot
             {
-                Tick = 0, // TODO set
+                Tick = tickRepo.Value,
                 Entities = entitySnapshotManager.GetEntitySnapshots(),
             },
         };

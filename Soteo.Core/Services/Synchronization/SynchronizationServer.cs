@@ -13,8 +13,8 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     private readonly IConnectionNotifier _connectionNotifier;
     private readonly IFrameStopwatch _frameStopwatch;
     private readonly IPauseRepository _pauseRepo;
+    private readonly ICurrentTickRepository _tickRepo;
 
-    private long _tick;
     private ShardSnapshot? _prevShardSnapshot;
     private readonly HashSet<Guid> _snapshotRequesters = [];
     private readonly IDisposable _physicsProcessSubscription;
@@ -26,7 +26,8 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         IConnectionNotifier connectionNotifier,
         IProcessPublisher processPublisher,
         IFrameStopwatch frameStopwatch,
-        IPauseRepository pauseRepo
+        IPauseRepository pauseRepo,
+        ICurrentTickRepository tickRepo
     )
     {
         _entitySnapshotManager = entitySnapshotManager;
@@ -34,6 +35,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         _connectionNotifier = connectionNotifier;
         _frameStopwatch = frameStopwatch;
         _pauseRepo = pauseRepo;
+        _tickRepo = tickRepo;
         
         connectionNotifier.PeerConnected += OnPeerConnected;
         _physicsProcessSubscription = processPublisher
@@ -55,7 +57,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     private void Tick(double delta)
     {
         var entitySnapshots = _entitySnapshotManager.GetEntityPuppetSnapshots();
-        var shardSnapshot = new ShardSnapshot { Tick = _tick, Entities = entitySnapshots };
+        var shardSnapshot = new ShardSnapshot { Tick = _tickRepo.Value, Entities = entitySnapshots };
         
         ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
             ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
@@ -80,7 +82,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         }
 
         if (!_pauseRepo.Paused)
-            _tick++;
+            _tickRepo.Value++;
     }
 
     public void ReceiveSnapshotRequest(Guid clientId) => _snapshotRequesters.Add(clientId);
