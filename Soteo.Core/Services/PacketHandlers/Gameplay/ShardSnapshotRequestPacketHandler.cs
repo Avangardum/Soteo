@@ -31,7 +31,7 @@ public sealed class ShardSnapshotRequestPacketHandler
             Snapshot = new ShardSnapshot
             {
                 Tick = tickRepo.Value,
-                Entities = entitySnapshotManager.GetEntitySnapshots(),
+                Entities = entitySnapshotManager.CreateEntitySnapshots(),
             },
         };
         packetSender.SendReliable(packet, Const.CampaignServerId);

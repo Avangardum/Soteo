@@ -5,7 +5,7 @@ using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Services;
 
-public sealed class PersistenceService
+public sealed class CampaignSnapshotManager
 (
     IFromCampaignServerPacketSender packetSender,
     IUserRepository userRepo,
@@ -21,10 +21,10 @@ public sealed class PersistenceService
     private readonly Dictionary<Guid, TaskCompletionSource<ShardSnapshot>> _shardSnapshotTcs = [];
     private bool _isSaving;
     
-    public async Task<CampaignSnapshot> SaveAsync()
+    public async Task<CampaignSnapshot> CreateSnapshotAsync()
     {
         if (_isSaving)
-            throw new InvalidOperationException("Save is already in progress");
+            throw new InvalidOperationException("Snapshot creation is already in progress");
         _isSaving = true;
 
         try

@@ -21,6 +21,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     /// referenced by any other object. That is required to replicate references to removed entities across restarts.
     /// </summary>
     private readonly Dictionary<Guid, WeakReference<ISnapshottableEntity>> _removedEntities = [];
+    
     private const int CleanupRemovedEntitiesEveryXRemovals = 1000;
     private int _removalsUntilRemovedEntitiesCleanup = CleanupRemovedEntitiesEveryXRemovals;
     
@@ -48,7 +49,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     public event Action<IEntity> EntityAdded = delegate { };
     public event Action<IEntity> EntityRemoved = delegate { };
     
-    public IReadOnlyDictionary<Guid, EntitySnapshot> GetEntitySnapshots()
+    public IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntitySnapshots()
     {
         Dictionary<Guid, EntitySnapshot> snapshots = [];
         
@@ -62,7 +63,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         return snapshots;
     }
     
-    public IReadOnlyDictionary<Guid, EntitySnapshot> GetEntityPuppetSnapshots()
+    public IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntityPuppetSnapshots()
     {
         ImmutableDictionary<Guid, EntitySnapshot> snapshots = _entities.Values
             .Select(it => it.CreateSnapshot().ToPuppet())

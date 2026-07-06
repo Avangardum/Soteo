@@ -10,16 +10,16 @@ using Soteo.Core.Services.Repositories;
 
 namespace Soteo.Core.Tests;
 
-public sealed class PersistenceServiceTests
+public sealed class CampaignSnapshotManagerTests
 {
     private readonly UserRepository _userRepo;
     private readonly PlayerCharacterTrackerRepository _charRepo;
     private readonly FakePacketSender _packetSender;
     private readonly FakeTimeProvider _timeProvider;
     private readonly FakeConsistencyValidator _consistencyValidator;
-    private readonly PersistenceService _sut;
+    private readonly CampaignSnapshotManager _sut;
     
-    public PersistenceServiceTests()
+    public CampaignSnapshotManagerTests()
     {
         _userRepo = new UserRepository();
         _charRepo = new PlayerCharacterTrackerRepository();
@@ -27,40 +27,40 @@ public sealed class PersistenceServiceTests
             new FakePacketSender((packet, senderId) => _sut.Required.ReceiveShardSnapshotPacket(packet, senderId));
         _timeProvider = new FakeTimeProvider();
         _consistencyValidator = new FakeConsistencyValidator();
-        _sut = new PersistenceService(_packetSender, _userRepo, _charRepo, _timeProvider, _consistencyValidator);
+        _sut = new CampaignSnapshotManager(_packetSender, _userRepo, _charRepo, _timeProvider, _consistencyValidator);
     }
 
     [Fact]
-    public async Task SavedSnapshotContainsUsersFromRepository()
+    public async Task SnapshotContainsUsersFromRepository()
     {
         User user1 = CreatePlayer();
         User user2 = CreatePlayer();
         
-        CampaignSnapshot snapshot = await _sut.SaveAsync();
+        CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
         
         snapshot.CampaignServer.Users[user1.Id].Should().Be(user1.CreateSnapshot());
         snapshot.CampaignServer.Users[user2.Id].Should().Be(user2.CreateSnapshot());
     }
     
     [Fact]
-    public async Task SavedSnapshotContainsPlayerCharactersFromRepository()
+    public async Task SnapshotContainsPlayerCharactersFromRepository()
     {
         var char1 = CreatePlayerCharacterInShard(Guid.NewGuid());
         var char2 = CreatePlayerCharacterInShard(null);
         
-        CampaignSnapshot snapshot = await _sut.SaveAsync();
+        CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
         
         snapshot.CampaignServer.PlayerCharacterTrackers[char1.Id].Should().Be(char1.CreateSnapshot());
         snapshot.CampaignServer.PlayerCharacterTrackers[char2.Id].Should().Be(char2.CreateSnapshot());
     }
     
     [Fact]
-    public async Task SavedSnapshotContainsShardSnapshotsSentByShardServers()
+    public async Task SnapshotContainsShardSnapshotsSentByShardServers()
     {
         var shard1 = CreateShard();
         var shard2 = CreateShard();
         
-        CampaignSnapshot snapshot = await _sut.SaveAsync();
+        CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
         
         snapshot.Shards[shard1.Id].Tick.Should().Be(shard1.Id.ToString()[^1]);
         snapshot.Shards[shard2.Id].Tick.Should().Be(shard2.Id.ToString()[^1]);
@@ -93,7 +93,7 @@ public sealed class PersistenceServiceTests
         
         _packetSender.DuplicateResponse = true;
         
-        await _sut.Awaiting(it => it.SaveAsync()).Should().ThrowAsync<InvalidOperationException>(); 
+        await _sut.Awaiting(it => it.CreateSnapshotAsync()).Should().ThrowAsync<InvalidOperationException>(); 
     }
     
     [Fact]
@@ -102,8 +102,8 @@ public sealed class PersistenceServiceTests
         CreateShard();
         CreateUnresponsiveShard();
         
-        var assertTask = FluentActions.Awaiting(_sut.SaveAsync).Should().ThrowAsync<TimeoutException>();
-        _timeProvider.Advance(TimeSpan.FromSeconds(PersistenceService.ShardServerSnapshotRequestTimeout * 1.1));
+        var assertTask = FluentActions.Awaiting(_sut.CreateSnapshotAsync).Should().ThrowAsync<TimeoutException>();
+        _timeProvider.Advance(TimeSpan.FromSeconds(CampaignSnapshotManager.ShardServerSnapshotRequestTimeout * 1.1));
         await assertTask;
     }
     
@@ -113,7 +113,7 @@ public sealed class PersistenceServiceTests
         CreateShard();
         _consistencyValidator.FailuresRemaining = int.MaxValue;
         
-        var assertTask = FluentActions.Awaiting(_sut.SaveAsync).Should().ThrowAsync<Exception>();
+        var assertTask = FluentActions.Awaiting(_sut.CreateSnapshotAsync).Should().ThrowAsync<Exception>();
         for (int i = 0; i < 510; i++)
             _timeProvider.Advance(TimeSpan.FromDays(365));
         await assertTask;
@@ -125,30 +125,30 @@ public sealed class PersistenceServiceTests
         CreateShard();
         _consistencyValidator.FailuresRemaining = 2;
 
-        Task actTask = _sut.SaveAsync();
+        Task actTask = _sut.CreateSnapshotAsync();
         
         _consistencyValidator.FailuresRemaining.Should().Be(1);
-        _timeProvider.Advance(TimeSpan.FromSeconds(PersistenceService.InconsistencyRetryDelay * 1.1));
+        _timeProvider.Advance(TimeSpan.FromSeconds(CampaignSnapshotManager.InconsistencyRetryDelay * 1.1));
         _consistencyValidator.FailuresRemaining.Should().Be(0);
-        _timeProvider.Advance(TimeSpan.FromSeconds(PersistenceService.InconsistencyRetryDelay * 1.1));
+        _timeProvider.Advance(TimeSpan.FromSeconds(CampaignSnapshotManager.InconsistencyRetryDelay * 1.1));
         _consistencyValidator.FailuresRemaining.Should().Be(-1);
         actTask.Status.Should().Be(TaskStatus.RanToCompletion);
     }
     
     [Fact]
-    public async Task CocurrentSaveThrows()
+    public async Task CocurrentSnapshotCreationThrows()
     {
         CreateUnresponsiveShard();
-        _ = _sut.SaveAsync();
-        await FluentActions.Awaiting(_sut.SaveAsync).Should().ThrowAsync<InvalidOperationException>();
+        _ = _sut.CreateSnapshotAsync();
+        await FluentActions.Awaiting(_sut.CreateSnapshotAsync).Should().ThrowAsync<InvalidOperationException>();
     }
     
     [Fact]
-    public async Task SequentialSaveDoesNotThrow()
+    public async Task SequentialSnapshotCreationDoesNotThrow()
     {
         CreateShard();
-        await _sut.SaveAsync();
-        await _sut.SaveAsync();
+        await _sut.CreateSnapshotAsync();
+        await _sut.CreateSnapshotAsync();
     }
     
     private User CreatePlayer()

@@ -53,8 +53,8 @@ public sealed class CampaignServer : Node
         services.AddAlias<IFromCampaignServerPacketSender, ICommunicator>();
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         services.AddSingleton<ITypeLocator>(new TypeLocator(SoteoCoreAssembly.Value));
-        services.AddSingleton<PersistenceService>();
-        services.AddAlias<IShardSnapshotPacketReceiver, PersistenceService>();
+        services.AddSingleton<CampaignSnapshotManager>();
+        services.AddAlias<IShardSnapshotPacketReceiver, CampaignSnapshotManager>();
         services.AddSingleton
         <
             ICampaignSnapshotCrossServerConsistencyValidator,
@@ -102,8 +102,8 @@ public sealed class CampaignServer : Node
         await Task.Delay(TimeSpan.FromSeconds(30));
         var packetSender = ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>();
         packetSender.BroadcastToAll(new PausePacket { Pause = true });
-        var persistenceService = ServiceProvider.GetRequiredService<PersistenceService>();
-        CampaignSnapshot snapshot = await persistenceService.SaveAsync();
+        var persistenceService = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
+        CampaignSnapshot snapshot = await persistenceService.CreateSnapshotAsync();
         var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
         var bytes = snapshotSerializer.Serialize(snapshot);
         File.WriteAllBytes("C:/Users/yuryk/TestCampaignSnapshot", bytes);

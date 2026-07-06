@@ -56,7 +56,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 
     private void Tick(double delta)
     {
-        var entitySnapshots = _entitySnapshotManager.GetEntityPuppetSnapshots();
+        var entitySnapshots = _entitySnapshotManager.CreateEntityPuppetSnapshots();
         var shardSnapshot = new ShardSnapshot { Tick = _tickRepo.Value, Entities = entitySnapshots };
         
         ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
