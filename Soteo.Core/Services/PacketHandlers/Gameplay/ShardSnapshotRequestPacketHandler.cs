@@ -11,9 +11,8 @@ namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 public sealed class ShardSnapshotRequestPacketHandler
 (
     ISynchronizationServer synchronizationServer,
-    IEntitySnapshotManager entitySnapshotManager,
     IFromGameplayPacketSender packetSender,
-    ICurrentTickRepository tickRepo
+    IShardPersistenceSnapshotManager shardPersistenceSnapshotManager
 ) : PacketHandler<ShardSnapshotRequestPacket>
 {
     protected override void Handle(ShardSnapshotRequestPacket packet, Guid senderId)
@@ -26,16 +25,9 @@ public sealed class ShardSnapshotRequestPacketHandler
     
     private void HandlePersistenceSnapshotRequest()
     {
-        var packet = new ShardSnapshotPacket
-        {
-            Snapshot = new ShardSnapshot
-            {
-                Tick = tickRepo.Value,
-                Entities = entitySnapshotManager.CreateEntitySnapshots(),
-            },
-        };
+        ShardSnapshot snapshot = shardPersistenceSnapshotManager.CreateSnapshot();
+        var packet = new ShardSnapshotPacket { Snapshot = snapshot, };
         packetSender.SendReliable(packet, Const.CampaignServerId);
-        
         // TODO fails with a lot of entities (ws buffer overflow)
     }
 }
