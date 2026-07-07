@@ -13,7 +13,7 @@ public abstract class CommandPacketHandler<TPacket, TCommand>
 {
     protected override void Handle(TPacket packet, Guid senderId)
     {
-        if (pauseRepo.Paused) return;
+        if (pauseRepo.IsPaused) return;
         ICommandableUnit? unit = entityManager.GetEntity<ICommandableUnit>(packet.UnitId);
         if (unit != null && unit.ControllingPlayerIds.Contains(senderId))
             unit.SetCommand(packet.Command);

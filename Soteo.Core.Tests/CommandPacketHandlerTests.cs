@@ -40,7 +40,7 @@ public sealed class CommandPacketHandlerTests
     [Fact]
     public async Task HandlingPacketFromControllingPlayerWhilePausedDoesNotSetUnitCommand()
     {
-        _pauseRepo.Paused.Returns(true);
+        _pauseRepo.IsPaused.Returns(true);
         var packet = new TestCommandPacket { UnitId = _unitId, Command = _command };
         await _sut.HandleAsync(packet, _controllingPlayerId);
         _unit.Received(0).SetCommand(_command);

@@ -81,7 +81,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
             _packetSender.BroadcastReliable(shardSnapshotDeltaPacket);
         }
 
-        if (!_pauseRepo.Paused)
+        if (!_pauseRepo.IsPaused)
             _tickRepo.Value++;
     }
 

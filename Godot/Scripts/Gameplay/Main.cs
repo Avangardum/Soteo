@@ -71,7 +71,10 @@ public sealed class Main : Node2D, IShardLoader
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
         if (_isServer)
+        {
             LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
+            //_rootServiceProvider.GetRequiredService<IPauseRepository>().Paused = true;
+        }
     }
     
     private void RegisterServices(IServiceCollection services)

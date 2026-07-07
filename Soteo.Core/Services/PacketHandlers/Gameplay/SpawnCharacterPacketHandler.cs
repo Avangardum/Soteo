@@ -9,6 +9,7 @@ public class SpawnCharacterPacketHandler(IEntityManager entityManager) : PacketH
 {
     protected override void Handle(SpawnCharacterPacket packet, Guid senderId)
     {
+        // todo wait for unpause
         entityManager.SpawnPlayerCharacter(packet.CharacterId, packet.PeerId);
     }
 }

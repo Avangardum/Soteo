@@ -137,7 +137,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
             return false;
         }
 
-        bool canSynchronize = _syncData.LastDeltaTick >= _syncData.LastSnapshotPacket?.Snapshot.Tick + 2;
+        bool canSynchronize = _syncData.ReceivedDeltaCount >= 2;
         if (!canSynchronize) return false;
         
         _entitySnapshotManager.ReplicateEntitySnapshots(_syncData.LastSnapshotPacket.Required.Snapshot.Entities);
@@ -183,15 +183,17 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         
         _syncData.DeltaRing.RingSet(packet.SnapshotDelta.Tick, packet.SnapshotDelta);
         _syncData.ServerLoad = packet.ServerLoad;
-        _syncData.ApproxServerTick = packet.SnapshotDelta.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
+        _syncData.ApproxServerTick =
+            packet.SnapshotDelta.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
         _syncData.LastDeltaTick = packet.SnapshotDelta.Tick;
+        _syncData.ReceivedDeltaCount++;
     }
     
     private enum StateEnum
     {
         Desynchronized,
         Synchronizing,
-        Synchronized
+        Synchronized,
     }
     
     private record SynchronizationData
@@ -201,6 +203,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         public long? LastDeltaTick { get; set; }
         public ShardSnapshotPacket? LastSnapshotPacket { get; set; }
         public ShardSnapshotDelta?[] DeltaRing { get; } = new ShardSnapshotDelta[10 * Const.TicksPerSecond];
+        public long ReceivedDeltaCount { get; set; }
         
         // Stores minimal difference between _tick and _lastDeltaTick for every recent second. This number
         // shouldn't go below 0, or else synchronization will pause until the delta necessary to continue arrives.

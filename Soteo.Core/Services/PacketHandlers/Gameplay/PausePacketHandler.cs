@@ -9,6 +9,6 @@ public sealed class PausePacketHandler(IPauseRepository pauseRepo) : PacketHandl
 {
     protected override void Handle(PausePacket packet, Guid senderId)
     {
-        pauseRepo.Paused = packet.Pause;
+        pauseRepo.IsPaused = packet.Pause;
     }
 }
