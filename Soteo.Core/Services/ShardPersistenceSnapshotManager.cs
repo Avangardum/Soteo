@@ -20,6 +20,7 @@ public sealed class ShardPersistenceSnapshotManager
 
     public void ReplicateSnapshot(ShardSnapshot snapshot)
     {
-        throw new NotImplementedException();
+        tickRepo.Value = snapshot.Tick;
+        entitySnapshotManager.ReplicateEntitySnapshots(snapshot.Entities);
     }
 }

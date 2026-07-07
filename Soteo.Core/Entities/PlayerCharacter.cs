@@ -1,4 +1,5 @@
 using Soteo.Core.Abilities;
+using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 
@@ -21,5 +22,17 @@ public sealed class PlayerCharacter : Unit
         SetAbility<VampireAbility>(AbilitySlot.Class3, 1);
         SetAbility<RecallAbility>(AbilitySlot.Recall, 1);
         SetAbility<RangedAttackAbility>(AbilitySlot.Attack, 1);
+    }
+    
+    public static PlayerCharacter FromSnapshot
+    (
+        UnitSnapshot snapshot,
+        IUnitNode node,
+        IEntityManager entityManager,
+        IServiceProvider serviceProvider
+    )
+    {
+        // todo set player id
+        return new(snapshot.Id, Guid.Empty, node, entityManager, serviceProvider);
     }
 }

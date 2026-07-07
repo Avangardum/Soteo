@@ -115,6 +115,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     {
         return snapshot switch
         {
+            UnitSnapshot s => Add(PlayerCharacter.FromSnapshot(s, AddNode<IUnitNode>(s.Id), this, _serviceProvider)),
+            ProjectileSnapshot s => Add(Projectile.FromSnapshot(s, AddNode<IProjectileNode>(s.Id), _serviceProvider)),
             UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, AddNode<IUnitPuppetNode>(s.Id), _camera.Required)),
             ProjectilePuppetSnapshot s =>
                 Add(new ProjectilePuppet(s.Id, AddNode<IProjectilePuppetNode>(s.Id), _camera.Required)),

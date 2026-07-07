@@ -14,6 +14,12 @@ public sealed class Projectile : Entity<IProjectileNode>
     private ProjectileTarget _target;
     private bool _didHit;
     
+    /// <summary>
+    /// If true, the projectile is in invalid state due to some non-nullable fields having null value, which are
+    /// expected to be set via snapshot replication immediately
+    /// </summary>
+    private bool _isSnapshotReplicationPendingToFinishInit;
+    
     public Projectile
     (
         Guid id,
@@ -28,6 +34,30 @@ public sealed class Projectile : Entity<IProjectileNode>
         _speed = speed;
         _target = target;
         _serviceProvider = serviceProvider;
+    }
+    
+    public static Projectile FromSnapshot
+    (
+        ProjectileSnapshot snapshot,
+        IProjectileNode node,
+        IServiceProvider serviceProvider
+    )
+    {
+        // Null is passed to parameters that require objects potentially referencing other entities.
+        // This is because during snapshot replication these other entities may be not instantiated yet.
+        // These values are set via snapshot replication after all entities are instantiated.
+        return new Projectile
+        (
+            snapshot.Id,
+            abilityContext: null!,
+            snapshot.Speed,
+            target: null!,
+            node,
+            serviceProvider
+        )
+        {
+            _isSnapshotReplicationPendingToFinishInit = true
+        };
     }
 
     public override Vector2 Position
@@ -61,10 +91,14 @@ public sealed class Projectile : Entity<IProjectileNode>
         _abilityContext = AbilityContext.FromSnapshot(s.AbilityContext, _serviceProvider);
         _speed = s.Speed;
         _target = ProjectileTarget.FromSnapshot(s.Target, _serviceProvider);
+        _isSnapshotReplicationPendingToFinishInit = false;
     }
 
     public void Tick(double delta)
     {
+        if (_isSnapshotReplicationPendingToFinishInit)
+            throw new InvalidOperationException("Snapshot replication is pending to finish initialization");
+        
         if (_didHit)
         {
             Remove();
