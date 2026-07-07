@@ -28,9 +28,9 @@ approach include avoidance of manual lifetime management (no need to call Free, 
 unreferenced) and ability to use object pooling separately (such as pooling nodes for performance and avoiding pooling
 plain C# objects with complex lifetime).
 
-Most of the codebase is thread-unaware, meaning that it works under an assumption that no other thread is performing any
-concurrent reads or writes on any state. Since Godot always calls scripts on the main thread and uses a synchronization
-context that runs async continuations on the main thread, all code runs on the main thread by default,
+Most of the codebase is thread-unaware, meaning that it works under the assumption that no other thread is performing
+any concurrent reads or writes on any state. Since Godot always calls scripts on the main thread and uses a
+synchronization context that runs async continuations on the main thread, all code runs on the main thread by default,
 unless a thread is created explicitly. If any extra threads are created explicitly, they must honor the aforementioned
 assumption by not reading or writing any state.
 
