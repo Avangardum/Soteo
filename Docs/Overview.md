@@ -8,7 +8,7 @@ The solution consists of the following projects:
 - Core - Core game logic independent from Godot.
 - Util - Language level utilities extending standard libraries.
 - Soteo - Main Godot entry point project for the client, the shard server and the campaign server. Contains all Godot
-    dependent code.
+  dependent code.
 
 The shard server runs with a fixed tick rate, all gameplay logic is executed exclusively in _PhysicsProcess.
 
@@ -28,6 +28,12 @@ approach include avoidance of manual lifetime management (no need to call Free, 
 unreferenced) and ability to use object pooling separately (such as pooling nodes for performance and avoiding pooling
 plain C# objects with complex lifetime).
 
+Most of the codebase is thread-unaware, meaning that it works under an assumption that no other thread is performing any
+concurrent reads or writes on any state. Since Godot always calls scripts on the main thread and uses a synchronization
+context that runs async continuations on the main thread, all code runs on the main thread by default,
+unless a thread is created explicitly. If any extra threads are created explicitly, they must honor the aforementioned
+assumption by not reading or writing any state.
+
 # DTO
 
 DTO (data transfer objects) are immutable groupings of data to be exchanged between functions.
@@ -36,7 +42,7 @@ Snapshots are DTO that capture some state at some point of time. Packets are DTO
 over network. Snapshots and packets should follow extra rules:
 
 - They should not reference anything mutable either directly or transitively to remain unchanged even after
-    the state they captured changes.
+  the state they captured changes.
 - They should not reference objects that have an id, instead storing just the id 
   to avoid duplication in serialized data.
 
@@ -87,14 +93,14 @@ in the background, provide methods to be used by other objects or both of these.
 
 Services suffixed `Communicator` manage communications between servers and clients by sending and receiving packets.
 They are not used directly, instead `IFromGameplayPacketSender` / `IFromCampaignServerPacketSender` interfaces are used
-for sending packets and handling received packets is done by packet handlers inheriting from `PacketHandler` that are
+for sending packets, while handling received packets is done by packet handlers inheriting from `PacketHandler` that are
 called automatically by communicators when a matching packet is received. By default they only accept packets
 from the server side, add `[AllowClientPackets]` to change it. Handlers allowing client packets are responsible for
 validating them.
 
 ## Gameplay singleton services
 
-`EntityLocator` is the client utility to search for an entity across all loaded shards.
+`EntityLocator` is a client utility to search for an entity across all loaded shards.
 
 ## Gameplay shard scoped services
 
