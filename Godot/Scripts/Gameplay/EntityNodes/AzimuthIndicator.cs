@@ -4,6 +4,8 @@ namespace Soteo.Main.Gameplay.EntityNodes;
 
 public sealed class AzimuthIndicator : Line2D
 {
+    // TODO custom shader
+    
     private const int SectorCount = 100;
     private const int ArrowHalfWidthSectors = 4;
     private const int EllipseWidth = 8;

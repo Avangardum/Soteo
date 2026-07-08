@@ -99,8 +99,10 @@ public sealed class CampaignServer : Node
     
     private async Task TestLifetimeAsync()
     {
-        await Task.Delay(TimeSpan.FromSeconds(30));
+        await Task.Delay(TimeSpan.FromSeconds(15));
         var packetSender = ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>();
+        packetSender.BroadcastToAll(new PausePacket { Pause = false });
+        await Task.Delay(TimeSpan.FromSeconds(15));
         packetSender.BroadcastToAll(new PausePacket { Pause = true });
         var persistenceService = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
         CampaignSnapshot snapshot = await persistenceService.CreateSnapshotAsync();

@@ -73,7 +73,7 @@ public sealed class Main : Node2D, IShardLoader
         if (_isServer)
         {
             LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
-            //_rootServiceProvider.GetRequiredService<IPauseRepository>().Paused = true;
+            _rootServiceProvider.GetRequiredService<IPauseRepository>().IsPaused = true;
         }
     }
     
