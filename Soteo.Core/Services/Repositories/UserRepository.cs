@@ -7,6 +7,8 @@ namespace Soteo.Core.Services.Repositories;
 
 public class UserRepository : Dictionary<Guid, User>, IUserRepository
 {
+    public void Add(User user) => Add(user.Id, user);
+    
     public void OnConnected(IDictionary<string, object> claims)
     {
         Guid id = Guid.Parse((string)claims["sub"]);

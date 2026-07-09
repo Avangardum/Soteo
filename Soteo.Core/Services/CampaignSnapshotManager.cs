@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
+using Soteo.Core.Models;
 
 namespace Soteo.Core.Services;
 
@@ -9,7 +10,7 @@ public sealed class CampaignSnapshotManager
 (
     IFromCampaignServerPacketSender packetSender,
     IUserRepository userRepo,
-    IPlayerCharacterRepository charRepo,
+    IPlayerCharacterRepository trackerRepo,
     TimeProvider timeProvider,
     ICampaignSnapshotCrossServerConsistencyValidator consistencyValidator
 ) : IShardSnapshotPacketReceiver
@@ -49,7 +50,7 @@ public sealed class CampaignSnapshotManager
     {
         var campaignServerSnapshot = new CampaignServerSnapshot
         {
-            PlayerCharacterTrackers = charRepo.CreateSnapshot(),
+            PlayerCharacterTrackers = trackerRepo.CreateSnapshot(),
             Users = userRepo.CreateSnapshot(),
         };
 
@@ -94,8 +95,54 @@ public sealed class CampaignSnapshotManager
             throw new InvalidOperationException($"Duplicate packet from {senderId}");
     }
 
-    public async Task LoadAsync(CampaignSnapshot snapshot)
+    public async Task ReplicateSnapshotAsync(CampaignSnapshot snapshot)
     {
-        throw new NotImplementedException();
+        ReplicateCampaignServerSnapshot(snapshot.CampaignServer);
+        
+        foreach ((Guid shardId, ShardSnapshot shardSnapshot) in snapshot.Shards)
+        {
+            var packet = new ShardSnapshotPacket { Snapshot = shardSnapshot };
+            packetSender.SendTo(packet, shardId);
+        }
+        
+        // TODO wait for shard server response
+    }
+    
+    private void ReplicateCampaignServerSnapshot(CampaignServerSnapshot snapshot)
+    {
+        userRepo.Clear();
+        trackerRepo.Clear();
+        
+        // Domain objects may contain circular references, so to properly replicate them, first we create them without
+        // references to other domain objects...
+        
+        foreach (UserSnapshot s in snapshot.Users.Values)
+        {
+            userRepo.Add(new User
+            {
+                Id = s.Id,
+                IsConnected = false,
+                IsPlayer = s.IsPlayer,
+                IsShard = s.IsShard,
+            });
+        }
+
+        foreach (PlayerCharacterTrackerSnapshot s in snapshot.PlayerCharacterTrackers.Values)
+        {
+             trackerRepo.Add(new PlayerCharacterTracker
+             {
+                 Id = s.Id,
+                 Player = null,
+                 ShardId = s.ShardId,
+             });
+        }
+        
+        // ...then replicate references to domain objects
+        
+        foreach (PlayerCharacterTrackerSnapshot s in snapshot.PlayerCharacterTrackers.Values)
+        {
+            PlayerCharacterTracker tracker = trackerRepo[s.Id];
+            tracker.Player = userRepo[s.PlayerId.Value];
+        }
     }
 }

@@ -2,6 +2,7 @@ using Soteo.Core.Dto.Snapshots;
 
 namespace Soteo.Core.Models;
 
+// TODO make abstract with Player and Shard subclasses
 public sealed record User
 {
     public required Guid Id { get; init; }

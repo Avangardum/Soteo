@@ -99,16 +99,28 @@ public sealed class CampaignServer : Node
     
     private async Task TestLifetimeAsync()
     {
+        var persistenceService = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
+        var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
+        
+        if (File.Exists("C:/Users/yuryk/TestCampaignSnapshot"))
+        {
+            var bytes = File.ReadAllBytes("C:/Users/yuryk/TestCampaignSnapshot");
+            var snapshot = snapshotSerializer.Deserialize(bytes);
+            await persistenceService.ReplicateSnapshotAsync(snapshot);
+        }
+        
         await Task.Delay(TimeSpan.FromSeconds(15));
         var packetSender = ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>();
         packetSender.BroadcastToAll(new PausePacket { Pause = false });
         await Task.Delay(TimeSpan.FromSeconds(15));
         packetSender.BroadcastToAll(new PausePacket { Pause = true });
-        var persistenceService = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
-        CampaignSnapshot snapshot = await persistenceService.CreateSnapshotAsync();
-        var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
-        var bytes = snapshotSerializer.Serialize(snapshot);
-        File.WriteAllBytes("C:/Users/yuryk/TestCampaignSnapshot", bytes);
+
+        {
+            CampaignSnapshot snapshot = await persistenceService.CreateSnapshotAsync();
+            var bytes = snapshotSerializer.Serialize(snapshot);
+            File.WriteAllBytes("C:/Users/yuryk/TestCampaignSnapshot", bytes);
+        }
+        
         // TODO extract paths to env
     }
 }

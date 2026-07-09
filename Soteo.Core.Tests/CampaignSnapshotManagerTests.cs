@@ -13,7 +13,7 @@ namespace Soteo.Core.Tests;
 public sealed class CampaignSnapshotManagerTests
 {
     private readonly UserRepository _userRepo;
-    private readonly PlayerCharacterTrackerRepository _charRepo;
+    private readonly PlayerCharacterTrackerRepository _trackerRepo;
     private readonly FakePacketSender _packetSender;
     private readonly FakeTimeProvider _timeProvider;
     private readonly FakeConsistencyValidator _consistencyValidator;
@@ -22,12 +22,12 @@ public sealed class CampaignSnapshotManagerTests
     public CampaignSnapshotManagerTests()
     {
         _userRepo = new UserRepository();
-        _charRepo = new PlayerCharacterTrackerRepository();
+        _trackerRepo = new PlayerCharacterTrackerRepository();
         _packetSender =
             new FakePacketSender((packet, senderId) => _sut.Required.ReceiveShardSnapshotPacket(packet, senderId));
         _timeProvider = new FakeTimeProvider();
         _consistencyValidator = new FakeConsistencyValidator();
-        _sut = new CampaignSnapshotManager(_packetSender, _userRepo, _charRepo, _timeProvider, _consistencyValidator);
+        _sut = new CampaignSnapshotManager(_packetSender, _userRepo, _trackerRepo, _timeProvider, _consistencyValidator);
     }
 
     [Fact]
@@ -151,6 +151,83 @@ public sealed class CampaignSnapshotManagerTests
         await _sut.CreateSnapshotAsync();
     }
     
+    [Fact]
+    public async Task SnapshotReplicationPopulatesRepositories()
+    {
+        // Arrange
+        
+        var shardId = Guid.NewGuid();
+        var playerId = Guid.NewGuid();
+        var characterId = Guid.NewGuid();
+        
+        var snapshot = new CampaignSnapshot
+        {
+            CampaignServer = new CampaignServerSnapshot
+            {
+                Users = new Dictionary<Guid, UserSnapshot>
+                {
+                    [shardId] = new()
+                    {
+                        Id = shardId,
+                        IsConnected = false,
+                        IsPlayer = false,
+                        IsShard = true,
+                    },
+                    [playerId] = new()
+                    {
+                        Id = playerId,
+                        IsConnected = false,
+                        IsPlayer = true,
+                        IsShard = false,
+                    }
+                }.ToImmutableDictionary(),
+                PlayerCharacterTrackers = new Dictionary<Guid, PlayerCharacterTrackerSnapshot>
+                {
+                    [characterId] = new()
+                    {
+                        Id = characterId,
+                        PlayerId = playerId,
+                        ShardId = shardId,
+                    },
+                }.ToImmutableDictionary(),
+            },
+            Shards = ImmutableDictionary<Guid, ShardSnapshot>.Empty,
+        };
+        
+        // Act
+        
+        await _sut.ReplicateSnapshotAsync(snapshot);
+        
+        // Assert
+        
+        _userRepo.Should().HaveCount(2);
+        var expectedShard = new User
+        {
+            Id = shardId,
+            IsConnected = false,
+            IsPlayer = false,
+            IsShard = true,
+        };
+        _userRepo.Should().ContainValue(expectedShard);
+        var expectedPlayer = new User
+        {
+            Id = playerId,
+            IsConnected = false,
+            IsPlayer = true,
+            IsShard = false,
+        };
+        _userRepo.Should().ContainValue(expectedPlayer);
+        
+        _trackerRepo.Should().HaveCount(1);
+        var expectedCharTracker = new PlayerCharacterTracker
+        {
+            Id = characterId,
+            Player = expectedPlayer,
+            ShardId = shardId,
+        };
+        _trackerRepo.Should().ContainValue(expectedCharTracker);
+    }
+    
     private User CreatePlayer()
     {
         var user = new User
@@ -186,7 +263,7 @@ public sealed class CampaignSnapshotManagerTests
     private PlayerCharacterTracker CreatePlayerCharacterInShard(Guid? shardId)
     {
         var character = new PlayerCharacterTracker { Id = Guid.NewGuid(), ShardId = shardId };
-        _charRepo.Add(character);
+        _trackerRepo.Add(character);
         return character;
     }
     
