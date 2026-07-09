@@ -37,4 +37,11 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
     
     public IReadOnlyDictionary<Guid, UserSnapshot> CreateSnapshot() =>
         this.ToImmutableDictionary(it => it.Key, it => it.Value.CreateSnapshot());
+    
+    public void ReplicateSnapshot(IReadOnlyDictionary<Guid, UserSnapshot> snapshot)
+    {
+        Clear();
+        foreach (UserSnapshot userSnapshot in snapshot.Values)
+            Add(User.FromSnapshot(userSnapshot));
+    }
 }

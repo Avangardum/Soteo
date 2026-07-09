@@ -2,13 +2,23 @@ using Soteo.Core.Dto.Snapshots;
 
 namespace Soteo.Core.Models;
 
-// TODO make abstract with Player and Shard subclasses
 public sealed record User
 {
     public required Guid Id { get; init; }
     public required bool IsConnected { get; set; }
     public required bool IsPlayer { get; init; }
     public required bool IsShard { get; init; }
+
+    public static User FromSnapshot(UserSnapshot snapshot)
+    {
+        return new()
+        {
+            Id = snapshot.Id,
+            IsConnected = false,
+            IsPlayer = snapshot.IsPlayer,
+            IsShard = snapshot.IsShard,
+        };
+    }
     
     public UserSnapshot CreateSnapshot()
     {

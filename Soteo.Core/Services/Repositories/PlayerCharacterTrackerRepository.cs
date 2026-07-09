@@ -12,4 +12,15 @@ public sealed class PlayerCharacterTrackerRepository :
     
     public IReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot> CreateSnapshot() =>
         this.ToImmutableDictionary(it => it.Key, it => it.Value.CreateSnapshot());
+    
+    public void ReplicateSnapshot
+    (
+        IReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot> snapshot,
+        IUserRepository userRepo
+    )
+    {
+        Clear();
+        foreach (PlayerCharacterTrackerSnapshot trackerSnapshot in snapshot.Values)
+            Add(PlayerCharacterTracker.FromSnapshot(trackerSnapshot, userRepo));
+    }
 }

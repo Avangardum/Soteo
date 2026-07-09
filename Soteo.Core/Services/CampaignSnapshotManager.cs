@@ -110,39 +110,7 @@ public sealed class CampaignSnapshotManager
     
     private void ReplicateCampaignServerSnapshot(CampaignServerSnapshot snapshot)
     {
-        userRepo.Clear();
-        trackerRepo.Clear();
-        
-        // Domain objects may contain circular references, so to properly replicate them, first we create them without
-        // references to other domain objects...
-        
-        foreach (UserSnapshot s in snapshot.Users.Values)
-        {
-            userRepo.Add(new User
-            {
-                Id = s.Id,
-                IsConnected = false,
-                IsPlayer = s.IsPlayer,
-                IsShard = s.IsShard,
-            });
-        }
-
-        foreach (PlayerCharacterTrackerSnapshot s in snapshot.PlayerCharacterTrackers.Values)
-        {
-             trackerRepo.Add(new PlayerCharacterTracker
-             {
-                 Id = s.Id,
-                 Player = null,
-                 ShardId = s.ShardId,
-             });
-        }
-        
-        // ...then replicate references to domain objects
-        
-        foreach (PlayerCharacterTrackerSnapshot s in snapshot.PlayerCharacterTrackers.Values)
-        {
-            PlayerCharacterTracker tracker = trackerRepo[s.Id];
-            tracker.Player = userRepo[s.PlayerId.Value];
-        }
+        userRepo.ReplicateSnapshot(snapshot.Users);
+        trackerRepo.ReplicateSnapshot(snapshot.PlayerCharacterTrackers, userRepo);
     }
 }

@@ -9,4 +9,5 @@ public interface IUserRepository : IDictionary<Guid, User>
     void OnConnected(IDictionary<string, object> claims);
     void OnDisconnected(Guid id);
     IReadOnlyDictionary<Guid, UserSnapshot> CreateSnapshot();
+    void ReplicateSnapshot(IReadOnlyDictionary<Guid, UserSnapshot> snapshot);
 }

@@ -1,4 +1,5 @@
 using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Models;
 
@@ -6,7 +7,21 @@ public sealed record PlayerCharacterTracker
 {
     public required Guid Id { get; init; }
     public User? Player { get; set; } // todo make required
-    public Guid? ShardId { get; set; }
+    public Guid? ShardId { get; set; } // todo make Shard
+    
+    public static PlayerCharacterTracker FromSnapshot
+    (
+        PlayerCharacterTrackerSnapshot snapshot,
+        IUserRepository userRepository
+    )
+    {
+        return new()
+        {
+            Id = snapshot.Id,
+            Player = userRepository[snapshot.PlayerId.Value],
+            ShardId = snapshot.ShardId,
+        };
+    }
     
     public PlayerCharacterTrackerSnapshot CreateSnapshot()
     {
