@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Models;
+using Soteo.Util;
 
 namespace Soteo.Core.Services;
 
@@ -15,18 +15,17 @@ public sealed class CampaignSnapshotManager
     ICampaignSnapshotCrossServerConsistencyValidator consistencyValidator
 ) : IShardSnapshotPacketReceiver
 {
-    public const double ShardServerSnapshotRequestTimeout = 10;
+    public const double ShardServerResponseTimeout = 10;
     public const int InconsistencyRetryMaxCount = 10;
     public const int InconsistencyRetryDelay = 5;
     
     private readonly Dictionary<Guid, TaskCompletionSource<ShardSnapshot>> _shardSnapshotTcs = [];
-    private bool _isSaving;
+    private readonly Dictionary<Guid, TaskCompletionSource> _shardSnapshotReplicatedTcs = [];
+    private readonly SemaphoreSlim _mutex = new(1);
     
     public async Task<CampaignSnapshot> CreateSnapshotAsync()
     {
-        if (_isSaving)
-            throw new InvalidOperationException("Snapshot creation is already in progress");
-        _isSaving = true;
+        await _mutex.WaitAsync();
 
         try
         {
@@ -41,8 +40,8 @@ public sealed class CampaignSnapshotManager
         }
         finally
         {
-            _isSaving = false;
             _shardSnapshotTcs.Clear();
+            _mutex.Release();
         }
     }
     
@@ -71,14 +70,14 @@ public sealed class CampaignSnapshotManager
             if (userSnapshot.IsShard)
                 _shardSnapshotTcs[userSnapshot.Id] = new TaskCompletionSource<ShardSnapshot>();
         packetSender.BroadcastToShardServers(new ShardSnapshotRequestPacket());
-        Task timeout = timeProvider.Delay(TimeSpan.FromSeconds(ShardServerSnapshotRequestTimeout));
+        Task timeout = timeProvider.Delay(TimeSpan.FromSeconds(ShardServerResponseTimeout));
         Task completedTask =
             await Task.WhenAny(timeout, Task.WhenAll(_shardSnapshotTcs.Values.Select(it => it.Task)));
-        if (completedTask == timeout) throw ShardSnapshotTimeoutException();
+        if (completedTask == timeout) throw ShardServerSnapshotCreationTimeoutException();
         return _shardSnapshotTcs.ToImmutableDictionary(it => it.Key, it => it.Value.Task.Result);
     }
     
-    private Exception ShardSnapshotTimeoutException()
+    private Exception ShardServerSnapshotCreationTimeoutException()
     {
         string timedOutShardIds = _shardSnapshotTcs
             .Where(it => !it.Value.Task.IsCompleted)
@@ -97,20 +96,47 @@ public sealed class CampaignSnapshotManager
 
     public async Task ReplicateSnapshotAsync(CampaignSnapshot snapshot)
     {
-        ReplicateCampaignServerSnapshot(snapshot.CampaignServer);
+        await _mutex.WaitAsync();
         
-        foreach ((Guid shardId, ShardSnapshot shardSnapshot) in snapshot.Shards)
+        try
         {
-            var packet = new ShardSnapshotPacket { Snapshot = shardSnapshot };
-            packetSender.SendTo(packet, shardId);
+            userRepo.ReplicateSnapshot(snapshot.CampaignServer.Users);
+            trackerRepo.ReplicateSnapshot(snapshot.CampaignServer.PlayerCharacterTrackers, userRepo);
+
+            foreach ((Guid shardId, ShardSnapshot shardSnapshot) in snapshot.Shards)
+            {
+                _shardSnapshotReplicatedTcs[shardId] = new TaskCompletionSource();
+                var packet = new ShardSnapshotPacket { Snapshot = shardSnapshot };
+                packetSender.SendTo(packet, shardId);
+            }
+            
+            Task timeout = timeProvider.Delay(TimeSpan.FromSeconds(ShardServerResponseTimeout));
+            Task completedTask =
+                await Task.WhenAny(timeout, Task.WhenAll(_shardSnapshotReplicatedTcs.Values.Select(it => it.Task)));
+            if (completedTask == timeout) throw ShardServerSnapshotReplicationTimeoutException();
         }
-        
-        // TODO wait for shard server response
+        finally
+        {
+            _shardSnapshotReplicatedTcs.Clear();
+            _mutex.Release();
+        }
     }
     
-    private void ReplicateCampaignServerSnapshot(CampaignServerSnapshot snapshot)
+    private Exception ShardServerSnapshotReplicationTimeoutException()
     {
-        userRepo.ReplicateSnapshot(snapshot.Users);
-        trackerRepo.ReplicateSnapshot(snapshot.PlayerCharacterTrackers, userRepo);
+        string timedOutShardIds = _shardSnapshotReplicatedTcs
+            .Where(it => !it.Value.Task.IsCompleted)
+            .Select(it => it.Key)
+            .JoinToString(", ");
+        return new TimeoutException($"The following shard servers did not respond: {timedOutShardIds}");
+    }
+
+    // todo actually send and handle this packet
+    public void ReceiveShardSnapshotReplicatedPacket(Guid senderId)
+    {
+        if (!_shardSnapshotReplicatedTcs.TryGetValue(senderId, out TaskCompletionSource tcs))
+            throw new InvalidOperationException($"No packet was requested from {senderId}");
+        if (!tcs.TrySetResult())
+            throw new InvalidOperationException($"Duplicate packet from {senderId}");
     }
 }

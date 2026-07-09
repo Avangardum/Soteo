@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
+using NSubstitute.ExceptionExtensions;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
@@ -23,15 +24,15 @@ public sealed class CampaignSnapshotManagerTests
     {
         _userRepo = new UserRepository();
         _trackerRepo = new PlayerCharacterTrackerRepository();
-        _packetSender =
-            new FakePacketSender((packet, senderId) => _sut.Required.ReceiveShardSnapshotPacket(packet, senderId));
+        _packetSender = new FakePacketSender(() => _sut.Required);
         _timeProvider = new FakeTimeProvider();
         _consistencyValidator = new FakeConsistencyValidator();
-        _sut = new CampaignSnapshotManager(_packetSender, _userRepo, _trackerRepo, _timeProvider, _consistencyValidator);
+        _sut =
+            new CampaignSnapshotManager(_packetSender, _userRepo, _trackerRepo, _timeProvider, _consistencyValidator);
     }
 
     [Fact]
-    public async Task SnapshotContainsUsersFromRepository()
+    public async Task CreatedSnapshotContainsUsersFromRepository()
     {
         User user1 = CreatePlayer();
         User user2 = CreatePlayer();
@@ -89,7 +90,8 @@ public sealed class CampaignSnapshotManagerTests
     [Fact]
     public async Task ReceivingDuplicatedShardSnapshotPacketThrows()
     {
-        var shard = CreateShard();
+        CreateShard();
+        CreateShard();
         
         _packetSender.DuplicateResponse = true;
         
@@ -103,7 +105,7 @@ public sealed class CampaignSnapshotManagerTests
         CreateUnresponsiveShard();
         
         var assertTask = FluentActions.Awaiting(_sut.CreateSnapshotAsync).Should().ThrowAsync<TimeoutException>();
-        _timeProvider.Advance(TimeSpan.FromSeconds(CampaignSnapshotManager.ShardServerSnapshotRequestTimeout * 1.1));
+        _timeProvider.Advance(TimeSpan.FromSeconds(CampaignSnapshotManager.ShardServerResponseTimeout * 1.1));
         await assertTask;
     }
     
@@ -133,22 +135,6 @@ public sealed class CampaignSnapshotManagerTests
         _timeProvider.Advance(TimeSpan.FromSeconds(CampaignSnapshotManager.InconsistencyRetryDelay * 1.1));
         _consistencyValidator.FailuresRemaining.Should().Be(-1);
         actTask.Status.Should().Be(TaskStatus.RanToCompletion);
-    }
-    
-    [Fact]
-    public async Task CocurrentSnapshotCreationThrows()
-    {
-        CreateUnresponsiveShard();
-        _ = _sut.CreateSnapshotAsync();
-        await FluentActions.Awaiting(_sut.CreateSnapshotAsync).Should().ThrowAsync<InvalidOperationException>();
-    }
-    
-    [Fact]
-    public async Task SequentialSnapshotCreationDoesNotThrow()
-    {
-        CreateShard();
-        await _sut.CreateSnapshotAsync();
-        await _sut.CreateSnapshotAsync();
     }
     
     [Fact]
@@ -228,6 +214,64 @@ public sealed class CampaignSnapshotManagerTests
         _trackerRepo.Should().ContainValue(expectedCharTracker);
     }
     
+    [Fact]
+    public async Task SnapshotReplicationSendsShardSnapshotsToShardServersAndWaitsForResponse()
+    {
+        (Guid shard1Id, Guid shard2Id, CampaignSnapshot snapshot) = CreateSnapshotWith2ShardSnapshots();
+        
+        Task task = _sut.ReplicateSnapshotAsync(snapshot);
+        
+        _packetSender.SendHistory.Should().BeEquivalentTo
+        ([
+            (
+                new ShardSnapshotPacket { Snapshot = snapshot.Shards[shard1Id] },
+                shard1Id
+            ),
+            (
+                new ShardSnapshotPacket { Snapshot = snapshot.Shards[shard2Id] },
+                shard2Id
+            ),
+        ]);
+        
+        task.IsCompleted.Should().BeFalse();
+        _sut.ReceiveShardSnapshotReplicatedPacket(shard1Id);
+        task.IsCompleted.Should().BeFalse();
+        _sut.ReceiveShardSnapshotReplicatedPacket(shard2Id);
+        task.IsCompleted.Should().BeTrue();
+    }
+    
+    [Fact]
+    public void ReceivingUnrequestedShardSnapshotReplicatedPacketThrows()
+    {
+        _sut.Invoking(it => it.ReceiveShardSnapshotReplicatedPacket(Guid.NewGuid()))
+            .Should().Throw<InvalidOperationException>();
+    }
+    
+    [Fact]
+    public void ReceivingDuplicateShardSnapshotReplicatedPacketThrows()
+    {
+        (Guid shard1Id, Guid shard2Id, CampaignSnapshot snapshot) = CreateSnapshotWith2ShardSnapshots();
+        
+        Task task = _sut.ReplicateSnapshotAsync(snapshot);
+        
+        _sut.ReceiveShardSnapshotReplicatedPacket(shard1Id);
+        _sut.Invoking(it => it.ReceiveShardSnapshotReplicatedPacket(shard1Id))
+            .Should().Throw<InvalidOperationException>();
+    }
+    
+    [Fact]
+    public async Task NeverGettingSnapshotReplicatedPacketThrows()
+    {
+        (Guid shard1Id, Guid shard2Id, CampaignSnapshot snapshot) = CreateSnapshotWith2ShardSnapshots();
+        
+        Task task = _sut.ReplicateSnapshotAsync(snapshot);
+        
+        for (int i = 0; i < 510; i++)
+            _timeProvider.Advance(TimeSpan.FromDays(365));
+        
+        await FluentActions.Awaiting(() => task).Should().ThrowAsync<TimeoutException>();
+    }
+    
     private User CreatePlayer()
     {
         var user = new User
@@ -267,26 +311,60 @@ public sealed class CampaignSnapshotManagerTests
         return character;
     }
     
-    private sealed class FakePacketSender(Action<ShardSnapshotPacket, Guid> callback) : IFromCampaignServerPacketSender
+    private (Guid Shard1Id, Guid Shard2Id, CampaignSnapshot Snapshot) CreateSnapshotWith2ShardSnapshots()
+    {
+        var shard1Id = Guid.NewGuid();
+        var shard2Id = Guid.NewGuid();
+        var snapshot = new CampaignSnapshot
+        {
+            CampaignServer = new CampaignServerSnapshot
+            {
+                Users = ImmutableDictionary<Guid, UserSnapshot>.Empty,
+                PlayerCharacterTrackers = ImmutableDictionary<Guid, PlayerCharacterTrackerSnapshot>.Empty,
+            },
+            Shards = new Dictionary<Guid, ShardSnapshot>
+            {
+                [shard1Id] = new()
+                {
+                    Tick = 123,
+                    Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+                },
+                [shard2Id] = new()
+                {
+                    Tick = 321,
+                    Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+                },
+            },
+        };
+        return (shard1Id, shard2Id, snapshot);
+    }
+    
+    private sealed class FakePacketSender(Func<CampaignSnapshotManager> sut) : IFromCampaignServerPacketSender
     {
         public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; } =
             new Dictionary<Guid, ShardSnapshot>();
         
         public bool DuplicateResponse { get; set; }
         
+        public List<(Packet Packet, Guid ReceiverId)> SendHistory { get; } = [];
+        
         public void SendTo(Packet packet, params IEnumerable<Guid> receiverIds)
         {
-            if (packet is not ShardSnapshotRequestPacket) return;
-            foreach (Guid id in receiverIds)
+            foreach (Guid receiverId in receiverIds)
+                SendHistory.Add((packet, receiverId));
+            
+            if (packet is ShardSnapshotRequestPacket)
             {
-                if (!ShardSnapshots.TryGetValue(id, out ShardSnapshot? snapshot)) return;
-                for (int i = 0; i < (DuplicateResponse ? 2 : 1); i++)
-                    callback(new ShardSnapshotPacket { Snapshot = snapshot }, id);
+                foreach (Guid id in receiverIds)
+                {
+                    if (!ShardSnapshots.TryGetValue(id, out ShardSnapshot? snapshot)) continue;
+                    for (int i = 0; i < (DuplicateResponse ? 2 : 1); i++)
+                        sut().ReceiveShardSnapshotPacket(new ShardSnapshotPacket { Snapshot = snapshot }, id);
+                }
             }
         }
 
         public void BroadcastToShardServers(Packet packet) => SendTo(packet, ShardSnapshots.Keys);
-
         public void BroadcastToAll(Packet packet) => throw new NotSupportedException();
         public void BroadcastToClients(Packet packet) => throw new NotSupportedException();
         public void RelayFrom(RelayedPacket packet, Guid senderId) => throw new NotSupportedException();
