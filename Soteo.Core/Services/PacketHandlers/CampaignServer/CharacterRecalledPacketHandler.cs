@@ -5,11 +5,11 @@ using Soteo.Core.Interfaces;
 namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
 
 [CampaignServerPacketHandler]
-public sealed class CharacterRecalledPacketHandler(IPlayerCharacterRepository playerCharRepository) :
+public sealed class CharacterRecalledPacketHandler(IPlayerCharacterTrackerRepository playerCharTrackerRepository) :
     PacketHandler<CharacterRecalledPacket>
 {
     protected override void Handle(CharacterRecalledPacket packet, Guid senderId)
     {
-        playerCharRepository[packet.CharacterId].ShardId = null;
+        playerCharTrackerRepository[packet.CharacterId].ShardId = null;
     }
 }

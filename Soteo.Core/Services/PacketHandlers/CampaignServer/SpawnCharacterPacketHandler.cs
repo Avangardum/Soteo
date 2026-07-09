@@ -10,7 +10,7 @@ namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
 public sealed class SpawnCharacterPacketHandler
 (
     IUserRepository userRepo,
-    IPlayerCharacterRepository charRepo,
+    IPlayerCharacterTrackerRepository charRepo,
     IFromCampaignServerPacketSender packetSender
 ) : PacketHandler<SpawnCharacterPacket>
 {

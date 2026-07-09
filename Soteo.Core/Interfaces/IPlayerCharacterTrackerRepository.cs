@@ -3,7 +3,7 @@ using Soteo.Core.Models;
 
 namespace Soteo.Core.Interfaces;
 
-public interface IPlayerCharacterRepository : IDictionary<Guid, PlayerCharacterTracker> // todo rename
+public interface IPlayerCharacterTrackerRepository : IDictionary<Guid, PlayerCharacterTracker>
 {
     void Add(PlayerCharacterTracker playerCharacter);
     IReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot> CreateSnapshot();

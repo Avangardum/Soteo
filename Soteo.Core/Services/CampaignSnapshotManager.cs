@@ -10,7 +10,7 @@ public sealed class CampaignSnapshotManager
 (
     IFromCampaignServerPacketSender packetSender,
     IUserRepository userRepo,
-    IPlayerCharacterRepository trackerRepo,
+    IPlayerCharacterTrackerRepository trackerRepo,
     TimeProvider timeProvider,
     ICampaignSnapshotCrossServerConsistencyValidator consistencyValidator
 ) : IShardSnapshotPacketReceiver
