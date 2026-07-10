@@ -99,6 +99,8 @@ public sealed class CampaignServer : Node
     
     private async Task TestLifetimeAsync()
     {
+        await Task.Delay(TimeSpan.FromSeconds(5)); // todo wait until all shard servers connect
+        
         var persistenceService = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
         var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
         

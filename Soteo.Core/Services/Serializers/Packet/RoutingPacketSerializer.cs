@@ -16,6 +16,11 @@ public sealed class RoutingPacketSerializer(IServiceProvider serviceProvider) : 
         return serializer.Deserialize(bytes);
     }
 
-    public byte[] Serialize(Dto.Packets.Packet packet) =>
-        serviceProvider.GetPacketSerializerFor(packet.TypeCode).Required.Serialize(packet);
+    public byte[] Serialize(Dto.Packets.Packet packet)
+    {
+        IPacketSerializer? serializer = serviceProvider.GetPacketSerializerFor(packet.TypeCode);
+        if (serializer == null)
+            throw new Exception($"Serializer for {packet.GetType()} not found");
+        return serializer.Serialize(packet);
+    }
 }

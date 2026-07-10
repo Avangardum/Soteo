@@ -30,7 +30,7 @@ public static class PacketSerializer
     }
 }
 
-public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Dto.Packets.Packet
+public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Dto.Packets.Packet // todo fix namespace stuff
 {
     public static readonly PacketTypeCode PacketTypeCode =
         typeof(TPacket).GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;

@@ -18,7 +18,7 @@ public sealed record PlayerCharacterTracker
         return new()
         {
             Id = snapshot.Id,
-            Player = userRepository[snapshot.PlayerId.Value],
+            Player = snapshot.PlayerId?.PassTo(it => userRepository[it]),
             ShardId = snapshot.ShardId,
         };
     }
