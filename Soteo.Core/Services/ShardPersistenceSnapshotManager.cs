@@ -1,12 +1,15 @@
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
+using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Core.Services;
 
 public sealed class ShardPersistenceSnapshotManager
 (
     IEntitySnapshotManager entitySnapshotManager,
-    ICurrentTickRepository tickRepo
+    ICurrentTickRepository tickRepo,
+    IFromGameplayPacketSender packetSender
 ) : IShardPersistenceSnapshotManager
 {
     public ShardSnapshot CreateSnapshot()
@@ -22,5 +25,6 @@ public sealed class ShardPersistenceSnapshotManager
     {
         tickRepo.Value = snapshot.Tick;
         entitySnapshotManager.ReplicateEntitySnapshots(snapshot.Entities);
+        packetSender.SendReliable(new ShardSnapshotReplicatedPacket(), Const.CampaignServerId);
     }
 }
