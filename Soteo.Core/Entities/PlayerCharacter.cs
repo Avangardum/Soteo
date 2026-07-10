@@ -32,7 +32,6 @@ public sealed class PlayerCharacter : Unit
         IServiceProvider serviceProvider
     )
     {
-        // todo set player id
-        return new(snapshot.Id, Guid.Empty, node, entityManager, serviceProvider);
+        return new(snapshot.Id, snapshot.ControllingPlayerId.Required, node, entityManager, serviceProvider);
     }
 }
