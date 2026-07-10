@@ -5,6 +5,7 @@ using Soteo.Core.Interfaces;
 namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
 [GameplayPacketHandler]
+[AllowClientPackets]
 public abstract class CommandPacketHandler<TPacket, TCommand>
 (
     IEntityManager entityManager,

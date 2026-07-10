@@ -76,7 +76,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             Stats = Stats.ToImmutableDictionary(),
             AbilitySlotStates = AbilitySlotStatesInternal.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress,
-            Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot())
+            Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot()),
+            ControllingPlayerId = _controllingPlayerId,
         };
     }
 
@@ -92,6 +93,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         StatusesInternal =
             s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _serviceProvider));
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
+        _controllingPlayerId = s.ControllingPlayerId;
     }
 
     public void Tick(double delta)

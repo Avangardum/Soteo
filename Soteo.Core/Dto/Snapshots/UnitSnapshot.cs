@@ -11,6 +11,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, StatusContextSnapshot> Statuses { get; init; }
+    public required Guid? ControllingPlayerId { get; init; }
 
     public override EntitySnapshot ToPuppet()
     {

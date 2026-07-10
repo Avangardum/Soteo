@@ -431,6 +431,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeDictionary(unit.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
         SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
         SerializeIndexedDictionary(unit.Statuses, SerializeDeflatedStatusContext, stream);
+        SerializeNullableStruct(unit.ControllingPlayerId, SerializeGuid, stream);
     }
 
     public UnitSnapshot DeserializeUnitSnapshot(Stream stream)
@@ -447,7 +448,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             AbilitySlotStates =
                 DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
-            Statuses = DeserializeIndexedDictionary(DeserializeDeflatedStatusContext, it => it.Id, stream)
+            Statuses = DeserializeIndexedDictionary(DeserializeDeflatedStatusContext, it => it.Id, stream),
+            ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream),
         };
     }
 

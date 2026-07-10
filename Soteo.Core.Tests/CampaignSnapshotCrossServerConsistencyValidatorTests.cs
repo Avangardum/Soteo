@@ -246,6 +246,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             IsRemoved = false,
             Position = default,
             Azimuth = 0,
+            ControllingPlayerId = null,
         };
     }
     
