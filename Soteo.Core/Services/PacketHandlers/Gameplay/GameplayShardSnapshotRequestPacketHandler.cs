@@ -8,7 +8,7 @@ namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
 [GameplayPacketHandler]
 [AllowClientPackets]
-public sealed class ShardSnapshotRequestPacketHandler
+public sealed class GameplayShardSnapshotRequestPacketHandler
 (
     ISynchronizationServer synchronizationServer,
     IFromGameplayPacketSender packetSender,

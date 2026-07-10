@@ -7,7 +7,7 @@ namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
 
 [CampaignServerPacketHandler]
 [AllowClientPackets]
-public abstract class WebrtcPacketHandler<TPacket>(IFromCampaignServerPacketSender packetSender, IUserRepository userRepo) :
+public abstract class CampaignServerWebrtcPacketHandler<TPacket>(IFromCampaignServerPacketSender packetSender, IUserRepository userRepo) :
     PacketHandler<TPacket> where TPacket : RelayedPacket
 {
     protected override void Handle(TPacket packet, Guid senderId)

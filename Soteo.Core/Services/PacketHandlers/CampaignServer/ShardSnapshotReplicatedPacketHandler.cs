@@ -5,7 +5,7 @@ using Soteo.Core.Interfaces;
 namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
 
 [CampaignServerPacketHandler]
-public sealed class CampaignServerShardSnapshotReplicatedPacketHandler
+public sealed class ShardSnapshotReplicatedPacketHandler
 (
     ICampaignServerPersistencePacketReceiver receiver
 ) : PacketHandler<ShardSnapshotReplicatedPacket>

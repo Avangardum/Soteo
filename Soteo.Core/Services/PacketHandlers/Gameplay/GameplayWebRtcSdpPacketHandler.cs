@@ -5,7 +5,7 @@ using Soteo.Core.Interfaces;
 namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
 [GameplayPacketHandler]
-public sealed class WebRtcSdpPacketHandler(IWebrtcPacketReceiver receiver) : PacketHandler<WebrtcSdpPacket>
+public sealed class GameplayWebRtcSdpPacketHandler(IWebrtcPacketReceiver receiver) : PacketHandler<WebrtcSdpPacket>
 {
     protected override void Handle(WebrtcSdpPacket packet, Guid senderId)
     {
