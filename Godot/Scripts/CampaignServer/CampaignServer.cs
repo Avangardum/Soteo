@@ -54,7 +54,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         services.AddSingleton<ITypeLocator>(new TypeLocator(SoteoCoreAssembly.Value));
         services.AddSingleton<CampaignSnapshotManager>();
-        services.AddAlias<IShardSnapshotPacketReceiver, CampaignSnapshotManager>();
+        services.AddAlias<ICampaignServerPersistencePacketReceiver, CampaignSnapshotManager>();
         services.AddSingleton
         <
             ICampaignSnapshotCrossServerConsistencyValidator,

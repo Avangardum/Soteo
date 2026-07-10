@@ -18,4 +18,5 @@ public enum PacketTypeCode : byte
     ShardSnapshotRequest,
     ShardSnapshot,
     ShardSnapshotDelta,
+    ShardSnapshotReplicated,
 }

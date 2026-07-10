@@ -5,7 +5,7 @@ using Soteo.Core.Interfaces;
 namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
 
 [CampaignServerPacketHandler]
-public sealed class CampaignServerShardSnapshotPacketHandler(IShardSnapshotPacketReceiver receiver) :
+public sealed class CampaignServerShardSnapshotPacketHandler(ICampaignServerPersistencePacketReceiver receiver) :
     PacketHandler<ShardSnapshotPacket>
 {
     protected override void Handle(ShardSnapshotPacket packet, Guid senderId) =>

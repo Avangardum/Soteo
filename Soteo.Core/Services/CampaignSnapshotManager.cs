@@ -13,7 +13,7 @@ public sealed class CampaignSnapshotManager
     IPlayerCharacterTrackerRepository trackerRepo,
     TimeProvider timeProvider,
     ICampaignSnapshotCrossServerConsistencyValidator consistencyValidator
-) : IShardSnapshotPacketReceiver
+) : ICampaignServerPersistencePacketReceiver
 {
     public const double ShardServerResponseTimeout = 10;
     public const int InconsistencyRetryMaxCount = 10;
