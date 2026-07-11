@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Services.Serializers.Packet;
+using Soteo.Core.Services.Serializers.PacketSerializers;
 using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Core.Extensions;

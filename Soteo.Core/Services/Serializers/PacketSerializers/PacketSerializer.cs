@@ -1,10 +1,11 @@
 ﻿using System.Collections.Immutable;
 using Soteo.Core.Attributes;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.Serializers.Packet;
+namespace Soteo.Core.Services.Serializers.PacketSerializers;
 
 public static class PacketSerializer
 {
@@ -30,12 +31,12 @@ public static class PacketSerializer
     }
 }
 
-public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Dto.Packets.Packet // todo fix namespace stuff
+public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Packet
 {
     public static readonly PacketTypeCode PacketTypeCode =
         typeof(TPacket).GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;
     
-    byte[] IPacketSerializer.Serialize(Dto.Packets.Packet packet) => Serialize((TPacket)packet);
+    byte[] IPacketSerializer.Serialize(Packet packet) => Serialize((TPacket)packet);
     
     public byte[] Serialize(TPacket packet)
     {
@@ -47,7 +48,7 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
     
     protected abstract void SerializeInternal(TPacket packet, Stream stream);
     
-    Dto.Packets.Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
+    Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
     
     public TPacket Deserialize(Span<byte> bytes)
     {

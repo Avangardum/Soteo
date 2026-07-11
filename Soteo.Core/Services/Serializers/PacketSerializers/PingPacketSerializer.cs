@@ -1,7 +1,7 @@
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.Serializers.Packet;
+namespace Soteo.Core.Services.Serializers.PacketSerializers;
 
 public class PingPacketSerializer(ISerializationHelper s) : PacketSerializer<PingPacket>(s)
 {

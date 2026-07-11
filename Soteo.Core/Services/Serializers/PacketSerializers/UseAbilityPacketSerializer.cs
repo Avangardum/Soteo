@@ -3,7 +3,7 @@ using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.Serializers.Packet;
+namespace Soteo.Core.Services.Serializers.PacketSerializers;
 
 public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketSerializer<UseAbilityPacket>(s)
 {

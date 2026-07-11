@@ -4,7 +4,7 @@ using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.Serializers.Packet;
+namespace Soteo.Core.Services.Serializers.PacketSerializers;
 
 public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
     PacketSerializer<ShardSnapshotDeltaPacket>(s)

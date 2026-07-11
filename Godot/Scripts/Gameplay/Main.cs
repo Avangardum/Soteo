@@ -6,7 +6,7 @@ using Soteo.Core.Services;
 using Soteo.Core.Services.PacketHandlers.Gameplay;
 using Soteo.Core.Services.Repositories;
 using Soteo.Core.Services.Serializers;
-using Soteo.Core.Services.Serializers.Packet;
+using Soteo.Core.Services.Serializers.PacketSerializers;
 using Soteo.Core.Services.Synchronization;
 using Soteo.Core.SidedDependencies;
 using Soteo.Core.StaticHelpers;
