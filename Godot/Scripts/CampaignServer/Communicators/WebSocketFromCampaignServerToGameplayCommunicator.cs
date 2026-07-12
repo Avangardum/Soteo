@@ -170,9 +170,9 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
             _wsServer.DisconnectPeer(oldWsPeerId, 1000, "New connection opened");
             _userIdsByWsPeerId.Remove(oldWsPeerId);
         }
-        
-        _userRepo.OnConnected(claims);
+
         _userIdsByWsPeerId[wsPeerId] = userId;
+        _userRepo.OnConnected(claims);
     }
     
     private async void HandlePacket(Packet packet, Guid senderId)
