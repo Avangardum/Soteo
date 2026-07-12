@@ -2,11 +2,14 @@ using System.Collections.Immutable;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Models;
+using Soteo.Util;
 
 namespace Soteo.Core.Services.Repositories;
 
 public class UserRepository : Dictionary<Guid, User>, IUserRepository
 {
+    private TaskCompletionSource _userConnectedTcs = new();
+    
     public void Add(User user) => Add(user.Id, user);
     
     public void OnConnected(IDictionary<string, object> claims)
@@ -23,10 +26,13 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
                 Id = id,
                 IsConnected = true,
                 IsPlayer = claims.ContainsKey("player"),
-                IsShard = claims.ContainsKey("shard")
+                IsShard = claims.ContainsKey("shard"),
             };
             Add(id, user);
         }
+        
+        _userConnectedTcs.SetResult();
+        _userConnectedTcs = new();
     }
     
     public void OnDisconnected(Guid id)
@@ -43,5 +49,18 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
         Clear();
         foreach (UserSnapshot userSnapshot in snapshot.Values)
             Add(User.FromSnapshot(userSnapshot));
+    }
+    
+    public async Task WaitForUsersToConnectAsync(params IReadOnlyList<Guid> ids)
+    {
+    begin:
+        foreach (Guid id in ids)
+        {
+            if (!TryGetValue(id, out User user) || !user.IsConnected)
+            {
+                await _userConnectedTcs.Task;
+                goto begin;
+            }
+        }
     }
 }

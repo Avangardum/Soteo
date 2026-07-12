@@ -23,7 +23,7 @@ public sealed class CampaignServer : Node
 {
     private readonly bool _useJsmq = OS.HasFeature("web") && OS.GetCmdlineArgs().Contains("--singleplayer");
     
-    private LateInit<ICommunicator> _communicator = new();
+    private LateInit<IFromCampaignServerCommunicator> _communicator = new();
     private LateInit<IServiceProvider> _serviceProvider = new();
     
     private IServiceProvider ServiceProvider => _serviceProvider.Value;
@@ -34,9 +34,9 @@ public sealed class CampaignServer : Node
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
-        _communicator.Value = ServiceProvider.GetRequiredService<ICommunicator>();
-        StartShardServers();
-        TestLifetimeAsync().CollectException();
+        _communicator.Value = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
+        var shardServerIds = StartShardServers();
+        TestLifetimeAsync(shardServerIds).CollectException();
     }
 
     public override void _Process(float delta)
@@ -50,7 +50,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPlayerCharacterTrackerRepository, PlayerCharacterTrackerRepository>();
         services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
-        services.AddAlias<IFromCampaignServerPacketSender, ICommunicator>();
+        services.AddAlias<IFromCampaignServerPacketSender, IFromCampaignServerCommunicator>();
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         services.AddSingleton<ITypeLocator>(new TypeLocator(SoteoCoreAssembly.Value));
         services.AddSingleton<CampaignSnapshotManager>();
@@ -64,9 +64,9 @@ public sealed class CampaignServer : Node
         services.AddSingleton<ICampaignSnapshotSerializer, CampaignSnapshotSerializer>();
         
         if (_useJsmq)
-            services.AddSingleton<ICommunicator, JsmqFromCampaignServerCommunicator>();
+            services.AddSingleton<IFromCampaignServerCommunicator, JsmqFromCampaignServerCommunicator>();
         else
-            services.AddSingleton<ICommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
+            services.AddSingleton<IFromCampaignServerCommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
         
         foreach (Type type in PacketSerializer.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
             services.AddSingleton(type);
@@ -75,7 +75,7 @@ public sealed class CampaignServer : Node
             services.AddSingleton(type);
     }
     
-    private void StartShardServers()
+    private IReadOnlyList<Guid> StartShardServers()
     {
         // todo redirect output
         ImmutableList<Guid> ids = 
@@ -94,15 +94,32 @@ public sealed class CampaignServer : Node
             process.Start();
         }
         
+        return [..ids, ..ExternalShardServerIds()];
+        
         // TODO if the campaign server crashes, child processes are not terminated and interfere with future runs
     }
     
-    private async Task TestLifetimeAsync()
+    private IReadOnlyList<Guid> ExternalShardServerIds()
     {
-        await Task.Delay(TimeSpan.FromSeconds(5)); // todo wait until all shard servers connect
-        
+        List<Guid> result = [];
+        string[] args = OS.GetCmdlineArgs();
+        for (int i = 0; i < args.Length - 1; i++)
+        {
+            if (args[i] == "--externalShardServer")
+                result.Add(Guid.Parse(args[++i]));
+        }
+        return result;
+    }
+    
+    private async Task TestLifetimeAsync(IReadOnlyList<Guid> shardServerIds)
+    {
         var persistenceService = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
         var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
+        var userRepo = ServiceProvider.GetRequiredService<IUserRepository>();
+        var communicator = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
+        
+        await userRepo.WaitForUsersToConnectAsync(shardServerIds);
+        communicator.AllowPlayerConnections = true;
         
         if (File.Exists("C:/Users/yuryk/TestCampaignSnapshot"))
         {

@@ -13,10 +13,12 @@ public sealed class JsmqFromCampaignServerCommunicator
     IPacketSerializer packetSerializer,
     IPacketHandler packetHandler,
     IUserRepository userRepo
-) : GdObject, ICommunicator
+) : GdObject, IFromCampaignServerCommunicator
 {
     private readonly HashSet<Guid> _peerIds = [];
-    
+
+    public bool AllowPlayerConnections { get; set; }
+
     public void Poll()
     {
         while (true)
@@ -34,6 +36,9 @@ public sealed class JsmqFromCampaignServerCommunicator
                     // When using JSMQ, role is sent instead of token
                     [handshake.Token] = true,
                 };
+                bool isPlayer = claims.TryGetValue("player", out object value) && value is true;
+                if (isPlayer && !AllowPlayerConnections)
+                    throw new InvalidOperationException("Client connections are not allowed");
                 userRepo.OnConnected(claims);
                 _peerIds.Add(senderId);
             }

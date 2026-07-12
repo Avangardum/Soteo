@@ -11,7 +11,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.CampaignServer.Communicators;
 
-public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject, ICommunicator
+public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject, IFromCampaignServerCommunicator
 {
     private readonly WebSocketServer _wsServer = new();
     private readonly IPacketSerializer _packetSerializer;
@@ -20,7 +20,9 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
     private readonly JwtBuilder _jwtBuilder;
     
     private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = [];
-    
+
+    public bool AllowPlayerConnections { get; set; }
+
     public WebSocketFromCampaignServerToGameplayCommunicator
     (
         IPacketSerializer packetSerializer,
@@ -154,6 +156,14 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
             return;
         }
         var userId = Guid.Parse((string)claims["sub"]);
+        var isPlayer = claims.TryGetValue("player", out object value) && value is true;
+        
+        if (isPlayer && !AllowPlayerConnections)
+        {
+            var reason = "Not accepting player connections yet, try again later";
+            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = reason } )).ThrowIfError();
+            return;
+        }
      
         if (_userIdsByWsPeerId.Inverse.TryGetValue(userId, out int oldWsPeerId))
         {
