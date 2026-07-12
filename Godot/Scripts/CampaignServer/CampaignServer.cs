@@ -77,7 +77,7 @@ public sealed class CampaignServer : Node
     
     private IReadOnlyList<Guid> StartShardServers()
     {
-        // todo redirect output
+        // todo logging
         ImmutableList<Guid> ids = 
         [
             Guid.Parse("00000000-0000-0000-0000-00000007e571"),
@@ -141,5 +141,6 @@ public sealed class CampaignServer : Node
         }
         
         // TODO extract paths to env
+        // TODO command line args parser
     }
 }
