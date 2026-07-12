@@ -105,7 +105,7 @@ public sealed class CampaignServer : Node
         string[] args = OS.GetCmdlineArgs();
         for (int i = 0; i < args.Length - 1; i++)
         {
-            if (args[i] == "--externalShardServer")
+            if (args[i] == "--external-shard-server")
                 result.Add(Guid.Parse(args[++i]));
         }
         return result;
