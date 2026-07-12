@@ -44,6 +44,7 @@ See Architecture.md files in subfolders to learn about specific components.
 - [x] Testing
 - [ ] Cluster startup / shutdown
 - [ ] Stress test / optimization
+- [ ] Staging polygon
 - [x] Manual character creation and spawning
 - [ ] Extra data dictionary
 - [ ] Shard limits
