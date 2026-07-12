@@ -31,8 +31,9 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
             Add(id, user);
         }
         
-        _userConnectedTcs.SetResult();
+        var oldUserConnectedTcs = _userConnectedTcs;
         _userConnectedTcs = new();
+        oldUserConnectedTcs.SetResult();
     }
     
     public void OnDisconnected(Guid id)
@@ -54,6 +55,7 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
     public async Task WaitForUsersToConnectAsync(params IReadOnlyList<Guid> ids)
     {
     begin:
+        //await Task.Delay(5000);
         foreach (Guid id in ids)
         {
             if (!TryGetValue(id, out User user) || !user.IsConnected)
