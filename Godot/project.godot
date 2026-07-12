@@ -154,6 +154,10 @@ project/assembly_name="Soteo"
 
 ssl/certificates="res://devcert.crt"
 limits/webrtc/max_channel_in_buffer_kb=100000
+limits/websocket_client/max_in_buffer_kb=100000
+limits/websocket_client/max_out_buffer_kb=100000
+limits/websocket_server/max_in_buffer_kb=100000
+limits/websocket_server/max_out_buffer_kb=100000
 
 [physics]
 
