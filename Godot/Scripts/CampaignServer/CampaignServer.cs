@@ -147,8 +147,5 @@ public sealed class CampaignServer : Node
             var bytes = snapshotSerializer.Serialize(snapshot);
             File.WriteAllBytes(EnvironmentVariables.CampaignSnapshotPath, bytes);
         }
-        
-        // TODO extract paths to env
-        // TODO command line args parser
     }
 }
