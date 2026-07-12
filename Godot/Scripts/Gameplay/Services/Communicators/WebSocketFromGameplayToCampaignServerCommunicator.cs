@@ -5,6 +5,7 @@ using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.StaticHelpers;
+using Soteo.Main.CampaignServer;
 
 namespace Soteo.Main.Gameplay.Services.Communicators;
 
@@ -120,11 +121,9 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
-        string intercomSecret = SysEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
-            throw new Exception("Intercom secret is not set.");
         Guid id = _currentUserIdRepository.Required;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
-            $"&intercomSecret={Uri.EscapeDataString(intercomSecret)}";
+            $"&intercomSecret={Uri.EscapeDataString(EnvironmentVariables.IntercomSecret)}";
         string url = $"{AuthServerUrl}/token/service";
         _httpRequest.Request(url, method: HTTPClient.Method.Post, customHeaders: headers, requestData: body);
     }

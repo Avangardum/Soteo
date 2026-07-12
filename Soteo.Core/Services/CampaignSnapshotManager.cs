@@ -131,7 +131,6 @@ public sealed class CampaignSnapshotManager
         return new TimeoutException($"The following shard servers did not respond: {timedOutShardIds}");
     }
 
-    // todo actually send and handle this packet
     public void ReceiveShardSnapshotReplicatedPacket(Guid senderId)
     {
         if (!_shardSnapshotReplicatedTcs.TryGetValue(senderId, out TaskCompletionSource tcs))

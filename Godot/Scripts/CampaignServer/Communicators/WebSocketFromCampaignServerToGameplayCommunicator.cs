@@ -34,11 +34,9 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         _packetHandler = packetHandler;
         _userRepo = userRepo;
         
-        string intercomSecret = SysEnvironment.GetEnvironmentVariable("Soteo__IntercomSecret") ??
-            throw new Exception("Intercom secret is not set");
         _jwtBuilder = JwtBuilder.Create()
             .WithAlgorithm(new HMACSHA256Algorithm())
-            .WithSecret(Convert.FromBase64String(intercomSecret));
+            .WithSecret(Convert.FromBase64String(EnvironmentVariables.IntercomSecret));
 
         _wsServer.SslCertificate = new X509Certificate();
         _wsServer.SslCertificate.Load("res://devcert.crt");

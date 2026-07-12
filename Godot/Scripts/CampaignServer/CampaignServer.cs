@@ -96,7 +96,7 @@ public sealed class CampaignServer : Node
         foreach (Guid id in ids)
         {
             var process = new Process();
-            process.StartInfo.FileName = "godot3.6.2.exe";
+            process.StartInfo.FileName = EnvironmentVariables.GodotPath;
             process.StartInfo.Arguments = $"--no-window --server {id}";
             process.StartInfo.UseShellExecute = false;
             process.Start();
@@ -129,9 +129,9 @@ public sealed class CampaignServer : Node
         await userRepo.WaitForUsersToConnectAsync(shardServerIds);
         communicator.AllowPlayerConnections = true;
         
-        if (File.Exists("C:/Users/yuryk/TestCampaignSnapshot"))
+        if (File.Exists(EnvironmentVariables.CampaignSnapshotPath))
         {
-            var bytes = File.ReadAllBytes("C:/Users/yuryk/TestCampaignSnapshot");
+            var bytes = File.ReadAllBytes(EnvironmentVariables.CampaignSnapshotPath);
             var snapshot = snapshotSerializer.Deserialize(bytes);
             await persistenceService.ReplicateSnapshotAsync(snapshot);
         }
@@ -145,7 +145,7 @@ public sealed class CampaignServer : Node
         {
             CampaignSnapshot snapshot = await persistenceService.CreateSnapshotAsync();
             var bytes = snapshotSerializer.Serialize(snapshot);
-            File.WriteAllBytes("C:/Users/yuryk/TestCampaignSnapshot", bytes);
+            File.WriteAllBytes(EnvironmentVariables.CampaignSnapshotPath, bytes);
         }
         
         // TODO extract paths to env
