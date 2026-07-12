@@ -35,8 +35,16 @@ public sealed class CampaignServer : Node
         RegisterServices(serviceCollection);
         _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
         _communicator.Value = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
-        var shardServerIds = StartShardServers();
-        TestLifetimeAsync(shardServerIds).CollectException();
+
+        if (OS.GetCmdlineArgs().Contains("--singleplayer"))
+        {
+            _communicator.Value.AllowPlayerConnections = true;
+        }
+        else
+        {
+            var shardServerIds = StartShardServers();
+            TestLifetimeAsync(shardServerIds).CollectException();
+        }
     }
 
     public override void _Process(float delta)

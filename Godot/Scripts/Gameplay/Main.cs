@@ -73,7 +73,8 @@ public sealed class Main : Node2D, IShardLoader
         if (_isServer)
         {
             LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
-            _rootServiceProvider.GetRequiredService<IPauseRepository>().IsPaused = true;
+            if (!OS.GetCmdlineArgs().Contains("--singleplayer"))
+                _rootServiceProvider.GetRequiredService<IPauseRepository>().IsPaused = true;
         }
     }
     
@@ -249,6 +250,8 @@ public sealed class Main : Node2D, IShardLoader
     
     public void LoadShard(Guid id)
     {
+        Console.WriteLine("Loading shard...");
+        
         string mapPath = $"res://Scenes/Maps/Test{id.ToString()[^1]}.tscn";
         Vector2 position = new Vector2(0, 0);
 

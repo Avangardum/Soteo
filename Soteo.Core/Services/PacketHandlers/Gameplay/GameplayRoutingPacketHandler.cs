@@ -18,7 +18,7 @@ public sealed class GameplayRoutingPacketHandler
         IServiceProvider? serviceProvider =
             sideDetector.IsServer ? shardServiceProviders[currentUserIdRepository.Required] :
             senderId == Const.CampaignServerId ? rootServiceProvider :
-            shardServiceProviders[senderId];
+            shardServiceProviders.GetOrDefault(senderId);
         if (serviceProvider == null) return;
         
         IPacketHandler handler = serviceProvider.GetPacketHandlerFor<GameplayPacketHandlerAttribute>(packet.TypeCode) ??
