@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo.TestUtil", "..\Soteo.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo.Core.Tests", "..\Soteo.Core.Tests\Soteo.Core.Tests.csproj", "{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Soteo.LocalRunner", "..\Soteo.LocalRunner\Soteo.LocalRunner.csproj", "{076E7FFF-4E1B-4695-B6E9-6B93BAEF98DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 	Debug|Any CPU = Debug|Any CPU
@@ -55,5 +57,11 @@ Global
 		{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
 		{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
 		{B5ADAFD4-4312-43DA-921C-5E49EA6FF46B}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
+		{076E7FFF-4E1B-4695-B6E9-6B93BAEF98DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{076E7FFF-4E1B-4695-B6E9-6B93BAEF98DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{076E7FFF-4E1B-4695-B6E9-6B93BAEF98DC}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{076E7FFF-4E1B-4695-B6E9-6B93BAEF98DC}.ExportDebug|Any CPU.Build.0 = Debug|Any CPU
+		{076E7FFF-4E1B-4695-B6E9-6B93BAEF98DC}.ExportRelease|Any CPU.ActiveCfg = Debug|Any CPU
+		{076E7FFF-4E1B-4695-B6E9-6B93BAEF98DC}.ExportRelease|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

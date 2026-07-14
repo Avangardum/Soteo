@@ -31,6 +31,11 @@ public sealed class LogInScreen
 
     private void OnLogInPressed()
     {
+        GD.PrintErr("Hello from PrintErr 1");
+        GD.PrintErr("Hello from PrintErr 2");
+        GD.PrintErr("Hello from PrintErr 3");
+        GD.PrintErr("Hello from PrintErr 4");
+        GD.PrintErr("Hello from PrintErr 5");
         string email = _emailLineEdit.Text;
         string password = _passwordLineEdit.Text;
         _campaignServerConnector.ConnectAsPlayer(email, password);
