@@ -38,12 +38,12 @@ public sealed class CampaignServer : Node
 
         if (OS.GetCmdlineArgs().Contains("--singleplayer"))
         {
+            // todo don't do this, may lose packets, instead wait for shards to connect
             _communicator.Value.AllowPlayerConnections = true;
         }
         else
         {
-            var shardServerIds = StartShardServers();
-            TestLifetimeAsync(shardServerIds).CollectException();
+            TestLifetimeAsync(ShardIds()).CollectException();
         }
     }
 
@@ -83,39 +83,13 @@ public sealed class CampaignServer : Node
             services.AddSingleton(type);
     }
     
-    private IReadOnlyList<Guid> StartShardServers()
-    {
-        // todo logging
-        ImmutableList<Guid> ids = 
-        [
-            Guid.Parse("00000000-0000-0000-0000-00000007e571"),
-            Guid.Parse("00000000-0000-0000-0000-00000007e572"),
-            Guid.Parse("00000000-0000-0000-0000-00000007e573"),
-        ];
-        
-        foreach (Guid id in ids)
-        {
-            var process = new Process();
-            process.StartInfo.FileName = EnvironmentVariables.GodotPath;
-            process.StartInfo.Arguments = $"--no-window --server {id}";
-            process.StartInfo.UseShellExecute = false;
-            process.Start();
-        }
-        
-        return [..ids, ..ExternalShardServerIds()];
-        
-        // TODO if the campaign server crashes, child processes are not terminated and interfere with future runs
-    }
-    
-    private IReadOnlyList<Guid> ExternalShardServerIds()
+    private IReadOnlyList<Guid> ShardIds()
     {
         List<Guid> result = [];
         string[] args = OS.GetCmdlineArgs();
         for (int i = 0; i < args.Length - 1; i++)
-        {
-            if (args[i] == "--external-shard-server")
+            if (args[i] == "--shard")
                 result.Add(Guid.Parse(args[++i]));
-        }
         return result;
     }
     
