@@ -74,28 +74,14 @@ margin_bottom = 225.0
 margin_right = 350.0
 margin_bottom = 25.0
 toggle_mode = true
-text = "00000000-0000-0000-0000-00000007e571"
+text = "00000000-0000-0000-0000-0000000005d1"
 
 [node name="Button2" type="Button" parent="ShardButtons"]
 margin_top = 29.0
 margin_right = 350.0
 margin_bottom = 54.0
 toggle_mode = true
-text = "00000000-0000-0000-0000-00000007e572"
-
-[node name="Button3" type="Button" parent="ShardButtons"]
-margin_top = 58.0
-margin_right = 350.0
-margin_bottom = 83.0
-toggle_mode = true
-text = "00000000-0000-0000-0000-00000007e573"
-
-[node name="Button4" type="Button" parent="ShardButtons"]
-margin_top = 87.0
-margin_right = 350.0
-margin_bottom = 112.0
-toggle_mode = true
-text = "00000000-0000-0000-0000-0000000deb09"
+text = "00000000-0000-0000-0000-0000000005d2"
 
 [node name="SpectateButton" type="Button" parent="."]
 margin_left = 501.0
