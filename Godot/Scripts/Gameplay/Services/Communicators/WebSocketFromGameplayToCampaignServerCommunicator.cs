@@ -130,19 +130,24 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     
     public void OnAuthRequestCompleted(int result, int responseCode, string[] headers, byte[] body)
     {
+        // todo replace throw with UI popups
+        
+// Unreachable code detected
+#pragma warning disable CS0162
+        
         if (result != (int)HTTPRequest.Result.Success)
         {
-            GD.PrintErr($"Authentication error: {(HTTPRequest.Result)result}");
+            throw new Exception($"Authentication error: {(HTTPRequest.Result)result}");
             _status = Status.Disconnected;
         }
         else if (responseCode == 401)
         {
-            GD.PrintErr("Incorrect credentials");
+            throw new Exception("Incorrect credentials");
             _status = Status.Disconnected;
         }
         else if (responseCode is not (>= 200 and < 300))
         {
-            GD.PrintErr($"Auth server responded with code {responseCode}");
+            throw new Exception($"Auth server responded with code {responseCode}");
             _status = Status.Disconnected;
         }
         else
@@ -151,6 +156,8 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
             _currentUserIdRepository.Value = GetPlayerIdFromTrustedToken(_token);
             _wsClient.ConnectToUrl(CampaignServerUrl);
         }
+        
+#pragma warning restore CS0162
     }
     
     private Guid GetPlayerIdFromTrustedToken(string token)
