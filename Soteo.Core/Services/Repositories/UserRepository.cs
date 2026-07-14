@@ -8,6 +8,8 @@ namespace Soteo.Core.Services.Repositories;
 
 public class UserRepository : Dictionary<Guid, User>, IUserRepository
 {
+    // todo throw on unexpected shard server connection
+    
     private TaskCompletionSource _userConnectedTcs = new();
     
     public void Add(User user) => Add(user.Id, user);
@@ -52,16 +54,19 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
             Add(User.FromSnapshot(userSnapshot));
     }
     
-    public async Task WaitForUsersToConnectAsync(params IReadOnlyList<Guid> ids)
+    public async Task WaitForUsersToConnectAsync(IReadOnlyList<Guid> ids, double timeout)
     {
-    begin:
-        //await Task.Delay(5000);
+        Task timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeout));
+        
+    retry:
         foreach (Guid id in ids)
         {
             if (!TryGetValue(id, out User user) || !user.IsConnected)
             {
-                await _userConnectedTcs.Task;
-                goto begin;
+                Task completedTask = await Task.WhenAny(_userConnectedTcs.Task, timeoutTask);
+                if (completedTask == timeoutTask)
+                    throw new TimeoutException($"The following users did not connect: {ids.JoinToString(", ")}");
+                goto retry;
             }
         }
     }

@@ -23,8 +23,8 @@ public sealed class CampaignServer : Node
 {
     private readonly bool _useJsmq = OS.HasFeature("web") && OS.GetCmdlineArgs().Contains("--singleplayer");
     
-    private LateInit<IFromCampaignServerCommunicator> _communicator = new();
-    private LateInit<IServiceProvider> _serviceProvider = new();
+    private readonly LateInit<IFromCampaignServerCommunicator> _communicator = new();
+    private readonly LateInit<IServiceProvider> _serviceProvider = new();
     
     private IServiceProvider ServiceProvider => _serviceProvider.Value;
     
@@ -35,16 +35,7 @@ public sealed class CampaignServer : Node
         RegisterServices(serviceCollection);
         _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
         _communicator.Value = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
-
-        if (OS.GetCmdlineArgs().Contains("--singleplayer"))
-        {
-            // todo don't do this, may lose packets, instead wait for shards to connect
-            _communicator.Value.AllowPlayerConnections = true;
-        }
-        else
-        {
-            TestLifetimeAsync(ShardIds()).CollectException();
-        }
+        TestLifetimeAsync().CollectException();
     }
 
     public override void _Process(float delta)
@@ -93,15 +84,17 @@ public sealed class CampaignServer : Node
         return result;
     }
     
-    private async Task TestLifetimeAsync(IReadOnlyList<Guid> shardServerIds)
+    private async Task TestLifetimeAsync()
     {
         var persistenceService = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
         var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
         var userRepo = ServiceProvider.GetRequiredService<IUserRepository>();
         var communicator = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
-        
-        await userRepo.WaitForUsersToConnectAsync(shardServerIds);
+
+        await userRepo.WaitForUsersToConnectAsync(ShardIds(), timeout: 10);
         communicator.AllowPlayerConnections = true;
+        
+        if (OS.GetCmdlineArgs().Contains("--singleplayer")) return;
         
         if (File.Exists(EnvironmentVariables.CampaignSnapshotPath))
         {
