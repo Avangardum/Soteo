@@ -6,10 +6,8 @@ using Soteo.Util;
 
 namespace Soteo.Core.Services.Repositories;
 
-public class UserRepository : Dictionary<Guid, User>, IUserRepository
+public class UserRepository(IShardServerAllowlist shardServerAllowlist) : Dictionary<Guid, User>, IUserRepository
 {
-    // todo throw on unexpected shard server connection
-    
     private TaskCompletionSource _userConnectedTcs = new();
     
     public void Add(User user) => Add(user.Id, user);
@@ -17,6 +15,11 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
     public void OnConnected(IDictionary<string, object> claims)
     {
         Guid id = Guid.Parse((string)claims["sub"]);
+        bool isShard = claims.ContainsKey("shard");
+        
+        if (isShard && shardServerAllowlist.IsEnabled && !shardServerAllowlist.AllowedShardIds.Contains(id))
+            throw new Exception($"Unexpected connection from shard server {id}");
+        
         if (TryGetValue(id, out User? user))
         {
             user.IsConnected = true;
@@ -28,7 +31,7 @@ public class UserRepository : Dictionary<Guid, User>, IUserRepository
                 Id = id,
                 IsConnected = true,
                 IsPlayer = claims.ContainsKey("player"),
-                IsShard = claims.ContainsKey("shard"),
+                IsShard = isShard,
             };
             Add(id, user);
         }

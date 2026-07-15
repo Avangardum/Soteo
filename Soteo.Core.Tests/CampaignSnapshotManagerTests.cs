@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
 using NSubstitute.ExceptionExtensions;
+using Soteo.Core.Dto;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
@@ -22,7 +23,7 @@ public sealed class CampaignSnapshotManagerTests
     
     public CampaignSnapshotManagerTests()
     {
-        _userRepo = new UserRepository();
+        _userRepo = new UserRepository(ShardServerAllowlist.Disabled());
         _trackerRepo = new PlayerCharacterTrackerRepository();
         _packetSender = new FakePacketSender(() => _sut.Required);
         _timeProvider = new FakeTimeProvider();

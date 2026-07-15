@@ -3,7 +3,7 @@ using Soteo.Util.Interfaces;
 
 namespace Soteo.Util;
 
-public sealed class ReadOnlySetWrapper<T>(ISet<T> inner) : IReadOnlySet<T>
+public class ReadOnlySetWrapper<T>(ISet<T> inner) : IReadOnlySet<T>
 {
     public static readonly ReadOnlySetWrapper<T> Empty = new(new HashSet<T>());
     

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core;
 using Soteo.Core.Attributes;
+using Soteo.Core.Dto;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
@@ -61,6 +62,7 @@ public sealed class CampaignServer : Node
         >();
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ICampaignSnapshotSerializer, CampaignSnapshotSerializer>();
+        services.AddSingleton<IShardServerAllowlist>(ShardServerAllowlist.Enabled(CampaignServerCmdLineArgs.ShardIds));
         
         if (_useJsmq)
             services.AddSingleton<IFromCampaignServerCommunicator, JsmqFromCampaignServerCommunicator>();
@@ -74,16 +76,6 @@ public sealed class CampaignServer : Node
             services.AddSingleton(type);
     }
     
-    private IReadOnlyList<Guid> ShardIds()
-    {
-        List<Guid> result = [];
-        string[] args = OS.GetCmdlineArgs();
-        for (int i = 0; i < args.Length - 1; i++)
-            if (args[i] == "--shard")
-                result.Add(Guid.Parse(args[++i]));
-        return result;
-    }
-    
     private async Task TestLifetimeAsync()
     {
         var persistenceService = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
@@ -91,7 +83,7 @@ public sealed class CampaignServer : Node
         var userRepo = ServiceProvider.GetRequiredService<IUserRepository>();
         var communicator = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
 
-        await userRepo.WaitForUsersToConnectAsync(ShardIds(), timeout: 10);
+        await userRepo.WaitForUsersToConnectAsync(CampaignServerCmdLineArgs.ShardIds, timeout: 10);
         communicator.AllowPlayerConnections = true;
         
         if (OS.GetCmdlineArgs().Contains("--singleplayer")) return;
