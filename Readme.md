@@ -42,7 +42,7 @@ See Architecture.md files in subfolders to learn about specific components.
 - [x] Death
 - [x] Style convention
 - [x] Testing
-- [ ] Cluster startup / shutdown
+- [x] Cluster startup / shutdown
 - [ ] Stress test / optimization
 - [ ] Staging polygon
 - [x] Manual character creation and spawning

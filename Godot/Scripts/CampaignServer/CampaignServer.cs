@@ -20,6 +20,8 @@ using File = System.IO.File;
 
 namespace Soteo.Main.CampaignServer;
 
+// todo move cmdline parsing to special classes
+
 public sealed class CampaignServer : Node
 {
     private readonly bool _useJsmq = OS.HasFeature("web") && OS.GetCmdlineArgs().Contains("--singleplayer");
