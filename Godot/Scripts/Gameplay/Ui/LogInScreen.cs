@@ -18,17 +18,11 @@ public sealed class LogInScreen
         _emailLineEdit = node.GetNode<LineEdit>("Email");
         _passwordLineEdit = node.GetNode<LineEdit>("Password");
         node.GetNode<Button>("LogIn").Connect("pressed", OnLogInPressed);
-        LoadCredentialsFromCmdLineArgs();
+        
+        if (ClientCmdLineArgs.Email != null)
+            _emailLineEdit.Text = ClientCmdLineArgs.Email;
     }
     
-    private void LoadCredentialsFromCmdLineArgs()
-    {
-        string[] args = OS.GetCmdlineArgs();
-        int emailIndex = args.IndexOf("--email") + 1;
-        if (emailIndex > 0 && emailIndex < args.Length)
-            _emailLineEdit.Text = args[emailIndex];
-    }
-
     private void OnLogInPressed()
     {
         string email = _emailLineEdit.Text;

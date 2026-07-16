@@ -20,11 +20,9 @@ using File = System.IO.File;
 
 namespace Soteo.Main.CampaignServer;
 
-// todo move cmdline parsing to special classes
-
 public sealed class CampaignServer : Node
 {
-    private readonly bool _useJsmq = OS.HasFeature("web") && OS.GetCmdlineArgs().Contains("--singleplayer");
+    private readonly bool _useJsmq = OS.HasFeature("web") && CampaignServerCmdLineArgs.IsSingleplayer;
     
     private readonly LateInit<IFromCampaignServerCommunicator> _communicator = new();
     private readonly LateInit<IServiceProvider> _serviceProvider = new();
@@ -88,7 +86,7 @@ public sealed class CampaignServer : Node
         await userRepo.WaitForUsersToConnectAsync(CampaignServerCmdLineArgs.ShardIds, timeout: 10);
         communicator.AllowPlayerConnections = true;
         
-        if (OS.GetCmdlineArgs().Contains("--singleplayer")) return;
+        if (CampaignServerCmdLineArgs.IsSingleplayer) return;
         
         if (File.Exists(EnvironmentVariables.CampaignSnapshotPath))
         {

@@ -27,9 +27,8 @@ public sealed class Main : Node2D, IShardLoader
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
-    private readonly bool _useJsmq = OS.HasFeature("web") && OS.GetCmdlineArgs().Contains("--singleplayer");
-    private bool _isServer = OS.GetCmdlineArgs().Contains("--server");
-    
+    private readonly bool _useJsmq = OS.HasFeature("web") && GameplayCmdLineArgs.IsSingleplayer;
+
     private LogInScreenNode? _logIScreenNode;
     private HudNode? _hudNode;
     private DebugScreenNode? _debugScreenNode;
@@ -45,19 +44,6 @@ public sealed class Main : Node2D, IShardLoader
     private ShardNode? _newScopeShard;
     private readonly Dictionary<Guid, IServiceScope> _shardServiceScopes = [];
     
-    // Fields for running a shard server from the editor
-    public static bool EditorIsServer { get; private set; }
-    public static Guid EditorLocalShardServerId { get; private set; }
-    [Export] private bool _editorIsServer;
-    [Export] private string _editorLocalShardServerId = "";
-
-    public override void _EnterTree()
-    {
-        EditorIsServer = _editorIsServer;
-        EditorLocalShardServerId = Guid.Parse(_editorLocalShardServerId);
-        if (_editorIsServer) _isServer = true;
-    }
-
     public override void _Ready()
     {
         GlobalInit.Init();
@@ -70,10 +56,10 @@ public sealed class Main : Node2D, IShardLoader
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
-        if (_isServer)
+        if (GameplayCmdLineArgs.IsServer)
         {
             LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
-            if (!OS.GetCmdlineArgs().Contains("--singleplayer"))
+            if (!GameplayCmdLineArgs.IsSingleplayer)
                 _rootServiceProvider.GetRequiredService<IPauseRepository>().IsPaused = true;
         }
     }
@@ -82,7 +68,7 @@ public sealed class Main : Node2D, IShardLoader
     {
         RegisterSharedServices(services);
         
-        if (_isServer)
+        if (GameplayCmdLineArgs.IsServer)
             RegisterServerServices(services);
         else
             RegisterClientServices(services);
@@ -105,7 +91,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
         services.AddSingletonNode<IPauseRepository>("/root/PauseRepository");
-        services.AddSingleton<ISideDetector>(new SideDetector(_isServer));
+        services.AddSingleton<ISideDetector>(new SideDetector(GameplayCmdLineArgs.IsServer));
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         
         var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
@@ -214,7 +200,7 @@ public sealed class Main : Node2D, IShardLoader
                 .Also(it => AddChild(it));
         }
         
-        if (!_isServer)
+        if (!GameplayCmdLineArgs.IsServer)
         {
             var ui = GetNode<CanvasLayer>("Ui").Required;
             _hudNode = HudNode.Instance().Also(it => ui.AddChild(it));
@@ -227,7 +213,7 @@ public sealed class Main : Node2D, IShardLoader
     
     private void CreateSingletonServices(IServiceProvider serviceProvider)
     {
-        if (!_isServer)
+        if (!GameplayCmdLineArgs.IsServer)
         {
             serviceProvider.GetRequiredService<LogInScreen>();
             serviceProvider.GetRequiredService<DebugScreen>();
@@ -238,20 +224,18 @@ public sealed class Main : Node2D, IShardLoader
     
     private void CreateShardScopedNodes(ShardNode shard, IServiceProvider serviceProvider)
     {
-        if (_isServer) return;
+        if (GameplayCmdLineArgs.IsServer) return;
         shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
     }
     
     private void CreateShardScopedServices(IServiceProvider serviceProvider)
     {
-        if (_isServer)
+        if (GameplayCmdLineArgs.IsServer)
             serviceProvider.GetRequiredService<ISynchronizationServer>();
     }
     
     public void LoadShard(Guid id)
     {
-        Console.WriteLine("Loading shard...");
-        
         string mapPath = $"res://Scenes/Maps/Test{id.ToString()[^1]}.tscn";
         Vector2 position = new Vector2(0, 0);
 

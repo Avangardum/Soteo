@@ -99,7 +99,8 @@ public sealed class SoteoCamera : Camera2D, ICamera
     
     private void Scroll(double delta)
     {
-        if (OS.GetCmdlineArgs().Contains("--no-scroll")) return;
+        if (GameplayCmdLineArgs.IsServer) return; // todo should not exist on server at all
+        if (ClientCmdLineArgs.NoScroll) return;
         GdVector2 viewportMousePos = GetViewport().GetMousePosition();
         GdVector2 viewportSize = GetViewport().GetVisibleRect().Size;
         int xDirection = viewportMousePos.x < _scrollZoneThickness ? -1 :
