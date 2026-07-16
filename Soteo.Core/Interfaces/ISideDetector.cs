@@ -1,7 +1,8 @@
+using Soteo.Core.Enums;
+
 namespace Soteo.Core.Interfaces;
 
 public interface ISideDetector
 {
-    bool IsServer { get; }
-    bool IsClient { get; }
+    Side Side { get; }
 }

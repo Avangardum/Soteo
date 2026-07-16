@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core;
 using Soteo.Core.Attributes;
+using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Services;
 using Soteo.Core.Services.PacketHandlers.Gameplay;
@@ -27,7 +28,7 @@ public sealed class Main : Node2D, IShardLoader
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
-    private readonly bool _useJsmq = OS.HasFeature("web") && GameplayCmdLineArgs.IsSingleplayer;
+    private readonly bool _useJsmq = OS.HasFeature("web") && SharedCmdLineArgs.IsSingleplayer;
 
     private LogInScreenNode? _logIScreenNode;
     private HudNode? _hudNode;
@@ -56,10 +57,10 @@ public sealed class Main : Node2D, IShardLoader
         
         _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
         
-        if (GameplayCmdLineArgs.IsServer)
+        if (SharedCmdLineArgs.Side == Side.ShardServer)
         {
             LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
-            if (!GameplayCmdLineArgs.IsSingleplayer)
+            if (!SharedCmdLineArgs.IsSingleplayer)
                 _rootServiceProvider.GetRequiredService<IPauseRepository>().IsPaused = true;
         }
     }
@@ -68,7 +69,7 @@ public sealed class Main : Node2D, IShardLoader
     {
         RegisterSharedServices(services);
         
-        if (GameplayCmdLineArgs.IsServer)
+        if (SharedCmdLineArgs.Side == Side.ShardServer)
             RegisterServerServices(services);
         else
             RegisterClientServices(services);
@@ -91,7 +92,7 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
         services.AddSingletonNode<IPauseRepository>("/root/PauseRepository");
-        services.AddSingleton<ISideDetector>(new SideDetector(GameplayCmdLineArgs.IsServer));
+        services.AddSingleton<ISideDetector>(new SideDetector(SharedCmdLineArgs.Side));
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         
         var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
@@ -200,7 +201,7 @@ public sealed class Main : Node2D, IShardLoader
                 .Also(it => AddChild(it));
         }
         
-        if (!GameplayCmdLineArgs.IsServer)
+        if (SharedCmdLineArgs.Side == Side.Client)
         {
             var ui = GetNode<CanvasLayer>("Ui").Required;
             _hudNode = HudNode.Instance().Also(it => ui.AddChild(it));
@@ -213,7 +214,7 @@ public sealed class Main : Node2D, IShardLoader
     
     private void CreateSingletonServices(IServiceProvider serviceProvider)
     {
-        if (!GameplayCmdLineArgs.IsServer)
+        if (SharedCmdLineArgs.Side == Side.Client)
         {
             serviceProvider.GetRequiredService<LogInScreen>();
             serviceProvider.GetRequiredService<DebugScreen>();
@@ -224,13 +225,13 @@ public sealed class Main : Node2D, IShardLoader
     
     private void CreateShardScopedNodes(ShardNode shard, IServiceProvider serviceProvider)
     {
-        if (GameplayCmdLineArgs.IsServer) return;
+        if (SharedCmdLineArgs.Side == Side.ShardServer) return;
         shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
     }
     
     private void CreateShardScopedServices(IServiceProvider serviceProvider)
     {
-        if (GameplayCmdLineArgs.IsServer)
+        if (SharedCmdLineArgs.Side == Side.ShardServer)
             serviceProvider.GetRequiredService<ISynchronizationServer>();
     }
     

@@ -1,4 +1,5 @@
 using Soteo.Core;
+using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.StaticHelpers;
 using Soteo.Util;
@@ -99,7 +100,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
     
     private void Scroll(double delta)
     {
-        if (GameplayCmdLineArgs.IsServer) return; // todo should not exist on server at all
+        if (SharedCmdLineArgs.Side != Side.Client) return; // todo should not exist on server at all
         if (ClientCmdLineArgs.NoScroll) return;
         GdVector2 viewportMousePos = GetViewport().GetMousePosition();
         GdVector2 viewportSize = GetViewport().GetVisibleRect().Size;

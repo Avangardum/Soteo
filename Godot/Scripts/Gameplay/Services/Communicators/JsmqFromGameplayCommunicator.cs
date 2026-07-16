@@ -49,19 +49,19 @@ public sealed class JsmqFromGameplayCommunicator :
     public override void _Ready()
     {
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        if (_sideDetector.IsServer) ConnectAsShardServer();
+        if (_sideDetector.Side == Side.ShardServer) ConnectAsShardServer();
     }
 
     public override void _Process(float delta)
     {
         // Client polls in _Process to minimize latency
-        if (_sideDetector.IsClient) Poll();
+        if (_sideDetector.Side == Side.Client) Poll();
     }
 
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (_sideDetector.IsServer) Poll();
+        if (_sideDetector.Side == Side.ShardServer) Poll();
     }
 
     public void ConnectAsPlayer(string email, string password)

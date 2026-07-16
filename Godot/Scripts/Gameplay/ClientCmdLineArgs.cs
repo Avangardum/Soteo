@@ -1,3 +1,5 @@
+using Soteo.Core.Enums;
+
 namespace Soteo.Main.Gameplay;
 
 public static class ClientCmdLineArgs
@@ -8,8 +10,8 @@ public static class ClientCmdLineArgs
     
     static ClientCmdLineArgs()
     {
-        if (GameplayCmdLineArgs.IsServer)
-            throw new InvalidOperationException($"{nameof(ClientCmdLineArgs)} should only be used on clients");
+        if (SharedCmdLineArgs.Side != Side.Client)
+            throw new InvalidOperationException("This class is for the client only");
         
         string[] args = OS.GetCmdlineArgs();
         

@@ -1,3 +1,6 @@
+using Soteo.Core.Enums;
+using Soteo.Main.Gameplay;
+
 namespace Soteo.Main.CampaignServer;
 
 public static class CampaignServerCmdLineArgs
@@ -7,12 +10,15 @@ public static class CampaignServerCmdLineArgs
     
     static CampaignServerCmdLineArgs()
     {
+        if (SharedCmdLineArgs.Side != Side.CampaignServer)
+            throw new InvalidOperationException("This class is for the campaign server only");
+        
         string[] args = OS.GetCmdlineArgs();
         List<Guid> shardIds = [];
         
         for (int i = 0; i < args.Length; i++)
         {
-            if (args[i].EndsWith(".tscn")) // todo custom argument for launching campaign server
+            if (args[i] == "--campaign-server")
             {
                 
             }

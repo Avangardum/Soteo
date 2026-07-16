@@ -1,5 +1,6 @@
 using Soteo.Core.Attributes;
 using Soteo.Core.Dto.Packets;
+using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.StaticHelpers;
 
@@ -16,7 +17,7 @@ public sealed class GameplayRoutingPacketHandler
     public async Task HandleAsync(Packet packet, Guid senderId)
     {
         IServiceProvider? serviceProvider =
-            sideDetector.IsServer ? shardServiceProviders[currentUserIdRepository.Required] :
+            sideDetector.Side == Side.ShardServer ? shardServiceProviders[currentUserIdRepository.Required] :
             senderId == Const.CampaignServerId ? rootServiceProvider :
             shardServiceProviders.GetOrDefault(senderId);
         if (serviceProvider == null) return;
@@ -26,7 +27,7 @@ public sealed class GameplayRoutingPacketHandler
         
         if
         (
-            sideDetector.IsServer &&
+            sideDetector.Side == Side.ShardServer &&
             senderId != Const.CampaignServerId &&
             !handler.GetType().HasAttribute<AllowClientPacketsAttribute>()
         )

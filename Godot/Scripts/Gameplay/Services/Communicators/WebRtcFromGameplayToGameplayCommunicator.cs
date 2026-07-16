@@ -71,7 +71,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         // _Process would be delayed to the next physics frame otherwise.
         Poll(delta);
         
-        if (_sideDetector.IsServer)
+        if (_sideDetector.Side == Side.ShardServer)
         {
             while (_packetQueue.Count > 0)
             {
@@ -130,7 +130,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     private void ProcessPing(double delta)
     {
-        if (_sideDetector.IsServer) return;
+        if (_sideDetector.Side == Side.ShardServer) return;
         _timeSinceLastPing += delta;
         if (_timeSinceLastPing >= PingInterval)
         {
@@ -168,7 +168,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         }
         catch (BadSerializedDataException e)
         {
-            if (_sideDetector.IsServer)
+            if (_sideDetector.Side == Side.ShardServer)
             {
                 SendReliable(new BadInputPacket { Reason = e.Message }, senderId);
                 return null;
@@ -195,14 +195,14 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             }
             
             // Server defers packet handling to _PhysicsProcess to ensure that all game logic is executed in it only
-            if (_sideDetector.IsServer && !_isPhysicsProcess)
+            if (_sideDetector.Side == Side.ShardServer && !_isPhysicsProcess)
                 _packetQueue.Enqueue((packet, senderId));
             else
                 await _packetHandler.HandleAsync(packet, senderId);
         }
         catch (BadPacketException e)
         {
-            if (_sideDetector.IsServer)
+            if (_sideDetector.Side == Side.ShardServer)
                 SendReliable(new BadInputPacket { Reason = e.Message }, senderId);
             else
                 AsyncExceptionCollector.Collect(e);
@@ -230,7 +230,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     public void ConnectToShardServer(Guid id)
     {
-        if (_sideDetector.IsServer) throw new InvalidOperationException();
+        if (_sideDetector.Side == Side.ShardServer) throw new InvalidOperationException();
         
         WebRTCPeerConnection connection = CreateConnection(id);
         connection.CreateOffer();
@@ -357,8 +357,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     public void ReceiveWebrtcSdpPacket(WebrtcSdpPacket packet)
     {
-        string type = _sideDetector.IsServer ? "offer" : "answer";
-        WebRTCPeerConnection? connection = _sideDetector.IsServer ? CreateConnection(packet.PeerId) :
+        string type = _sideDetector.Side == Side.ShardServer ? "offer" : "answer";
+        WebRTCPeerConnection? connection = _sideDetector.Side == Side.ShardServer ? CreateConnection(packet.PeerId) :
             _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         connection?.SetRemoteDescription(type, packet.Sdp);
     }

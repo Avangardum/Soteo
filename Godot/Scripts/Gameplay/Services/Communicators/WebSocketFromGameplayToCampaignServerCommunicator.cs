@@ -62,24 +62,24 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (_sideDetector.IsServer)
+        if (_sideDetector.Side == Side.ShardServer)
             _wsClient.Poll();
     }
     
     public override void _Process(float delta)
     {
-        if (_sideDetector.IsServer && _status == Status.Disconnected)
+        if (_sideDetector.Side == Side.ShardServer && _status == Status.Disconnected)
             ConnectAsShardServer();
         
         // Client polls in _Process to minimize latency
-        if (_sideDetector.IsClient)
+        if (_sideDetector.Side == Side.Client)
             _wsClient.Poll();
     }
 
     public void OnConnectionClosed(bool wasCleanClose)
     {
         _status = Status.Disconnected;
-        if (_sideDetector.IsClient)
+        if (_sideDetector.Side == Side.Client)
             _currentUserIdRepository.Value = null;
     }
     
@@ -105,7 +105,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     
     public void ConnectAsPlayer(string email, string password)
     {
-        if (_sideDetector.IsServer) throw new InvalidOperationException();
+        if (_sideDetector.Side == Side.ShardServer) throw new InvalidOperationException();
         if (_status != Status.Disconnected) return;
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
@@ -116,7 +116,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     
     public void ConnectAsShardServer()
     {
-        if (_sideDetector.IsClient) throw new InvalidOperationException();
+        if (_sideDetector.Side == Side.Client) throw new InvalidOperationException();
         if (_status != Status.Disconnected) return;
         
         _status = Status.Connecting;

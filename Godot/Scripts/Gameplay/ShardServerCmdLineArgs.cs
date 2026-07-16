@@ -1,3 +1,5 @@
+using Soteo.Core.Enums;
+
 namespace Soteo.Main.Gameplay;
 
 public static class ShardServerCmdLineArgs
@@ -7,23 +9,20 @@ public static class ShardServerCmdLineArgs
     
     static ShardServerCmdLineArgs()
     {
-        if (!GameplayCmdLineArgs.IsServer)
-        {
-            var message = $"{nameof(ShardServerCmdLineArgs)} should only be used on shard servers";
-            throw new InvalidOperationException(message);
-        }
+        if (SharedCmdLineArgs.Side != Side.ShardServer)
+            throw new InvalidOperationException("This class is for the shard server only");
         
         string[] args = OS.GetCmdlineArgs();
         
         for (int i = 0; i < args.Length; i++)
         {
-            if (args[i] == "--server")
+            if (args[i] == "--shard-server")
             {
                 if (ShardId != Guid.Empty)
-                    throw new ArgumentException("Duplicate --server argument");
+                    throw new ArgumentException("Duplicate --shard-server argument");
                 i++;
                 if (i == args.Length)
-                    throw new ArgumentException("--server should be followed by the shard id");
+                    throw new ArgumentException("--shard-server should be followed by the shard id");
                 ShardId = Guid.Parse(args[i]);
             }
             else if (args[i] == "--singleplayer")
