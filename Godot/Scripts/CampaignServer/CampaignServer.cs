@@ -60,7 +60,7 @@ public sealed class CampaignServer : Node
             ICampaignSnapshotCrossServerConsistencyValidator,
             CampaignSnapshotCrossServerConsistencyValidator
         >();
-        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<TimeProvider>(new GodotTimeProvider(GetTree()));
         services.AddSingleton<ICampaignSnapshotSerializer, CampaignSnapshotSerializer>();
         services.AddSingleton<IShardServerAllowlist>(ShardServerAllowlist.Enabled(CampaignServerCmdLineArgs.ShardIds));
         

@@ -6,7 +6,11 @@ using Soteo.Util;
 
 namespace Soteo.Core.Services.Repositories;
 
-public class UserRepository(IShardServerAllowlist shardServerAllowlist) : Dictionary<Guid, User>, IUserRepository
+public class UserRepository
+(
+    IShardServerAllowlist shardServerAllowlist,
+    TimeProvider timeProvider
+) : Dictionary<Guid, User>, IUserRepository
 {
     private TaskCompletionSource _userConnectedTcs = new();
     
@@ -59,7 +63,7 @@ public class UserRepository(IShardServerAllowlist shardServerAllowlist) : Dictio
     
     public async Task WaitForUsersToConnectAsync(IReadOnlyList<Guid> ids, double timeout)
     {
-        Task timeoutTask = Task.Delay(TimeSpan.FromSeconds(timeout));
+        Task timeoutTask = timeProvider.Delay(TimeSpan.FromSeconds(timeout));
         
     retry:
         foreach (Guid id in ids)

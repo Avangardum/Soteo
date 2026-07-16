@@ -94,17 +94,18 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingletonNode<IPauseRepository>("/root/PauseRepository");
         services.AddSingleton<ISideDetector>(new SideDetector(SharedCmdLineArgs.Side));
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
-        
         var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
-        
-        services.AddScoped<ShardNode>(
-            _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard"));
+        services.AddScoped<ShardNode>
+        (
+            _ => _newScopeShard ?? throw new InvalidOperationException("This scope doesn't have a shard")
+        );
         services.AddAlias<IShard, ShardNode>();
         services.AddScoped<EntityManager>();
         services.AddAlias<IEntityManager, EntityManager>();
         services.AddAlias<IEntitySnapshotManager, EntityManager>();
         services.AddScoped<IEntityNodeManager, EntityNodeManager>();
+        services.AddSingleton<TimeProvider>(new GodotTimeProvider(GetTree()));
         
         foreach (Type type in PacketSerializer.AllTypes(typeLocator))
             services.AddSingleton(type);

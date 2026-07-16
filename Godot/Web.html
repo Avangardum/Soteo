@@ -82,7 +82,7 @@
             shardServer.startGame({
                 unloadAfterInit: false,
                 canvasResizePolicy: canvasResizePolicy.doNotResize,
-                args: ["--server", "00000000-0000-0000-0000-0000000005d1", "--singleplayer"],
+                args: ["--shard-server", "00000000-0000-0000-0000-0000000005d1", "--singleplayer"],
                 canvas: document.querySelector("#shardServerCanvas"),
                 onPrint: text => print(text, console.log, "Shard server"),
                 onPrintError: text => print(text, console.error, "Shard server"),
