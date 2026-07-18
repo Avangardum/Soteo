@@ -28,6 +28,5 @@ public sealed class GameplayShardSnapshotRequestPacketHandler
         ShardSnapshot snapshot = shardPersistenceSnapshotManager.CreateSnapshot();
         var packet = new ShardSnapshotPacket { Snapshot = snapshot };
         packetSender.SendReliable(packet, Const.CampaignServerId);
-        // TODO fails with a lot of entities (ws buffer overflow)
     }
 }
