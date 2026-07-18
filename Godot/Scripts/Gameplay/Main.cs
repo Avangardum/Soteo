@@ -39,6 +39,7 @@ public sealed class Main : Node2D, IShardLoader
     private WebRtcFromGameplayToGameplayCommunicator? _webRtcGameplayCommunicator;
     private JsmqFromGameplayCommunicator? _jsmqCommunicator;
     private ProcessPublisher? _processPublisher;
+    private SoteoCamera? _camera;
     
     private PackedScene? _shardScene;
     private IServiceProvider? _rootServiceProvider;
@@ -131,7 +132,7 @@ public sealed class Main : Node2D, IShardLoader
         
         services.AddSingleton<LogInScreenNode>(_ => _logIScreenNode.Required);
         services.AddSingleton<LogInScreen>();
-        services.AddSingletonNode<ICamera>("Camera");
+        services.AddSingleton<ICamera>(_ => _camera.Required);
         services.AddSingleton<HudNode>(_ => _hudNode.Required);
         services.AddSingleton<IHud, Hud>();
         services.AddSingleton<DebugScreenNode>(_ => _debugScreenNode.Required);
@@ -204,6 +205,7 @@ public sealed class Main : Node2D, IShardLoader
         
         if (SharedCmdLineArgs.Side == Side.Client)
         {
+            _camera = new SoteoCamera().Also(it => AddChild(it));
             var ui = GetNode<CanvasLayer>("Ui").Required;
             _hudNode = HudNode.Instance().Also(it => ui.AddChild(it));
             AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));

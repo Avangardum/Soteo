@@ -8,14 +8,14 @@ namespace Soteo.Main.Gameplay;
 
 public sealed class SoteoCamera : Camera2D, ICamera
 {
-    [Export] private int _minZoomLog2;
-    [Export] private int _maxZoomLog2;
-    [Export] private int _defaultZoomLog2;
-    [Export] private double _zoomLog2Step;
-    [Export] private bool _roundZoomToInt;
-    [Export] private double _scrollSpeed;
-    [Export] private double _scrollZoneThickness;
-    [Export] private double _limit;
+    private const int MinZoomLog2 = 0;
+    private const int MaxZoomLog2 = 5;
+    private const int DefaultZoomLog2 = 2;
+    private const double ZoomLog2Step = 0.125;
+    private const bool RoundZoomToInt = true;
+    private const double ScrollSpeed = 720;
+    private const double ScrollZoneThickness = -1;
+    private const double Limit = 1000;
     
     private GdVector2 _prevGlobalMousePos;
     private bool _wasDraggingInPrevFrame;
@@ -50,18 +50,20 @@ public sealed class SoteoCamera : Camera2D, ICamera
             // When rounding zoom to int, dead zones appear near min and max values, in which resulting zoom is
             // the same. In this case, these dead zones are cut off, so that a single scroll tick from an edge
             // value changes the zoom.
-            double min = _roundZoomToInt ? Maths.Log(Maths.Pow(2, _minZoomLog2) + 0.499, 2) : _minZoomLog2;
-            double max = _roundZoomToInt ? Maths.Log(Maths.Pow(2, _maxZoomLog2) - 0.499, 2) : _maxZoomLog2;
+            double min = RoundZoomToInt ? Maths.Log(Maths.Pow(2, MinZoomLog2) + 0.499, 2) : MinZoomLog2;
+            double max = RoundZoomToInt ? Maths.Log(Maths.Pow(2, MaxZoomLog2) - 0.499, 2) : MaxZoomLog2;
             
             field = Maths.Clamp(value, min, max);
             double targetZoom = Math.Pow(2, field);
-            Zoom = _roundZoomToInt ? Math.Round(targetZoom) : targetZoom;
+            Zoom = RoundZoomToInt ? Math.Round(targetZoom) : targetZoom;
         }
     }
 
     public override void _Ready()
     {
-        TargetZoomLog2 = _defaultZoomLog2;
+        PauseMode = PauseModeEnum.Process;
+        Current = true;
+        TargetZoomLog2 = DefaultZoomLog2;
     }
 
     public override void _Process(float delta)
@@ -99,15 +101,14 @@ public sealed class SoteoCamera : Camera2D, ICamera
     
     private void Scroll(double delta)
     {
-        if (SharedCmdLineArgs.Side != Side.Client) return; // todo should not exist on server at all
         if (ClientCmdLineArgs.NoScroll) return;
         GdVector2 viewportMousePos = GetViewport().GetMousePosition();
         GdVector2 viewportSize = GetViewport().GetVisibleRect().Size;
-        int xDirection = viewportMousePos.x < _scrollZoneThickness ? -1 :
-            viewportMousePos.x > viewportSize.x - _scrollZoneThickness ? 1 : 0;
-        int yDirection = viewportMousePos.y < _scrollZoneThickness ? -1 :
-            viewportMousePos.y > viewportSize.y - _scrollZoneThickness ? 1 : 0;
-        base.Position += new GdVector2(xDirection, yDirection) * delta * _scrollSpeed / Zoom;
+        int xDirection = viewportMousePos.x < ScrollZoneThickness ? -1 :
+            viewportMousePos.x > viewportSize.x - ScrollZoneThickness ? 1 : 0;
+        int yDirection = viewportMousePos.y < ScrollZoneThickness ? -1 :
+            viewportMousePos.y > viewportSize.y - ScrollZoneThickness ? 1 : 0;
+        base.Position += new GdVector2(xDirection, yDirection) * delta * ScrollSpeed / Zoom;
     }
     
     private void EnforceLimit()
@@ -119,13 +120,13 @@ public sealed class SoteoCamera : Camera2D, ICamera
         GdVector2 viewportHalfSizeInWorldSpace = GetViewport().GetVisibleRect().Size / Zoom / 2;
         GdVector2 position = base.Position;
         
-        double minX = -_limit + viewportHalfSizeInWorldSpace.x;
-        double maxX = _limit - viewportHalfSizeInWorldSpace.x;
+        double minX = -Limit + viewportHalfSizeInWorldSpace.x;
+        double maxX = Limit - viewportHalfSizeInWorldSpace.x;
         if (minX > maxX) minX = maxX = 0;
         position.x = (float)Maths.Clamp(position.x, minX, maxX);
         
-        double minY = -_limit + viewportHalfSizeInWorldSpace.y;
-        double maxY = _limit - viewportHalfSizeInWorldSpace.y;
+        double minY = -Limit + viewportHalfSizeInWorldSpace.y;
+        double maxY = Limit - viewportHalfSizeInWorldSpace.y;
         if (minY > maxY) minY = maxY = 0;
         position.y = (float)Maths.Clamp(position.y, minY, maxY);
         
@@ -144,8 +145,8 @@ public sealed class SoteoCamera : Camera2D, ICamera
     public override void _Input(InputEvent e)
     {
         if (e.IsActionPressed("zoom_in"))
-            TargetZoomLog2 += _zoomLog2Step;
+            TargetZoomLog2 += ZoomLog2Step;
         else if (e.IsActionPressed("zoom_out"))
-            TargetZoomLog2 -= _zoomLog2Step;
+            TargetZoomLog2 -= ZoomLog2Step;
     }
 }
