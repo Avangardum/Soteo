@@ -57,7 +57,7 @@ public sealed class InputHandler : Node2D
     
     private void HandleSelect()
     {
-        UnitPuppet? unit = GetUnitsUnderMouse().FirstOrDefault();
+        IUnitPuppet? unit = GetUnitsUnderMouse().FirstOrDefault();
         if (unit != null)
             _hud.SelectedUnit = unit;
     }
@@ -66,9 +66,10 @@ public sealed class InputHandler : Node2D
     {
         if (_currentCharIdRepo.Value == null) return;
         _hud.TrySelectCurrentUnit();
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out UnitPuppet? user, out Guid? shardId)) return;
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? user, out Guid? shardId))
+            return;
         
-        UnitPuppet? targetUnit = GetUnitsUnderMouse()
+        IUnitPuppet? targetUnit = GetUnitsUnderMouse()
             .FirstOrDefault(it => ValidateAbility(user, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
         
         if (targetUnit != null)
@@ -98,7 +99,8 @@ public sealed class InputHandler : Node2D
     {
         if (_currentCharIdRepo.Value == null) return;
         _hud.TrySelectCurrentUnit();
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out UnitPuppet? user, out Guid? shardId)) return;
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? user, out Guid? shardId))
+            return;
         _packetSender.SendReliable
         (
             new StopPacket { UnitId = _currentCharIdRepo.Required, Command = new StopCommand() },
@@ -110,10 +112,11 @@ public sealed class InputHandler : Node2D
     {
         if (_currentCharIdRepo.Value == null) return;
         _hud.TrySelectCurrentUnit();
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out UnitPuppet? user, out Guid? shardId)) return;
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? user, out Guid? shardId))
+            return;
         if (!user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
-        UnitPuppet? targetUnit = null;
+        IUnitPuppet? targetUnit = null;
         Vector2? targetPosition = null;
         
         bool alt = Input.IsActionPressed("alt");
@@ -121,7 +124,8 @@ public sealed class InputHandler : Node2D
         
         if (!forceNoTarget)
         {
-            IReadOnlyList<UnitPuppet> candidateTargetUnits = alt ? [user] : GetUnitsUnderMouse();
+            // todo rework alt
+            IReadOnlyList<IUnitPuppet> candidateTargetUnits = alt ? [user] : GetUnitsUnderMouse();
             targetUnit = candidateTargetUnits
                 .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
             
@@ -140,12 +144,12 @@ public sealed class InputHandler : Node2D
         );
     }
 
-    private AbilityValidationResult ValidateAbility(UnitPuppet user, AbilitySlot slot, UnitPuppet targetUnit) =>
+    private AbilityValidationResult ValidateAbility(IUnitPuppet user, AbilitySlot slot, IUnitPuppet targetUnit) =>
         ValidateAbility(user, new UseAbilityCommand(slot, TargetUnitId: targetUnit.Id));
     
     private AbilityValidationResult ValidateAbility
     (
-        UnitPuppet user,
+        IUnitPuppet user,
         UseAbilityCommand command
     )
     {
@@ -155,7 +159,7 @@ public sealed class InputHandler : Node2D
         
         if (command.TargetUnitId != null)
         {
-            if (!_entityLocator.TryFindEntity(command.TargetUnitId.Value, out UnitPuppet? targetUnit, out _))
+            if (!_entityLocator.TryFindEntity(command.TargetUnitId.Value, out IUnitPuppet? targetUnit, out _))
                 return AbilityValidationResult.InvalidTarget;
             if (targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(CanTarget.Ally))
                 return AbilityValidationResult.InvalidTarget;
@@ -168,7 +172,7 @@ public sealed class InputHandler : Node2D
         return AbilityValidationResult.Ok;
     }
 
-    private IReadOnlyList<UnitPuppet> GetUnitsUnderMouse()
+    private IReadOnlyList<IUnitPuppet> GetUnitsUnderMouse()
     {
         GdArray intersections = GetWorld2d().DirectSpaceState.IntersectPoint
         (

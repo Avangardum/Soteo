@@ -7,7 +7,7 @@ namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class OverheadUi
 {
-    private readonly UnitPuppet _unit;
+    private readonly IUnitPuppet _unit;
     private readonly ICamera _camera;
     private readonly IPalette _palette;
     
@@ -22,7 +22,7 @@ public sealed class OverheadUi
     
     private Vector2 _offset;
     
-    public OverheadUi(OverheadUiNode node, UnitPuppet unit, ICamera camera, IPalette palette)
+    public OverheadUi(OverheadUiNode node, IUnitPuppet unit, ICamera camera, IPalette palette)
     {
         _unit = unit;
         _camera = camera;

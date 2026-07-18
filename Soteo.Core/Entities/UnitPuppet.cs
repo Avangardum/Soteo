@@ -9,7 +9,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Entities;
 
-public sealed class UnitPuppet : UnitBase<IUnitPuppetNode> // todo extract interface
+public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 {
     private readonly ICamera _camera;
     
@@ -166,5 +166,5 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode> // todo extract inter
         }
     }
     
-    public bool IsAlliedTo(UnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
+    public bool IsAlliedTo(IUnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
 }

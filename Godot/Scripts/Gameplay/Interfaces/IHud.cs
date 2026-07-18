@@ -5,7 +5,7 @@ namespace Soteo.Main.Gameplay.Interfaces;
 
 public interface IHud
 {
-    UnitPuppet? SelectedUnit { get; set; }
+    IUnitPuppet SelectedUnit { get; set; }
     
     [MemberNotNullWhen(true, nameof(SelectedUnit))]
     bool TrySelectCurrentUnit();

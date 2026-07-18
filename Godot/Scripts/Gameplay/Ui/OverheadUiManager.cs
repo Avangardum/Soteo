@@ -23,7 +23,7 @@ public sealed class OverheadUiManager : Control
     
     private void OnEntityAdded(IEntity entity)
     {
-        if (entity is not UnitPuppet unit) return;
+        if (entity is not IUnitPuppet unit) return;
         
         var node = OverheadUiNode.Instance();
         AddChild(node);

@@ -51,9 +51,6 @@ public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, 
         Removed();
     }
     
-    /// <summary>
-    /// Bring the removed node back to the active state
-    /// </summary>
     public void Respawn(TNode node)
     {
         if (!IsRemoved) throw new InvalidOperationException("Only removed entities can be respawned");

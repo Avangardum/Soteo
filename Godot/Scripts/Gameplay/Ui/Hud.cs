@@ -27,7 +27,7 @@ public sealed class Hud : IHud
     private readonly ITooltip _tooltip;
     private readonly ILocalizer _localizer;
     
-    public UnitPuppet? SelectedUnit { get; set; }
+    public IUnitPuppet? SelectedUnit { get; set; }
 
     public Hud
     (
@@ -137,13 +137,14 @@ public sealed class Hud : IHud
     public bool TrySelectCurrentUnit()
     {
         if (_currentCharIdRepository.Value == null) return false;
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepository.Required, out UnitPuppet? unit, out _)) return false;
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepository.Required, out IUnitPuppet? unit, out _))
+            return false;
         
         SelectedUnit = unit;
         return true;
     }
     
-    private void ProcessBars(UnitPuppet unit)
+    private void ProcessBars(IUnitPuppet unit)
     {
         _healthBar.TintProgress = _palette.FactionColor(unit.Faction);
         
@@ -157,7 +158,7 @@ public sealed class Hud : IHud
             $"{Maths.CeilToInt(unit.Stats[Stat.MaxMana])}";
     }
     
-    private void ProcessAbilities(UnitPuppet unit)
+    private void ProcessAbilities(IUnitPuppet unit)
     {
         for (var slot = AbilitySlot.Class0; slot <= AbilitySlot.ClassLast; slot++)
         {
@@ -188,7 +189,7 @@ public sealed class Hud : IHud
         }
     }
     
-    private void ProcessStatuses(UnitPuppet unit)
+    private void ProcessStatuses(IUnitPuppet unit)
     {
         ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(unit);
         for (int i = 0; i < contexts.Count; i++)
@@ -203,7 +204,7 @@ public sealed class Hud : IHud
         }
     }
     
-    private ImmutableList<PuppetStatusContext> GetVisibleStatusContexts(UnitPuppet unit)
+    private ImmutableList<PuppetStatusContext> GetVisibleStatusContexts(IUnitPuppet unit)
     {
         return unit.Statuses.Values
             .Where(it => it.Status.HudVisible)
