@@ -6,7 +6,6 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay;
 
-// todo zoom doesn't work when paused
 public sealed class SoteoCamera : Camera2D, ICamera
 {
     [Export] private int _minZoomLog2;
