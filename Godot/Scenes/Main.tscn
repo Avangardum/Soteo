@@ -35,6 +35,7 @@ visible = false
 
 [node name="PauseScreen" parent="Ui" instance=ExtResource( 4 )]
 visible = false
+mouse_filter = 2
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 scroll_ignore_camera_zoom = true

@@ -142,7 +142,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
             Position, Zoom, isCamera: true, halfPixelXOffset, halfPixelYOffset);
     }
 
-    public override void _UnhandledInput(InputEvent e)
+    public override void _Input(InputEvent e)
     {
         if (e.IsActionPressed("zoom_in"))
             TargetZoomLog2 += _zoomLog2Step;
