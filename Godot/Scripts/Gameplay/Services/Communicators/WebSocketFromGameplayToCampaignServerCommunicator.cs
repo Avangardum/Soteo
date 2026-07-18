@@ -174,5 +174,3 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     
     private enum Status { Disconnected, Connecting, Connected }
 }
-
-// TODO Godot errors don't show in console until an exception is thrown
