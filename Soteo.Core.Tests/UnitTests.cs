@@ -157,7 +157,7 @@ public sealed class UnitTests
     
     public sealed class StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff : Status
     {
-        public const double BuffValue = 50;
+        public const double BuffValue = 5;
         
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
 
