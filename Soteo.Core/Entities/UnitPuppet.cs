@@ -71,7 +71,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode> // todo extract inter
         );
     }
 
-    public override EntitySnapshot CreateSnapshot() => throw new NotSupportedException();
+    public override EntitySnapshot ToSnapshot() => throw new NotSupportedException();
 
     public override void ReplicateSnapshot(EntitySnapshot snapshot)
     {

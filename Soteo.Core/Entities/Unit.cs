@@ -63,7 +63,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         }
     }
     
-    public override EntitySnapshot CreateSnapshot()
+    public override EntitySnapshot ToSnapshot()
     {
         return new UnitSnapshot
         {

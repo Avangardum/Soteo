@@ -23,7 +23,7 @@ public sealed record PlayerCharacterTracker
         };
     }
     
-    public PlayerCharacterTrackerSnapshot CreateSnapshot()
+    public PlayerCharacterTrackerSnapshot ToSnapshot()
     {
         return new PlayerCharacterTrackerSnapshot
         {

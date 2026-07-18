@@ -29,7 +29,6 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
     
     public object? GetService(Type serviceType) => ServiceProvider.GetService(serviceType);
     
-    // todo rename CreateSnapshot to ToSnapshot globally
     public AbilityContextSnapshot ToSnapshot()
     {
         return new AbilityContextSnapshot

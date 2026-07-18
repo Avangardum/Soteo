@@ -20,7 +20,7 @@ public sealed record User
         };
     }
     
-    public UserSnapshot CreateSnapshot()
+    public UserSnapshot ToSnapshot()
     {
         return new UserSnapshot
         {

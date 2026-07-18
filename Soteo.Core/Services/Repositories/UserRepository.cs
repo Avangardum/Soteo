@@ -51,8 +51,8 @@ public class UserRepository
             user.IsConnected = false;
     }
     
-    public IReadOnlyDictionary<Guid, UserSnapshot> CreateSnapshot() =>
-        this.ToImmutableDictionary(it => it.Key, it => it.Value.CreateSnapshot());
+    public IReadOnlyDictionary<Guid, UserSnapshot> ToSnapshot() =>
+        this.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot());
     
     public void ReplicateSnapshot(IReadOnlyDictionary<Guid, UserSnapshot> snapshot)
     {

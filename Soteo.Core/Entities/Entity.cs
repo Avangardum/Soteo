@@ -23,7 +23,7 @@ public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, 
     public virtual Vector2 Position { get; set; }
     public virtual double Azimuth { get; set => field = Maths.PosMod(value, 360); }
 
-    public abstract EntitySnapshot CreateSnapshot();
+    public abstract EntitySnapshot ToSnapshot();
 
     public virtual void ReplicateSnapshot(EntitySnapshot snapshot)
     {

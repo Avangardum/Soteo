@@ -6,7 +6,7 @@ namespace Soteo.Core.Interfaces;
 public interface IPlayerCharacterTrackerRepository : IDictionary<Guid, PlayerCharacterTracker>
 {
     void Add(PlayerCharacterTracker playerCharacter);
-    IReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot> CreateSnapshot();
+    IReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot> ToSnapshot();
 
     void ReplicateSnapshot
     (

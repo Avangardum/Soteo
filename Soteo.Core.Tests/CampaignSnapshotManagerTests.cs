@@ -40,8 +40,8 @@ public sealed class CampaignSnapshotManagerTests
         
         CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
         
-        snapshot.CampaignServer.Users[user1.Id].Should().Be(user1.CreateSnapshot());
-        snapshot.CampaignServer.Users[user2.Id].Should().Be(user2.CreateSnapshot());
+        snapshot.CampaignServer.Users[user1.Id].Should().Be(user1.ToSnapshot());
+        snapshot.CampaignServer.Users[user2.Id].Should().Be(user2.ToSnapshot());
     }
     
     [Fact]
@@ -52,8 +52,8 @@ public sealed class CampaignSnapshotManagerTests
         
         CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
         
-        snapshot.CampaignServer.PlayerCharacterTrackers[char1.Id].Should().Be(char1.CreateSnapshot());
-        snapshot.CampaignServer.PlayerCharacterTrackers[char2.Id].Should().Be(char2.CreateSnapshot());
+        snapshot.CampaignServer.PlayerCharacterTrackers[char1.Id].Should().Be(char1.ToSnapshot());
+        snapshot.CampaignServer.PlayerCharacterTrackers[char2.Id].Should().Be(char2.ToSnapshot());
     }
     
     [Fact]

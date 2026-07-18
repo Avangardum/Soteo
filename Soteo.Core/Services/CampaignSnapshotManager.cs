@@ -49,8 +49,8 @@ public sealed class CampaignSnapshotManager
     {
         var campaignServerSnapshot = new CampaignServerSnapshot
         {
-            PlayerCharacterTrackers = trackerRepo.CreateSnapshot(),
-            Users = userRepo.CreateSnapshot(),
+            PlayerCharacterTrackers = trackerRepo.ToSnapshot(),
+            Users = userRepo.ToSnapshot(),
         };
 
         return new CampaignSnapshot

@@ -10,8 +10,8 @@ public sealed class PlayerCharacterTrackerRepository :
 {
     public void Add(PlayerCharacterTracker playerCharacter) => Add(playerCharacter.Id, playerCharacter);
     
-    public IReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot> CreateSnapshot() =>
-        this.ToImmutableDictionary(it => it.Key, it => it.Value.CreateSnapshot());
+    public IReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot> ToSnapshot() =>
+        this.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot());
     
     public void ReplicateSnapshot
     (

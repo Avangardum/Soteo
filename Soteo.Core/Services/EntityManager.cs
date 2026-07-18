@@ -54,11 +54,11 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         Dictionary<Guid, EntitySnapshot> snapshots = [];
         
         foreach ((Guid id, ISnapshottableEntity entity) in _entities)
-            snapshots[id] = entity.CreateSnapshot();
+            snapshots[id] = entity.ToSnapshot();
         
         foreach ((Guid id, WeakReference<ISnapshottableEntity> entityRef) in _removedEntities)
             if (entityRef.TryGetTarget(out ISnapshottableEntity? entity))
-                snapshots[id] = entity.CreateSnapshot();
+                snapshots[id] = entity.ToSnapshot();
         
         return snapshots;
     }
@@ -66,7 +66,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     public IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntityPuppetSnapshots()
     {
         ImmutableDictionary<Guid, EntitySnapshot> snapshots = _entities.Values
-            .Select(it => it.CreateSnapshot().ToPuppet())
+            .Select(it => it.ToSnapshot().ToPuppet())
             .Concat(_deadPuppetSnapshots)
             .ToImmutableDictionary(it => it.Id);
         _deadPuppetSnapshots.Clear();
@@ -198,7 +198,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
             CleanupRemovedEntities();
         
         if (entity is Unit { IsDead: true })
-            _deadPuppetSnapshots.Add(entity.CreateSnapshot().ToPuppet());
+            _deadPuppetSnapshots.Add(entity.ToSnapshot().ToPuppet());
         
         EntityRemoved(entity);
     }

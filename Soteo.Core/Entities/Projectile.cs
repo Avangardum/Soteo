@@ -70,7 +70,7 @@ public sealed class Projectile : Entity<IProjectileNode>
         }
     }
     
-    public override EntitySnapshot CreateSnapshot()
+    public override EntitySnapshot ToSnapshot()
     {
         return new ProjectileSnapshot
         {

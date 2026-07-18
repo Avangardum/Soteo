@@ -4,7 +4,7 @@ namespace Soteo.Core.Interfaces;
 
 internal interface ISnapshottableEntity : IEntity
 {
-    EntitySnapshot CreateSnapshot();
+    EntitySnapshot ToSnapshot();
     void ReplicateSnapshot(EntitySnapshot snapshot);
     void ApplyDelta(EntitySnapshotDelta delta, double interpolationWeight);
 }
