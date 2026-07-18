@@ -17,7 +17,7 @@ public abstract class AttackAbility : Ability
         AttackInterval(context) * (1 - context.UserStats[Stat.AttackUseTimeFraction]);
 
     private double AttackInterval(AbilityContext context) =>
-        1 / (context.UserStats[Stat.AttackSpeed] / 1000);
+        1 / context.UserStats[Stat.AttackSpeed];
 
     protected sealed override double DynamicRange(AbilityContext context) =>
         context.UserStats[Stat.AttackRange];

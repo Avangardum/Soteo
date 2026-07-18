@@ -20,9 +20,9 @@ public enum Stat : byte
     TurnSpeed,
     AttackDamage,
     /// <summary>
-    /// Attack speed in millihertz (number of attacks per 1000 seconds)
+    /// Attack speed in hertz (attacks per second)
     /// </summary>
-    AttackSpeed, // todo use hertz
+    AttackSpeed,
     /// <summary>
     /// Use time of an attack ability as a fraction of attack interval. The rest is attack cooldown.
     /// </summary>

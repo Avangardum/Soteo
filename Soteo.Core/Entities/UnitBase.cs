@@ -19,7 +19,7 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEnti
             [Stat.MoveSpeed] = (5, 50, 500),
             [Stat.TurnSpeed] = (36, 360, 3600),
             [Stat.AttackDamage] = (0, 50, double.PositiveInfinity),
-            [Stat.AttackSpeed] = (100, 1000, 10_000),
+            [Stat.AttackSpeed] = (0.1, 1, 10),
             [Stat.AttackUseTimeFraction] = (0, 0.5, 1),
             [Stat.AttackRange] = (10, 100, double.PositiveInfinity),
             [Stat.AttackProjectileSpeed] = (50, 500, 5000)
