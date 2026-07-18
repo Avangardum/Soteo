@@ -99,13 +99,16 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     public void Tick(double delta)
     {
         if (IsRemoved) return;
-        
         IsMoving = false;
         ProcessStatuses(delta);
+        if (IsRemoved) return;
         UpdateStats();
+        if (IsRemoved) return;
         DecreaseCooldowns(delta);
+        if (IsRemoved) return;
         ApplyRegen(delta);
-        ExecuteCommands(Node.Required, delta); // todo Required throws when status tick kills the unit
+        if (IsRemoved) return;
+        ExecuteCommands(Node.Required, delta);
     }
     
     private void DecreaseCooldowns(double delta)

@@ -120,10 +120,18 @@ public sealed class UnitTests
     [Fact]
     public void StatusRemovedOnDealAttackDamageIsRemovedAccordingly()
     {
-        _sut.AddStatus<StatusRemovedOnDealAttackDamage>(10, tickInterval: null, source: null);
+        _sut.AddStatus<StatusRemovedOnDealAttackDamage>(time: 10, tickInterval: null, source: null);
         _sut.Statuses.Should().NotBeEmpty();
         _sut.DealAttackDamageTo(_sut, Ability.Instance<MeleeAttackAbility>());
         _sut.Statuses.Should().BeEmpty();
+    }
+    
+    [Fact]
+    public void DieOnTickStatusKillsItsUnitWhenTicked()
+    {
+        _sut.AddStatus<DieOnTickStatus>(time: 10, tickInterval: 1, source: null);
+        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
+        _sut.IsDead.Should().BeTrue();
     }
     
     private sealed class Sut : Unit
@@ -190,5 +198,11 @@ public sealed class UnitTests
             base.OnDealAttackDamage(context, target, damage);
             context.Unit.RemoveStatus(context.Id);
         }
+    }
+    
+    public sealed class DieOnTickStatus : Status
+    {
+        public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
+        public override void Tick(StatusContext context, double delta) => context.Unit.Die();
     }
 }
