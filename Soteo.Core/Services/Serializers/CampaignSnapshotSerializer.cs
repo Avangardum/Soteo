@@ -62,7 +62,7 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
     private void SerializePlayerCharacterTrackerSnapshot(PlayerCharacterTrackerSnapshot value, Stream stream)
     {
         s.SerializeGuid(value.Id, stream);
-        s.SerializeNullableStruct(value.PlayerId, s.SerializeGuid, stream);
+        s.SerializeGuid(value.PlayerId, stream);
         s.SerializeNullableStruct(value.ShardId, s.SerializeGuid, stream);
     }
     
@@ -71,7 +71,7 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
         return new()
         {
             Id = s.DeserializeGuid(stream),
-            PlayerId = s.DeserializeNullableStruct(s.DeserializeGuid, stream),
+            PlayerId = s.DeserializeGuid(stream),
             ShardId = s.DeserializeNullableStruct(s.DeserializeGuid, stream),
         };
     }

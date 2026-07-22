@@ -45,15 +45,16 @@ public sealed class CampaignSnapshotManagerTests
     }
     
     [Fact]
-    public async Task SnapshotContainsPlayerCharactersFromRepository()
+    public async Task SnapshotContainsPlayerCharacterTrackersFromRepository()
     {
-        var char1 = CreatePlayerCharacterInShard(Guid.NewGuid());
-        var char2 = CreatePlayerCharacterInShard(null);
+        User player = CreatePlayer();
+        PlayerCharacterTracker char1Tracker = CreatePlayerCharacterTracker(Guid.NewGuid(), player);
+        PlayerCharacterTracker char2Tracker = CreatePlayerCharacterTracker(null, player);
         
         CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
         
-        snapshot.CampaignServer.PlayerCharacterTrackers[char1.Id].Should().Be(char1.ToSnapshot());
-        snapshot.CampaignServer.PlayerCharacterTrackers[char2.Id].Should().Be(char2.ToSnapshot());
+        snapshot.CampaignServer.PlayerCharacterTrackers[char1Tracker.Id].Should().Be(char1Tracker.ToSnapshot());
+        snapshot.CampaignServer.PlayerCharacterTrackers[char2Tracker.Id].Should().Be(char2Tracker.ToSnapshot());
     }
     
     [Fact]
@@ -305,11 +306,11 @@ public sealed class CampaignSnapshotManagerTests
         return shard;
     }
     
-    private PlayerCharacterTracker CreatePlayerCharacterInShard(Guid? shardId)
+    private PlayerCharacterTracker CreatePlayerCharacterTracker(Guid? shardId, User player)
     {
-        var character = new PlayerCharacterTracker { Id = Guid.NewGuid(), ShardId = shardId };
-        _trackerRepo.Add(character);
-        return character;
+        var tracker = new PlayerCharacterTracker { Id = Guid.NewGuid(), ShardId = shardId, Player = player };
+        _trackerRepo.Add(tracker);
+        return tracker;
     }
     
     private (Guid Shard1Id, Guid Shard2Id, CampaignSnapshot Snapshot) CreateSnapshotWith2ShardSnapshots()
