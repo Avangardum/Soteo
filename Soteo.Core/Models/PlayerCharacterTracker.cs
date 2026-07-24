@@ -8,7 +8,7 @@ public sealed record PlayerCharacterTracker
 {
     public required Guid Id { get; init; }
     public required User Player { get; set; }
-    public Guid? ShardId { get; set; } // todo make Shard
+    public User? Shard { get; set; }
     
     public static PlayerCharacterTracker FromSnapshot
     (
@@ -20,7 +20,7 @@ public sealed record PlayerCharacterTracker
         {
             Id = snapshot.Id,
             Player = userRepository[snapshot.PlayerId],
-            ShardId = snapshot.ShardId,
+            Shard = snapshot.ShardId?.PassTo(it => userRepository[it]),
         };
     }
     
@@ -30,7 +30,7 @@ public sealed record PlayerCharacterTracker
         {
             Id = Id,
             PlayerId = Player.Id,
-            ShardId = ShardId,
+            ShardId = Shard?.Id,
         };
     }
 }

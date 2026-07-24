@@ -28,8 +28,8 @@ public sealed class CampaignServerSpawnCharacterPacketHandler
             tracker = new PlayerCharacterTracker { Id = packet.CharacterId, Player = sender };
             trackerRepo.Add(tracker);
         }
-        if (tracker.ShardId != null) return;
-        tracker.ShardId = packet.PeerId;
+        if (tracker.Shard != null) return;
+        tracker.Shard = receiver;
         packetSender.RelayFrom(packet, senderId);
     }
 }

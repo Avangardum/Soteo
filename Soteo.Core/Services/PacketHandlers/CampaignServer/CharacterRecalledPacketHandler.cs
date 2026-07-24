@@ -10,6 +10,6 @@ public sealed class CharacterRecalledPacketHandler(IPlayerCharacterTrackerReposi
 {
     protected override void Handle(CharacterRecalledPacket packet, Guid senderId)
     {
-        playerCharTrackerRepository[packet.CharacterId].ShardId = null;
+        playerCharTrackerRepository[packet.CharacterId].Shard = null;
     }
 }

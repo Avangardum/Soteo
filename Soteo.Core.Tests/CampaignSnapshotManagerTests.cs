@@ -48,7 +48,8 @@ public sealed class CampaignSnapshotManagerTests
     public async Task SnapshotContainsPlayerCharacterTrackersFromRepository()
     {
         User player = CreatePlayer();
-        PlayerCharacterTracker char1Tracker = CreatePlayerCharacterTracker(Guid.NewGuid(), player);
+        User shard = CreateShard();
+        PlayerCharacterTracker char1Tracker = CreatePlayerCharacterTracker(shard, player);
         PlayerCharacterTracker char2Tracker = CreatePlayerCharacterTracker(null, player);
         
         CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
@@ -211,7 +212,7 @@ public sealed class CampaignSnapshotManagerTests
         {
             Id = characterId,
             Player = expectedPlayer,
-            ShardId = shardId,
+            Shard = expectedShard,
         };
         _trackerRepo.Should().ContainValue(expectedCharTracker);
     }
@@ -306,9 +307,9 @@ public sealed class CampaignSnapshotManagerTests
         return shard;
     }
     
-    private PlayerCharacterTracker CreatePlayerCharacterTracker(Guid? shardId, User player)
+    private PlayerCharacterTracker CreatePlayerCharacterTracker(User? shard, User player)
     {
-        var tracker = new PlayerCharacterTracker { Id = Guid.NewGuid(), ShardId = shardId, Player = player };
+        var tracker = new PlayerCharacterTracker { Id = Guid.NewGuid(), Shard = shard, Player = player };
         _trackerRepo.Add(tracker);
         return tracker;
     }
