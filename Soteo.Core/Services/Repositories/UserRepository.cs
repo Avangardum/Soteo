@@ -6,6 +6,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Services.Repositories;
 
+/// <inheritdoc cref="IUserRepository" />
 public class UserRepository
 (
     IShardServerAllowlist shardServerAllowlist,

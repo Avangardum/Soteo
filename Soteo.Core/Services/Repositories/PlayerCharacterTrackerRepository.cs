@@ -5,6 +5,7 @@ using Soteo.Core.Models;
 
 namespace Soteo.Core.Services.Repositories;
 
+/// <inheritdoc cref="IPlayerCharacterTrackerRepository" />
 public sealed class PlayerCharacterTrackerRepository :
     Dictionary<Guid, PlayerCharacterTracker>, IPlayerCharacterTrackerRepository
 {

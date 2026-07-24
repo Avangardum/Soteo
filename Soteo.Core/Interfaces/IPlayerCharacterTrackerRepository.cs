@@ -3,6 +3,9 @@ using Soteo.Core.Models;
 
 namespace Soteo.Core.Interfaces;
 
+/// <summary>
+/// Campaign server repository containing trackers for all player characters
+/// </summary>
 public interface IPlayerCharacterTrackerRepository : IDictionary<Guid, PlayerCharacterTracker>
 {
     void Add(PlayerCharacterTracker playerCharacter);

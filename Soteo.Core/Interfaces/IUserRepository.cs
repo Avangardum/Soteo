@@ -3,6 +3,9 @@ using Soteo.Core.Models;
 
 namespace Soteo.Core.Interfaces;
 
+/// <summary>
+/// Campaign server repository containing all users ever connected
+/// </summary>
 public interface IUserRepository : IDictionary<Guid, User>
 {
     void Add(User user);

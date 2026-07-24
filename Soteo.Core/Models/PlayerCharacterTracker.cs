@@ -3,7 +3,9 @@ using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Models;
 
-// todo summary
+/// <summary>
+/// Campaign server object storing information about a player character
+/// </summary>
 public sealed record PlayerCharacterTracker
 {
     public required Guid Id { get; init; }

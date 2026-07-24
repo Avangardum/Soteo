@@ -2,6 +2,10 @@ using Soteo.Core.Dto.Snapshots;
 
 namespace Soteo.Core.Models;
 
+/// <summary>
+/// Campaign server object representing a user. User can be any other party connected to the campaign server such as
+/// a player client or a shard server.
+/// </summary>
 public sealed record User
 {
     public required Guid Id { get; init; }
