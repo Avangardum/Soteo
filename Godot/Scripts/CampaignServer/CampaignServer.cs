@@ -78,7 +78,7 @@ public sealed class CampaignServer : Node
     
     private async Task TestLifetimeAsync()
     {
-        var persistenceService = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
+        var snapshotManager = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
         var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
         var userRepo = ServiceProvider.GetRequiredService<IUserRepository>();
         var communicator = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
@@ -92,7 +92,7 @@ public sealed class CampaignServer : Node
         {
             var bytes = File.ReadAllBytes(EnvironmentVariables.CampaignSnapshotPath);
             var snapshot = snapshotSerializer.Deserialize(bytes);
-            await persistenceService.ReplicateSnapshotAsync(snapshot);
+            await snapshotManager.ReplicateSnapshotAsync(snapshot);
         }
         
         await Task.Delay(TimeSpan.FromSeconds(15));
@@ -102,7 +102,7 @@ public sealed class CampaignServer : Node
         packetSender.BroadcastToAll(new PausePacket { Pause = true });
 
         {
-            CampaignSnapshot snapshot = await persistenceService.CreateSnapshotAsync();
+            CampaignSnapshot snapshot = await snapshotManager.CreateSnapshotAsync();
             var bytes = snapshotSerializer.Serialize(snapshot);
             File.WriteAllBytes(EnvironmentVariables.CampaignSnapshotPath, bytes);
         }
