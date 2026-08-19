@@ -19,4 +19,5 @@ public enum PacketTypeCode : byte
     ShardSnapshot,
     ShardSnapshotDelta,
     ShardSnapshotReplicated,
+    SynchronizedCampaignState,
 }

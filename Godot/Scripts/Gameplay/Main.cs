@@ -85,6 +85,7 @@ public sealed class Main : Node2D, IShardLoader
     {
         services.AddSingleton(this);
         services.AddSingleton<IShardLoader>(this);
+        services.AddSingleton(GetTree());
         services.AddSingleton<IShardServiceProviders>(new ShardServiceProviders(_shardServiceScopes));
         services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
         services.AddSingleton<IPacketHandler, GameplayRoutingPacketHandler>();
@@ -107,6 +108,10 @@ public sealed class Main : Node2D, IShardLoader
         services.AddAlias<IEntitySnapshotManager, EntityManager>();
         services.AddScoped<IEntityNodeManager, EntityNodeManager>();
         services.AddSingleton<TimeProvider>(new GodotTimeProvider(GetTree()));
+        services.AddSingleton<SynchronizedCampaignStatePuppetRepository>();
+        services.AddAlias<ISynchronizedCampaignStatePuppetRepository, SynchronizedCampaignStatePuppetRepository>();
+        services.AddAlias<ISynchronizedCampaignStatePacketReceiver, SynchronizedCampaignStatePuppetRepository>();
+        services.AddSingleton<SceneTreePauser>();
         
         foreach (Type type in PacketSerializer.AllTypes(typeLocator))
             services.AddSingleton(type);
@@ -217,6 +222,8 @@ public sealed class Main : Node2D, IShardLoader
     
     private void CreateSingletonServices(IServiceProvider serviceProvider)
     {
+        serviceProvider.GetRequiredService<SceneTreePauser>();
+        
         if (SharedCmdLineArgs.Side == Side.Client)
         {
             serviceProvider.GetRequiredService<LogInScreen>();

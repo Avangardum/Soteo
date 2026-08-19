@@ -63,6 +63,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<TimeProvider>(new GodotTimeProvider(GetTree()));
         services.AddSingleton<ICampaignSnapshotSerializer, CampaignSnapshotSerializer>();
         services.AddSingleton<IShardServerAllowlist>(ShardServerAllowlist.Enabled(CampaignServerCmdLineArgs.ShardIds));
+        services.AddSingleton<ISynchronizedCampaignStateRepository, SynchronizedCampaignStateRepository>();
         
         if (_useJsmq)
             services.AddSingleton<IFromCampaignServerCommunicator, JsmqFromCampaignServerCommunicator>();
