@@ -11,13 +11,25 @@ public sealed class SynchronizedCampaignStatePuppetRepository :
 {
     public event Action Changed = delegate {};
     
+    private SynchronizedCampaignState? _value;
+    
     /// <inheritdoc/>
-    public SynchronizedCampaignState? Value { get; private set; }
+    public SynchronizedCampaignState Value
+    {
+        get
+        {
+            return _value ??
+                throw new InvalidOperationException("SynchronizedCampaignState is not yet received");
+        }
+    }
+    
+    public bool IsInitialized { get; private set; }
 
     public void ReceiveSynchronizedCampaignStatePacket(SynchronizedCampaignStatePacket packet)
     {
-        if (Value == packet.Value) return;
-        Value = packet.Value;
+        if (_value == packet.Value) return;
+        _value = packet.Value;
+        IsInitialized = true;
         Changed();
     }
 }

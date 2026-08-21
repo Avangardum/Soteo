@@ -5,5 +5,8 @@ using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
-public sealed class UseAbilityPacketHandler(IEntityManager entityManager, IPauseRepository pauseRepo) :
-    CommandPacketHandler<UseAbilityPacket, UseAbilityCommand>(entityManager, pauseRepo);
+public sealed class UseAbilityPacketHandler
+(
+    IEntityManager entityManager,
+    ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo
+) : CommandPacketHandler<UseAbilityPacket, UseAbilityCommand>(entityManager, synchronizedCampaignStateRepo);

@@ -9,5 +9,5 @@ namespace Soteo.Core.Dto;
 /// </summary>
 public sealed record SynchronizedCampaignState
 {
-    public bool IsPaused { get; init; } 
+    public bool IsPaused { get; init; } = true;
 }

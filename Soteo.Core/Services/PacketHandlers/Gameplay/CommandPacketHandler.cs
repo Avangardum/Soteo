@@ -9,12 +9,13 @@ namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 public abstract class CommandPacketHandler<TPacket, TCommand>
 (
     IEntityManager entityManager,
-    IPauseRepository pauseRepo
+    ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo
 ) : PacketHandler<TPacket> where TPacket : CommandPacket<TCommand> where TCommand : ICommand
 {
     protected override void Handle(TPacket packet, Guid senderId)
     {
-        if (pauseRepo.IsPaused) return;
+        // TODO ensure this runs only when initialized
+        if (synchronizedCampaignStateRepo.Value.IsPaused) return;
         ICommandableUnit? unit = entityManager.GetEntity<ICommandableUnit>(packet.UnitId);
         if (unit != null && unit.ControllingPlayerIds.Contains(senderId))
             unit.SetCommand(packet.Command);

@@ -15,6 +15,7 @@ using Soteo.Core.Services.Serializers.PacketSerializers;
 using Soteo.Core.StaticHelpers;
 using Soteo.Main.CampaignServer.Communicators;
 using Soteo.Main.Shared;
+using Soteo.Main.Shared.Nodes;
 using Soteo.Util;
 using File = System.IO.File;
 
@@ -27,6 +28,8 @@ public sealed class CampaignServer : Node
     private readonly LateInit<IFromCampaignServerCommunicator> _communicator = new();
     private readonly LateInit<IServiceProvider> _serviceProvider = new();
     
+    private IProcessPublisher? _processPublisher;
+    
     private IServiceProvider ServiceProvider => _serviceProvider.Value;
     
     public override void _Ready()
@@ -34,6 +37,7 @@ public sealed class CampaignServer : Node
         GlobalInit.Init();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
+        CreateSingletonNodes();
         _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
         _communicator.Value = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
         TestLifetimeAsync().CollectException();
@@ -51,6 +55,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IFromCampaignServerPacketSender, IFromCampaignServerCommunicator>();
+        services.AddAlias<IConnectionNotifier, IFromCampaignServerCommunicator>();
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         services.AddSingleton<ITypeLocator>(new TypeLocator(SoteoCoreAssembly.Value));
         services.AddSingleton<CampaignSnapshotManager>();
@@ -64,6 +69,7 @@ public sealed class CampaignServer : Node
         services.AddSingleton<ICampaignSnapshotSerializer, CampaignSnapshotSerializer>();
         services.AddSingleton<IShardServerAllowlist>(ShardServerAllowlist.Enabled(CampaignServerCmdLineArgs.ShardIds));
         services.AddSingleton<ISynchronizedCampaignStateRepository, SynchronizedCampaignStateRepository>();
+        services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         
         if (_useJsmq)
             services.AddSingleton<IFromCampaignServerCommunicator, JsmqFromCampaignServerCommunicator>();
@@ -77,31 +83,40 @@ public sealed class CampaignServer : Node
             services.AddSingleton(type);
     }
     
+    private void CreateSingletonNodes()
+    {
+        _processPublisher = new ProcessPublisher().Also(it => AddChild(it));
+    }
+    
     private async Task TestLifetimeAsync()
     {
         var snapshotManager = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
         var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
         var userRepo = ServiceProvider.GetRequiredService<IUserRepository>();
         var communicator = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
+        var synchronizedCampaignStateRepo = ServiceProvider.GetRequiredService<ISynchronizedCampaignStateRepository>();
+        var timeProvider = ServiceProvider.GetRequiredService<TimeProvider>();
 
         await userRepo.WaitForUsersToConnectAsync(CampaignServerCmdLineArgs.ShardIds, timeout: 10);
         communicator.AllowPlayerConnections = true;
         
-        if (CampaignServerCmdLineArgs.IsSingleplayer) return;
-        
-        if (File.Exists(EnvironmentVariables.CampaignSnapshotPath))
+        if (!CampaignServerCmdLineArgs.IsSingleplayer && File.Exists(EnvironmentVariables.CampaignSnapshotPath))
         {
             var bytes = File.ReadAllBytes(EnvironmentVariables.CampaignSnapshotPath);
             var snapshot = snapshotSerializer.Deserialize(bytes);
             await snapshotManager.ReplicateSnapshotAsync(snapshot);
         }
         
-        await Task.Delay(TimeSpan.FromSeconds(15));
-        var packetSender = ServiceProvider.GetRequiredService<IFromCampaignServerPacketSender>();
-        packetSender.BroadcastToAll(new PausePacket { Pause = false });
-        await Task.Delay(TimeSpan.FromSeconds(15));
-        packetSender.BroadcastToAll(new PausePacket { Pause = true });
+        GD.Print(1);
+        await timeProvider.Delay(TimeSpan.FromSeconds(15));
+        GD.Print(2);
+        synchronizedCampaignStateRepo.Value = synchronizedCampaignStateRepo.Value with { IsPaused = false };
+        GD.Print(3);
+        await timeProvider.Delay(TimeSpan.FromSeconds(15));
+        GD.Print(4);
+        synchronizedCampaignStateRepo.Value = synchronizedCampaignStateRepo.Value with { IsPaused = true };
 
+        if (!CampaignServerCmdLineArgs.IsSingleplayer)
         {
             CampaignSnapshot snapshot = await snapshotManager.CreateSnapshotAsync();
             var bytes = snapshotSerializer.Serialize(snapshot);

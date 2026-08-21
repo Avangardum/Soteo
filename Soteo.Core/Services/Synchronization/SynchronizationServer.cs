@@ -12,7 +12,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     private readonly IFromGameplayPacketSender _packetSender;
     private readonly IConnectionNotifier _connectionNotifier;
     private readonly IFrameStopwatch _frameStopwatch;
-    private readonly IPauseRepository _pauseRepo;
+    private readonly ISynchronizedCampaignStatePuppetRepository _synchronizedCampaignStateRepo;
     private readonly ICurrentTickRepository _tickRepo;
 
     private ShardSnapshot? _prevShardSnapshot;
@@ -26,7 +26,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         IConnectionNotifier connectionNotifier,
         IProcessPublisher processPublisher,
         IFrameStopwatch frameStopwatch,
-        IPauseRepository pauseRepo,
+        ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo,
         ICurrentTickRepository tickRepo
     )
     {
@@ -34,7 +34,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         _packetSender = packetSender;
         _connectionNotifier = connectionNotifier;
         _frameStopwatch = frameStopwatch;
-        _pauseRepo = pauseRepo;
+        _synchronizedCampaignStateRepo = synchronizedCampaignStateRepo;
         _tickRepo = tickRepo;
         
         connectionNotifier.PeerConnected += OnPeerConnected;
@@ -56,6 +56,8 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 
     private void Tick(double delta)
     {
+        if (!_synchronizedCampaignStateRepo.IsInitialized) return;
+        
         var entitySnapshots = _entitySnapshotManager.CreateEntityPuppetSnapshots();
         var shardSnapshot = new ShardSnapshot { Tick = _tickRepo.Value, Entities = entitySnapshots };
         
@@ -81,7 +83,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
             _packetSender.BroadcastReliable(shardSnapshotDeltaPacket);
         }
 
-        if (!_pauseRepo.IsPaused)
+        if (!_synchronizedCampaignStateRepo.Value.IsPaused)
             _tickRepo.Value++;
     }
 

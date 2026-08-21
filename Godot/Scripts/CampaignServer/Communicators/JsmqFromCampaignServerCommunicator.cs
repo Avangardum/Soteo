@@ -18,6 +18,10 @@ public sealed class JsmqFromCampaignServerCommunicator
     private readonly HashSet<Guid> _peerIds = [];
 
     public bool AllowPlayerConnections { get; set; }
+    
+    // TODO invoke
+    public event Action<Guid> PeerConnected = delegate {};
+    public event Action<Guid> PeerDisconnected = delegate {};
 
     public void Poll()
     {

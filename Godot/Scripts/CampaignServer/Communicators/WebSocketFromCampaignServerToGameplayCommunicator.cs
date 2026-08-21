@@ -22,6 +22,9 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
     private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = [];
 
     public bool AllowPlayerConnections { get; set; }
+    
+    public event Action<Guid> PeerConnected = delegate {};
+    public event Action<Guid> PeerDisconnected = delegate {};
 
     public WebSocketFromCampaignServerToGameplayCommunicator
     (
@@ -91,7 +94,10 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
     private void OnClientDisconnected(int wsPeerId, bool wasClean)
     {
         if (_userIdsByWsPeerId.TryGetValue(wsPeerId, out Guid userId))
+        {
             _userRepo.OnDisconnected(userId);
+            PeerDisconnected(userId);
+        }
         _userIdsByWsPeerId.Remove(wsPeerId);
     }
     
@@ -167,10 +173,12 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         {
             _wsServer.DisconnectPeer(oldWsPeerId, 1000, "New connection opened");
             _userIdsByWsPeerId.Remove(oldWsPeerId);
+            PeerDisconnected(userId);
         }
 
         _userIdsByWsPeerId[wsPeerId] = userId;
         _userRepo.OnConnected(claims);
+        PeerConnected(userId);
     }
     
     private async void HandlePacket(Packet packet, Guid senderId)

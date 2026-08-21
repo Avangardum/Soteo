@@ -10,7 +10,6 @@ public enum PacketTypeCode : byte
     SpawnCharacter,
     WebrtcSdp,
     WebrtcIceCandidate,
-    Pause,
     CharacterRecalled,
     Move,
     UseAbility,

@@ -1,4 +1,5 @@
 using NSubstitute;
+using Soteo.Core.Dto;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Services.PacketHandlers.Gameplay;
@@ -9,7 +10,7 @@ public sealed class CommandPacketHandlerTests
 {
     private readonly Sut _sut;
     private readonly IEntityManager _entityManager;
-    private readonly IPauseRepository _pauseRepo;
+    private readonly ISynchronizedCampaignStatePuppetRepository _synchronizedCampaignStateRepo;
     private readonly Guid _unitId;
     private readonly Guid _controllingPlayerId;
     private readonly ICommandableUnit _unit;
@@ -18,8 +19,8 @@ public sealed class CommandPacketHandlerTests
     public CommandPacketHandlerTests()
     {
         _entityManager = Substitute.For<IEntityManager>();
-        _pauseRepo = Substitute.For<IPauseRepository>();
-        _sut = new Sut(_entityManager, _pauseRepo);
+        _synchronizedCampaignStateRepo = Substitute.For<ISynchronizedCampaignStatePuppetRepository>();
+        _sut = new Sut(_entityManager, _synchronizedCampaignStateRepo);
         _unitId = Guid.NewGuid();
         _unit = Substitute.For<ICommandableUnit>();
         _unit.Id.Returns(_unitId);
@@ -40,7 +41,7 @@ public sealed class CommandPacketHandlerTests
     [Fact]
     public async Task HandlingPacketFromControllingPlayerWhilePausedDoesNotSetUnitCommand()
     {
-        _pauseRepo.IsPaused.Returns(true);
+        _synchronizedCampaignStateRepo.Value.Returns(new SynchronizedCampaignState { IsPaused = true });
         var packet = new TestCommandPacket { UnitId = _unitId, Command = _command };
         await _sut.HandleAsync(packet, _controllingPlayerId);
         _unit.Received(0).SetCommand(_command);
@@ -62,7 +63,7 @@ public sealed class CommandPacketHandlerTests
         _unit.Received(0).SetCommand(Arg.Any<ICommand>());
     }
     
-    private class Sut(IEntityManager entityManager, IPauseRepository pauseRepo) :
+    private class Sut(IEntityManager entityManager, ISynchronizedCampaignStatePuppetRepository pauseRepo) :
         CommandPacketHandler<TestCommandPacket, TestCommand>(entityManager, pauseRepo);
 
     private record TestCommandPacket : CommandPacket<TestCommand>;

@@ -5,5 +5,7 @@ using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
-public sealed class MovePacketHandler(IEntityManager entityManager, IPauseRepository pauseRepo) :
-    CommandPacketHandler<MovePacket, MoveCommand>(entityManager, pauseRepo);
+public sealed class MovePacketHandler
+(
+    IEntityManager entityManager, ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo
+) : CommandPacketHandler<MovePacket, MoveCommand>(entityManager, synchronizedCampaignStateRepo);

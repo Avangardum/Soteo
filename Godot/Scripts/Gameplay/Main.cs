@@ -61,8 +61,6 @@ public sealed class Main : Node2D, IShardLoader
         if (SharedCmdLineArgs.Side == Side.ShardServer)
         {
             LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
-            if (!SharedCmdLineArgs.IsSingleplayer)
-                _rootServiceProvider.GetRequiredService<IPauseRepository>().IsPaused = true;
         }
     }
     
@@ -93,7 +91,6 @@ public sealed class Main : Node2D, IShardLoader
         services.AddSingleton<IEntityNodePool, EntityNodePool>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
-        services.AddSingletonNode<IPauseRepository>("/root/PauseRepository");
         services.AddSingleton<ISideDetector>(new SideDetector(SharedCmdLineArgs.Side));
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);

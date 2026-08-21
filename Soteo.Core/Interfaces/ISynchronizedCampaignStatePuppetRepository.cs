@@ -6,10 +6,6 @@ namespace Soteo.Core.Interfaces;
 public interface ISynchronizedCampaignStatePuppetRepository
 {
     event Action Changed;
-    
-    /// <summary>
-    /// Last known state. Can be null if disconnected or connected recently.
-    /// Guaranteed to be not null while handling any packet except the one setting the initial state.
-    /// </summary>
-    SynchronizedCampaignState? Value { get; }
+    SynchronizedCampaignState Value { get; }
+    bool IsInitialized { get; }
 }
