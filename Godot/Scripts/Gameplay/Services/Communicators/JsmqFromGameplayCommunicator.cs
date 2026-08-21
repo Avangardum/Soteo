@@ -44,6 +44,7 @@ public sealed class JsmqFromGameplayCommunicator :
         _sideDetector = sideDetector;
         
         Name = nameof(JsmqFromGameplayCommunicator);
+        PauseMode = PauseModeEnum.Process;
     }
 
     public override void _Ready()
@@ -89,6 +90,7 @@ public sealed class JsmqFromGameplayCommunicator :
     {
         while (true)
         {
+            if (_currentUserIdRepository.Value == null) return;
             string? base64 = (string?)JavaScript.Eval($"""jsmq.receive("{_currentUserIdRepository.Value}")""");
             if (base64 == null) return;
             byte[] bytes = Convert.FromBase64String(base64);

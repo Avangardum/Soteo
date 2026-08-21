@@ -107,19 +107,15 @@ public sealed class CampaignServer : Node
             await snapshotManager.ReplicateSnapshotAsync(snapshot);
         }
         
-        GD.Print(1);
         await timeProvider.Delay(TimeSpan.FromSeconds(15));
-        GD.Print(2);
         synchronizedCampaignStateRepo.Value = synchronizedCampaignStateRepo.Value with { IsPaused = false };
-        GD.Print(3);
         await timeProvider.Delay(TimeSpan.FromSeconds(15));
-        GD.Print(4);
         synchronizedCampaignStateRepo.Value = synchronizedCampaignStateRepo.Value with { IsPaused = true };
 
         if (!CampaignServerCmdLineArgs.IsSingleplayer)
         {
             CampaignSnapshot snapshot = await snapshotManager.CreateSnapshotAsync();
-            var bytes = snapshotSerializer.Serialize(snapshot);
+            byte[] bytes = snapshotSerializer.Serialize(snapshot);
             File.WriteAllBytes(EnvironmentVariables.CampaignSnapshotPath, bytes);
         }
     }
