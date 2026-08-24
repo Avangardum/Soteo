@@ -1,5 +1,6 @@
 namespace Soteo.Core.Enums;
 
+// todo dynamic type codes
 public enum PacketTypeCode : byte
 {
     Chunk,
@@ -19,4 +20,7 @@ public enum PacketTypeCode : byte
     ShardSnapshotDelta,
     ShardSnapshotReplicated,
     SynchronizedCampaignState,
+    NoInitialShardSnapshot,
+    CampaignInitialized,
+    ShardServerInitAwaitingCampaignServerInit,
 }

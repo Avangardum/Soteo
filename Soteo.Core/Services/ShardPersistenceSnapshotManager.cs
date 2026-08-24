@@ -12,6 +12,8 @@ public sealed class ShardPersistenceSnapshotManager
     IFromGameplayPacketSender packetSender
 ) : IShardPersistenceSnapshotManager
 {
+    public event Action SnapshotReplicated = delegate { };
+    
     public ShardSnapshot CreateSnapshot()
     {
         return new ShardSnapshot
@@ -26,5 +28,6 @@ public sealed class ShardPersistenceSnapshotManager
         tickRepo.Value = snapshot.Tick;
         entitySnapshotManager.ReplicateEntitySnapshots(snapshot.Entities);
         packetSender.SendReliable(new ShardSnapshotReplicatedPacket(), Const.CampaignServerId);
+        SnapshotReplicated();
     }
 }

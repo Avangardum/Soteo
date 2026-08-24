@@ -19,17 +19,14 @@ public sealed class SynchronizedCampaignStatePuppetRepository :
         get
         {
             return _value ??
-                throw new InvalidOperationException("SynchronizedCampaignState is not yet received");
+                throw new InvalidOperationException("This API should not be used until the app is initialized");
         }
     }
-    
-    public bool IsInitialized { get; private set; }
 
     public void ReceiveSynchronizedCampaignStatePacket(SynchronizedCampaignStatePacket packet)
     {
         if (_value == packet.Value) return;
         _value = packet.Value;
-        IsInitialized = true;
         Changed();
     }
 }

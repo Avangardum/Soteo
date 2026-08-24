@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core;
 using Soteo.Core.Attributes;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Services;
@@ -18,17 +19,22 @@ using Soteo.Main.Gameplay.Services.Communicators;
 using Soteo.Main.Gameplay.Ui;
 using Soteo.Main.Shared;
 using Soteo.Main.Shared.Nodes;
+using Soteo.Util;
 
 namespace Soteo.Main.Gameplay;
 
-public sealed class Main : Node2D, IShardLoader
+public sealed class Main : Node2D, IShardLoader, IGameplayInitPacketReceiver, IInitializationRepository
 {
-    // This class handles scene loading and dependency injection.
+    // Client and shard server entry point.
+    // Handles scene loading and dependency injection.
     // A service scope corresponds to a shard.
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
     private readonly bool _useJsmq = OS.HasFeature("web") && SharedCmdLineArgs.IsSingleplayer;
+    private readonly TaskCompletionSource _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs = new();
+    private readonly TaskCompletionSource _synchronizedCampaignStateInitializedTcs = new();
+    private readonly TaskCompletionSource _campaignInitializedTcs = new();
 
     private LogInScreenNode? _logIScreenNode;
     private HudNode? _hudNode;
@@ -46,21 +52,41 @@ public sealed class Main : Node2D, IShardLoader
     private ShardNode? _newScopeShard;
     private readonly Dictionary<Guid, IServiceScope> _shardServiceScopes = [];
     
-    public override void _Ready()
+    public bool Initialized { get; private set; }
+    
+    public override async void _Ready()
     {
-        GlobalInit.Init();
-        var serviceCollection = new ServiceCollection();
-        RegisterServices(serviceCollection);
-        _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
-        GetNodes();
-        CreateSingletonNodes();
-        CreateSingletonServices(_rootServiceProvider);
-        
-        _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
-        
-        if (SharedCmdLineArgs.Side == Side.ShardServer)
+        try
         {
-            LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
+            GlobalInit.Init();
+            var serviceCollection = new ServiceCollection();
+            RegisterServices(serviceCollection);
+            _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
+            GetNodes();
+            CreateSingletonNodes();
+            CreateSingletonServices(_rootServiceProvider);
+
+            _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
+
+            if (SharedCmdLineArgs.Side == Side.ShardServer)
+            {
+                LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
+                _rootServiceProvider = _shardServiceScopes[ShardServerCmdLineArgs.ShardId].ServiceProvider;
+                _rootServiceProvider.GetRequiredService<IShardPersistenceSnapshotManager>().SnapshotReplicated +=
+                    () => _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.TrySetResult();
+                _rootServiceProvider.GetRequiredService<ISynchronizedCampaignStatePuppetRepository>().Changed +=
+                    () => _synchronizedCampaignStateInitializedTcs.TrySetResult();
+                await _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.Task;
+                await _synchronizedCampaignStateInitializedTcs.Task;
+                _rootServiceProvider.GetRequiredService<IFromGameplayPacketSender>()
+                    .SendReliable(new ShardServerInitAwaitingCampaignServerInitPacket(), Const.CampaignServerId);
+                await _campaignInitializedTcs.Task;
+                Initialized = true;
+            }
+        }
+        catch (Exception e)
+        {
+            AsyncExceptionCollector.Collect(e);
         }
     }
     
@@ -83,6 +109,8 @@ public sealed class Main : Node2D, IShardLoader
     {
         services.AddSingleton(this);
         services.AddSingleton<IShardLoader>(this);
+        services.AddSingleton<IInitializationRepository>(this);
+        services.AddSingleton<IGameplayInitPacketReceiver>(this);
         services.AddSingleton(GetTree());
         services.AddSingleton<IShardServiceProviders>(new ShardServiceProviders(_shardServiceScopes));
         services.AddSingleton<ICurrentUserIdRepository, CurrentUserIdRepository>();
@@ -263,5 +291,15 @@ public sealed class Main : Node2D, IShardLoader
         CreateShardScopedNodes(shard, scope.ServiceProvider);
         CreateShardScopedServices(scope.ServiceProvider);
         _shardServiceScopes[id] = scope;
+    }
+
+    public void ReceiveNoInitialSnapshotPacket()
+    {
+        _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.TrySetResult();
+    }
+
+    public void ReceiveCampaignInitializedPacket()
+    {
+        _campaignInitializedTcs.SetResult();
     }
 }

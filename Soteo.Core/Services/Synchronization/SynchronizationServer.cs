@@ -14,6 +14,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
     private readonly IFrameStopwatch _frameStopwatch;
     private readonly ISynchronizedCampaignStatePuppetRepository _synchronizedCampaignStateRepo;
     private readonly ICurrentTickRepository _tickRepo;
+    private readonly IInitializationRepository _initRepo;
 
     private ShardSnapshot? _prevShardSnapshot;
     private readonly HashSet<Guid> _snapshotRequesters = [];
@@ -27,7 +28,8 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         IProcessPublisher processPublisher,
         IFrameStopwatch frameStopwatch,
         ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo,
-        ICurrentTickRepository tickRepo
+        ICurrentTickRepository tickRepo,
+        IInitializationRepository initRepo
     )
     {
         _entitySnapshotManager = entitySnapshotManager;
@@ -36,6 +38,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         _frameStopwatch = frameStopwatch;
         _synchronizedCampaignStateRepo = synchronizedCampaignStateRepo;
         _tickRepo = tickRepo;
+        _initRepo = initRepo;
         
         connectionNotifier.PeerConnected += OnPeerConnected;
         _physicsProcessSubscription = processPublisher
@@ -56,7 +59,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
 
     private void Tick(double delta)
     {
-        if (!_synchronizedCampaignStateRepo.IsInitialized) return;
+        if (!_initRepo.Initialized) return;
         
         var entitySnapshots = _entitySnapshotManager.CreateEntityPuppetSnapshots();
         var shardSnapshot = new ShardSnapshot { Tick = _tickRepo.Value, Entities = entitySnapshots };

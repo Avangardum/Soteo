@@ -7,5 +7,4 @@ public interface ISynchronizedCampaignStatePuppetRepository
 {
     event Action Changed;
     SynchronizedCampaignState Value { get; }
-    bool IsInitialized { get; }
 }
