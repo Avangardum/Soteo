@@ -20,6 +20,7 @@ public sealed class CommandPacketHandlerTests
     {
         _entityManager = Substitute.For<IEntityManager>();
         _synchronizedCampaignStateRepo = Substitute.For<ISynchronizedCampaignStatePuppetRepository>();
+        _synchronizedCampaignStateRepo.Value.Returns(new SynchronizedCampaignState { IsPaused = false } );
         _sut = new Sut(_entityManager, _synchronizedCampaignStateRepo);
         _unitId = Guid.NewGuid();
         _unit = Substitute.For<ICommandableUnit>();
