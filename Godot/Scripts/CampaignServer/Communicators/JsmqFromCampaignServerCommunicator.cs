@@ -19,7 +19,6 @@ public sealed class JsmqFromCampaignServerCommunicator
 
     public bool AllowPlayerConnections { get; set; }
     
-    // TODO invoke
     public event Action<Guid> PeerConnected = delegate {};
     public event Action<Guid> PeerDisconnected = delegate {};
 
@@ -44,7 +43,8 @@ public sealed class JsmqFromCampaignServerCommunicator
                 if (isPlayer && !AllowPlayerConnections)
                     throw new InvalidOperationException("Client connections are not allowed");
                 userRepo.OnConnected(claims);
-                _peerIds.Add(senderId);
+                if (_peerIds.Add(senderId))
+                    PeerConnected(senderId);
             }
             else
             {
