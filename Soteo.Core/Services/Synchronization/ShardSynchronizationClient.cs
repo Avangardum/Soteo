@@ -101,7 +101,7 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         if (State != StateEnum.Synchronized) throw new InvalidOperationException();
         
         long firstFullDeltaTick = Maths.NextIntegerToLong(prevTick);
-        long lastFullDeltaTick = Maths.FloorToLong(_syncData.Tick!.Value);
+        long lastFullDeltaTick = Maths.FloorToLong(_syncData.Tick.Required);
         
         for (long t = firstFullDeltaTick; t <= lastFullDeltaTick; t++)
             _entitySnapshotManager.ApplyDelta(_syncData.DeltaRing.RingGet(t).Required, lerpWeight: 1);
