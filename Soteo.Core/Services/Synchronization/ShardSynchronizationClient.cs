@@ -227,3 +227,6 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         public double? ServerLoad { get; set; }
     }
 }
+
+// TODO inconsistent behavior between browser and native versions: native sees spawned character immediately
+// even when paused, browser (singleplayer only) sees only after unpause
