@@ -16,11 +16,15 @@ The client sends commands to the shard server and replicates the state using sna
 
 # Entry points and dependency injection
 
-`Main` node is the entry point for the client and the shard server that sets up dependency injection and creates
+`Main` is the entry point which starts the game by reading the command line args and loading an apporopriate scene
+which contains actual startup logic.
+
+`GameplayMain` node is the entry point for the client and the shard server that sets up dependency injection and creates
 services. Scoped services are instanced once per every loaded shard.
 For the server, they are equivalent to singletons, since a shard server handles only one shard.
 For the client, they are created for each shard the client connects to and disposed on disconnect.
-`CampaignServer` node is the entry point for the campaign server.
+
+`CampaignServerMain` node is the entry point for the campaign server.
 
 Constructor dependency injection is used for all classes. When a node needs dependencies, but at the same time it needs
 to exist in a scene (which wouldn't allow using constructor injection), it's split into two classes: the plain C# class
