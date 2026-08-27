@@ -14,7 +14,6 @@ public abstract class CommandPacketHandler<TPacket, TCommand>
 {
     protected override void Handle(TPacket packet, Guid senderId)
     {
-        // TODO ensure this runs only when initialized
         if (synchronizedCampaignStateRepo.Value.IsPaused) return;
         ICommandableUnit? unit = entityManager.GetEntity<ICommandableUnit>(packet.UnitId);
         if (unit != null && unit.ControllingPlayerIds.Contains(senderId))
