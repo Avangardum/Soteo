@@ -14,10 +14,12 @@ The shard server runs with a fixed tick rate, all gameplay logic is executed exc
 
 The client sends commands to the shard server and replicates the state using snapshots and deltas sent by the server.
 
+# Entry points and dependency injection
+
 `Main` node is the entry point for the client and the shard server that sets up dependency injection and creates
 services. Scoped services are instanced once per every loaded shard.
 For the server, they are equivalent to singletons, since a shard server handles only one shard.
-For the client, they are created for each shard the client connects to.
+For the client, they are created for each shard the client connects to and disposed on disconnect.
 `CampaignServer` node is the entry point for the campaign server.
 
 Constructor dependency injection is used for all classes. When a node needs dependencies, but at the same time it needs
@@ -28,11 +30,26 @@ approach include avoidance of manual lifetime management (no need to call Free, 
 unreferenced) and ability to use object pooling separately (such as pooling nodes for performance and avoiding pooling
 plain C# objects with complex lifetime).
 
+# Concurrency
+
 Most of the codebase is thread-unaware, meaning that it works under the assumption that no other thread is performing
-any concurrent reads or writes on any state. Since Godot always calls scripts on the main thread and uses a
+any concurrent reads or writes on process state. Since Godot always calls scripts on the main thread and uses a
 synchronization context that runs async continuations on the main thread, all code runs on the main thread by default,
 unless a thread is created explicitly. If any extra threads are created explicitly, they must honor the aforementioned
 assumption by not reading or writing any state.
+
+However, when accessing data of other processes, keep in mind that it may be acessed concurently by different
+processes and apply usual concurrency control techniques.
+
+# Session lifecyle
+
+A session starts by starting the campaign server and shard servers. They begin in the uninitialized state. In this
+state the cluster works in limited mode, some invariants that are usually relied on always being true may be false
+and client connections are rejected. When started, servers establish internal connections and exchange initial data,
+such as shared campaign state and shard snapshots from a previous session, after which initialization is considered
+complete and client connections are allowed. The game, however, starts paused, to allow players to connect in advance.
+After a delay the game unpauses and the session starts. When the session ends, it's paused, then a persistence snapshot
+is created and saved for the next session.
 
 # DTO
 
@@ -87,7 +104,7 @@ tick with a fixed interval.
 # Services
 
 Services are objects that do not correspond to any specific "thing" in the game, they either perform some work
-in the background, provide methods to be used by other objects or both of these.
+in the background, provide methods to be used by other objects or both.
 
 ## Communication
 
@@ -106,4 +123,4 @@ validating them.
 
 `EntityManager` creates entities, stores the index of existing entities, notifies about entity additions and removals.
 
-`SynchronizationServer` and `SynchronizationClient` synchronize shard state between shard servers and clients.
+`ShardSynchronizationServer` and `ShardSynchronizationClient` synchronize shard state between shard servers and clients.
