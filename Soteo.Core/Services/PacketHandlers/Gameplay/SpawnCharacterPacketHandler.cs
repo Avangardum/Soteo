@@ -5,11 +5,12 @@ using Soteo.Core.Interfaces;
 namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
 [GameplayPacketHandler]
-public class SpawnCharacterPacketHandler(IEntityManager entityManager) : PacketHandler<SpawnCharacterPacket>
+public class SpawnCharacterPacketHandler(IEntityManager entityManager, TimeProvider t) : PacketHandler<SpawnCharacterPacket>
 {
-    protected override void Handle(SpawnCharacterPacket packet, Guid senderId)
+    public override async Task HandleAsync(SpawnCharacterPacket packet, Guid senderId)
     {
         // todo wait for unpause
+        await t.Delay(TimeSpan.FromSeconds(3)); // todo remove
         entityManager.SpawnPlayerCharacter(packet.CharacterId, packet.PeerId);
     }
 }

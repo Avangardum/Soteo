@@ -60,4 +60,12 @@ public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
         foreach (TKey key in RemovedKeys)
             dictionary.Remove(key);
     }
+
+    public override string ToString()
+    {
+        if (!HasChanged) return "Unchanged";
+        string changesStr = "{ " + Changes.Select(it => $"[{it.Key}] = {it.Value}").JoinToString(", ") + " }";
+        return $$"""DictionaryDelta<{{typeof(TKey).Name}}, {{typeof(TValue).Name}}>""" +
+               $$"""{ Changes = {{changesStr}}, RemovedKeys = [{{RemovedKeys.JoinToString(", ")}}] }""";
+    }
 }

@@ -10,7 +10,7 @@ public record AbilitySlotState
     public double Cooldown { get; init; }
     
     /// <summary>
-    /// Cooldown of the ability at the last moment it was used
+    /// Cooldown of the ability at the last moment it was used. Used for cooldown indicators.
     /// </summary>
     public double MaxCooldown { get; init; }
     

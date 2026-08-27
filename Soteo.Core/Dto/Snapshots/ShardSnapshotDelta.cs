@@ -18,7 +18,7 @@ public sealed record ShardSnapshotDelta
                     .Select(it => it.DeltaFrom(from.Entities.GetOrDefault(it.Id)))
                     .Where(it => it.HasChanged)
                     .ToImmutableDictionary(it => it.Id, it => it),
-                RemovedKeys = from.Entities.Keys.Except(to.Entities.Keys).ToImmutableList()
+                RemovedKeys = from.Entities.Keys.Except(to.Entities.Keys).ToImmutableList(),
             },
         };
     }

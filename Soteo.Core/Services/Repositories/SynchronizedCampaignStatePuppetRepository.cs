@@ -7,7 +7,8 @@ namespace Soteo.Core.Services.Repositories;
 /// <inheritdoc cref="ISynchronizedCampaignStateRepository" />
 public sealed class SynchronizedCampaignStatePuppetRepository :
     ISynchronizedCampaignStatePuppetRepository,
-    ISynchronizedCampaignStatePacketReceiver
+    ISynchronizedCampaignStatePacketReceiver,
+    IPauseRepository
 {
     public event Action Changed = delegate {};
     
@@ -29,4 +30,6 @@ public sealed class SynchronizedCampaignStatePuppetRepository :
         _value = packet.Value;
         Changed();
     }
+    
+    public bool IsPaused => Value.IsPaused;
 }

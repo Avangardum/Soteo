@@ -17,12 +17,7 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
     {
         return Subscribe(it => it.Process, handler, priority, callWhenPaused);
     }
-
-    public IDisposable SubscribeToProcess(Action handler, ProcessPriorityEnum priority, bool callWhenPaused)
-    {
-        return SubscribeToProcess(_ => handler(), priority, callWhenPaused);
-    }
-
+    
     public IDisposable SubscribeToPhysicsProcess
     (
         Action<double> handler,
@@ -31,11 +26,6 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
     )
     {
         return Subscribe(it => it.PhysicsProcess, handler, priority, callWhenPaused);
-    }
-
-    public IDisposable SubscribeToPhysicsProcess(Action handler, ProcessPriorityEnum priority, bool callWhenPaused)
-    {
-        return SubscribeToPhysicsProcess(_ => handler(), priority, callWhenPaused);
     }
 
     private IDisposable Subscribe

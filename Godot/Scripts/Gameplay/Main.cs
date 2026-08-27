@@ -136,6 +136,7 @@ public sealed class Main : Node2D, IShardLoader, IGameplayInitPacketReceiver, II
         services.AddSingleton<SynchronizedCampaignStatePuppetRepository>();
         services.AddAlias<ISynchronizedCampaignStatePuppetRepository, SynchronizedCampaignStatePuppetRepository>();
         services.AddAlias<ISynchronizedCampaignStatePacketReceiver, SynchronizedCampaignStatePuppetRepository>();
+        services.AddAlias<IPauseRepository, SynchronizedCampaignStatePuppetRepository>();
         services.AddSingleton<SceneTreePauser>();
         
         foreach (Type type in PacketSerializer.AllTypes(typeLocator))

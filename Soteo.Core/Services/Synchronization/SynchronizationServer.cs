@@ -6,13 +6,13 @@ using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Core.Services.Synchronization;
 
-public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
+public sealed class SynchronizationServer : ISynchronizationServer, IDisposable // todo rename (+client)
 {
     private readonly IEntitySnapshotManager _entitySnapshotManager;
     private readonly IFromGameplayPacketSender _packetSender;
     private readonly IConnectionNotifier _connectionNotifier;
     private readonly IFrameStopwatch _frameStopwatch;
-    private readonly ISynchronizedCampaignStatePuppetRepository _synchronizedCampaignStateRepo;
+    private readonly IPauseRepository _pauseRepo;
     private readonly ICurrentTickRepository _tickRepo;
     private readonly IInitializationRepository _initRepo;
 
@@ -27,7 +27,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         IConnectionNotifier connectionNotifier,
         IProcessPublisher processPublisher,
         IFrameStopwatch frameStopwatch,
-        ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo,
+        IPauseRepository pauseRepo,
         ICurrentTickRepository tickRepo,
         IInitializationRepository initRepo
     )
@@ -36,7 +36,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
         _packetSender = packetSender;
         _connectionNotifier = connectionNotifier;
         _frameStopwatch = frameStopwatch;
-        _synchronizedCampaignStateRepo = synchronizedCampaignStateRepo;
+        _pauseRepo = pauseRepo;
         _tickRepo = tickRepo;
         _initRepo = initRepo;
         
@@ -57,17 +57,13 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
             _snapshotRequesters.Add(peerId);
     }
 
-    private void Tick(double delta)
+    public void Tick(double delta)
     {
         if (!_initRepo.Initialized) return;
         
-        var entitySnapshots = _entitySnapshotManager.CreateEntityPuppetSnapshots();
+        IReadOnlyDictionary<Guid, EntitySnapshot> entitySnapshots =
+            _entitySnapshotManager.CreateEntityPuppetSnapshots();
         var shardSnapshot = new ShardSnapshot { Tick = _tickRepo.Value, Entities = entitySnapshots };
-        
-        ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
-            ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
-        _prevShardSnapshot = shardSnapshot;
-        double serverLoad = _frameStopwatch.ElapsedSincePhysicsProcess * Const.TicksPerSecond;
 
         if (_snapshotRequesters.Count > 0)
         {
@@ -75,19 +71,24 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable
             _packetSender.SendReliable(shardSnapshotPacket, _snapshotRequesters);
             _snapshotRequesters.Clear();
         }
-
+        
+        if (_pauseRepo.IsPaused) return;
+        
+        ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
+            ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
+        
         if (shardSnapshotDelta != null)
         {
             var shardSnapshotDeltaPacket = new ShardSnapshotDeltaPacket
             {
-                ServerLoad = serverLoad,
+                ServerLoad = _frameStopwatch.ElapsedSincePhysicsProcess * Const.TicksPerSecond,
                 SnapshotDelta = shardSnapshotDelta
             };
             _packetSender.BroadcastReliable(shardSnapshotDeltaPacket);
         }
-
-        if (!_synchronizedCampaignStateRepo.Value.IsPaused)
-            _tickRepo.Value++;
+        
+        _prevShardSnapshot = shardSnapshot;
+        _tickRepo.Value++;
     }
 
     public void ReceiveSnapshotRequest(Guid clientId) => _snapshotRequesters.Add(clientId);

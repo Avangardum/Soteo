@@ -19,4 +19,11 @@ public readonly record struct Delta<T>
     public T NewValue => HasChanged ? field : throw new InvalidOperationException("Value has not changed");
 
     public static implicit operator Delta<T>(T newValue) => new(newValue);
+
+    public override string ToString()
+    {
+        return HasChanged ?
+            NewValue == null ? "null" : NewValue.ToString() :
+            "Unchanged";
+    }
 }

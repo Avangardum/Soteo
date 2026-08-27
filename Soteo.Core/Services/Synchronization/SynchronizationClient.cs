@@ -70,15 +70,15 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
     {
         if (State != StateEnum.Synchronized && !TrySynchronize()) return;
         
-        if (_syncData.DeltaRingEarliestValidTick > Maths.CeilToLong(_syncData.Tick!.Value))
+        if (_syncData.DeltaRingEarliestValidTick > Maths.CeilToLong(_syncData.Tick.Required))
         {
             State = StateEnum.Desynchronized;
             return;
         }
         
         _syncData.ApproxServerTick += delta * Const.TicksPerSecond;
-        double prevTick = _syncData.Tick!.Value;
-        double prevSecond = _syncData.Second!.Value;
+        double prevTick = _syncData.Tick.Required;
+        double prevSecond = _syncData.Second.Required;
         _syncData.Tick += delta * Const.TicksPerSecond;
         if ((long)_syncData.Second > (long)prevSecond)
             _syncData.BufferTicksHistoryRing.RingSet((long)_syncData.Second, double.PositiveInfinity);
@@ -104,7 +104,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         long lastFullDeltaTick = Maths.FloorToLong(_syncData.Tick!.Value);
         
         for (long t = firstFullDeltaTick; t <= lastFullDeltaTick; t++)
-            _entitySnapshotManager.ApplyDelta(_syncData.DeltaRing.RingGet(t).Required, 1);
+            _entitySnapshotManager.ApplyDelta(_syncData.DeltaRing.RingGet(t).Required, lerpWeight: 1);
 
         if (_syncData.Tick % 1 > 0)
         {
@@ -140,8 +140,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         bool canSynchronize = _syncData.ReceivedDeltaCount >= 2;
         if (!canSynchronize) return false;
         
-        _entitySnapshotManager.ReplicateEntitySnapshots(_syncData.LastSnapshotPacket.Required.Snapshot.Entities);
-        _syncData.Tick = _syncData.LastSnapshotPacket.Snapshot.Tick;
+        _syncData.Tick = _syncData.LastSnapshotPacket.Required.Snapshot.Tick;
         State = StateEnum.Synchronized;
         return true;
     }
@@ -175,12 +174,21 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
         
         _syncData.LastSnapshotPacket = packet;
         State = StateEnum.Synchronizing;
+        _entitySnapshotManager.ReplicateEntitySnapshots(packet.Snapshot.Entities);
     }
 
     public void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet)
     {
         if (State == StateEnum.Desynchronized) return;
         
+        if (_syncData.ReceivedDeltaCount > 0 && packet.SnapshotDelta.Tick != _syncData.LastDeltaTick + 1)
+        {
+            throw new Exception
+            (
+                $"Expected delta for tick {_syncData.LastDeltaTick + 1}, received for {packet.SnapshotDelta.Tick}"
+            );
+        }
+
         _syncData.DeltaRing.RingSet(packet.SnapshotDelta.Tick, packet.SnapshotDelta);
         _syncData.ServerLoad = packet.ServerLoad;
         _syncData.ApproxServerTick =
