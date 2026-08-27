@@ -7,7 +7,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Services.Synchronization;
 
-public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
+public sealed class ShardSynchronizationClient : IShardSynchronizationClient, IDisposable
 {
     private static readonly double BufferTicksMinSafeValue = 0.05f * Const.TicksPerSecond;
     
@@ -22,7 +22,7 @@ public sealed class SynchronizationClient : ISynchronizationClient, IDisposable
 
     private SynchronizationData _syncData = new();
 
-    public SynchronizationClient
+    public ShardSynchronizationClient
     (
         IEntitySnapshotManager entitySnapshotManager,
         IShard shard,

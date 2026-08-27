@@ -10,15 +10,15 @@ using Soteo.TestUtil;
 
 namespace Soteo.Core.Tests;
 
-public sealed class SynchronizationServerTests
+public sealed class ShardSynchronizationServerTests
 {
-    private readonly SynchronizationServer _sut;
+    private readonly ShardSynchronizationServer _sut;
     private readonly CurrentTickRepository _tickRepo;
     private readonly FakePauseRepo _pauseRepo;
     private readonly FakeFromGameplayPacketSender _packetSender;
     private readonly IEntitySnapshotManager _entitySnapshotManager;
     
-    public SynchronizationServerTests()
+    public ShardSynchronizationServerTests()
     {
         _tickRepo = new CurrentTickRepository();
         _entitySnapshotManager = Substitute.For<IEntitySnapshotManager>();
@@ -28,7 +28,7 @@ public sealed class SynchronizationServerTests
         var frameStopwatch = Substitute.For<IFrameStopwatch>();
         _pauseRepo = new FakePauseRepo();
         var initRepo = new FakeInitializationRepo { Initialized = true };
-        _sut = new SynchronizationServer
+        _sut = new ShardSynchronizationServer
         (
             _entitySnapshotManager,
             _packetSender,

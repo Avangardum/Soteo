@@ -2,7 +2,7 @@ using Soteo.Core.Dto.Packets;
 
 namespace Soteo.Core.Interfaces;
 
-public interface ISynchronizationClient
+public interface IShardSynchronizationClient
 {
     double? Latency { get; }
     int WaitFrameCount { get; }

@@ -9,7 +9,7 @@ namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 public sealed class GameplayShardSnapshotPacketHandler
 (
     ServerDependency<IShardPersistenceSnapshotManager> persistenceSnapshotManager,
-    ClientDependency<ISynchronizationClient> synchronizationClient
+    ClientDependency<IShardSynchronizationClient> synchronizationClient
 ) : PacketHandler<ShardSnapshotPacket>
 {
     protected override void Handle(ShardSnapshotPacket packet, Guid senderId)

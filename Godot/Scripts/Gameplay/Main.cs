@@ -151,7 +151,7 @@ public sealed class Main : Node2D, IShardLoader, IGameplayInitPacketReceiver, II
         services.AddTransient(typeof(ServerDependency<>), typeof(ServerDependency<>.NotNull));
         services.AddTransient(typeof(ClientDependency<>), typeof(ClientDependency<>.Null));
         
-        services.AddScoped<ISynchronizationServer, SynchronizationServer>();
+        services.AddScoped<IShardSynchronizationServer, ShardSynchronizationServer>();
         services.AddScoped<ICurrentTickRepository, CurrentTickRepository>();
         services.AddScoped<IShardPersistenceSnapshotManager, ShardPersistenceSnapshotManager>();
     }
@@ -177,7 +177,7 @@ public sealed class Main : Node2D, IShardLoader, IGameplayInitPacketReceiver, II
         services.AddSingleton<ICurrentCharacterIdRepository, CurrentCharacterIdRepository>();
         services.AddSingleton<IVisibleShardIdRepository, VisibleShardIdRepository>();
         
-        services.AddScoped<ISynchronizationClient, SynchronizationClient>();
+        services.AddScoped<IShardSynchronizationClient, ShardSynchronizationClient>();
     }
     
     private void RegisterJsmqServices(IServiceCollection services)
@@ -268,7 +268,7 @@ public sealed class Main : Node2D, IShardLoader, IGameplayInitPacketReceiver, II
     private void CreateShardScopedServices(IServiceProvider serviceProvider)
     {
         if (SharedCmdLineArgs.Side == Side.ShardServer)
-            serviceProvider.GetRequiredService<ISynchronizationServer>();
+            serviceProvider.GetRequiredService<IShardSynchronizationServer>();
     }
     
     public void LoadShard(Guid id)

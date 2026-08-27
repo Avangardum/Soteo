@@ -6,7 +6,7 @@ using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Core.Services.Synchronization;
 
-public sealed class SynchronizationServer : ISynchronizationServer, IDisposable // todo rename (+client)
+public sealed class ShardSynchronizationServer : IShardSynchronizationServer, IDisposable
 {
     private readonly IEntitySnapshotManager _entitySnapshotManager;
     private readonly IFromGameplayPacketSender _packetSender;
@@ -20,7 +20,7 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable 
     private readonly HashSet<Guid> _snapshotRequesters = [];
     private readonly IDisposable _physicsProcessSubscription;
     
-    public SynchronizationServer
+    public ShardSynchronizationServer
     (
         IEntitySnapshotManager entitySnapshotManager,
         IFromGameplayPacketSender packetSender,

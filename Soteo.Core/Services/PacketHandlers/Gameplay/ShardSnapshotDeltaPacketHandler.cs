@@ -5,7 +5,7 @@ using Soteo.Core.Interfaces;
 namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
 [GameplayPacketHandler]
-public sealed class ShardSnapshotDeltaPacketHandler(ISynchronizationClient synchronizationClient) :
+public sealed class ShardSnapshotDeltaPacketHandler(IShardSynchronizationClient synchronizationClient) :
     PacketHandler<ShardSnapshotDeltaPacket>
 {
     protected override void Handle(ShardSnapshotDeltaPacket packet, Guid senderId)

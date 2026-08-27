@@ -59,7 +59,7 @@ public sealed class DebugScreen
             _pendingProcessCount--;
             IServiceProvider? shardServiceProvider =
                 _visibleShardIdRepository.Value?.PassTo(_shardServiceProviders.GetOrDefault);
-            var synchronizationClient = shardServiceProvider?.GetRequiredService<ISynchronizationClient>();
+            var synchronizationClient = shardServiceProvider?.GetRequiredService<IShardSynchronizationClient>();
             var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
 
             _ringNextIndex = (_ringNextIndex + 1) % RingLength;
@@ -85,14 +85,14 @@ public sealed class DebugScreen
         _entityCountGraph.SetData(_unrolledRing, "N0", 0);
     }
     
-    private void ProcessServerLoadGraph(ISynchronizationClient? syncClient)
+    private void ProcessServerLoadGraph(IShardSynchronizationClient? syncClient)
     {
         _serverLoadRing[_ringNextIndex] = syncClient?.ServerLoad ?? 0;
         _serverLoadRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
         _serverLoadGraph.SetData(_unrolledRing, "N2", min: 0, max: 1);
     }
     
-    private void UpdateText(double delta, ISynchronizationClient? synchronizationClient, IEntityManager? entityManager)
+    private void UpdateText(double delta, IShardSynchronizationClient? synchronizationClient, IEntityManager? entityManager)
     {
         _label.Text =
             $"""
