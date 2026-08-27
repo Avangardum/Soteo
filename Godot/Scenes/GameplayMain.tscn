@@ -5,7 +5,7 @@
 [ext_resource path="res://Scenes/Ui/PauseScreen.tscn" type="PackedScene" id=4]
 [ext_resource path="res://Textures/Stars.png" type="Texture" id=7]
 
-[node name="Main" type="Node2D"]
+[node name="GameplayMain" type="Node2D"]
 script = ExtResource( 2 )
 
 [node name="Shards" type="Node2D" parent="."]

@@ -2,5 +2,5 @@
 
 [ext_resource path="res://Scripts/CampaignServer/CampaignServerMain.cs" type="Script" id=1]
 
-[node name="MasterServer" type="Node"]
+[node name="CampaignServerMain" type="Node"]
 script = ExtResource( 1 )
