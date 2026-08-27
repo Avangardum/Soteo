@@ -57,13 +57,23 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable 
             _snapshotRequesters.Add(peerId);
     }
 
-    public void Tick(double delta)
+    public void Tick()
     {
         if (!_initRepo.Initialized) return;
         
-        IReadOnlyDictionary<Guid, EntitySnapshot> entitySnapshots =
-            _entitySnapshotManager.CreateEntityPuppetSnapshots();
-        var shardSnapshot = new ShardSnapshot { Tick = _tickRepo.Value, Entities = entitySnapshots };
+        if (_pauseRepo.IsPaused)
+            PausedTick();
+        else
+            UnpausedTick();
+    }
+    
+    private void UnpausedTick()
+    {
+        var shardSnapshot = new ShardSnapshot
+        {
+            Tick = _tickRepo.Value,
+            Entities = _entitySnapshotManager.CreateEntityPuppetSnapshots()
+        };
 
         if (_snapshotRequesters.Count > 0)
         {
@@ -71,8 +81,6 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable 
             _packetSender.SendReliable(shardSnapshotPacket, _snapshotRequesters);
             _snapshotRequesters.Clear();
         }
-        
-        if (_pauseRepo.IsPaused) return;
         
         ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
             ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
@@ -88,7 +96,23 @@ public sealed class SynchronizationServer : ISynchronizationServer, IDisposable 
         }
         
         _prevShardSnapshot = shardSnapshot;
-        _tickRepo.Value++;
+        _tickRepo.Value++; // todo move to the tick repo
+    }
+    
+    private void PausedTick()
+    {
+        if (_snapshotRequesters.Count > 0)
+        {
+            _prevShardSnapshot ??= new ShardSnapshot
+            {
+                Tick = _tickRepo.Value - 1,
+                Entities = _entitySnapshotManager.CreateEntityPuppetSnapshots()
+            };
+            
+            var shardSnapshotPacket = new ShardSnapshotPacket { Snapshot = _prevShardSnapshot };
+            _packetSender.SendReliable(shardSnapshotPacket, _snapshotRequesters);
+            _snapshotRequesters.Clear();
+        }
     }
 
     public void ReceiveSnapshotRequest(Guid clientId) => _snapshotRequesters.Add(clientId);
