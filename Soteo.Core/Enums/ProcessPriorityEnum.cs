@@ -2,9 +2,11 @@ namespace Soteo.Core.Enums;
 
 public enum ProcessPriorityEnum
 {
-    FrameStopwatch = -100,
-    Communicator = -10,
+    Min = -1000,
+    FrameStopwatch,
+    Communicator,
     Default = 0,
-    OverheadUi = 2,
-    SynchronizationServer = 10,
+    OverheadUi,
+    SynchronizationServer,
+    CurrentTickRepository,
 }

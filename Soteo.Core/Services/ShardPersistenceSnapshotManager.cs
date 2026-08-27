@@ -18,14 +18,14 @@ public sealed class ShardPersistenceSnapshotManager
     {
         return new ShardSnapshot
         {
-            Tick = tickRepo.Value,
+            Tick = tickRepo.Tick,
             Entities = entitySnapshotManager.CreateEntitySnapshots(),
         };
     }
 
     public void ReplicateSnapshot(ShardSnapshot snapshot)
     {
-        tickRepo.Value = snapshot.Tick;
+        tickRepo.Tick = snapshot.Tick;
         entitySnapshotManager.ReplicateEntitySnapshots(snapshot.Entities);
         packetSender.SendReliable(new ShardSnapshotReplicatedPacket(), Const.CampaignServerId);
         SnapshotReplicated();

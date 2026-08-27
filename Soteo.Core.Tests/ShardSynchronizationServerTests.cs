@@ -20,11 +20,11 @@ public sealed class ShardSynchronizationServerTests
     
     public ShardSynchronizationServerTests()
     {
-        _tickRepo = new CurrentTickRepository();
+        var processPublisher = Substitute.For<IProcessPublisher>();
+        _tickRepo = new CurrentTickRepository(processPublisher);
         _entitySnapshotManager = Substitute.For<IEntitySnapshotManager>();
         _packetSender = new FakeFromGameplayPacketSender();
         var connectionNotifier = Substitute.For<IConnectionNotifier>();
-        var processPublisher = Substitute.For<IProcessPublisher>();
         var frameStopwatch = Substitute.For<IFrameStopwatch>();
         _pauseRepo = new FakePauseRepo();
         var initRepo = new FakeInitializationRepo { Initialized = true };
@@ -45,7 +45,7 @@ public sealed class ShardSynchronizationServerTests
     public void SendsFreshSnapshotOnRequestWhenUnpaused()
     {
         // Arrange
-        _tickRepo.Value = 100;
+        _tickRepo.Tick = 100;
         _pauseRepo.IsPaused = false;
         
         // Act
@@ -54,7 +54,7 @@ public sealed class ShardSynchronizationServerTests
         _sut.ReceiveSnapshotRequest(player1Id);
         _sut.Tick();
         
-        _tickRepo.Value = 101;
+        _tickRepo.Tick = 101;
         var player2Id = Guid.NewGuid();
         _sut.ReceiveSnapshotRequest(player2Id);
         _sut.Tick();
@@ -67,7 +67,7 @@ public sealed class ShardSynchronizationServerTests
     public void SendsCachedPreviousSnapshotOnRequestWhenPaused()
     {
         // Arrange
-        _tickRepo.Value = 100;
+        _tickRepo.Tick = 100;
         _pauseRepo.IsPaused = false;
         
         // Since snapshots are identified by their tick number, it's important that only one snapshot is created
@@ -81,7 +81,7 @@ public sealed class ShardSynchronizationServerTests
             .When(it => it.CreateEntityPuppetSnapshots())
             .Do(_ =>
             {
-                if (!ticksWhereEntityPuppetSnapshotsWereCreated.Add(_tickRepo.Value))
+                if (!ticksWhereEntityPuppetSnapshotsWereCreated.Add(_tickRepo.Tick))
                     throw new InvalidOperationException("CreateEntityPuppetSnapshots was called twice per tick");
             });
         
@@ -91,14 +91,14 @@ public sealed class ShardSynchronizationServerTests
         _sut.ReceiveSnapshotRequest(player1Id);
         _sut.Tick();
         
-        _tickRepo.Value = 101;
+        _tickRepo.Tick = 101;
         _pauseRepo.IsPaused = true;
         
         var player2Id = Guid.NewGuid();
         _sut.ReceiveSnapshotRequest(player2Id);
         _sut.Tick();
         
-        _tickRepo.Value = 101;
+        _tickRepo.Tick = 101;
         
         var player3Id = Guid.NewGuid();
         _sut.ReceiveSnapshotRequest(player3Id);
@@ -116,7 +116,7 @@ public sealed class ShardSynchronizationServerTests
     public void SendsNewlyCreatedSnapshotWithPreviousTickNumberOnFirstRequestThenReusesItWhenPausedFromStart()
     {
         // Arrange
-        _tickRepo.Value = 100;
+        _tickRepo.Tick = 100;
         _pauseRepo.IsPaused = true;
         
         // Act

@@ -71,7 +71,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
     {
         var shardSnapshot = new ShardSnapshot
         {
-            Tick = _tickRepo.Value,
+            Tick = _tickRepo.Tick,
             Entities = _entitySnapshotManager.CreateEntityPuppetSnapshots()
         };
 
@@ -96,7 +96,6 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
         }
         
         _prevShardSnapshot = shardSnapshot;
-        _tickRepo.Value++; // todo move to the tick repo
     }
     
     private void PausedTick()
@@ -105,7 +104,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
         {
             _prevShardSnapshot ??= new ShardSnapshot
             {
-                Tick = _tickRepo.Value - 1,
+                Tick = _tickRepo.Tick - 1,
                 Entities = _entitySnapshotManager.CreateEntityPuppetSnapshots()
             };
             

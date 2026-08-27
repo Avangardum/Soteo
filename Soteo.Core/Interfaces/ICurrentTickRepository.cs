@@ -2,5 +2,5 @@ namespace Soteo.Core.Interfaces;
 
 public interface ICurrentTickRepository
 {
-    long Value { get; set; }
+    long Tick { get; set; }
 }
