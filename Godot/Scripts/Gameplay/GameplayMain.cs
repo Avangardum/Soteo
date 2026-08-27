@@ -23,7 +23,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay;
 
-public sealed class Main : Node2D, IShardLoader, IGameplayInitPacketReceiver, IInitializationRepository
+public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketReceiver, IInitializationRepository
 {
     // Client and shard server entry point.
     // Handles scene loading and dependency injection.

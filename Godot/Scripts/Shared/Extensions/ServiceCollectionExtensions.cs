@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
             self.AddTransient<TAlias>(sp => sp.GetService<TRefersTo>()!);
         
         public IServiceCollection AddSingletonNode<TService>(string path) where TService : class =>
-            self.AddSingleton<TService>(sp => sp.GetRequiredService<Gameplay.Main>().GetNode<TService>(path));
+            self.AddSingleton<TService>(sp => sp.GetRequiredService<GameplayMain>().GetNode<TService>(path));
         
         public IServiceCollection AddSingletonNode<TService, TImplementation>()
             where TImplementation : class, TService

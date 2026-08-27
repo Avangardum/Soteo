@@ -21,7 +21,7 @@ using File = System.IO.File;
 
 namespace Soteo.Main.CampaignServer;
 
-public sealed class CampaignServer : Node, ICampaignServerInitPacketReceiver
+public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
 {
     private readonly Dictionary<Guid, TaskCompletionSource> _shardServerInitAwaitingCampaignServerInitTcs = new();
     

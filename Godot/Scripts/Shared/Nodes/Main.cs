@@ -3,7 +3,7 @@ using Soteo.Main.Gameplay;
 
 namespace Soteo.Main.Shared.Nodes;
 
-public sealed class Startup : Node
+public sealed class Main : Node
 {
     public override void _Ready()
     {
