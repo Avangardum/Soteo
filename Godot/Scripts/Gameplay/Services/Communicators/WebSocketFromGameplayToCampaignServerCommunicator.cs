@@ -48,8 +48,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     
     public override void _Ready()
     {
-        ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        
+        _wsClient.VerifySsl = EnvironmentVariables.VerifyCertificate;
         _wsClient.Connect("connection_closed", this, nameof(OnConnectionClosed));
         _wsClient.Connect("connection_error", this, nameof(OnConnectionError));
         _wsClient.Connect("connection_established", this, nameof(OnConnectionEstablished));
@@ -111,7 +110,14 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         string body = $"email={Uri.EscapeDataString(email)}&password={Uri.EscapeDataString(password)}";
         string url = $"{AuthServerUrl}/token";
-        _httpRequest.Request(url, method: HTTPClient.Method.Post, customHeaders: headers, requestData: body);
+        _httpRequest.Request
+        (
+            url,
+            method: HTTPClient.Method.Post,
+            customHeaders: headers,
+            requestData: body,
+            sslValidateDomain: EnvironmentVariables.VerifyCertificate
+        );
     }
     
     public void ConnectAsShardServer()
@@ -125,7 +131,14 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(EnvironmentVariables.IntercomSecret)}";
         string url = $"{AuthServerUrl}/token/service";
-        _httpRequest.Request(url, method: HTTPClient.Method.Post, customHeaders: headers, requestData: body);
+        _httpRequest.Request
+        (
+            url,
+            method: HTTPClient.Method.Post,
+            customHeaders: headers,
+            requestData: body,
+            sslValidateDomain: EnvironmentVariables.VerifyCertificate
+        );
     }
     
     public void OnAuthRequestCompleted(int result, int responseCode, string[] headers, byte[] body)

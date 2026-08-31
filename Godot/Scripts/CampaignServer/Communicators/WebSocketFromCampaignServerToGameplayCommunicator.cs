@@ -42,11 +42,9 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
             .WithSecret(Convert.FromBase64String(EnvironmentVariables.IntercomSecret));
 
         _wsServer.SslCertificate = new X509Certificate();
-        _wsServer.SslCertificate.Load("res://devcert.crt");
+        _wsServer.SslCertificate.Load(EnvironmentVariables.CertificatePath);
         _wsServer.PrivateKey = new CryptoKey();
-        string privateKeyPath = SysEnvironment.GetEnvironmentVariable("Soteo__PrivateKeyPath") ??
-            throw new Exception("Private key path is not set");
-        _wsServer.PrivateKey.Load(privateKeyPath);
+        _wsServer.PrivateKey.Load(EnvironmentVariables.PrivateKeyPath);
         _wsServer.Listen(3706);
         _wsServer.Connect("client_disconnected", this, nameof(OnClientDisconnected));
         _wsServer.Connect("data_received", this, nameof(OnDataReceived));

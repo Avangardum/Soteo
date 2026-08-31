@@ -42,7 +42,13 @@ correct, the Godot project selection menu will open.
 
 [Install latest PostgreSQL](https://www.postgresql.org/download/) and create an empty database called `SoteoAuthServer`
 
-TODO Devcert
+Export the .NET development certificate into any directory outside of the repository by running the following command
+with <PATH> replaced by a path where the cerficiate file will be created, including the .crt extension. This will
+produce a pair of .crt and .key files.
+
+```bash
+dotnet dev-certs https --export-path <PATH> --no-password --format PEM
+```
 
 Set the following environment variables:
 
@@ -58,7 +64,11 @@ Set the following environment variables:
 `Soteo__IntercomSecret` - Base64 encoded secret that servers use for internal authentication, use any random
 base64 string
 
-`Soteo__PrivateKeyPath` - TODO
+`Soteo__CertificatePath` - Path to the .crt file
+
+`Soteo__PrivateKeyPath` - Path to the .key file
+
+`Soteo__VerifyCertificate` - `False`
 
 Go to the auth server url in a browser and register a new account with email `player1@soteo.net`
 and password `Pa55_word`
