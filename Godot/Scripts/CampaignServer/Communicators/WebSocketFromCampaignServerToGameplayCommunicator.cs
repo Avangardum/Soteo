@@ -45,7 +45,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         _wsServer.SslCertificate.Load(EnvironmentVariables.CertificatePath);
         _wsServer.PrivateKey = new CryptoKey();
         _wsServer.PrivateKey.Load(EnvironmentVariables.PrivateKeyPath);
-        _wsServer.Listen(3706);
+        _wsServer.Listen(CampaignServerCmdLineArgs.Port);
         _wsServer.Connect("client_disconnected", this, nameof(OnClientDisconnected));
         _wsServer.Connect("data_received", this, nameof(OnDataReceived));
     }
