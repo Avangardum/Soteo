@@ -12,7 +12,7 @@ Players pick a side and work alongside their allies to destroy the enemy.
 
 In Soteo there is no fog of war, every player or spectator can observe any point of the world in real time.
 
-A secondary game mode called challenges lets you try yourself in series of trials at your own pace either alone or
+A secondary game mode called challenges lets you try yourself in a series of trials at your own pace either alone or
 in a party.
 
 The game is currently in early development.
@@ -23,15 +23,15 @@ The game is currently in early development.
 
 ### Building and running from source
 
-### Browser singleplayer
+#### Browser singleplayer
 
 The simplest way to run the Soteo from source is browser singleplayer.
-Install .NET and Godot using links form the next section. Open the Godot project and press the HTML5
+Install .NET and Godot using links from the next section. Open the Godot project and press the HTML5
 icon in the top right, in the opened browser window click singleplayer and log in with default credentials.
 
-### Multiplayer
+#### Multiplayer
 
-#### Environment setup
+##### Environment setup
 
 [Install .NET 10 SDK](https://dotnet.microsoft.com/en-us/download)
 
@@ -43,7 +43,7 @@ correct, the Godot project selection menu will open.
 [Install latest PostgreSQL](https://www.postgresql.org/download/) and create an empty database called `SoteoAuthServer`
 
 Export the .NET development certificate into any directory outside of the repository by running the following command
-with <PATH> replaced by a path where the cerficiate file will be created, including the .crt extension. This will
+with <PATH> replaced by a path where the certificate file will be created, including the .crt extension. This will
 produce a pair of .crt and .key files.
 
 ```bash
@@ -73,11 +73,11 @@ base64 string
 Go to the auth server url in a browser and register a new account with email `player1@soteo.net`
 and password `Pa55_word`
 
-#### Running from a terminal
+##### Running from a terminal
 
 Open a terminal and navigate to `/Godot`, all commands should run from here
 
-Before running build the solution with `dontet build` or with a `Build` button in Godot
+Before running build the solution with `dotnet build` or with a `Build` button in Godot
 
 Start the auth server, the campaign server, 2 shard servers and 2 clients by running the following commands,
 each in a separate terminal:
@@ -93,19 +93,19 @@ soteo --quiet --no-scroll --position 10,550 --resolution 1000x500 --email player
 
 Log in with default credentials.
 
-#### Running from Rider
+##### Running from Rider
 
-If using Rider, you can user Run/Debug configurations to run the game instead of terminal. For the auth server add
+If using Rider, you can use Run/Debug configurations to run the game instead of terminal. For the auth server add
 ".NET Launch Settings Profile", for other processes add "Godot 3 Start and Debug" (set working directory to `/Godot`,
 copy arguments from above and use "Redirect standard streams" terminal mode). To launch all processes in one click add
 "Multi-Launch" with first step building the solution immediately, second step launching auth server after previous
 finished and the rest after previous started.
 
-#### Customizing ports
+##### Customizing ports
 
 By default, the port 3705 is used for the auth server and the port 3706 is used for the campaign server.
 Auth server port can be changed by editing launchsettings.json (don't commit the changes).
-Campaign server port can be changerd by adding `--port 1234`.
+Campaign server port can be changed by adding `--port 1234`.
 If changing ports, don't forget to also update URLs in environment variables to reflect that.
 
 ### Exploring the codebase
