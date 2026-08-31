@@ -55,9 +55,9 @@ Set the following environment variables:
 `Soteo__AuthServerConnectionString` - PostgreSQL connection string in the following format (adjust if necessary):
 `Server=127.0.0.1;Port=5432;Database=SoteoAuthServer;User Id=postgres;Password=postgres;`
 
-`Soteo__AuthServerUrl` - Auth server url, `localhost:3705` if using the default port
+`Soteo__AuthServerUrl` - `https://localhost:3705`
 
-`Soteo__MasterServerUrl` - Campaign server url, `localhost:3706` if using the default port TODO rename
+`Soteo__CampaignServerUrl` - `wss://localhost:3706`
 
 `Soteo__CampaignSnapshotPath` - TODO
 

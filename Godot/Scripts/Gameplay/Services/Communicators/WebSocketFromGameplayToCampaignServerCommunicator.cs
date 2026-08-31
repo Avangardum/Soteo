@@ -1,6 +1,5 @@
 using System.Text;
 using JWT.Builder;
-using Soteo.Core;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
@@ -12,9 +11,6 @@ namespace Soteo.Main.Gameplay.Services.Communicators;
 public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     Node, IFromGameplayToCampaignServerPacketSender, ICampaignServerConnector
 {
-    private const string CampaignServerUrl = "wss://localhost:3706";
-    private const string AuthServerUrl = "https://localhost:3705";
-
     private readonly WebSocketClient _wsClient = new();
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
     
@@ -84,6 +80,12 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     
     public void OnConnectionError()
     {
+        // todo replace throw with UI popups
+        
+// Unreachable code detected
+#pragma warning disable CS0162
+        
+        throw new Exception("WebSocket connection error");
         _status = Status.Disconnected;
     }
     
@@ -109,7 +111,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         string body = $"email={Uri.EscapeDataString(email)}&password={Uri.EscapeDataString(password)}";
-        string url = $"{AuthServerUrl}/token";
+        string url = $"{EnvironmentVariables.AuthServerUrl}/token";
         _httpRequest.Request
         (
             url,
@@ -130,7 +132,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         Guid id = _currentUserIdRepository.Required;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(EnvironmentVariables.IntercomSecret)}";
-        string url = $"{AuthServerUrl}/token/service";
+        string url = $"{EnvironmentVariables.AuthServerUrl}/token/service";
         _httpRequest.Request
         (
             url,
@@ -144,9 +146,6 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     public void OnAuthRequestCompleted(int result, int responseCode, string[] headers, byte[] body)
     {
         // todo replace throw with UI popups
-        
-// Unreachable code detected
-#pragma warning disable CS0162
         
         if (result != (int)HTTPRequest.Result.Success)
         {
@@ -167,10 +166,8 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         {
             _token = Encoding.UTF8.GetString(body);
             _currentUserIdRepository.Value = GetPlayerIdFromTrustedToken(_token);
-            _wsClient.ConnectToUrl(CampaignServerUrl);
+            _wsClient.ConnectToUrl(EnvironmentVariables.CampaignServerUrl);
         }
-        
-#pragma warning restore CS0162
     }
     
     private Guid GetPlayerIdFromTrustedToken(string token)

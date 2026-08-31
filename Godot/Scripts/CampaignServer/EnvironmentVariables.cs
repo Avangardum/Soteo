@@ -2,6 +2,10 @@ namespace Soteo.Main.CampaignServer;
 
 public static class EnvironmentVariables
 {
+    public static string AuthServerUrl => SysEnvironment.GetRequiredEnvironmentVariable("Soteo__AuthServerUrl");
+    
+    public static string CampaignServerUrl => SysEnvironment.GetRequiredEnvironmentVariable("Soteo__CampaignServerUrl");
+    
     public static string CampaignSnapshotPath =>
         SysEnvironment.GetRequiredEnvironmentVariable("Soteo__CampaignSnapshotPath");
     
