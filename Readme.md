@@ -101,6 +101,13 @@ copy arguments from above and use "Redirect standard streams" terminal mode). To
 "Multi-Launch" with first step building the solution immediately, second step launching auth server after previous
 finished and the rest after previous started.
 
+#### Customizing ports
+
+By default, the port 3705 is used for the auth server and the port 3706 is used for the campaign server.
+Auth server port can be changed by adding `--urls localhost:1234`.
+Campaign server port can be changerd by adding `--port 1234`.
+If changing ports, don't forget to also update URLs in environment variables to reflect that.
+
 ### Exploring the codebase
 
 Start by reading the contents of the Docs folder to get a top level overview on the project. After that you can
