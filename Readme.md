@@ -17,18 +17,81 @@ in a party.
 
 The game is currently in early development.
 
-## Architecture
+[Discord](https://discord.gg/kJzPpwdwrc)
 
-Campaign is run by a cluster of servers consisting of one campaign server, which coordinates the cluster and handles
-global state, and several shard servers, each representing a shard of the game world.
+## Getting started
 
-Singleplayer mode works by running the required servers locally alongside the client.
+### Building and running from source
 
-AuthServer contain an ASP.NET project handling user accounts and issuing access tokens.
+### Browser singleplayer
 
-Godot folder contains a Godot project containing campaign server, shard server and client components.
+The simplest way to run the Soteo from source is browser singleplayer.
+Install .NET and Godot using links form the next section. Open the Godot project and press the HTML5
+icon in the top right, in the opened browser window click singleplayer and log in with default credentials.
 
-See Architecture.md files in subfolders to learn about specific components.
+### Multiplayer
+
+#### Environment setup
+
+[Install .NET 10 SDK](https://dotnet.microsoft.com/en-us/download)
+
+[Install Godot 3.6.2](https://godotengine.org/download/archive/3.6.2-stable/) (pick the .NET version, not standard).
+Create a symlink to the Godot executable called `soteo` (`soteo.exe` on Windows) and update the PATH environment
+variable to include the directory containing the symlink. Open a new terminal and type `soteo`. If everything is
+correct, the Godot project selection menu will open.
+
+[Install latest PostgreSQL](https://www.postgresql.org/download/) and create an empty database called `SoteoAuthServer`
+
+TODO Devcert
+
+Set the following environment variables:
+
+`Soteo__AuthServerConnectionString` - PostgreSQL connection string in the following format (adjust if necessary):
+`Server=127.0.0.1;Port=5432;Database=SoteoAuthServer;User Id=postgres;Password=postgres;`
+
+`Soteo__AuthServerUrl` - Auth server url, `localhost:3705` if using the default port
+
+`Soteo__MasterServerUrl` - Campaign server url, `localhost:3706` if using the default port TODO rename
+
+`Soteo__CampaignSnapshotPath` - TODO
+
+`Soteo__IntercomSecret` - Base64 encoded secret that servers use for internal authentication, use any random
+base64 string
+
+`Soteo__PrivateKeyPath` - TODO
+
+Go to the auth server url in a browser and register a new account with email `player1@soteo.net`
+and password `Pa55_word`
+
+#### Building
+
+#### Running from a terminal
+
+Start the auth server, the campaign server, 2 shard servers and 1 client by running the following commands,
+each in a separate terminal:
+
+```bash
+dotnet run --project ../Soteo.AuthServer
+soteo --quiet --no-window --campaign-server --shard 00000000-0000-0000-0000-0000000005d1 --shard 00000000-0000-0000-0000-0000000005d2
+soteo --quiet --no-window --shard-server 00000000-0000-0000-0000-0000000005d1
+soteo --quiet --no-window --shard-server 00000000-0000-0000-0000-0000000005d2
+soteo --quiet --no-scroll --position 10,10 --resolution 1000x500 --email player1@soteo.net
+```
+
+Log in with default credentials.
+
+#### Running from Rider
+
+TODO
+
+### Exploring the codebase
+
+Start by reading the contents of the Docs folder to get a top level overview on the project. After that you can
+explore the classes mentioned in the docs or the ones you are interested in.
+
+## Contributing
+
+If you'd like to contribute, join the Discord server and let me know
 
 ## To-do
 
@@ -47,7 +110,7 @@ See Architecture.md files in subfolders to learn about specific components.
 - [ ] Staging polygon
 - [x] Manual character creation and spawning
 - [ ] Extra data dictionary
-- [ ] Shard limits
+- [ ] Shard capacity limits
 - [ ] Travel between shards
 - [ ] Navigation
 - [ ] Items

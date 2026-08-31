@@ -2,12 +2,6 @@ namespace Soteo.Main.CampaignServer;
 
 public static class EnvironmentVariables
 {
-    /// <summary>
-    /// Path to the Godot executable. Defined by the campaign server and used to start shard server processes.
-    /// </summary>
-    public static string GodotPath =>
-        SysEnvironment.GetRequiredEnvironmentVariable("Soteo__GodotPath");
-    
     public static string CampaignSnapshotPath =>
         SysEnvironment.GetRequiredEnvironmentVariable("Soteo__CampaignSnapshotPath");
     
