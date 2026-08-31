@@ -63,11 +63,13 @@ base64 string
 Go to the auth server url in a browser and register a new account with email `player1@soteo.net`
 and password `Pa55_word`
 
-#### Building
-
 #### Running from a terminal
 
-Start the auth server, the campaign server, 2 shard servers and 1 client by running the following commands,
+Open a terminal and navigate to `/Godot`, all commands should run from here
+
+Before running build the solution with `dontet build` or with a `Build` button in Godot
+
+Start the auth server, the campaign server, 2 shard servers and 2 clients by running the following commands,
 each in a separate terminal:
 
 ```bash
@@ -75,14 +77,19 @@ dotnet run --project ../Soteo.AuthServer
 soteo --quiet --no-window --campaign-server --shard 00000000-0000-0000-0000-0000000005d1 --shard 00000000-0000-0000-0000-0000000005d2
 soteo --quiet --no-window --shard-server 00000000-0000-0000-0000-0000000005d1
 soteo --quiet --no-window --shard-server 00000000-0000-0000-0000-0000000005d2
-soteo --quiet --no-scroll --position 10,10 --resolution 1000x500 --email player1@soteo.net
+soteo --quiet --no-scroll --position 10,10 --resolution 1000x500
+soteo --quiet --no-scroll --position 10,550 --resolution 1000x500 --email player2@soteo.net
 ```
 
 Log in with default credentials.
 
 #### Running from Rider
 
-TODO
+If using Rider, you can user Run/Debug configurations to run the game instead of terminal. For the auth server add
+".NET Launch Settings Profile", for other processes add "Godot 3 Start and Debug" (set working directory to `/Godot`,
+copy arguments from above and use "Redirect standard streams" terminal mode). To launch all processes in one click add
+"Multi-Launch" with first step building the solution immediately, second step launching auth server after previous
+finished and the rest after previous started.
 
 ### Exploring the codebase
 
