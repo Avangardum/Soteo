@@ -2,12 +2,14 @@ namespace Soteo.Main.CampaignServer;
 
 public static class EnvironmentVariables
 {
+    // todo define clearly which variables exist where, make clients runnable without any
+    
     public static string AuthServerUrl => SysEnvironment.GetRequiredEnvironmentVariable("Soteo__AuthServerUrl");
     
     public static string CampaignServerUrl => SysEnvironment.GetRequiredEnvironmentVariable("Soteo__CampaignServerUrl");
     
-    public static string CampaignSnapshotPath =>
-        SysEnvironment.GetRequiredEnvironmentVariable("Soteo__CampaignSnapshotPath");
+    public static string SnapshotFolder =>
+        SysEnvironment.GetRequiredEnvironmentVariable("Soteo__SnapshotFolder");
     
     /// <summary>
     /// Secret used by servers for internal authentication and for token validation. Base64 string.

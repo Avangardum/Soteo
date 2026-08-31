@@ -59,7 +59,7 @@ Set the following environment variables:
 
 `Soteo__CampaignServerUrl` - `wss://localhost:3706`
 
-`Soteo__CampaignSnapshotPath` - TODO
+`Soteo__SnapshotFolder` - Path to any folder outside the repository where snapshot files will be stored
 
 `Soteo__IntercomSecret` - Base64 encoded secret that servers use for internal authentication, use any random
 base64 string
@@ -104,7 +104,7 @@ finished and the rest after previous started.
 #### Customizing ports
 
 By default, the port 3705 is used for the auth server and the port 3706 is used for the campaign server.
-Auth server port can be changed by adding `--urls localhost:1234`.
+Auth server port can be changed by editing launchsettings.json (don't commit the changes).
 Campaign server port can be changerd by adding `--port 1234`.
 If changing ports, don't forget to also update URLs in environment variables to reflect that.
 

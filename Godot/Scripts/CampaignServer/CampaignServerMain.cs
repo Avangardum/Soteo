@@ -18,6 +18,7 @@ using Soteo.Main.Shared;
 using Soteo.Main.Shared.Nodes;
 using Soteo.Util;
 using File = System.IO.File;
+using Path = System.IO.Path;
 
 namespace Soteo.Main.CampaignServer;
 
@@ -36,6 +37,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     
     public override async void _Ready()
     {
+        // todo refactor
         try
         {
             GlobalInit.Init();
@@ -62,9 +64,10 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             foreach (Guid id in CampaignServerCmdLineArgs.ShardIds)
                 _shardServerInitAwaitingCampaignServerInitTcs[id] = new TaskCompletionSource();
             
-            if (!CampaignServerCmdLineArgs.IsSingleplayer && File.Exists(EnvironmentVariables.CampaignSnapshotPath))
+            string snapshotPath = Path.Combine(EnvironmentVariables.SnapshotFolder, "Snapshot");
+            if (!CampaignServerCmdLineArgs.IsSingleplayer && File.Exists(snapshotPath))
             {
-                byte[] bytes = File.ReadAllBytes(EnvironmentVariables.CampaignSnapshotPath);
+                byte[] bytes = File.ReadAllBytes(snapshotPath);
                 CampaignSnapshot snapshot = snapshotSerializer.Deserialize(bytes);
                 await snapshotManager.ReplicateSnapshotAsync(snapshot);
             }
@@ -88,7 +91,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             {
                 CampaignSnapshot snapshot = await snapshotManager.CreateSnapshotAsync();
                 byte[] bytes = snapshotSerializer.Serialize(snapshot);
-                File.WriteAllBytes(EnvironmentVariables.CampaignSnapshotPath, bytes);
+                File.WriteAllBytes(snapshotPath, bytes);
             }
         }
         catch (Exception e)
