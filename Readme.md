@@ -7,7 +7,7 @@ beginning to the end.
 The project aims to provide MMO level scale while keeping the gameplay engaging and concentrated. It aims to avoid
 the grind, long downtime and filler content which are common in the MMO genre.
 
-Two factions: Empire and Syndicate fight in a for for shards of the shattered world.
+Two factions: Empire and Syndicate fight for shards of a shattered world.
 Players pick a side and work alongside their allies to destroy the enemy.
 
 In Soteo there is no fog of war, every player or spectator can observe any point of the world in real time.
