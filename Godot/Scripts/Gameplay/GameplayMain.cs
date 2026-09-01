@@ -118,6 +118,8 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddOptions<ToAuthServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
         services.AddOptions<ToCampaignServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
         services.AddOptions<CertificateVerificationOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<CertificateOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<IntercomOptions>().Bind(configuration).ValidateDataAnnotations();
     }
     
     private void RegisterSharedServices(IServiceCollection services)

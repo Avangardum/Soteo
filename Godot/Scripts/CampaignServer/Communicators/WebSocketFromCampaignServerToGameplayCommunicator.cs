@@ -1,7 +1,9 @@
 using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
+using Microsoft.Extensions.Options;
 using Soteo.Core;
+using Soteo.Core.Dto.Options;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
@@ -30,7 +32,9 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
     (
         IPacketSerializer packetSerializer,
         IPacketHandler packetHandler,
-        IUserRepository userRepo
+        IUserRepository userRepo,
+        IOptions<IntercomOptions> intercomOptions,
+        IOptions<CertificateOptions> certificateOptions
     )
     {
         _packetSerializer = packetSerializer;
@@ -39,12 +43,12 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         
         _jwtBuilder = JwtBuilder.Create()
             .WithAlgorithm(new HMACSHA256Algorithm())
-            .WithSecret(Convert.FromBase64String(EnvironmentVariables.IntercomSecret));
+            .WithSecret(Convert.FromBase64String(intercomOptions.Value.IntercomSecret));
 
         _wsServer.SslCertificate = new X509Certificate();
-        _wsServer.SslCertificate.Load(EnvironmentVariables.CertificatePath);
+        _wsServer.SslCertificate.Load(certificateOptions.Value.CertificatePath);
         _wsServer.PrivateKey = new CryptoKey();
-        _wsServer.PrivateKey.Load(EnvironmentVariables.PrivateKeyPath);
+        _wsServer.PrivateKey.Load(certificateOptions.Value.PrivateKeyPath);
         _wsServer.Listen(CampaignServerCmdLineArgs.Port);
         _wsServer.Connect("client_disconnected", this, nameof(OnClientDisconnected));
         _wsServer.Connect("data_received", this, nameof(OnDataReceived));

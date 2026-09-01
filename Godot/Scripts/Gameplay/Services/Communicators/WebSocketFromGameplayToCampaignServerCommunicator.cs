@@ -5,6 +5,7 @@ using Soteo.Core.Dto.Options;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
+using Soteo.Core.SidedDependencies;
 using Soteo.Core.StaticHelpers;
 using Soteo.Main.CampaignServer;
 
@@ -20,9 +21,11 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     private readonly IPacketHandler _packetHandler;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly ISideDetector _sideDetector;
+    
     private readonly ToAuthServerConnectionOptions _toAuthServerConnectionOptions;
     private readonly ToCampaignServerConnectionOptions _toCampaignServerConnectionOptions;
     private readonly CertificateVerificationOptions _certificateVerificationOptions;
+    private readonly ServerDependency<IntercomOptions> _intercomOptions;
     
     private string? _token;
     private Status _status;
@@ -35,7 +38,8 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         ISideDetector sideDetector,
         IOptions<ToAuthServerConnectionOptions> toAuthServerConnectionOptions,
         IOptions<ToCampaignServerConnectionOptions> toCampaignServerConnectionOptions,
-        IOptions<CertificateVerificationOptions> certificateVerificationOptions
+        IOptions<CertificateVerificationOptions> certificateVerificationOptions,
+        IOptions<IntercomOptions> intercomOptions
     )
     {
         _packetHandler = packetHandler;
@@ -45,6 +49,9 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         _toAuthServerConnectionOptions = toAuthServerConnectionOptions.Value;
         _toCampaignServerConnectionOptions = toCampaignServerConnectionOptions.Value;
         _certificateVerificationOptions = certificateVerificationOptions.Value;
+        _intercomOptions = sideDetector.Side == Side.ShardServer ?
+            ServerDependency.From(intercomOptions.Value) :
+            ServerDependency.Null<IntercomOptions>();
         
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
@@ -142,7 +149,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         Guid id = _currentUserIdRepository.Required;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
-            $"&intercomSecret={Uri.EscapeDataString(EnvironmentVariables.IntercomSecret)}";
+            $"&intercomSecret={Uri.EscapeDataString(_intercomOptions.Value.Required.IntercomSecret)}";
         string url = $"{_toAuthServerConnectionOptions.AuthServerUrl}/token/service";
         _httpRequest.Request
         (

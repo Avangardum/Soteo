@@ -155,6 +155,8 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         services.AddOptions<ToAuthServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
         services.AddOptions<ToCampaignServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
         services.AddOptions<CertificateVerificationOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<CertificateOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<IntercomOptions>().Bind(configuration).ValidateDataAnnotations();
     }
     
     private void CreateSingletonNodes()
