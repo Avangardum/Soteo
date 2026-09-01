@@ -119,25 +119,14 @@ If you'd like to contribute, join the Discord server and let me know
 
 ## To-do
 
-- [x] Rework azimuth indicator
-- [x] Fix pixel perfect rendering
-- [x] Show statuses in HUD
-- [x] Stop command
-- [x] Switch to double
-- [x] Status / abililty icons
-- [x] Status / ability tooltips
-- [x] Death
-- [x] Style convention
-- [x] Testing
-- [x] Cluster startup / shutdown
-- [ ] Stress test / optimization
 - [ ] Staging polygon
-- [x] Manual character creation and spawning
+- [ ] Stress test / optimization
 - [ ] Extra data dictionary
 - [ ] Shard capacity limits
 - [ ] Travel between shards
 - [ ] Navigation
 - [ ] Items
+- [ ] Building
 - [ ] Singleplayer scenarios
 - [ ] Email sending
 
