@@ -1,6 +1,8 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core;
 using Soteo.Core.Attributes;
+using Soteo.Core.Dto.Options;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
@@ -92,6 +94,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     
     private void RegisterServices(IServiceCollection services)
     {
+        RegisterConfigurationOptions(services);
         RegisterSharedServices(services);
         
         if (SharedCmdLineArgs.Side == Side.ShardServer)
@@ -103,6 +106,18 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             RegisterJsmqServices(services);
         else
             RegisterWebServices(services);
+    }
+    
+    private void RegisterConfigurationOptions(IServiceCollection services)
+    {
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables("Soteo__")
+            .Build();
+        
+        services.AddOptions<CampaignPersistenceOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<ToAuthServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<ToCampaignServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<CertificateVerificationOptions>().Bind(configuration).ValidateDataAnnotations();
     }
     
     private void RegisterSharedServices(IServiceCollection services)

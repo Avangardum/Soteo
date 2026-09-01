@@ -1,5 +1,7 @@
 using System.Text;
 using JWT.Builder;
+using Microsoft.Extensions.Options;
+using Soteo.Core.Dto.Options;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
@@ -18,6 +20,9 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     private readonly IPacketHandler _packetHandler;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly ISideDetector _sideDetector;
+    private readonly ToAuthServerConnectionOptions _toAuthServerConnectionOptions;
+    private readonly ToCampaignServerConnectionOptions _toCampaignServerConnectionOptions;
+    private readonly CertificateVerificationOptions _certificateVerificationOptions;
     
     private string? _token;
     private Status _status;
@@ -27,13 +32,19 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer,
         ICurrentUserIdRepository currentUserIdRepository,
-        ISideDetector sideDetector
+        ISideDetector sideDetector,
+        IOptions<ToAuthServerConnectionOptions> toAuthServerConnectionOptions,
+        IOptions<ToCampaignServerConnectionOptions> toCampaignServerConnectionOptions,
+        IOptions<CertificateVerificationOptions> certificateVerificationOptions
     )
     {
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
         _sideDetector = sideDetector;
         _currentUserIdRepository = currentUserIdRepository;
+        _toAuthServerConnectionOptions = toAuthServerConnectionOptions.Value;
+        _toCampaignServerConnectionOptions = toCampaignServerConnectionOptions.Value;
+        _certificateVerificationOptions = certificateVerificationOptions.Value;
         
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
@@ -44,7 +55,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     
     public override void _Ready()
     {
-        _wsClient.VerifySsl = EnvironmentVariables.VerifyCertificate;
+        _wsClient.VerifySsl = _certificateVerificationOptions.VerifyCertificate;
         _wsClient.Connect("connection_closed", this, nameof(OnConnectionClosed));
         _wsClient.Connect("connection_error", this, nameof(OnConnectionError));
         _wsClient.Connect("connection_established", this, nameof(OnConnectionEstablished));
@@ -111,14 +122,14 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         string body = $"email={Uri.EscapeDataString(email)}&password={Uri.EscapeDataString(password)}";
-        string url = $"{EnvironmentVariables.AuthServerUrl}/token";
+        string url = $"{_toAuthServerConnectionOptions.AuthServerUrl}/token";
         _httpRequest.Request
         (
             url,
             method: HTTPClient.Method.Post,
             customHeaders: headers,
             requestData: body,
-            sslValidateDomain: EnvironmentVariables.VerifyCertificate
+            sslValidateDomain: _certificateVerificationOptions.VerifyCertificate
         );
     }
     
@@ -132,14 +143,14 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         Guid id = _currentUserIdRepository.Required;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(EnvironmentVariables.IntercomSecret)}";
-        string url = $"{EnvironmentVariables.AuthServerUrl}/token/service";
+        string url = $"{_toAuthServerConnectionOptions.AuthServerUrl}/token/service";
         _httpRequest.Request
         (
             url,
             method: HTTPClient.Method.Post,
             customHeaders: headers,
             requestData: body,
-            sslValidateDomain: EnvironmentVariables.VerifyCertificate
+            sslValidateDomain: _certificateVerificationOptions.VerifyCertificate
         );
     }
     
@@ -166,7 +177,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         {
             _token = Encoding.UTF8.GetString(body);
             _currentUserIdRepository.Value = GetPlayerIdFromTrustedToken(_token);
-            _wsClient.ConnectToUrl(EnvironmentVariables.CampaignServerUrl);
+            _wsClient.ConnectToUrl(_toCampaignServerConnectionOptions.CampaignServerUrl);
         }
     }
     

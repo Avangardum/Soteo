@@ -1,9 +1,10 @@
-using System.Collections.Immutable;
-using System.Diagnostics;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Soteo.Core;
 using Soteo.Core.Attributes;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Options;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Interfaces;
@@ -54,6 +55,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             var synchronizedCampaignStateRepo =
                 ServiceProvider.GetRequiredService<ISynchronizedCampaignStateRepository>();
             var timeProvider = ServiceProvider.GetRequiredService<TimeProvider>();
+            var campaignPersistenceOptions = ServiceProvider.GetRequiredService<IOptions<CampaignPersistenceOptions>>();
 
             await userRepo.WaitForUsersToConnectAsync(CampaignServerCmdLineArgs.ShardIds, timeout: 30);
 
@@ -64,7 +66,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             foreach (Guid id in CampaignServerCmdLineArgs.ShardIds)
                 _shardServerInitAwaitingCampaignServerInitTcs[id] = new TaskCompletionSource();
             
-            Func<string> snapshotPath = () => Path.Combine(EnvironmentVariables.SnapshotFolder, "Snapshot");
+            Func<string> snapshotPath = () => Path.Combine(campaignPersistenceOptions.Value.SnapshotFolder, "Snapshot");
             if (!CampaignServerCmdLineArgs.IsSingleplayer && File.Exists(snapshotPath()))
             {
                 byte[] bytes = File.ReadAllBytes(snapshotPath());
@@ -138,6 +140,21 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         
         foreach (Type type in PacketHandlerLocator<CampaignServerPacketHandlerAttribute>.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
             services.AddSingleton(type);
+        
+        RegisterConfigurationOptions(services);
+    }
+    
+    private void RegisterConfigurationOptions(IServiceCollection services)
+    {
+        // todo fix duplication
+        IConfigurationRoot configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables("Soteo__")
+            .Build();
+        
+        services.AddOptions<CampaignPersistenceOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<ToAuthServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<ToCampaignServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
+        services.AddOptions<CertificateVerificationOptions>().Bind(configuration).ValidateDataAnnotations();
     }
     
     private void CreateSingletonNodes()
