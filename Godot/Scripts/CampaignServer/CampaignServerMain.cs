@@ -141,22 +141,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         foreach (Type type in PacketHandlerLocator<CampaignServerPacketHandlerAttribute>.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
             services.AddSingleton(type);
         
-        RegisterConfigurationOptions(services);
-    }
-    
-    private void RegisterConfigurationOptions(IServiceCollection services)
-    {
-        // todo fix duplication
-        IConfigurationRoot configuration = new ConfigurationBuilder()
-            .AddEnvironmentVariables("Soteo__")
-            .Build();
-        
-        services.AddOptions<CampaignPersistenceOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<ToAuthServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<ToCampaignServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<CertificateVerificationOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<CertificateOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<IntercomOptions>().Bind(configuration).ValidateDataAnnotations();
+        Configurator.RegisterConfigurationOptions(services);
     }
     
     private void CreateSingletonNodes()

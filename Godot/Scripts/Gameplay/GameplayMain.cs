@@ -94,7 +94,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     
     private void RegisterServices(IServiceCollection services)
     {
-        RegisterConfigurationOptions(services);
+        Configurator.RegisterConfigurationOptions(services);
         RegisterSharedServices(services);
         
         if (SharedCmdLineArgs.Side == Side.ShardServer)
@@ -106,20 +106,6 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             RegisterJsmqServices(services);
         else
             RegisterWebServices(services);
-    }
-    
-    private void RegisterConfigurationOptions(IServiceCollection services)
-    {
-        IConfigurationRoot configuration = new ConfigurationBuilder()
-            .AddEnvironmentVariables("Soteo__")
-            .Build();
-        
-        services.AddOptions<CampaignPersistenceOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<ToAuthServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<ToCampaignServerConnectionOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<CertificateVerificationOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<CertificateOptions>().Bind(configuration).ValidateDataAnnotations();
-        services.AddOptions<IntercomOptions>().Bind(configuration).ValidateDataAnnotations();
     }
     
     private void RegisterSharedServices(IServiceCollection services)
