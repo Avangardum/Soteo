@@ -77,7 +77,6 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             }
 
             // todo timeout
-            // todo document init
             await Task.WhenAll(_shardServerInitAwaitingCampaignServerInitTcs.Values.Select(it => it.Task));
             communicator.BroadcastToShardServers(new CampaignInitializedPacket());
             communicator.AllowPlayerConnections = true; // todo check init state inside a communicator

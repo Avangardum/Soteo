@@ -136,7 +136,6 @@ public sealed class OverheadUi
     {
         _node.SetProcess(false);
         _node.QueueFree();
-        // todo use pooling
     }
     
     private enum Variant
