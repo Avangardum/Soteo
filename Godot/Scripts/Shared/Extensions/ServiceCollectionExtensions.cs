@@ -1,6 +1,8 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Soteo.Main.Gameplay;
 
 namespace Soteo.Main.Shared.Extensions;
@@ -42,6 +44,16 @@ public static class ServiceCollectionExtensions
             where TService : class
         {
             return self.AddShardScopedNode<TService>(typeof(TImplementation).Name);
+        }
+        
+        public IServiceCollection UnwrapOptions<T>() where T : class =>
+            self.AddSingleton<T>(sp => sp.GetRequiredService<IOptions<T>>().Value);
+        
+        public IServiceCollection SmartAddOptions<T>(IConfiguration configuration) where T : class
+        {
+            self.AddOptions<T>().Bind(configuration).ValidateDataAnnotations();
+            self.UnwrapOptions<T>();
+            return self;
         }
     }
 }

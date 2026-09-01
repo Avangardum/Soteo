@@ -141,7 +141,14 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         foreach (Type type in PacketHandlerLocator<CampaignServerPacketHandlerAttribute>.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
             services.AddSingleton(type);
         
-        Configurator.RegisterConfigurationOptions(services);
+        RegisterConfigurationOptions(services);
+    }
+    
+    private void RegisterConfigurationOptions(IServiceCollection services)
+    {
+        services.SmartAddOptions<CampaignPersistenceOptions>(Config.Value);
+        services.SmartAddOptions<CertificateOptions>(Config.Value);
+        services.SmartAddOptions<IntercomOptions>(Config.Value);
     }
     
     private void CreateSingletonNodes()

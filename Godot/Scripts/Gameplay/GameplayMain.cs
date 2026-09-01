@@ -94,7 +94,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     
     private void RegisterServices(IServiceCollection services)
     {
-        Configurator.RegisterConfigurationOptions(services);
+        RegisterConfigurationOptions(services);
         RegisterSharedServices(services);
         
         if (SharedCmdLineArgs.Side == Side.ShardServer)
@@ -106,6 +106,22 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             RegisterJsmqServices(services);
         else
             RegisterWebServices(services);
+    }
+    
+    private void RegisterConfigurationOptions(IServiceCollection services)
+    {
+        services.SmartAddOptions<ToAuthServerConnectionOptions>(Config.Value);
+        services.SmartAddOptions<CertificateVerificationOptions>(Config.Value);
+        
+        if (SharedCmdLineArgs.Side == Side.ShardServer)
+        {
+            services.SmartAddOptions<CertificateOptions>(Config.Value);
+            services.SmartAddOptions<IntercomOptions>(Config.Value);
+        }
+        else
+        {
+            services.SmartAddOptions<ToCampaignServerConnectionOptions>(Config.Value);
+        }
     }
     
     private void RegisterSharedServices(IServiceCollection services)

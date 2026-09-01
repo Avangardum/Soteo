@@ -162,7 +162,11 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
             return;
         }
         var userId = Guid.Parse((string)claims["sub"]);
-        var isPlayer = claims.TryGetValue("player", out object value) && value is true;
+        bool isPlayer =
+            claims.TryGetValue("player", out object value) &&
+            value is string strValue &&
+            bool.TryParse(strValue, out bool parsedValue) &&
+            parsedValue;
         
         if (isPlayer && !AllowPlayerConnections)
         {
