@@ -2,7 +2,7 @@ namespace Soteo.Main.CampaignServer;
 
 public static class EnvironmentVariables
 {
-    // todo define clearly which variables exist where, make clients runnable without any
+    // todo refactor towards standard .NET configuration API (and cmdline args too)
     
     public static string AuthServerUrl => SysEnvironment.GetRequiredEnvironmentVariable("Soteo__AuthServerUrl");
     

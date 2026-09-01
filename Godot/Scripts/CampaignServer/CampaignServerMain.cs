@@ -64,10 +64,10 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             foreach (Guid id in CampaignServerCmdLineArgs.ShardIds)
                 _shardServerInitAwaitingCampaignServerInitTcs[id] = new TaskCompletionSource();
             
-            string snapshotPath = Path.Combine(EnvironmentVariables.SnapshotFolder, "Snapshot");
-            if (!CampaignServerCmdLineArgs.IsSingleplayer && File.Exists(snapshotPath))
+            Func<string> snapshotPath = () => Path.Combine(EnvironmentVariables.SnapshotFolder, "Snapshot");
+            if (!CampaignServerCmdLineArgs.IsSingleplayer && File.Exists(snapshotPath()))
             {
-                byte[] bytes = File.ReadAllBytes(snapshotPath);
+                byte[] bytes = File.ReadAllBytes(snapshotPath());
                 CampaignSnapshot snapshot = snapshotSerializer.Deserialize(bytes);
                 await snapshotManager.ReplicateSnapshotAsync(snapshot);
             }
@@ -91,7 +91,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             {
                 CampaignSnapshot snapshot = await snapshotManager.CreateSnapshotAsync();
                 byte[] bytes = snapshotSerializer.Serialize(snapshot);
-                File.WriteAllBytes(snapshotPath, bytes);
+                File.WriteAllBytes(snapshotPath(), bytes);
             }
         }
         catch (Exception e)
