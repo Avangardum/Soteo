@@ -441,6 +441,7 @@ export_presets.cfg
 data_source_mapping.xml
 dataSources.xml
 sqldialects.xml
+discord.xml
 
 # Claude
 CLAUDE.md
