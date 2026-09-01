@@ -36,22 +36,20 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         IPacketSerializer packetSerializer,
         ICurrentUserIdRepository currentUserIdRepository,
         ISideDetector sideDetector,
-        IOptions<ToAuthServerConnectionOptions> toAuthServerConnectionOptions,
-        IOptions<ToCampaignServerConnectionOptions> toCampaignServerConnectionOptions,
-        IOptions<CertificateVerificationOptions> certificateVerificationOptions,
-        IOptions<IntercomOptions> intercomOptions
+        ToAuthServerConnectionOptions toAuthServerConnectionOptions,
+        ToCampaignServerConnectionOptions toCampaignServerConnectionOptions,
+        CertificateVerificationOptions certificateVerificationOptions,
+        ServerDependency<IntercomOptions> intercomOptions
     )
     {
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
         _sideDetector = sideDetector;
         _currentUserIdRepository = currentUserIdRepository;
-        _toAuthServerConnectionOptions = toAuthServerConnectionOptions.Value;
-        _toCampaignServerConnectionOptions = toCampaignServerConnectionOptions.Value;
-        _certificateVerificationOptions = certificateVerificationOptions.Value;
-        _intercomOptions = sideDetector.Side == Side.ShardServer ?
-            ServerDependency.From(intercomOptions.Value) :
-            ServerDependency.Null<IntercomOptions>();
+        _toAuthServerConnectionOptions = toAuthServerConnectionOptions;
+        _toCampaignServerConnectionOptions = toCampaignServerConnectionOptions;
+        _certificateVerificationOptions = certificateVerificationOptions;
+        _intercomOptions = intercomOptions;
         
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;

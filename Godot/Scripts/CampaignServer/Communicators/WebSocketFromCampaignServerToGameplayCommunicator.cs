@@ -33,8 +33,8 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         IPacketSerializer packetSerializer,
         IPacketHandler packetHandler,
         IUserRepository userRepo,
-        IOptions<IntercomOptions> intercomOptions,
-        IOptions<CertificateOptions> certificateOptions
+        IntercomOptions intercomOptions,
+        CertificateOptions certificateOptions
     )
     {
         _packetSerializer = packetSerializer;
@@ -43,12 +43,12 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         
         _jwtBuilder = JwtBuilder.Create()
             .WithAlgorithm(new HMACSHA256Algorithm())
-            .WithSecret(Convert.FromBase64String(intercomOptions.Value.IntercomSecret));
+            .WithSecret(Convert.FromBase64String(intercomOptions.IntercomSecret));
 
         _wsServer.SslCertificate = new X509Certificate();
-        _wsServer.SslCertificate.Load(certificateOptions.Value.CertificatePath);
+        _wsServer.SslCertificate.Load(certificateOptions.CertificatePath);
         _wsServer.PrivateKey = new CryptoKey();
-        _wsServer.PrivateKey.Load(certificateOptions.Value.PrivateKeyPath);
+        _wsServer.PrivateKey.Load(certificateOptions.PrivateKeyPath);
         _wsServer.Listen(CampaignServerCmdLineArgs.Port);
         _wsServer.Connect("client_disconnected", this, nameof(OnClientDisconnected));
         _wsServer.Connect("data_received", this, nameof(OnDataReceived));
