@@ -9,24 +9,23 @@ namespace Soteo.Main.Shared;
 
 public static class Config
 {
-    private static readonly ImmutableDictionary<string, string?> Defaults = new Dictionary<string, string?>
-    {
-        ["Side"] = "Client",
-        ["IsSingleplayer"] = "false",
-        ["Environment"] = "Production",
-        ["VerifyCertificate"] = "true",
-        ["Port"] = "3706",
-    }.ToImmutableDictionary(); // todo to appsettings.json
-    
-    private static readonly IConfigurationRoot Configuration = new ConfigurationBuilder()
-        .AddInMemoryCollection(Defaults)
-        .AddEnvironmentVariables("Soteo__")
-        .AddCommandLine(OS.GetCmdlineArgs())
-        .Build();
+    private static readonly string Environment = BuildConfiguration(null)["Environment"].Required;
+    private static readonly IConfiguration Configuration = BuildConfiguration(Environment);
     
     // Static fields are only for accessing the configuration in main classes before a service provider is built
     internal static readonly Side Side = Side.Parse(Configuration["Side"].Required);
     internal static readonly bool IsSingleplayer = bool.Parse(Configuration["IsSingleplayer"].Required);
+    
+    private static IConfiguration BuildConfiguration(string? environment)
+    {
+        var builder = new ConfigurationBuilder();
+        builder.AddGodotJsonFile("res://appsettings.json", optional: false);
+        if (environment != null)
+            builder.AddGodotJsonFile($"res://appsettings.{environment}.json", optional: true);
+        builder.AddCommandLine(OS.GetCmdlineArgs());
+        builder.AddEnvironmentVariables("Soteo__");
+        return builder.Build();
+    }
     
     public static void RegisterConfigurationOptions(IServiceCollection services)
     {

@@ -37,6 +37,8 @@
     </ItemGroup>
     
     <ItemGroup>
+      <Content Include="appsettings.Development.json" />
+      <Content Include="appsettings.json" />
       <Content Include="Localization\English.csv" />
       <Content Include="Localization\Russian.csv" />
       <Content Include="Web.html" />

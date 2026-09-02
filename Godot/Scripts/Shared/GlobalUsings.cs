@@ -12,3 +12,5 @@ global using Vector2 = System.Numerics.Vector2;
 global using GdVector2 = Godot.Vector2;
 global using GdObject = Godot.Object;
 global using GdDictionary = Godot.Collections.Dictionary;
+global using SysFile = System.IO.File;
+global using GdFile = Godot.File;
