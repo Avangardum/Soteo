@@ -75,7 +75,7 @@
             campaignServer.startGame({
                 unloadAfterInit: false,
                 canvasResizePolicy: canvasResizePolicy.doNotResize,
-                args: ["--quiet", "Side=CampaignServer", "IsSingleplayer=true", "ShardIds:0=00000000-0000-0000-0000-0000000005d1"],
+                args: ["--quiet", "Environment=Development", "Side=CampaignServer", "IsSingleplayer=true", "ShardIds:0=00000000-0000-0000-0000-0000000005d1"],
                 canvas: document.querySelector("#campaignServerCanvas"),
                 onPrint: text => print(text, console.log, "Campaign server"),
                 onPrintError: text => print(text, console.error, "Campaign server"),
@@ -84,7 +84,7 @@
             shardServer.startGame({
                 unloadAfterInit: false,
                 canvasResizePolicy: canvasResizePolicy.doNotResize,
-                args: ["--quiet", "Side=ShardServer", "ShardId=00000000-0000-0000-0000-0000000005d1", "IsSingleplayer=true"],
+                args: ["--quiet", "Environment=Development", "Side=ShardServer", "ShardId=00000000-0000-0000-0000-0000000005d1", "IsSingleplayer=true"],
                 canvas: document.querySelector("#shardServerCanvas"),
                 onPrint: text => print(text, console.log, "Shard server"),
                 onPrintError: text => print(text, console.error, "Shard server"),
@@ -93,7 +93,7 @@
             client.startGame({
                 unloadAfterInit: true,
                 canvasResizePolicy: canvasResizePolicy.fillPage,
-                args: ["--quiet", "IsSingleplayer=true"],
+                args: ["--quiet", "Environment=Development", "IsSingleplayer=true"],
                 canvas: document.querySelector("#clientCanvas"),
                 onPrint: text => print(text, console.log, "Client"),
                 onPrintError: text => print(text, console.error, "Client"),
@@ -107,7 +107,7 @@
         client.startGame({
             unloadAfterInit: true,
             canvasResizePolicy: canvasResizePolicy.fillPage,
-            args: ["--quiet"],
+            args: ["--quiet", "Environment=Development"],
             canvas: document.querySelector("#clientCanvas"),
             onPrint: text => print(text, console.log),
             onPrintError: text => print(text, console.error),
