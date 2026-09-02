@@ -47,10 +47,10 @@ public static class Config
         services.AddOptions<PortOptions>().Bind(Configuration).ValidateDataAnnotations();
         services.AddOptions<CampaignOptions>().Bind(Configuration).ValidateDataAnnotations();
         
-        // Unwrap only the options that must be present on the current side. Options should be injected directly,
-        // without using the IOptions<T> interface, this way trying to inject an option that's not supposed to be
-        // defined on that side will throw even if it is coincidentally defined. The following registrations define
-        // which sides can rely on which options.
+        // Unwrap (register as plain object without IOptions<T> wrapper) only the options that must be present on the
+        // current side. Options should be injected directly, without using IOptions<T> interface, this way trying to
+        // inject an option that's not supposed to be defined on that side will throw even if it is coincidentally
+        // defined. The following registrations define which sides can rely on which options.
         services.UnwrapOptions<SideOptions>();
         services.UnwrapOptions<SingleplayerOptions>();
         if (Side is Side.CampaignServer)
