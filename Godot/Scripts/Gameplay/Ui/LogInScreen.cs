@@ -1,3 +1,4 @@
+using Soteo.Core.Dto.Options;
 using Soteo.Core.Interfaces;
 
 namespace Soteo.Main.Gameplay.Ui;
@@ -10,7 +11,12 @@ public sealed class LogInScreen
     private readonly LineEdit _emailLineEdit;
     private readonly LineEdit _passwordLineEdit;
 
-    public LogInScreen(LogInScreenNode node, ICampaignServerConnector campaignServerConnector)
+    public LogInScreen
+    (
+        LogInScreenNode node,
+        ICampaignServerConnector campaignServerConnector,
+        LogInOptions logInOptions
+    )
     {
         _campaignServerConnector = campaignServerConnector;
         
@@ -19,8 +25,8 @@ public sealed class LogInScreen
         _passwordLineEdit = node.GetNode<LineEdit>("Password");
         node.GetNode<Button>("LogIn").Connect("pressed", OnLogInPressed);
         
-        if (ClientCmdLineArgs.Email != null)
-            _emailLineEdit.Text = ClientCmdLineArgs.Email;
+        if (logInOptions.Email != null)
+            _emailLineEdit.Text = logInOptions.Email;
     }
     
     private void OnLogInPressed()

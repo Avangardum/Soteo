@@ -27,7 +27,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
 {
     private readonly Dictionary<Guid, TaskCompletionSource> _shardServerInitAwaitingCampaignServerInitTcs = new();
     
-    private readonly bool _useJsmq = OS.HasFeature("web") && CampaignServerCmdLineArgs.IsSingleplayer;
+    private readonly bool _useJsmq = OS.HasFeature("web") && Config.IsSingleplayer;
     
     private readonly LateInit<IFromCampaignServerCommunicator> _communicator = new();
     private readonly LateInit<IServiceProvider> _serviceProvider = new();
@@ -55,19 +55,22 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             var synchronizedCampaignStateRepo =
                 ServiceProvider.GetRequiredService<ISynchronizedCampaignStateRepository>();
             var timeProvider = ServiceProvider.GetRequiredService<TimeProvider>();
+            // todo unwrap
             var campaignPersistenceOptions = ServiceProvider.GetRequiredService<IOptions<CampaignPersistenceOptions>>();
+            IReadOnlyList<Guid> shardIds = ServiceProvider.GetRequiredService<CampaignOptions>().ShardIds;
+            bool isSingleplayer = ServiceProvider.GetRequiredService<SingleplayerOptions>().IsSingleplayer;
 
-            await userRepo.WaitForUsersToConnectAsync(CampaignServerCmdLineArgs.ShardIds, timeout: 30);
+            await userRepo.WaitForUsersToConnectAsync(shardIds, timeout: 30);
 
             // Create a task for each shard server waiting for it to send
             // ShardServerInitAwaitingCampaignServerInitPacket, notifying that all initializing steps are done,
             // except for waiting for other servers' initialization. Once all the shard servers sent that, we can
             // tell them to complete initialization.
-            foreach (Guid id in CampaignServerCmdLineArgs.ShardIds)
+            foreach (Guid id in shardIds)
                 _shardServerInitAwaitingCampaignServerInitTcs[id] = new TaskCompletionSource();
             
             Func<string> snapshotPath = () => Path.Combine(campaignPersistenceOptions.Value.SnapshotFolder, "Snapshot");
-            if (!CampaignServerCmdLineArgs.IsSingleplayer && File.Exists(snapshotPath()))
+            if (!isSingleplayer && File.Exists(snapshotPath()))
             {
                 byte[] bytes = File.ReadAllBytes(snapshotPath());
                 CampaignSnapshot snapshot = snapshotSerializer.Deserialize(bytes);
@@ -88,7 +91,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             await timeProvider.Delay(TimeSpan.FromSeconds(15));
             synchronizedCampaignStateRepo.Value = synchronizedCampaignStateRepo.Value with { IsPaused = true };
 
-            if (!CampaignServerCmdLineArgs.IsSingleplayer)
+            if (!isSingleplayer)
             {
                 CampaignSnapshot snapshot = await snapshotManager.CreateSnapshotAsync();
                 byte[] bytes = snapshotSerializer.Serialize(snapshot);
@@ -126,7 +129,8 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         >();
         services.AddSingleton<TimeProvider>(new GodotTimeProvider(GetTree()));
         services.AddSingleton<ICampaignSnapshotSerializer, CampaignSnapshotSerializer>();
-        services.AddSingleton<IShardServerAllowlist>(ShardServerAllowlist.Enabled(CampaignServerCmdLineArgs.ShardIds));
+        services.AddSingleton<IShardServerAllowlist>(sp =>
+            ShardServerAllowlist.Enabled(sp.GetRequiredService<CampaignOptions>().ShardIds));
         services.AddSingleton<ISynchronizedCampaignStateRepository, SynchronizedCampaignStateRepository>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         

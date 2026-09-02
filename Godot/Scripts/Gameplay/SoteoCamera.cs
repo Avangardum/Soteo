@@ -1,4 +1,5 @@
 using Soteo.Core;
+using Soteo.Core.Dto.Options;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.StaticHelpers;
@@ -6,7 +7,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay;
 
-public sealed class SoteoCamera : Camera2D, ICamera
+public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
 {
     private const int MinZoomLog2 = 0;
     private const int MaxZoomLog2 = 5;
@@ -101,7 +102,7 @@ public sealed class SoteoCamera : Camera2D, ICamera
     
     private void Scroll(double delta)
     {
-        if (ClientCmdLineArgs.NoScroll) return;
+        if (cameraOptions.NoScroll) return;
         GdVector2 viewportMousePos = GetViewport().GetMousePosition();
         GdVector2 viewportSize = GetViewport().GetVisibleRect().Size;
         int xDirection = viewportMousePos.x < ScrollZoneThickness ? -1 :

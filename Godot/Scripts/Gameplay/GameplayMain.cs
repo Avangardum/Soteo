@@ -33,7 +33,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
     
-    private readonly bool _useJsmq = OS.HasFeature("web") && SharedCmdLineArgs.IsSingleplayer;
+    private readonly bool _useJsmq = OS.HasFeature("web") && Config.IsSingleplayer;
     private readonly TaskCompletionSource _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs = new();
     private readonly TaskCompletionSource _synchronizedCampaignStateInitializedTcs = new();
     private readonly TaskCompletionSource _campaignInitializedTcs = new();
@@ -70,10 +70,11 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
 
             _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
 
-            if (SharedCmdLineArgs.Side == Side.ShardServer)
+            if (Config.Side == Side.ShardServer)
             {
                 LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
-                _rootServiceProvider = _shardServiceScopes[ShardServerCmdLineArgs.ShardId].ServiceProvider;
+                Guid shardId = _rootServiceProvider.GetRequiredService<ShardOptions>().ShardId;
+                _rootServiceProvider = _shardServiceScopes[shardId].ServiceProvider;
                 _rootServiceProvider.GetRequiredService<IShardPersistenceSnapshotManager>().SnapshotReplicated +=
                     () => _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.TrySetResult();
                 _rootServiceProvider.GetRequiredService<ISynchronizedCampaignStatePuppetRepository>().Changed +=
@@ -97,7 +98,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         Config.RegisterConfigurationOptions(services);
         RegisterSharedServices(services);
         
-        if (SharedCmdLineArgs.Side == Side.ShardServer)
+        if (Config.Side == Side.ShardServer)
             RegisterServerServices(services);
         else
             RegisterClientServices(services);
@@ -122,7 +123,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddSingleton<IEntityNodePool, EntityNodePool>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
-        services.AddSingleton<ISideDetector>(new SideDetector(SharedCmdLineArgs.Side));
+        services.AddSingleton<ISideDetector>(new SideDetector(Config.Side)); // todo remove
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
@@ -237,9 +238,9 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
                 .Also(it => AddChild(it));
         }
         
-        if (SharedCmdLineArgs.Side == Side.Client)
+        if (Config.Side == Side.Client)
         {
-            _camera = new SoteoCamera().Also(it => AddChild(it));
+            _camera = ActivatorUtilities.CreateInstance<SoteoCamera>(_rootServiceProvider).Also(it => AddChild(it));
             var ui = GetNode<CanvasLayer>("Ui").Required;
             _hudNode = HudNode.Instance().Also(it => ui.AddChild(it));
             AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));
@@ -253,7 +254,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     {
         serviceProvider.GetRequiredService<SceneTreePauser>();
         
-        if (SharedCmdLineArgs.Side == Side.Client)
+        if (Config.Side == Side.Client)
         {
             serviceProvider.GetRequiredService<LogInScreen>();
             serviceProvider.GetRequiredService<DebugScreen>();
@@ -264,13 +265,13 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     
     private void CreateShardScopedNodes(ShardNode shard, IServiceProvider serviceProvider)
     {
-        if (SharedCmdLineArgs.Side == Side.ShardServer) return;
+        if (Config.Side == Side.ShardServer) return;
         shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
     }
     
     private void CreateShardScopedServices(IServiceProvider serviceProvider)
     {
-        if (SharedCmdLineArgs.Side == Side.ShardServer)
+        if (Config.Side == Side.ShardServer)
             serviceProvider.GetRequiredService<IShardSynchronizationServer>();
     }
     

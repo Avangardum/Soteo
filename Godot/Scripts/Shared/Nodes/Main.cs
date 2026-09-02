@@ -7,7 +7,7 @@ public sealed class Main : Node
 {
     public override void _Ready()
     {
-        if (SharedCmdLineArgs.Side == Side.CampaignServer)
+        if (Config.Side == Side.CampaignServer)
             GetTree().ChangeScene("res://Scenes/CampaignServerMain.tscn");
         else
             GetTree().ChangeScene("res://Scenes/GameplayMain.tscn");
