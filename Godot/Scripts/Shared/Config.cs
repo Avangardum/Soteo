@@ -55,10 +55,13 @@ public static class Config
         services.UnwrapOptions<SingleplayerOptions>();
         if (Side is Side.CampaignServer)
         {
-            services.UnwrapOptions<CampaignPersistenceOptions>(); // todo multiplayer only
             services.UnwrapOptions<CertificateOptions>();
-            services.UnwrapOptions<PortOptions>(); // todo multiplayer only
             services.UnwrapOptions<CampaignOptions>();
+            if (!IsSingleplayer)
+            {
+                services.UnwrapOptions<CampaignPersistenceOptions>();
+                services.UnwrapOptions<PortOptions>();
+            }
         }
         if (Side is Side.ShardServer)
         {
