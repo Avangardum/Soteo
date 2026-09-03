@@ -22,7 +22,6 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
     private static readonly Guid Shard3Id = Guid.NewGuid(); 
     private static readonly Guid ProjectileId = Guid.NewGuid(); 
     
-    // todo add non-player units after they are introduced
     private static readonly CampaignSnapshot ConsistentSnapshot = new()
     {
         CampaignServer = new CampaignServerSnapshot

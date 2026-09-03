@@ -155,8 +155,6 @@ public abstract class Ability
                 return AbilityValidationResult.InvalidTarget;
         }
         
-        // todo validate character / building
-        
         return AbilityValidationResult.Ok;
     }
     

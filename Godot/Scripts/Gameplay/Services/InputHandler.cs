@@ -167,8 +167,6 @@ public sealed class InputHandler : Node2D
                 return AbilityValidationResult.InvalidTarget;
         }
         
-        // todo validate character / building
-        
         return AbilityValidationResult.Ok;
     }
 
