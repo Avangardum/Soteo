@@ -17,8 +17,7 @@ public sealed class AuthController : Controller
     public AuthController(UserManager<IdentityUser> userManager, IConfiguration configuration)
     {
         _userManager = userManager;
-        _intercomSecret = configuration["Soteo:IntercomSecret"] ??
-            throw new Exception("IntercomSecret is not set.");
+        _intercomSecret = configuration["IntercomSecret"] ?? throw new Exception("IntercomSecret is not set.");
         var securityKey = new SymmetricSecurityKey(Convert.FromBase64String(_intercomSecret));
         _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
     }
