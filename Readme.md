@@ -52,26 +52,16 @@ dotnet dev-certs https --export-path <PATH> --no-password --format PEM
 
 Set the following environment variables:
 
-`Soteo__AuthServerConnectionString` - PostgreSQL connection string in the following format (adjust if necessary):
+`Soteo__AuthServerConnectionString` - PostgreSQL connection string in the following format:
 `Server=127.0.0.1;Port=5432;Database=SoteoAuthServer;User Id=postgres;Password=postgres;`
 
-`Soteo__AuthServerUrl` - `https://localhost:3705`
-
-`Soteo__CampaignServerUrl` - `wss://localhost:3706`
-
 `Soteo__SnapshotFolder` - Path to any folder outside the repository where snapshot files will be stored
-
-`Soteo__IntercomSecret` - Base64 encoded secret that servers use for internal authentication, use any random
-base64 string
 
 `Soteo__CertificatePath` - Path to the .crt file
 
 `Soteo__PrivateKeyPath` - Path to the .key file
 
-`Soteo__VerifyCertificate` - `False`
-
-Go to the auth server url in a browser and register a new account with email `player1@soteo.net`
-and password `Pa55_word`
+Restart your IDE or terminal for the environment variable changes to apply.
 
 ##### Running from a terminal
 
@@ -84,14 +74,19 @@ each in a separate terminal:
 
 ```bash
 dotnet run --project ../Soteo.AuthServer
-soteo --quiet --no-window --campaign-server --shard 00000000-0000-0000-0000-0000000005d1 --shard 00000000-0000-0000-0000-0000000005d2
-soteo --quiet --no-window --shard-server 00000000-0000-0000-0000-0000000005d1
-soteo --quiet --no-window --shard-server 00000000-0000-0000-0000-0000000005d2
-soteo --quiet --no-scroll --position 10,10 --resolution 1000x500
-soteo --quiet --no-scroll --position 10,550 --resolution 1000x500 --email player2@soteo.net
+soteo --quiet --no-window Side=CampaignServer ShardIds:0=00000000-0000-0000-0000-0000000005d1 ShardIds:1=00000000-0000-0000-0000-0000000005d2
+soteo --quiet --no-window Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d1
+soteo --quiet --no-window Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d2
+soteo --quiet --position 10,10 --resolution 1000x500 NoScroll=true
+soteo --quiet --position 10,550 --resolution 1000x500 NoScroll=true Email=player2@soteo.net
 ```
 
+Go to the auth server url in a browser and register a new account with email `player1@soteo.net`
+and password `Pa55_word`
+
 Log in with default credentials.
+
+For more info on configuration see the Config class.
 
 ##### Running from Rider
 
@@ -100,13 +95,6 @@ If using Rider, you can use Run/Debug configurations to run the game instead of 
 copy arguments from above and use "Redirect standard streams" terminal mode). To launch all processes in one click add
 "Multi-Launch" with first step building the solution immediately, second step launching auth server after previous
 finished and the rest after previous started.
-
-##### Customizing ports
-
-By default, the port 3705 is used for the auth server and the port 3706 is used for the campaign server.
-Auth server port can be changed by editing launchsettings.json (don't commit the changes).
-Campaign server port can be changed by adding `--port 1234`.
-If changing ports, don't forget to also update URLs in environment variables to reflect that.
 
 ### Exploring the codebase
 

@@ -9,6 +9,16 @@ namespace Soteo.Main.Shared;
 
 public static class Config
 {
+    // The game uses .NET configuration and option APIs for configuring the app. Configuration can be specified in the
+    // following ways:
+    // - appsettings.json
+    // - appsettings.<Environment>.json (for example, appsettings.Development.json defines configuration specific for
+    // development)
+    // - environment variables prefixed with Soteo__ (use the __ separator to declare hierarchical values, for
+    // example, Soteo__Foo__Bar sets value Bar in section Foo)
+    // - command line arguments in the Key=Value format (for distinction against Godot arguments, which use the
+    // --key value format) (use the : separator to declare hierarchical values)
+    
     private static readonly string Environment = BuildConfiguration(null)["Environment"].Required;
     private static readonly IConfiguration Configuration = BuildConfiguration(Environment);
     
