@@ -149,7 +149,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
-        Guid id = _currentUserIdRepository.Required;
+        Guid id = _currentUserIdRepository.Value.Required;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(_intercomOptions.Value.Required.IntercomSecret)}";
         string url = $"{_toAuthServerConnectionOptions.AuthServerUrl}/token/service";

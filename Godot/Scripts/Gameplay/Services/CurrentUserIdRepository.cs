@@ -14,7 +14,4 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
     }
     
     public Guid? Value { get; set; }
-    
-    // todo remove
-    public Guid Required => Value.Required;
 }

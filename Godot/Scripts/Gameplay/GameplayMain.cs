@@ -72,7 +72,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
 
             if (Config.Side == Side.ShardServer)
             {
-                LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Required);
+                LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Value.Required);
                 Guid shardId = _rootServiceProvider.GetRequiredService<ShardOptions>().ShardId;
                 _rootServiceProvider = _shardServiceScopes[shardId].ServiceProvider;
                 _rootServiceProvider.GetRequiredService<IShardPersistenceSnapshotManager>().SnapshotReplicated +=

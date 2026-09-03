@@ -106,7 +106,7 @@ public sealed class JsmqFromGameplayCommunicator :
     public void SendReliable(Packet packet, Guid receiverId)
     {
         if (_currentUserIdRepository.Value == null) return;
-        byte[] bytes = [.._currentUserIdRepository.Required.ToByteArray(), .._packetSerializer.Serialize(packet)];
+        byte[] bytes = [.._currentUserIdRepository.Value.Required.ToByteArray(), .._packetSerializer.Serialize(packet)];
         string base64 = Convert.ToBase64String(bytes);
         JavaScript.Eval($"""jsmq.send("{base64}", "{receiverId}");""");
     }
