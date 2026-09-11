@@ -46,9 +46,7 @@ Namespaces should correspond to the folder structure (use automatic namespace ad
 
 Types with the same name that differ only by number of generic parameters should be in one file.
 
-Extension classes for a single type declared in the same codebase should be in the same file with the extended type.
-
-Otherwise, each non-nested type should be in its own file.
+Each non-nested type should be in its own file.
 
 Classes that are not meant to be inherited from, but are meant to be instanced, should be sealed.
 
@@ -212,7 +210,6 @@ Avoid using special values like `0`, `-1`, `NaN`, `Guid.Empty`, `""` to encode a
 |-------------|------------------|
 | Repository  | `SomeRepository` |
 | Branch      | `some-branch`    |
-| Main branch | `main`           |
 
 ## JSON
 
@@ -224,7 +221,7 @@ Indentation: 4 spaces.
 
 ## XML, HTML, XAML
 
-Inline self-closing tag should have a space before `/>`.
+An inline self-closing tag should have no space before `/>`.
 
 A tag should either occupy one line with all its attributes, or have each attribute on a separate line,
 with the tag name and the closing angle bracket on its own line.
@@ -237,11 +234,11 @@ Abbreviations follow the same naming rules as if they were regular words (`JsonP
 
 When possible, format code to avoid line width exceeding 120 symbols.
 
-Empty lines should have the same indentation level as the surrounding code.
-
-Non-empty lines should have no trailing spaces.
+Lines should have no trailing spaces.
 
 All files should end with an empty line.
 
+LF line endings should be used.
+
 In special cases where fully following this convention would be impractical, it's possible to deviate from it.
-Reasons for such a deviation should be documented in a comment, unless they are obvious from the context.
+Reasons for such a deviation should be documented in a comment, unless they are obvious from context.
