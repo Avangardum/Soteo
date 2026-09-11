@@ -434,7 +434,6 @@ FodyWeavers.xsd
 # Godot
 .import/
 *.translation
-export_presets.cfg
 .mono/
 
 # Rider

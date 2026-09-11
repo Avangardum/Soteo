@@ -36,7 +36,7 @@ icon in the top right, in the opened browser window click singleplayer and log i
 [Install .NET 10 SDK](https://dotnet.microsoft.com/en-us/download)
 
 [Install Godot 3.6.2](https://godotengine.org/download/archive/3.6.2-stable/) (pick the .NET version, not standard).
-Create a symlink to the Godot executable called `soteo` (`soteo.exe` on Windows) and update the PATH environment
+Create a link to the Godot executable called `soteo` (`soteo.exe` on Windows) and update the PATH environment
 variable to include the directory containing the symlink. Open a new terminal and type `soteo`. If everything is
 correct, the Godot project selection menu will open.
 
@@ -67,7 +67,7 @@ Restart your IDE or terminal for the environment variable changes to apply.
 
 Open a terminal and navigate to `/Godot`, all commands should run from here
 
-Before running build the solution with `dotnet build` or with a `Build` button in Godot
+Before running, build the solution with `dotnet build` or with a `Build` button in Godot
 
 Start the auth server, the campaign server, 2 shard servers and 2 clients by running the following commands,
 each in a separate terminal:
@@ -81,12 +81,12 @@ soteo --quiet --position 10,10 --resolution 1000x500 NoScroll=true
 soteo --quiet --position 10,550 --resolution 1000x500 NoScroll=true Email=player2@soteo.net
 ```
 
-Go to the auth server url in a browser and register a new account with email `player1@soteo.net`
-and password `Pa55_word`
+Go to https://localhost:3705 in a browser and register a new account
+with email `player1@soteo.net` and password `Pa55_word`.
 
 Log in with default credentials.
 
-For more info on configuration see the Config class.
+For more info on configuration such as changing ports see the `Config` class.
 
 ##### Running from Rider
 
