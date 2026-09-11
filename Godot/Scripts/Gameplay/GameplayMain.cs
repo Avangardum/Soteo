@@ -27,6 +27,8 @@ namespace Soteo.Main.Gameplay;
 
 public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketReceiver, IInitializationRepository
 {
+    // TODO client initialization
+    
     // Client and shard server entry point.
     // Handles scene loading and dependency injection.
     // A service scope corresponds to a shard.
@@ -49,48 +51,47 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     private ProcessPublisher? _processPublisher;
     private SoteoCamera? _camera;
     
-    private PackedScene? _shardScene;
+    private readonly PackedScene? _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
     private IServiceProvider? _rootServiceProvider;
     private ShardNode? _newScopeShard;
     private readonly Dictionary<Guid, IServiceScope> _shardServiceScopes = [];
     
     public bool Initialized { get; private set; }
     
-    public override async void _Ready()
+    public override void _Ready()
     {
-        try
-        {
-            GlobalInit.Init();
-            var serviceCollection = new ServiceCollection();
-            RegisterServices(serviceCollection);
-            _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
-            GetNodes();
-            CreateSingletonNodes();
-            CreateSingletonServices(_rootServiceProvider);
+        InitAsync().CollectException();
+    }
+    
+    private async Task InitAsync()
+    {
+        GlobalInit.Init();
+        var serviceCollection = new ServiceCollection();
+        RegisterServices(serviceCollection);
+        _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
+        GetNodes();
+        CreateSingletonNodes();
+        CreateSingletonServices(_rootServiceProvider);
 
-            _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
-
-            if (Config.Side == Side.ShardServer)
-            {
-                LoadShard(_rootServiceProvider.GetRequiredService<ICurrentUserIdRepository>().Value.Required);
-                Guid shardId = _rootServiceProvider.GetRequiredService<ShardOptions>().ShardId;
-                _rootServiceProvider = _shardServiceScopes[shardId].ServiceProvider;
-                _rootServiceProvider.GetRequiredService<IShardPersistenceSnapshotManager>().SnapshotReplicated +=
-                    () => _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.TrySetResult();
-                _rootServiceProvider.GetRequiredService<ISynchronizedCampaignStatePuppetRepository>().Changed +=
-                    () => _synchronizedCampaignStateInitializedTcs.TrySetResult();
-                await _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.Task;
-                await _synchronizedCampaignStateInitializedTcs.Task;
-                _rootServiceProvider.GetRequiredService<IFromGameplayPacketSender>()
-                    .SendReliable(new ShardServerInitAwaitingCampaignServerInitPacket(), Const.CampaignServerId);
-                await _campaignInitializedTcs.Task;
-                Initialized = true;
-            }
-        }
-        catch (Exception e)
-        {
-            AsyncExceptionCollector.Collect(e);
-        }
+        if (Config.Side == Side.ShardServer)
+            await ServerInitAsync();
+    }
+    
+    private async Task ServerInitAsync()
+    {
+        LoadShard(_rootServiceProvider.Required.GetRequiredService<ICurrentUserIdRepository>().Value.Required);
+        Guid shardId = _rootServiceProvider.GetRequiredService<ShardOptions>().ShardId;
+        _rootServiceProvider = _shardServiceScopes[shardId].ServiceProvider;
+        _rootServiceProvider.GetRequiredService<IShardPersistenceSnapshotManager>().SnapshotReplicated +=
+            () => _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.TrySetResult();
+        _rootServiceProvider.GetRequiredService<ISynchronizedCampaignStatePuppetRepository>().Changed +=
+            () => _synchronizedCampaignStateInitializedTcs.TrySetResult();
+        await _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.Task;
+        await _synchronizedCampaignStateInitializedTcs.Task;
+        _rootServiceProvider.GetRequiredService<IFromGameplayPacketSender>()
+            .SendReliable(new ShardServerInitAwaitingCampaignServerInitPacket(), Const.CampaignServerId);
+        await _campaignInitializedTcs.Task;
+        Initialized = true;
     }
     
     private void RegisterServices(IServiceCollection services)

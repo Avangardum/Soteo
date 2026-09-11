@@ -38,7 +38,6 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     
     public override async void _Ready()
     {
-        // todo refactor
         try
         {
             GlobalInit.Init();
