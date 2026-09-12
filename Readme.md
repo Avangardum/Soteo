@@ -98,7 +98,7 @@ Go to https://localhost:3705 in a browser, register a new account with email `pl
 
 Log in with the Godot client with the default credentials, choose a shard and a character and click "Deploy".
 
-For more info on configuration such as changing ports see the `Config` class.
+For more info on configuration, such as changing ports, see the `Config` class.
 
 ##### Running from Rider
 
@@ -115,7 +115,7 @@ explore the classes mentioned in the docs or the ones you are interested in.
 
 ## Contributing
 
-If you'd like to contribute, join the Discord server and let me know
+If you'd like to contribute, join the Discord server and let me know.
 
 ## To-do
 
