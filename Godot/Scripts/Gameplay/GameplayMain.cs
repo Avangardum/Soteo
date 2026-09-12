@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Soteo.Core;
 using Soteo.Core.Attributes;
 using Soteo.Core.Dto.Options;
@@ -49,6 +50,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     private JsmqFromGameplayCommunicator? _jsmqCommunicator;
     private ProcessPublisher? _processPublisher;
     private SoteoCamera? _camera;
+    private ILogger<GameplayMain>? _logger;
     
     private readonly PackedScene? _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
     private IServiceProvider? _rootServiceProvider;
@@ -70,7 +72,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
         GetNodes();
         CreateSingletonNodes();
-        CreateSingletonServices(_rootServiceProvider);
+        CreateSingletonServices();
 
         if (Config.Side == Side.ShardServer)
             await ServerInitAsync();
@@ -85,12 +87,15 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             () => _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.TrySetResult();
         _rootServiceProvider.GetRequiredService<ISynchronizedCampaignStatePuppetRepository>().Changed +=
             () => _synchronizedCampaignStateInitializedTcs.TrySetResult();
+        _logger.Required.LogInformation("Initializing...");
         await _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.Task;
         await _synchronizedCampaignStateInitializedTcs.Task;
         _rootServiceProvider.GetRequiredService<IFromGameplayPacketSender>()
             .SendReliable(new ShardServerInitAwaitingCampaignServerInitPacket(), Const.CampaignServerId);
+        _logger.Required.LogInformation("Local initializing done, waiting for others...");
         await _campaignInitializedTcs.Task;
         Initialized = true;
+        _logger.Required.LogInformation("Initialized");
     }
     
     private void RegisterServices(IServiceCollection services)
@@ -250,16 +255,17 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         }
     }
     
-    private void CreateSingletonServices(IServiceProvider serviceProvider)
+    private void CreateSingletonServices()
     {
-        serviceProvider.GetRequiredService<SceneTreePauser>();
+        _logger = _rootServiceProvider.Required.GetRequiredService<ILogger<GameplayMain>>();
+        _rootServiceProvider.Required.GetRequiredService<SceneTreePauser>();
         
         if (Config.Side == Side.Client)
         {
-            serviceProvider.GetRequiredService<LogInScreen>();
-            serviceProvider.GetRequiredService<DebugScreen>();
-            serviceProvider.GetRequiredService<IHud>();
-            serviceProvider.GetRequiredService<CampaignScreen>();
+            _rootServiceProvider.Required.GetRequiredService<LogInScreen>();
+            _rootServiceProvider.Required.GetRequiredService<DebugScreen>();
+            _rootServiceProvider.Required.GetRequiredService<IHud>();
+            _rootServiceProvider.Required.GetRequiredService<CampaignScreen>();
         }
     }
     

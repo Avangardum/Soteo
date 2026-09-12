@@ -1,6 +1,7 @@
 namespace Soteo.Core.Enums;
 
 // TODO Use meters instead of pixels
+// TODO Use radians instead of degrees
 public enum Stat : byte
 {
     MaxHealth,
