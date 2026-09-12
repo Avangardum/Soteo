@@ -59,7 +59,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
 
     public void Tick()
     {
-        if (!_initRepo.Initialized) return;
+        if (!_initRepo.IsInitialized) return;
         
         if (_pauseRepo.IsPaused)
             PausedTick();

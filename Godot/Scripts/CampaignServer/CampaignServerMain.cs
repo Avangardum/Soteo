@@ -72,7 +72,6 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         
         await WaitForShardServersLocalInit();
         _communicator.Value.BroadcastToShardServers(new CampaignInitializedPacket());
-        _communicator.Value.AllowPlayerConnections = true; // todo check init state inside a communicator
         
         const int initialPauseDuration = 15;
         _logger.Value.LogInformation("Initialized, unpausing in {duration} seconds", initialPauseDuration);

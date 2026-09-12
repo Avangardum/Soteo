@@ -57,7 +57,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     private ShardNode? _newScopeShard;
     private readonly Dictionary<Guid, IServiceScope> _shardServiceScopes = [];
     
-    public bool Initialized { get; private set; }
+    public bool IsInitialized { get; private set; }
     
     public override void _Ready()
     {
@@ -94,7 +94,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             .SendReliable(new ShardServerLocalInitDonePacket(), Const.CampaignServerId);
         _logger.Required.LogInformation("Local initializing done, waiting for others");
         await _campaignInitializedTcs.Task;
-        Initialized = true;
+        IsInitialized = true;
         _logger.Required.LogInformation("Initialized");
     }
     

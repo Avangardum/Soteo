@@ -18,11 +18,10 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
     private readonly IPacketHandler _packetHandler;
     private readonly IUserRepository _userRepo;
     private readonly JwtBuilder _jwtBuilder;
+    private readonly IInitializationRepository _initRepo;
     
     private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = [];
 
-    public bool AllowPlayerConnections { get; set; }
-    
     public event Action<Guid> PeerConnected = delegate {};
     public event Action<Guid> PeerDisconnected = delegate {};
 
@@ -31,6 +30,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         IPacketSerializer packetSerializer,
         IPacketHandler packetHandler,
         IUserRepository userRepo,
+        IInitializationRepository initRepo,
         IntercomOptions intercomOptions,
         CertificateOptions certificateOptions,
         PortOptions portOptions
@@ -39,6 +39,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         _packetSerializer = packetSerializer;
         _packetHandler = packetHandler;
         _userRepo = userRepo;
+        _initRepo = initRepo;
         
         _jwtBuilder = JwtBuilder.Create()
             .WithAlgorithm(new HMACSHA256Algorithm())
@@ -167,7 +168,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
             bool.TryParse(strValue, out bool parsedValue) &&
             parsedValue;
         
-        if (isPlayer && !AllowPlayerConnections)
+        if (isPlayer && !_initRepo.IsInitialized)
         {
             var reason = "Not accepting player connections yet, try again later";
             peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = reason } )).ThrowIfError();

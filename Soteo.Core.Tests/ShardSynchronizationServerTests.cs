@@ -27,7 +27,7 @@ public sealed class ShardSynchronizationServerTests
         var connectionNotifier = Substitute.For<IConnectionNotifier>();
         var frameStopwatch = Substitute.For<IFrameStopwatch>();
         _pauseRepo = new FakePauseRepo();
-        var initRepo = new FakeInitializationRepo { Initialized = true };
+        var initRepo = new FakeInitializationRepo { IsInitialized = true };
         _sut = new ShardSynchronizationServer
         (
             _entitySnapshotManager,
