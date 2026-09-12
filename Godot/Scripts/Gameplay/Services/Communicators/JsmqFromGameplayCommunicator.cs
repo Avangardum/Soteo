@@ -1,4 +1,5 @@
 using Soteo.Core;
+using Soteo.Core.Dto.Options;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
@@ -22,7 +23,7 @@ public sealed class JsmqFromGameplayCommunicator :
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
-    private readonly ISideDetector _sideDetector;
+    private readonly SideOptions _sideOptions;
     
     public event Action Connected = delegate { };
     public event Action<Guid> PeerConnected = delegate { };
@@ -35,13 +36,13 @@ public sealed class JsmqFromGameplayCommunicator :
         ICurrentUserIdRepository currentUserIdRepository,
         IPacketSerializer packetSerializer,
         IPacketHandler packetHandler,
-        ISideDetector sideDetector
+        SideOptions sideOptions
     )
     {
         _currentUserIdRepository = currentUserIdRepository;
         _packetSerializer = packetSerializer;
         _packetHandler = packetHandler;
-        _sideDetector = sideDetector;
+        _sideOptions = sideOptions;
         
         Name = nameof(JsmqFromGameplayCommunicator);
         PauseMode = PauseModeEnum.Process;
@@ -50,19 +51,19 @@ public sealed class JsmqFromGameplayCommunicator :
     public override void _Ready()
     {
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        if (_sideDetector.Side == Side.ShardServer) ConnectAsShardServer();
+        if (_sideOptions.Side == Side.ShardServer) ConnectAsShardServer();
     }
 
     public override void _Process(float delta)
     {
         // Client polls in _Process to minimize latency
-        if (_sideDetector.Side == Side.Client) Poll();
+        if (_sideOptions.Side == Side.Client) Poll();
     }
 
     public override void _PhysicsProcess(float delta)
     {
         // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
-        if (_sideDetector.Side == Side.ShardServer) Poll();
+        if (_sideOptions.Side == Side.ShardServer) Poll();
     }
 
     public void ConnectAsPlayer(string email, string password)

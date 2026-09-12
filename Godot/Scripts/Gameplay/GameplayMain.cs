@@ -124,7 +124,6 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddSingleton<IEntityNodePool, EntityNodePool>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
-        services.AddSingleton<ISideDetector>(new SideDetector(Config.Side)); // todo remove
         services.AddSingleton<ISerializationHelper, SerializationHelper>();
         var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);

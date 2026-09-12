@@ -1,3 +1,4 @@
+using Soteo.Core.Dto.Options;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Exceptions;
@@ -38,7 +39,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     private readonly IChunkCollector _chunkCollector;
-    private readonly ISideDetector _sideDetector;
+    private readonly SideOptions _sideOptions;
     
     public long BytesSent { get; private set; }
     public long BytesReceived { get; private set; }
@@ -49,14 +50,14 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer, 
         IChunkCollector chunkCollector,
-        ISideDetector sideDetector
+        SideOptions sideOptions
     )
     {
         _campaignServerPacketSender = campaignServerPacketSender;
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
         _chunkCollector = chunkCollector;
-        _sideDetector = sideDetector;
+        _sideOptions = sideOptions;
 
         Name = nameof(WebRtcFromGameplayToGameplayCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
@@ -71,7 +72,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         // _Process would be delayed to the next physics frame otherwise.
         Poll(delta);
         
-        if (_sideDetector.Side == Side.ShardServer)
+        if (_sideOptions.Side == Side.ShardServer)
         {
             while (_packetQueue.Count > 0)
             {
@@ -130,7 +131,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     private void ProcessPing(double delta)
     {
-        if (_sideDetector.Side == Side.ShardServer) return;
+        if (_sideOptions.Side == Side.ShardServer) return;
         _timeSinceLastPing += delta;
         if (_timeSinceLastPing >= PingInterval)
         {
@@ -168,7 +169,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         }
         catch (BadSerializedDataException e)
         {
-            if (_sideDetector.Side == Side.ShardServer)
+            if (_sideOptions.Side == Side.ShardServer)
             {
                 SendReliable(new BadInputPacket { Reason = e.Message }, senderId);
                 return null;
@@ -195,14 +196,14 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             }
             
             // Server defers packet handling to _PhysicsProcess to ensure that all game logic is executed in it only
-            if (_sideDetector.Side == Side.ShardServer && !_isPhysicsProcess)
+            if (_sideOptions.Side == Side.ShardServer && !_isPhysicsProcess)
                 _packetQueue.Enqueue((packet, senderId));
             else
                 await _packetHandler.HandleAsync(packet, senderId);
         }
         catch (BadPacketException e)
         {
-            if (_sideDetector.Side == Side.ShardServer)
+            if (_sideOptions.Side == Side.ShardServer)
                 SendReliable(new BadInputPacket { Reason = e.Message }, senderId);
             else
                 AsyncExceptionCollector.Collect(e);
@@ -230,7 +231,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     public void ConnectToShardServer(Guid id)
     {
-        if (_sideDetector.Side == Side.ShardServer) throw new InvalidOperationException();
+        if (_sideOptions.Side == Side.ShardServer) throw new InvalidOperationException();
         
         WebRTCPeerConnection connection = CreateConnection(id);
         connection.CreateOffer();
@@ -357,8 +358,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     
     public void ReceiveWebrtcSdpPacket(WebrtcSdpPacket packet)
     {
-        string type = _sideDetector.Side == Side.ShardServer ? "offer" : "answer";
-        WebRTCPeerConnection? connection = _sideDetector.Side == Side.ShardServer ? CreateConnection(packet.PeerId) :
+        string type = _sideOptions.Side == Side.ShardServer ? "offer" : "answer";
+        WebRTCPeerConnection? connection = _sideOptions.Side == Side.ShardServer ? CreateConnection(packet.PeerId) :
             _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         connection?.SetRemoteDescription(type, packet.Sdp);
     }
