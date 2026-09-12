@@ -37,7 +37,7 @@ public static class Config
         return builder.Build();
     }
     
-    public static void RegisterConfigurationOptions(IServiceCollection services)
+    public static void AddToServiceCollection(IServiceCollection services)
     {
         // Register all options regardless of side, because omitting a registration would implicitly register a
         // default (possibly invalid) value which would be silently injected into IOptions<T> constructor parameters

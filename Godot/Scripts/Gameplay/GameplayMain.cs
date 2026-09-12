@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core;
 using Soteo.Core.Attributes;
@@ -96,7 +95,8 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     
     private void RegisterServices(IServiceCollection services)
     {
-        Config.RegisterConfigurationOptions(services);
+        Config.AddToServiceCollection(services);
+        Logging.AddToServiceCollection(services);
         RegisterSharedServices(services);
         
         if (Config.Side == Side.ShardServer)
