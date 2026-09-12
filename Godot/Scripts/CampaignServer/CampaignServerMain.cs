@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Soteo.Core;
 using Soteo.Core.Attributes;
@@ -25,7 +25,7 @@ namespace Soteo.Main.CampaignServer;
 
 public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
 {
-    private readonly Dictionary<Guid, TaskCompletionSource> _shardServerInitAwaitingCampaignServerInitTcs = new();
+    private readonly Dictionary<Guid, TaskCompletionSource> _shardServerLocalInitDoneTcs = new();
     
     private readonly bool _useJsmq = OS.HasFeature("web") && Config.IsSingleplayer;
     
@@ -36,71 +36,79 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     
     private IServiceProvider ServiceProvider => _serviceProvider.Value;
     
-    public override async void _Ready()
+    public override void _Ready()
     {
-        try
+        InitAsync().CollectException();
+    }
+    
+    private async Task InitAsync()
+    {
+        GlobalInit.Init();
+        var serviceCollection = new ServiceCollection();
+        RegisterServices(serviceCollection);
+        CreateSingletonNodes();
+        _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
+        _communicator.Value = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
+
+        var snapshotManager = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
+        var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
+        var userRepo = ServiceProvider.GetRequiredService<IUserRepository>();
+        var communicator = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
+        var synchronizedCampaignStateRepo =
+            ServiceProvider.GetRequiredService<ISynchronizedCampaignStateRepository>();
+        var timeProvider = ServiceProvider.GetRequiredService<TimeProvider>();
+        var logger = ServiceProvider.GetRequiredService<ILogger<CampaignServerMain>>();
+        // todo unwrap
+        var campaignPersistenceOptions = ServiceProvider.GetRequiredService<IOptions<CampaignPersistenceOptions>>();
+        IReadOnlyList<Guid> shardIds = ServiceProvider.GetRequiredService<CampaignOptions>().ShardIds;
+        bool isSingleplayer = ServiceProvider.GetRequiredService<SingleplayerOptions>().IsSingleplayer;
+
+        logger.LogInformation("Waiting for shard servers to connect");
+        await userRepo.WaitForUsersToConnectAsync(shardIds, timeout: 30);
+
+        // Create a task for each shard server waiting for it to finish local initializing, which is everything
+        // except for waiting for other servers' initialization. Once all the shard servers sent that, we can
+        // tell them to complete initialization.
+        foreach (Guid id in shardIds)
+            _shardServerLocalInitDoneTcs[id] = new TaskCompletionSource();
+        
+        Func<string> snapshotPath = () => Path.Combine(campaignPersistenceOptions.Value.SnapshotFolder, "Snapshot");
+        if (!isSingleplayer && File.Exists(snapshotPath()))
         {
-            GlobalInit.Init();
-            var serviceCollection = new ServiceCollection();
-            RegisterServices(serviceCollection);
-            CreateSingletonNodes();
-            _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
-            _communicator.Value = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
-
-            var snapshotManager = ServiceProvider.GetRequiredService<CampaignSnapshotManager>();
-            var snapshotSerializer = ServiceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
-            var userRepo = ServiceProvider.GetRequiredService<IUserRepository>();
-            var communicator = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
-            var synchronizedCampaignStateRepo =
-                ServiceProvider.GetRequiredService<ISynchronizedCampaignStateRepository>();
-            var timeProvider = ServiceProvider.GetRequiredService<TimeProvider>();
-            // todo unwrap
-            var campaignPersistenceOptions = ServiceProvider.GetRequiredService<IOptions<CampaignPersistenceOptions>>();
-            IReadOnlyList<Guid> shardIds = ServiceProvider.GetRequiredService<CampaignOptions>().ShardIds;
-            bool isSingleplayer = ServiceProvider.GetRequiredService<SingleplayerOptions>().IsSingleplayer;
-
-            await userRepo.WaitForUsersToConnectAsync(shardIds, timeout: 30);
-
-            // Create a task for each shard server waiting for it to send
-            // ShardServerInitAwaitingCampaignServerInitPacket, notifying that all initializing steps are done,
-            // except for waiting for other servers' initialization. Once all the shard servers sent that, we can
-            // tell them to complete initialization.
-            foreach (Guid id in shardIds)
-                _shardServerInitAwaitingCampaignServerInitTcs[id] = new TaskCompletionSource();
-            
-            Func<string> snapshotPath = () => Path.Combine(campaignPersistenceOptions.Value.SnapshotFolder, "Snapshot");
-            if (!isSingleplayer && File.Exists(snapshotPath()))
-            {
-                byte[] bytes = File.ReadAllBytes(snapshotPath());
-                CampaignSnapshot snapshot = snapshotSerializer.Deserialize(bytes);
-                await snapshotManager.ReplicateSnapshotAsync(snapshot);
-            }
-            else
-            {
-                communicator.BroadcastToShardServers(new NoInitialShardSnapshotPacket());
-            }
-
-            // todo timeout
-            await Task.WhenAll(_shardServerInitAwaitingCampaignServerInitTcs.Values.Select(it => it.Task));
-            communicator.BroadcastToShardServers(new CampaignInitializedPacket());
-            communicator.AllowPlayerConnections = true; // todo check init state inside a communicator
-
-            await timeProvider.Delay(TimeSpan.FromSeconds(15));
-            synchronizedCampaignStateRepo.Value = synchronizedCampaignStateRepo.Value with { IsPaused = false };
-            await timeProvider.Delay(TimeSpan.FromSeconds(15));
-            synchronizedCampaignStateRepo.Value = synchronizedCampaignStateRepo.Value with { IsPaused = true };
-
-            if (!isSingleplayer)
-            {
-                CampaignSnapshot snapshot = await snapshotManager.CreateSnapshotAsync();
-                byte[] bytes = snapshotSerializer.Serialize(snapshot);
-                File.WriteAllBytes(snapshotPath(), bytes);
-            }
+            logger.LogInformation("Loading a snapshot");
+            byte[] bytes = File.ReadAllBytes(snapshotPath());
+            CampaignSnapshot snapshot = snapshotSerializer.Deserialize(bytes);
+            await snapshotManager.ReplicateSnapshotAsync(snapshot);
         }
-        catch (Exception e)
+        else
         {
-            AsyncExceptionCollector.Collect(e);
+            logger.LogInformation("Starting a new campaign");
+            communicator.BroadcastToShardServers(new NoInitialShardSnapshotPacket());
         }
+
+        // todo timeout
+        logger.LogInformation("Waiting for shard servers to finish local initializing");
+        await Task.WhenAll(_shardServerLocalInitDoneTcs.Values.Select(it => it.Task));
+        communicator.BroadcastToShardServers(new CampaignInitializedPacket());
+        communicator.AllowPlayerConnections = true; // todo check init state inside a communicator
+        
+        const int initialPauseDuration = 15;
+        logger.LogInformation("Initialized, unpausing in {duration} seconds", initialPauseDuration);
+        await timeProvider.Delay(TimeSpan.FromSeconds(initialPauseDuration));
+        synchronizedCampaignStateRepo.Value = synchronizedCampaignStateRepo.Value with { IsPaused = false };
+        const int sessionDuration = 30;
+        logger.LogInformation("Unpaused, the session ends in {duration} seconds", sessionDuration);
+        await timeProvider.Delay(TimeSpan.FromSeconds(sessionDuration));
+        synchronizedCampaignStateRepo.Value = synchronizedCampaignStateRepo.Value with { IsPaused = true };
+
+        if (!isSingleplayer)
+        {
+            CampaignSnapshot snapshot = await snapshotManager.CreateSnapshotAsync();
+            byte[] bytes = snapshotSerializer.Serialize(snapshot);
+            File.WriteAllBytes(snapshotPath(), bytes);
+        }
+        
+        logger.LogInformation("Session ended");
     }
 
     public override void _Process(float delta)
@@ -155,6 +163,6 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
 
     public void ReceiveShardServerInitAwaitingCampaignServerInitPacket(Guid senderId)
     {
-        _shardServerInitAwaitingCampaignServerInitTcs[senderId].SetResult();
+        _shardServerLocalInitDoneTcs[senderId].SetResult();
     }
 }

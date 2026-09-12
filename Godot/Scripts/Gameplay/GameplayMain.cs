@@ -87,12 +87,12 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             () => _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.TrySetResult();
         _rootServiceProvider.GetRequiredService<ISynchronizedCampaignStatePuppetRepository>().Changed +=
             () => _synchronizedCampaignStateInitializedTcs.TrySetResult();
-        _logger.Required.LogInformation("Initializing...");
+        _logger.Required.LogInformation("Initializing");
         await _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.Task;
         await _synchronizedCampaignStateInitializedTcs.Task;
         _rootServiceProvider.GetRequiredService<IFromGameplayPacketSender>()
             .SendReliable(new ShardServerLocalInitDonePacket(), Const.CampaignServerId);
-        _logger.Required.LogInformation("Local initializing done, waiting for others...");
+        _logger.Required.LogInformation("Local initializing done, waiting for others");
         await _campaignInitializedTcs.Task;
         Initialized = true;
         _logger.Required.LogInformation("Initialized");
