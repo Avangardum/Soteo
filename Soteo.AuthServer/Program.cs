@@ -50,4 +50,6 @@ app.MapRazorPages()
     .WithStaticAssets();
 app.MapControllers();
 
+app.Services.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+
 app.Run();
