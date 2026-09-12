@@ -91,7 +91,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         await _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.Task;
         await _synchronizedCampaignStateInitializedTcs.Task;
         _rootServiceProvider.GetRequiredService<IFromGameplayPacketSender>()
-            .SendReliable(new ShardServerInitAwaitingCampaignServerInitPacket(), Const.CampaignServerId);
+            .SendReliable(new ShardServerLocalInitDonePacket(), Const.CampaignServerId);
         _logger.Required.LogInformation("Local initializing done, waiting for others...");
         await _campaignInitializedTcs.Task;
         Initialized = true;

@@ -8,9 +8,9 @@ namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
 public sealed class CampaignServerShardServerInitAwaitingCampaignServerInitPacketHandler
 (
     ICampaignServerInitPacketReceiver receiver
-) : PacketHandler<ShardServerInitAwaitingCampaignServerInitPacket>
+) : PacketHandler<ShardServerLocalInitDonePacket>
 {
-    protected override void Handle(ShardServerInitAwaitingCampaignServerInitPacket packet, Guid senderId)
+    protected override void Handle(ShardServerLocalInitDonePacket packet, Guid senderId)
     {
         receiver.ReceiveShardServerInitAwaitingCampaignServerInitPacket(senderId);
     }

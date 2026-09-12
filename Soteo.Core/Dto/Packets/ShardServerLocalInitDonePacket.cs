@@ -9,4 +9,4 @@ namespace Soteo.Core.Dto.Packets;
 /// finish initialization
 /// </summary>
 [PacketTypeCode(PacketTypeCode.ShardServerInitAwaitingCampaignServerInit)]
-public sealed record ShardServerInitAwaitingCampaignServerInitPacket : Packet;
+public sealed record ShardServerLocalInitDonePacket : Packet;
