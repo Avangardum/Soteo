@@ -6,4 +6,7 @@ namespace Soteo.Core.Interfaces;
 public interface ISynchronizedCampaignStateRepository
 {
     SynchronizedCampaignState Value { get; set; }
+    
+    void Pause();
+    void Unpause();
 }

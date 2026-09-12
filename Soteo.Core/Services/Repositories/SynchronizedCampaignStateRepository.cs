@@ -39,6 +39,9 @@ public sealed class SynchronizedCampaignStateRepository : ISynchronizedCampaignS
         }
     } = new();
     
+    public void Pause() => Value = Value with { IsPaused = true };
+    public void Unpause() => Value = Value with { IsPaused = false };
+    
     private void Tick()
     {
         if (_isChanged)
