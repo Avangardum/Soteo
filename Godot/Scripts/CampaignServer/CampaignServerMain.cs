@@ -23,7 +23,7 @@ using Path = System.IO.Path;
 
 namespace Soteo.Main.CampaignServer;
 
-public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
+public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver, IInitializationRepository
 {
     private readonly Dictionary<Guid, TaskCompletionSource> _shardServerLocalInitDoneTcs = new();
     
@@ -39,7 +39,9 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     private readonly LateInit<ILogger<CampaignServerMain>> _logger = new();
     
     private IProcessPublisher? _processPublisher;
-    
+
+    public bool IsInitialized { get; private set; }
+
     private IServiceProvider ServiceProvider => _serviceProvider.Value;
     private bool IsSingleplayer => ServiceProvider.GetRequiredService<SingleplayerOptions>().IsSingleplayer;
     
@@ -72,6 +74,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         
         await WaitForShardServersLocalInit();
         _communicator.Value.BroadcastToShardServers(new CampaignInitializedPacket());
+        IsInitialized = true;
         
         const int initialPauseDuration = 15;
         _logger.Value.LogInformation("Initialized, unpausing in {duration} seconds", initialPauseDuration);
@@ -161,6 +164,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     private void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton<ICampaignServerInitPacketReceiver>(this);
+        services.AddSingleton<IInitializationRepository>(this);
         services.AddSingleton<IUserRepository, UserRepository>();
         services.AddSingleton<IPlayerCharacterTrackerRepository, PlayerCharacterTrackerRepository>();
         services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
