@@ -1,7 +1,5 @@
 namespace Soteo.Core.Enums;
 
-// TODO Use meters instead of pixels
-// TODO Use radians instead of degrees
 public enum Stat : byte
 {
     MaxHealth,
@@ -11,7 +9,7 @@ public enum Stat : byte
     CurrentMana,
     ManaRegen,
     /// <summary>
-    /// Move speed in pixels per second
+    /// Move speed in meters per second
     /// </summary>
     MoveSpeed,
     /// <summary>
@@ -28,11 +26,11 @@ public enum Stat : byte
     /// </summary>
     AttackUseTimeFraction,
     /// <summary>
-    /// Attack range in pixels
+    /// Attack range in meters
     /// </summary>
     AttackRange,
     /// <summary>
-    /// Attack projectile speed in pixels per second
+    /// Attack projectile speed in meters per second
     /// </summary>
     AttackProjectileSpeed,
 }

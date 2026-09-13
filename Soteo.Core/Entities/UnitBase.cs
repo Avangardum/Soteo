@@ -16,13 +16,13 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEnti
             [Stat.ManaRegen] = (double.NegativeInfinity, 2, double.PositiveInfinity),
             [Stat.MaxMana] = (0, 1000, 10_000),
             [Stat.CurrentMana] = (0, 1000, 10_000),
-            [Stat.MoveSpeed] = (5, 50, 500),
+            [Stat.MoveSpeed] = (0.5, 5, 50),
             [Stat.TurnSpeed] = (36, 360, 3600),
             [Stat.AttackDamage] = (0, 50, double.PositiveInfinity),
             [Stat.AttackSpeed] = (0.1, 1, 10),
             [Stat.AttackUseTimeFraction] = (0, 0.5, 1),
-            [Stat.AttackRange] = (10, 100, double.PositiveInfinity),
-            [Stat.AttackProjectileSpeed] = (50, 500, 5000)
+            [Stat.AttackRange] = (1, 10, double.PositiveInfinity),
+            [Stat.AttackProjectileSpeed] = (5, 50, 500),
         }.ToImmutableDictionary();
     
     protected UnitBase(Guid id, TNode node) : base(id, node)

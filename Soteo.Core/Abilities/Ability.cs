@@ -77,7 +77,8 @@ public abstract class Ability
     protected virtual double DynamicAngularRange(AbilityContext context) => StaticAngularRange[context.Level];
     protected virtual double DynamicUseTime(AbilityContext context) => StaticUseTime[context.Level];
     
-    // Unprefixed values are values after applying status effect modifiers and are used in actual gameplay.
+    // Unprefixed values are values after applying status modifiers and are used in actual gameplay
+    // (the modifiers are not yet implemented)
     public double HealthCost(AbilityContext context) => DynamicHealthCost(context);
     public double ManaCost(AbilityContext context) => DynamicManaCost(context);
     public double Cooldown(AbilityContext context) => DynamicCooldown(context);
@@ -176,7 +177,7 @@ public abstract class Ability
         )
         {
             Vector2 deltaPosition = targetPosition - context.User.Position;
-            double rangeMultiplier = strict ? 1 : 1.5f;
+            double rangeMultiplier = strict ? 1 : 1.5;
             if (deltaPosition.Length() > Range(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfRange;
             

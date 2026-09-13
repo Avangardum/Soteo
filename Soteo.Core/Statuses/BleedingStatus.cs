@@ -12,7 +12,7 @@ public sealed class BleedingStatus : Status
 
     public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
     [
-        new(Stat.MoveSpeed, StatModifierKind.Add, -20)
+        new(Stat.MoveSpeed, StatModifierKind.Add, -2)
     ];
 
     public override void Tick(StatusContext context, double delta)

@@ -10,7 +10,7 @@ namespace Soteo.Core.Abilities;
 public sealed class ProjectileBurstAbility : Ability
 {
     public override CanTarget Targeting => CanTarget.Nothing;
-    public override Scalable<double> StaticRange => 1000;
+    public override Scalable<double> StaticRange => 100;
     public override Scalable<double> StaticCooldown => 5;
 
     public override void TakeEffect(AbilityContext context)
@@ -19,8 +19,8 @@ public sealed class ProjectileBurstAbility : Ability
         var entityManager = context.GetRequiredService<IEntityManager>();
         for (double azimuth = 0; azimuth < 360; azimuth += 1)
         {
-            Vector2 target = context.User.Position + Maths.AzimuthToDirection(azimuth) * 1000;
-            double speed = 150 + 15 * Math.Sin(Maths.Deg2Rad(azimuth) * 20);
+            Vector2 target = context.User.Position + Maths.AzimuthToDirection(azimuth) * 100;
+            double speed = 15 + 1.5 * Math.Sin(Maths.Deg2Rad(azimuth) * 20);
             entityManager.SpawnProjectile(context, speed, target);
         }
     }
