@@ -61,7 +61,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
     
     private void UpdateNodePosition()
     {
-        Node?.Position = NodeHelper.RoundPositionToPixelPerfect
+        Node?.PositionM = NodeHelper.RoundPositionToPixelPerfect
         (
             Position,
             _camera.Zoom,

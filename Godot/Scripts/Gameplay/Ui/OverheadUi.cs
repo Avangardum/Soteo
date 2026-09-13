@@ -78,7 +78,7 @@ public sealed class OverheadUi
     public void Process(double delta)
     {
         _node.RectPosition =
-            (((_unit.Position - _camera.Position) * Const.PixelsInMeter + _offsetPx) * _camera.Zoom).ToGd();
+            (((_unit.Position - _camera.PositionM) * Const.PixelsInMeter + _offsetPx) * _camera.Zoom).ToGd();
         SelectVariant();
         SetFaction(_unit.Faction);
         SetHealth((float)_unit.Stats[Stat.CurrentHealth], (float)_unit.Stats[Stat.MaxHealth]);

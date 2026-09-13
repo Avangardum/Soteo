@@ -23,10 +23,10 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
 
     public event Action ZoomChanged = delegate { };
     
-    public new Vector2 Position
+    public Vector2 PositionM
     {
-        get => base.Position.ToSys() / Const.PixelsInMeter;
-        set => base.Position = value.ToGd() * Const.PixelsInMeter;
+        get => Position.ToSys() / Const.PixelsInMeter;
+        private set => Position = value.ToGd() * Const.PixelsInMeter;
     }
     
     /// <inheritdoc/>
@@ -139,8 +139,8 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
         GdVector2 viewportSize = GetViewport().GetVisibleRect().Size;
         bool halfPixelXOffset = viewportSize.x % 2 == 1;
         bool halfPixelYOffset = viewportSize.y % 2 == 1;
-        Position = NodeHelper.RoundPositionToPixelPerfect(
-            Position, Zoom, isCamera: true, halfPixelXOffset, halfPixelYOffset);
+        PositionM = NodeHelper.RoundPositionToPixelPerfect(
+            PositionM, Zoom, isCamera: true, halfPixelXOffset, halfPixelYOffset);
     }
 
     public override void _Input(InputEvent e)

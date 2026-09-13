@@ -23,9 +23,9 @@ public sealed class ProjectilePuppetNode : Node2D, IProjectilePuppetNode
         set => ProjectilePuppet = (ProjectilePuppet?)value;
     }
     
-    public new Vector2 Position
+    public Vector2 PositionM
     {
-        get => base.Position.ToSys() / Const.PixelsInMeter;
-        set => base.Position = value.ToGd() * Const.PixelsInMeter;
+        get => Position.ToSys() / Const.PixelsInMeter;
+        set => Position = value.ToGd() * Const.PixelsInMeter;
     }
 }

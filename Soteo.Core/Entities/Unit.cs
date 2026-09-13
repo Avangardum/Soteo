@@ -59,7 +59,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         set
         {
             base.Position = value;
-            Node?.Position = Position;
+            Node?.PositionM = Position;
         }
     }
     
@@ -337,7 +337,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private void MoveAndCollide(Vector2 movement, IUnitNode node)
     {
         node.MoveAndCollide(movement);
-        Position = node.Position;
+        Position = node.PositionM;
     }
 
     private void UseAbility(UseAbilityCommand command, ref double remainingDeltaTime, IUnitNode node)

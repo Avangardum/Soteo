@@ -5,6 +5,6 @@ namespace Soteo.Core.Interfaces;
 public interface ICamera
 {
     event Action ZoomChanged;
-    Vector2 Position { get; }
+    Vector2 PositionM { get; }
     double Zoom { get; }
 }

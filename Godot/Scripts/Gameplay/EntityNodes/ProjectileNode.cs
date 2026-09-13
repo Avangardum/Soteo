@@ -14,10 +14,10 @@ public sealed class ProjectileNode : Area2D, IProjectileNode
         set => Projectile = (Projectile?)value;
     }
 
-    public new Vector2 Position
+    public Vector2 PositionM
     {
-        get => base.Position.ToSys() / Const.PixelsInMeter;
-        set => base.Position = value.ToGd() * Const.PixelsInMeter;
+        get => Position.ToSys() / Const.PixelsInMeter;
+        set => Position = value.ToGd() * Const.PixelsInMeter;
     }
 
     public override void _PhysicsProcess(float delta)

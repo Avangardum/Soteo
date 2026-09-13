@@ -66,7 +66,7 @@ public sealed class Projectile : Entity<IProjectileNode>
         set
         {
             base.Position = value;
-            Node?.Position = value;
+            Node?.PositionM = value;
         }
     }
     

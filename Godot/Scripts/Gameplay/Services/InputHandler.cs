@@ -187,7 +187,7 @@ public sealed class InputHandler : Node2D
             .Select(it => it.GetParent() as UnitPuppetNode)
             .WhereNotNull()
             .OrderByDescending(it => it.ZIndex)
-            .ThenByDescending(it => it.Position.Y)
+            .ThenByDescending(it => it.PositionM.Y)
             .Select(it => it.UnitPuppet)
             .WhereNotNull()
             .ToImmutableList();
