@@ -1,13 +1,11 @@
 using System.Text;
 using JWT.Builder;
-using Microsoft.Extensions.Options;
 using Soteo.Core.Dto.Options;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.SidedDependencies;
 using Soteo.Core.StaticHelpers;
-using Soteo.Main.CampaignServer;
 
 namespace Soteo.Main.Gameplay.Services.Communicators;
 
@@ -15,7 +13,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     Node, IFromGameplayToCampaignServerPacketSender, ICampaignServerConnector
 {
     private readonly WebSocketClient _wsClient = new();
-    private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 5 };
+    private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 15 };
     
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;

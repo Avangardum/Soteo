@@ -7,10 +7,10 @@ public static class NodeHelper
 {
     /// <summary>
     /// Round a visual position value to a value that allows pixel perfect rendering without artifacts due to
-    /// a sprite's pixels having fractional screen position, therefore rendering between screen pixels
+    /// sprite pixels having fractional screen pixel position, therefore rendering between screen pixels.
     /// </summary>
     /// <param name="halfPixelXOffset">
-    /// Whether a half screen pixel x offset should be applied. Used when a sprite's x position ends in .5 or
+    /// Whether a half screen pixel x offset should be applied. Used when a sprite x pixel position ends in .5 or
     /// for the camera when the viewport width is odd, since normal rounding would cause
     /// fractional screen pixel position.
     /// </param>
@@ -35,11 +35,14 @@ public static class NodeHelper
         if (!isCamera && Maths.IsMultipleOf(2, zoom))
             halfPixelXOffset = halfPixelYOffset = false;
         
+        Vector2 valueInWorldPixels = value * Const.PixelsInMeter;
         double screenPixelSizeInWorldPixels = 1 / zoom;
-        double roundedX = halfPixelXOffset ? Maths.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.X) :
-            Maths.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.X);
-        double roundedY = halfPixelYOffset ? Maths.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, value.Y) :
-            Maths.RoundToMultipleOf(screenPixelSizeInWorldPixels, value.Y);
-        return Vector2.New(roundedX, roundedY);
+        double roundedXInWorldPixels = halfPixelXOffset ?
+            Maths.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, valueInWorldPixels.X) :
+            Maths.RoundToMultipleOf(screenPixelSizeInWorldPixels, valueInWorldPixels.X);
+        double roundedYPx = halfPixelYOffset ?
+            Maths.RoundToMultipleOfPlusHalf(screenPixelSizeInWorldPixels, valueInWorldPixels.Y) :
+            Maths.RoundToMultipleOf(screenPixelSizeInWorldPixels, valueInWorldPixels.Y);
+        return Vector2.New(roundedXInWorldPixels, roundedYPx) / Const.PixelsInMeter;
     }
 }

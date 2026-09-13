@@ -1,5 +1,6 @@
 using Soteo.Core.Entities;
 using Soteo.Core.Interfaces;
+using Soteo.Core.StaticHelpers;
 using Soteo.Main.Gameplay.Interfaces;
 using Soteo.Util;
 
@@ -16,8 +17,9 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
     private AnimatedSprite Sprite => _sprite;
     private AzimuthIndicator AzimuthIndicator => _azimuthIndicator;
     
-    // If the sprite has position with .5 as fractional part in any dimension (used to center sprites with odd sizes),
-    // the following fields help compensate it for pixel perfect rendering. See NodeHelper for details.
+    // If a sprite has pixel position with .5 as the fractional part in any dimension
+    // (used to center sprites with odd sizes), the following fields help compensate
+    // it for pixel perfect rendering. See NodeHelper for details.
     [Export] private bool _halfPixelXVisualOffset;
     [Export] private bool _halfPixelYVisualOffset;
     
@@ -59,8 +61,8 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
     
     public new Vector2 Position
     {
-        get => base.Position.ToSys();
-        set => base.Position = value.ToGd();
+        get => base.Position.ToSys() / Const.PixelsInMeter;
+        set => base.Position = value.ToGd() * Const.PixelsInMeter;
     }
     
     public override void _Ready()

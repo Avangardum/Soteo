@@ -25,8 +25,8 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
     
     public new Vector2 Position
     {
-        get => base.Position.ToSys();
-        set => base.Position = value.ToGd();
+        get => base.Position.ToSys() / Const.PixelsInMeter;
+        set => base.Position = value.ToGd() * Const.PixelsInMeter;
     }
     
     /// <inheritdoc/>

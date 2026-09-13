@@ -139,7 +139,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         else if (IsMoving)
         {
             Node.Animation = "Move";
-            const double referenceMoveSpeed = 35;
+            const double referenceMoveSpeed = 3.5;
             Node.AnimationSpeedScale = (float)(Stats[Stat.MoveSpeed] / referenceMoveSpeed);
         }
         else

@@ -1,6 +1,7 @@
 using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
+using Soteo.Core.StaticHelpers;
 using Soteo.Main.Gameplay.Interfaces;
 
 namespace Soteo.Main.Gameplay.Ui;
@@ -20,7 +21,7 @@ public sealed class OverheadUi
     private readonly Control _tinyHealthPanel;
     private readonly TextureProgress _tinyHealthBar;
     
-    private Vector2 _offset;
+    private Vector2 _offsetPx;
     
     public OverheadUi(OverheadUiNode node, IUnitPuppet unit, ICamera camera, IPalette palette)
     {
@@ -61,12 +62,12 @@ public sealed class OverheadUi
                 case Variant.PlayerCharacter:
                     _playerCharacterPanel.Visible = true;
                     _tinyHealthPanel.Visible = false;
-                    _offset = new Vector2(0, -22);
+                    _offsetPx = new Vector2(0, -22);
                     break;
                 case Variant.TinyHealth:
                     _playerCharacterPanel.Visible = false;
                     _tinyHealthPanel.Visible = true;
-                    _offset = new Vector2(0, -22);
+                    _offsetPx = new Vector2(0, -22);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
@@ -76,7 +77,8 @@ public sealed class OverheadUi
 
     public void Process(double delta)
     {
-        _node.RectPosition = (_unit.Position - _camera.Position + _offset).ToGd() * _camera.Zoom;
+        _node.RectPosition =
+            (((_unit.Position - _camera.Position) * Const.PixelsInMeter + _offsetPx) * _camera.Zoom).ToGd();
         SelectVariant();
         SetFaction(_unit.Faction);
         SetHealth((float)_unit.Stats[Stat.CurrentHealth], (float)_unit.Stats[Stat.MaxHealth]);
@@ -142,6 +144,6 @@ public sealed class OverheadUi
     {
         None,
         PlayerCharacter,
-        TinyHealth
+        TinyHealth,
     }
 }

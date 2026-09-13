@@ -6,6 +6,7 @@ using Soteo.Core.Dto.Packets;
 using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
+using Soteo.Core.StaticHelpers;
 using Soteo.Main.Gameplay.EntityNodes;
 using Soteo.Main.Gameplay.Enums;
 using Soteo.Main.Gameplay.Interfaces;
@@ -88,7 +89,7 @@ public sealed class InputHandler : Node2D
                 new MovePacket
                 {
                     UnitId = _currentCharIdRepo.Required,
-                    Command = new MoveCommand(GetGlobalMousePosition().ToSys()),
+                    Command = new MoveCommand(GetGlobalMousePosition().ToSys() / Const.PixelsInMeter),
                 },
                 shardId.Value
             );
