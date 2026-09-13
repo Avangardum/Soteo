@@ -228,6 +228,11 @@ with the tag name and the closing angle bracket on its own line.
 
 Indentation: 4 spaces.
 
+## Units
+
+The default units are: meter, degree, second. Prefer using the default units where practical.
+Don't specify default units in names. Specify non-default units in names.
+
 ## Miscellaneous
 
 Abbreviations follow the same naming rules as if they were regular words (`JsonParser`, not `JSONParser`).
