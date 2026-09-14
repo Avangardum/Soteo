@@ -48,7 +48,7 @@ public abstract class Ability
     public virtual int MaxLevel => 1;
     public virtual Status? PassiveStatus => null;
     public virtual double? PassiveTickInterval => null;
-    public abstract CanTarget Targeting { get; }
+    public abstract Targeting Targeting { get; }
     
     public virtual string Animation => "Ability";
     public virtual bool LoopAnimation => false;
@@ -124,11 +124,11 @@ public abstract class Ability
     
     private AbilityValidationResult ValidateTarget(AbilityContext context)
     {
-        if (!Targeting.HasFlag(CanTarget.Nothing) && context.TargetPosition == null && context.TargetUnit == null)
+        if (!Targeting.HasFlag(Targeting.Nothing) && context.TargetPosition == null && context.TargetUnit == null)
             return AbilityValidationResult.InvalidTarget;
         if (context.TargetPosition != null && context.TargetUnit != null)
             return AbilityValidationResult.InvalidTarget;
-        if (!Targeting.HasFlag(CanTarget.Position) && context.TargetPosition != null)
+        if (!Targeting.HasFlag(Targeting.Position) && context.TargetPosition != null)
             return AbilityValidationResult.InvalidTarget;
         if (context.TargetUnit != null)
         {
@@ -136,9 +136,9 @@ public abstract class Ability
             if (targetUnitValidationResult != AbilityValidationResult.Ok)
                 return targetUnitValidationResult;
         }
-        if (Targeting.HasFlag(CanTarget.WithDirection) != context.TargetDirection.HasValue)
+        if (Targeting.HasFlag(Targeting.WithDirection) != context.TargetDirection.HasValue)
             return AbilityValidationResult.InvalidTarget;
-        if (Targeting.HasFlag(CanTarget.WithShard) != context.TargetShardId.HasValue)
+        if (Targeting.HasFlag(Targeting.WithShard) != context.TargetShardId.HasValue)
             return AbilityValidationResult.InvalidTarget;
         return AbilityValidationResult.Ok;
     }
@@ -147,12 +147,12 @@ public abstract class Ability
     {
         if (user.IsAlliedTo(target))
         {
-            if (!Targeting.HasFlag(CanTarget.Ally))
+            if (!Targeting.HasFlag(Targeting.Ally))
                 return AbilityValidationResult.InvalidTarget;
         }
         else
         {
-            if (!Targeting.HasFlag(CanTarget.Enemy))
+            if (!Targeting.HasFlag(Targeting.Enemy))
                 return AbilityValidationResult.InvalidTarget;
         }
         

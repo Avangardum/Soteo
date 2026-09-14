@@ -147,12 +147,12 @@ public sealed class UnitTests
     {
         public event Action Used = delegate { };
         
-        public override CanTarget Targeting
+        public override Targeting Targeting
         {
             get
             {
-                return CanTarget.Character | CanTarget.Building | CanTarget.Ally | CanTarget.Enemy |
-                    CanTarget.Position | CanTarget.Nothing;
+                return Targeting.Character | Targeting.Building | Targeting.Ally | Targeting.Enemy |
+                    Targeting.Position | Targeting.Nothing;
             }
         }
 

@@ -9,7 +9,7 @@ namespace Soteo.Core.Abilities;
 
 public sealed class RecallAbility : Ability
 {
-    public override CanTarget Targeting => CanTarget.Nothing;
+    public override Targeting Targeting => Targeting.Nothing;
     public override bool LoopAnimation => true;
     public override Scalable<double> StaticUseTime => 10;
     

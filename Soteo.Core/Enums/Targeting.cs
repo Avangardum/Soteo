@@ -1,7 +1,7 @@
 namespace Soteo.Core.Enums;
 
 [Flags]
-public enum CanTarget
+public enum Targeting
 {
     Passive = 0,
     

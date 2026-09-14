@@ -22,6 +22,6 @@ public sealed class AbilityTests
     
     private class TestAbility : Ability
     {
-        public override CanTarget Targeting => CanTarget.Passive;
+        public override Targeting Targeting => Targeting.Passive;
     }
 }

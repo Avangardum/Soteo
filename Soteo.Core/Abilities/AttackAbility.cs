@@ -5,7 +5,7 @@ namespace Soteo.Core.Abilities;
 
 public abstract class AttackAbility : Ability
 {
-    public override CanTarget Targeting => CanTarget.Enemy | CanTarget.Character | CanTarget.Building;
+    public override Targeting Targeting => Targeting.Enemy | Targeting.Character | Targeting.Building;
     public sealed override Scalable<double> StaticRange => 0;
     public sealed override Scalable<double> StaticUseTime => 0;
     public sealed override Scalable<double> StaticCooldown => 0;

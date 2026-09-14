@@ -121,7 +121,7 @@ public sealed class InputHandler : Node2D
         Vector2? targetPosition = null;
         
         bool alt = Input.IsActionPressed("alt");
-        bool forceNoTarget = alt && state.Ability.Targeting.HasFlag(CanTarget.Nothing);
+        bool forceNoTarget = alt && state.Ability.Targeting.HasFlag(Targeting.Nothing);
         
         if (!forceNoTarget)
         {
@@ -130,7 +130,7 @@ public sealed class InputHandler : Node2D
             targetUnit = candidateTargetUnits
                 .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
             
-            bool canTargetPosition = state.Ability.Targeting.HasFlag(CanTarget.Position);
+            bool canTargetPosition = state.Ability.Targeting.HasFlag(Targeting.Position);
             targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition().ToSys() : null;
         }
 
@@ -162,9 +162,9 @@ public sealed class InputHandler : Node2D
         {
             if (!_entityLocator.TryFindEntity(command.TargetUnitId.Value, out IUnitPuppet? targetUnit, out _))
                 return AbilityValidationResult.InvalidTarget;
-            if (targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(CanTarget.Ally))
+            if (targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(Targeting.Ally))
                 return AbilityValidationResult.InvalidTarget;
-            if (!targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(CanTarget.Enemy))
+            if (!targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(Targeting.Enemy))
                 return AbilityValidationResult.InvalidTarget;
         }
         

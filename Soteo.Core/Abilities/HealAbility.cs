@@ -11,7 +11,7 @@ public sealed class HealAbility : Ability
     public override Scalable<double> StaticCooldown => [15, 13, 11, 9];
     public override Scalable<double> StaticUseTime => 0.5;
     public override Scalable<double> StaticRange => 300;
-    public override CanTarget Targeting => CanTarget.Ally | CanTarget.Character;
+    public override Targeting Targeting => Targeting.Ally | Targeting.Character;
 
     public override void TakeEffect(AbilityContext context)
     {

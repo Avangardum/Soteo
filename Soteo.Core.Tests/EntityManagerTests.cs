@@ -110,6 +110,6 @@ public sealed class EntityManagerTests
     
     public sealed class TestAbility : Ability
     {
-        public override CanTarget Targeting => CanTarget.Passive;
+        public override Targeting Targeting => Targeting.Passive;
     }
 }
