@@ -78,7 +78,12 @@ public sealed class InputHandler : Node2D
         
         if (targetUnit != null)
         {
-            var command = new UseAbilityCommand(Slot: AbilitySlot.Attack, Repeat: true, TargetUnitId: targetUnit.Id);
+            var command = new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Attack,
+                Repeat = true,
+                TargetUnitId = targetUnit.Id
+            };
             _packetSender.SendReliable
             (
                 new UseAbilityPacket { UnitId = _currentCharIdRepo.Required, Command = command },
@@ -136,13 +141,13 @@ public sealed class InputHandler : Node2D
             {
                 UnitId = _currentCharIdRepo.Required,
                 Command = new UseAbilityCommand
-                (
-                    Slot: slot,
-                    Repeat: false,
-                    Alt: alt,
-                    TargetPosition: targetPosition,
-                    TargetUnitId: targetUnit?.Id
-                ), 
+                {
+                    Slot = slot,
+                    Repeat = false,
+                    Alt = alt,
+                    TargetPosition = targetPosition,
+                    TargetUnitId = targetUnit?.Id
+                }
             },
             shardId.Value
         );
@@ -156,7 +161,7 @@ public sealed class InputHandler : Node2D
         bool alt
     )
     {
-        return ValidateAbility(user, new UseAbilityCommand(slot, TargetUnitId: targetUnit.Id, Alt: alt));
+        return ValidateAbility(user, new UseAbilityCommand { Slot = slot, TargetUnitId = targetUnit.Id, Alt = alt });
     }
 
     private AbilityValidationResult ValidateAbility

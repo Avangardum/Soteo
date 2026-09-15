@@ -544,7 +544,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         AbilitySlotStatesInternal[slot] = new AbilitySlotState { Ability = ability, Level = level };
         if (ability.PassiveStatus != null)
         {
-            AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand(slot)).Required;
+            AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand { Slot = slot }).Required;
             AddStatus
             (
                 ability.PassiveStatus,

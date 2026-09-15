@@ -27,15 +27,15 @@ public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketS
         {
             UnitId = s.DeserializeGuid(stream),
             Command = new UseAbilityCommand
-            (
-                Slot: s.DeserializeEnum<AbilitySlot>(stream),
-                Repeat: s.DeserializeBool(stream),
-                Alt: s.DeserializeBool(stream),
-                TargetPosition: s.DeserializeNullableStruct(s.DeserializeVector2, stream),
-                TargetUnitId: s.DeserializeNullableStruct(s.DeserializeGuid, stream),
-                TargetDirection: s.DeserializeNullableStruct(s.DeserializeVector2, stream),
-                TargetShardId: s.DeserializeNullableStruct(s.DeserializeGuid, stream)
-            ),
+            {
+                Slot = s.DeserializeEnum<AbilitySlot>(stream),
+                Repeat = s.DeserializeBool(stream),
+                Alt = s.DeserializeBool(stream),
+                TargetPosition = s.DeserializeNullableStruct(s.DeserializeVector2, stream),
+                TargetUnitId = s.DeserializeNullableStruct(s.DeserializeGuid, stream),
+                TargetDirection = s.DeserializeNullableStruct(s.DeserializeVector2, stream),
+                TargetShardId = s.DeserializeNullableStruct(s.DeserializeGuid, stream)
+            }
         };
     }
 }

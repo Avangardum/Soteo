@@ -37,7 +37,7 @@ public sealed class UnitTests
         int useCount = 0;
         Ability.Instance<SpyAbility>().Used += () => useCount++;
 
-        _sut.SetCommand(new UseAbilityCommand(AbilitySlot.Class0, TargetUnitId: Guid.NewGuid()));
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0, TargetUnitId = Guid.NewGuid() });
         _sut.Tick(Const.TickInterval);
         
         useCount.Should().Be(0);
@@ -69,7 +69,7 @@ public sealed class UnitTests
         );
         _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [projectileId] = projectile });
         
-        _sut.SetCommand(new UseAbilityCommand(AbilitySlot.Class0, TargetUnitId: projectileId));
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0, TargetUnitId = projectileId });
         _sut.Tick(Const.TickInterval);
         
         useCount.Should().Be(0);
