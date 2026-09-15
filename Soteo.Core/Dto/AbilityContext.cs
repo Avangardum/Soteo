@@ -12,6 +12,7 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
     public required Ability Ability { get; init; }
     public required int Level { get; init; }
     public required IUnit User { get; init; }
+    public bool Alt { get; init; }
     
     /// <summary>
     /// Snapshot of user stats at the moment the ability took effect. Use this instead of User.Stats.
@@ -36,6 +37,7 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
             Ability = Ability,
             Level = Level,
             UserId = User.Id,
+            Alt = Alt,
             UserStats = UserStats,
             TargetPosition = TargetPosition,
             TargetUnitId = TargetUnit?.Id,
@@ -52,6 +54,7 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
             Ability = snapshot.Ability,
             Level = snapshot.Level,
             User = entityManager.GetEntity<Unit>(snapshot.UserId).Required,
+            Alt = snapshot.Alt,
             UserStats = snapshot.UserStats,
             ServiceProvider = serviceProvider,
             TargetPosition = snapshot.TargetPosition,

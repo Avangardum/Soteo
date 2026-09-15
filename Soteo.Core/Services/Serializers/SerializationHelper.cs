@@ -488,7 +488,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeEnum(EntityKind.Projectile, stream);
         SerializeBaseEntitySnapshot(projectile, stream);
         SerializeDouble(projectile.Speed, stream);
-        SerializeDeflatedAbilityContext(projectile.AbilityContext, stream);
+        SerializeAbilityContextSnapshot(projectile.AbilityContext, stream);
         SerializeProjectileTarget(projectile.Target, stream);
     }
 
@@ -501,7 +501,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream),
             Speed = DeserializeDouble(stream),
-            AbilityContext = DeserializeDeflatedAbilityContext(stream),
+            AbilityContext = DeserializeAbilityContextSnapshot(stream),
             Target = DeserializeProjectileTarget(stream),
         };
     }
@@ -541,11 +541,12 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         };
     }
 
-    public void SerializeDeflatedAbilityContext(AbilityContextSnapshot context, Stream stream)
+    public void SerializeAbilityContextSnapshot(AbilityContextSnapshot context, Stream stream)
     {
         SerializeAbility(context.Ability, stream);
         SerializeInt(context.Level, stream);
         SerializeGuid(context.UserId, stream);
+        SerializeBool(context.Alt, stream);
         SerializeDictionary(context.UserStats, SerializeEnum, SerializeDouble, stream);
         SerializeNullableStruct(context.TargetPosition, SerializeVector2, stream);
         SerializeNullableStruct(context.TargetUnitId, SerializeGuid, stream);
@@ -553,13 +554,14 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeNullableStruct(context.TargetShardId, SerializeGuid, stream);
     }
 
-    public AbilityContextSnapshot DeserializeDeflatedAbilityContext(Stream stream)
+    public AbilityContextSnapshot DeserializeAbilityContextSnapshot(Stream stream)
     {
         return new AbilityContextSnapshot
         {
             Ability = DeserializeAbility(stream),
             Level = DeserializeInt(stream),
             UserId = DeserializeGuid(stream),
+            Alt = DeserializeBool(stream),
             UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             TargetPosition = DeserializeNullableStruct(DeserializeVector2, stream),
             TargetUnitId = DeserializeNullableStruct(DeserializeGuid, stream),
@@ -572,7 +574,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     {
         SerializeGuid(value.Id, stream);
         SerializeStatus(value.Status, stream);
-        SerializeNullableClass(value.AbilityContext, SerializeDeflatedAbilityContext, stream);
+        SerializeNullableClass(value.AbilityContext, SerializeAbilityContextSnapshot, stream);
         SerializeGuid(value.UnitId, stream);
         SerializeNullableStruct(value.SourceId, SerializeGuid, stream);
         SerializeNullableClass(value.Tick, SerializeStatusTickContext, stream);
@@ -588,7 +590,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         {
             Id = DeserializeGuid(stream),
             Status = DeserializeStatus(stream),
-            AbilityContext = DeserializeNullableClass(DeserializeDeflatedAbilityContext, stream),
+            AbilityContext = DeserializeNullableClass(DeserializeAbilityContextSnapshot, stream),
             UnitId = DeserializeGuid(stream),
             SourceId = DeserializeNullableStruct(DeserializeGuid, stream),
             Tick = DeserializeNullableClass(DeserializeStatusTickContext, stream),

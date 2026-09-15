@@ -70,8 +70,11 @@ public sealed class InputHandler : Node2D
         if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? user, out Guid? shardId))
             return;
         
-        IUnitPuppet? targetUnit = GetUnitsUnderMouse()
-            .FirstOrDefault(it => ValidateAbility(user, AbilitySlot.Attack, it) == AbilityValidationResult.Ok);
+        IUnitPuppet? targetUnit = GetUnitsUnderMouse().FirstOrDefault
+        (
+            it => ValidateAbility(user: user, slot: AbilitySlot.Attack, targetUnit: it, alt: false) ==
+                AbilityValidationResult.Ok
+        );
         
         if (targetUnit != null)
         {
@@ -117,37 +120,45 @@ public sealed class InputHandler : Node2D
             return;
         if (!user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
-        IUnitPuppet? targetUnit = null;
-        Vector2? targetPosition = null;
-        
         bool alt = Input.IsActionPressed("alt");
-        bool forceNoTarget = alt && state.Ability.Targeting.HasFlag(Targeting.Nothing);
-        
-        if (!forceNoTarget)
-        {
-            // todo rework alt
-            IReadOnlyList<IUnitPuppet> candidateTargetUnits = alt ? [user] : GetUnitsUnderMouse();
-            targetUnit = candidateTargetUnits
-                .FirstOrDefault(it => ValidateAbility(user, slot, it) == AbilityValidationResult.Ok);
-            
-            bool canTargetPosition = state.Ability.Targeting.HasFlag(Targeting.Position);
-            targetPosition = canTargetPosition && targetUnit == null ? GetGlobalMousePosition().ToSys() : null;
-        }
+        Targeting targeting = alt ? state.Ability.AltTargeting : state.Ability.Targeting;
+
+        IUnitPuppet? targetUnit = GetUnitsUnderMouse()
+            .FirstOrDefault(it => ValidateAbility(user, slot, it, alt) == AbilityValidationResult.Ok);
+
+        Vector2? targetPosition = targeting.HasFlag(Targeting.Position) && targetUnit == null ?
+            GetGlobalMousePosition().ToSys() / Const.PixelsInMeter :
+            null;
 
         _packetSender.SendReliable
         (
             new UseAbilityPacket
             {
                 UnitId = _currentCharIdRepo.Required,
-                Command = new UseAbilityCommand(slot, Repeat: false, targetPosition, targetUnit?.Id) 
+                Command = new UseAbilityCommand
+                (
+                    Slot: slot,
+                    Repeat: false,
+                    Alt: alt,
+                    TargetPosition: targetPosition,
+                    TargetUnitId: targetUnit?.Id
+                ), 
             },
             shardId.Value
         );
     }
 
-    private AbilityValidationResult ValidateAbility(IUnitPuppet user, AbilitySlot slot, IUnitPuppet targetUnit) =>
-        ValidateAbility(user, new UseAbilityCommand(slot, TargetUnitId: targetUnit.Id));
-    
+    private AbilityValidationResult ValidateAbility
+    (
+        IUnitPuppet user,
+        AbilitySlot slot,
+        IUnitPuppet targetUnit,
+        bool alt
+    )
+    {
+        return ValidateAbility(user, new UseAbilityCommand(slot, TargetUnitId: targetUnit.Id, Alt: alt));
+    }
+
     private AbilityValidationResult ValidateAbility
     (
         IUnitPuppet user,
@@ -157,14 +168,15 @@ public sealed class InputHandler : Node2D
         // This method only validates target to select a valid target in a crowd
         
         AbilitySlotState state = user.AbilitySlotStates[command.Slot];
+        Targeting targeting = command.Alt ? state.Ability.AltTargeting : state.Ability.Targeting;
         
         if (command.TargetUnitId != null)
         {
             if (!_entityLocator.TryFindEntity(command.TargetUnitId.Value, out IUnitPuppet? targetUnit, out _))
                 return AbilityValidationResult.InvalidTarget;
-            if (targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(Targeting.Ally))
+            if (targetUnit.IsAlliedTo(user) && !targeting.HasFlag(Targeting.Ally))
                 return AbilityValidationResult.InvalidTarget;
-            if (!targetUnit.IsAlliedTo(user) && !state.Ability.Targeting.HasFlag(Targeting.Enemy))
+            if (!targetUnit.IsAlliedTo(user) && !targeting.HasFlag(Targeting.Enemy))
                 return AbilityValidationResult.InvalidTarget;
         }
         

@@ -403,6 +403,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             Ability = state.Ability,
             Level = state.Level,
             User = this,
+            Alt = command.Alt,
             UserStats = Stats.ToImmutableDictionary(),
             ServiceProvider = _serviceProvider,
             TargetPosition = command.TargetPosition,

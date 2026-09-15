@@ -13,6 +13,7 @@ public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketS
         
         s.SerializeEnum(packet.Command.Slot, stream);
         s.SerializeBool(packet.Command.Repeat, stream);
+        s.SerializeBool(packet.Command.Alt, stream);
         
         s.SerializeNullableStruct(packet.Command.TargetPosition, s.SerializeVector2, stream);
         s.SerializeNullableStruct(packet.Command.TargetUnitId, s.SerializeGuid, stream);
@@ -29,6 +30,7 @@ public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketS
             (
                 Slot: s.DeserializeEnum<AbilitySlot>(stream),
                 Repeat: s.DeserializeBool(stream),
+                Alt: s.DeserializeBool(stream),
                 TargetPosition: s.DeserializeNullableStruct(s.DeserializeVector2, stream),
                 TargetUnitId: s.DeserializeNullableStruct(s.DeserializeGuid, stream),
                 TargetDirection: s.DeserializeNullableStruct(s.DeserializeVector2, stream),

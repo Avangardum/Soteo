@@ -49,6 +49,7 @@ public abstract class Ability
     public virtual Status? PassiveStatus => null;
     public virtual double? PassiveTickInterval => null;
     public abstract Targeting Targeting { get; }
+    public virtual Targeting AltTargeting => Targeting;
     
     public virtual string Animation => "Ability";
     public virtual bool LoopAnimation => false;
@@ -124,35 +125,37 @@ public abstract class Ability
     
     private AbilityValidationResult ValidateTarget(AbilityContext context)
     {
-        if (!Targeting.HasFlag(Targeting.Nothing) && context.TargetPosition == null && context.TargetUnit == null)
+        Targeting targeting = context.Alt ? AltTargeting : Targeting;
+        if (!targeting.HasFlag(Targeting.Nothing) && context.TargetPosition == null && context.TargetUnit == null)
             return AbilityValidationResult.InvalidTarget;
         if (context.TargetPosition != null && context.TargetUnit != null)
             return AbilityValidationResult.InvalidTarget;
-        if (!Targeting.HasFlag(Targeting.Position) && context.TargetPosition != null)
+        if (!targeting.HasFlag(Targeting.Position) && context.TargetPosition != null)
             return AbilityValidationResult.InvalidTarget;
         if (context.TargetUnit != null)
         {
-            AbilityValidationResult targetUnitValidationResult = ValidateTargetUnit(context.User, context.TargetUnit);
+            AbilityValidationResult targetUnitValidationResult =
+                ValidateTargetUnit(context.User, context.TargetUnit, targeting);
             if (targetUnitValidationResult != AbilityValidationResult.Ok)
                 return targetUnitValidationResult;
         }
-        if (Targeting.HasFlag(Targeting.WithDirection) != context.TargetDirection.HasValue)
+        if (targeting.HasFlag(Targeting.WithDirection) != context.TargetDirection.HasValue)
             return AbilityValidationResult.InvalidTarget;
-        if (Targeting.HasFlag(Targeting.WithShard) != context.TargetShardId.HasValue)
+        if (targeting.HasFlag(Targeting.WithShard) != context.TargetShardId.HasValue)
             return AbilityValidationResult.InvalidTarget;
         return AbilityValidationResult.Ok;
     }
     
-    private AbilityValidationResult ValidateTargetUnit(IUnit user, IUnit target)
+    private AbilityValidationResult ValidateTargetUnit(IUnit user, IUnit target, Targeting targeting)
     {
         if (user.IsAlliedTo(target))
         {
-            if (!Targeting.HasFlag(Targeting.Ally))
+            if (!targeting.HasFlag(Targeting.Ally))
                 return AbilityValidationResult.InvalidTarget;
         }
         else
         {
-            if (!Targeting.HasFlag(Targeting.Enemy))
+            if (!targeting.HasFlag(Targeting.Enemy))
                 return AbilityValidationResult.InvalidTarget;
         }
         
