@@ -27,8 +27,6 @@ namespace Soteo.Main.Gameplay;
 
 public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketReceiver, IInitializationRepository
 {
-    // TODO client initialization
-    
     // Client and shard server entry point.
     // Handles scene loading and dependency injection.
     // A service scope corresponds to a shard.
@@ -57,7 +55,23 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     private ShardNode? _newScopeShard;
     private readonly Dictionary<Guid, IServiceScope> _shardServiceScopes = [];
     
-    public bool IsInitialized { get; private set; }
+    private TaskCompletionSource _waitForInitTcs = new();
+    
+    public bool IsInitialized
+    {
+        get;
+        private set
+        {
+            if (value == field) return;
+            field = value;
+            if (value)
+            {
+                TaskCompletionSource oldTcs = _waitForInitTcs;
+                _waitForInitTcs = new TaskCompletionSource();
+                oldTcs.SetResult();
+            }
+        }
+    }
     
     public override void _Ready()
     {
@@ -312,5 +326,11 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     public void ReceiveCampaignInitializedPacket()
     {
         _campaignInitializedTcs.SetResult();
+    }
+
+    public async Task WaitForInitAsync()
+    {
+        if (!IsInitialized)
+            await _waitForInitTcs.Task;
     }
 }

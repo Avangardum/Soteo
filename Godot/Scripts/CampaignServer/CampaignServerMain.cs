@@ -39,8 +39,24 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     private readonly LateInit<ILogger<CampaignServerMain>> _logger = new();
     
     private IProcessPublisher? _processPublisher;
-
-    public bool IsInitialized { get; private set; }
+    
+    private TaskCompletionSource _waitForInitTcs = new();
+    
+    public bool IsInitialized
+    {
+        get;
+        private set
+        {
+            if (value == field) return;
+            field = value;
+            if (value)
+            {
+                TaskCompletionSource oldTcs = _waitForInitTcs;
+                _waitForInitTcs = new TaskCompletionSource();
+                oldTcs.SetResult();
+            }
+        }
+    }
 
     private IServiceProvider ServiceProvider => _serviceProvider.Value;
     private bool IsSingleplayer => ServiceProvider.GetRequiredService<SingleplayerOptions>().IsSingleplayer;
@@ -210,5 +226,11 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     public void ReceiveShardServerInitAwaitingCampaignServerInitPacket(Guid senderId)
     {
         _shardServerLocalInitDoneTcs[senderId].SetResult();
+    }
+    
+    public async Task WaitForInitAsync()
+    {
+        if (!IsInitialized)
+            await _waitForInitTcs.Task;
     }
 }

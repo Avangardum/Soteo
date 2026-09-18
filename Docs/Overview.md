@@ -48,12 +48,21 @@ processes and apply usual concurrency control techniques.
 # Session lifecyle
 
 A session starts by starting the campaign server and shard servers. They begin in the uninitialized state. In this
-state the cluster works in limited mode, some invariants that are usually relied on always being true may be false
-and client connections are rejected. When started, servers establish internal connections and exchange initial data,
-such as shared campaign state and shard snapshots from a previous session, after which initialization is considered
+state some invariants that are usually relied on always being true may be false
+(server processes rely on invariants like having all internal connections to other server processes already established,
+having SynchronizedCampaignState immediately available, previous session end state being replicated from the start),
+so the cluster works in limited mode, with most of the systems inactive and client connections rejected,
+the only thing the cluster does in this state is trying to initialize by establishing internal connections
+and exchanging initial data,
+such as shared campaign state and shard snapshots from the previous session, after which initialization is considered
 complete and client connections are allowed. The game, however, starts paused, to allow players to connect in advance.
 After a delay the game unpauses and the session starts. When the session ends, it's paused, then a persistence snapshot
 is created and saved for the next session.
+
+Clients have their own initialization sequence, with their own invariants that are relied on normally, but not yet
+fulfilled during initialization (having connection to the campaign server established, having SynchronizedCampaignState
+immediately available). Until client initialization is complete, it works in limited mode and shows a loading screen
+until it's done.
 
 # DTO
 
