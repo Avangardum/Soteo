@@ -12,13 +12,12 @@ public sealed class JsmqFromCampaignServerCommunicator
 (
     IPacketSerializer packetSerializer,
     IPacketHandler packetHandler,
-    IUserRepository userRepo
+    IUserRepository userRepo,
+    IInitializationRepository initRepo
 ) : GdObject, IFromCampaignServerCommunicator
 {
     private readonly HashSet<Guid> _peerIds = [];
 
-    public bool AllowPlayerConnections { get; set; }
-    
     public event Action<Guid> PeerConnected = delegate {};
     public event Action<Guid> PeerDisconnected = delegate {};
 
@@ -40,8 +39,12 @@ public sealed class JsmqFromCampaignServerCommunicator
                     [handshake.Token] = true,
                 };
                 bool isPlayer = claims.TryGetValue("player", out object value) && value is true;
-                if (isPlayer && !AllowPlayerConnections)
-                    throw new InvalidOperationException("Client connections are not allowed");
+                if (isPlayer && !initRepo.IsInitialized)
+                {
+                    var reason = "Not accepting player connections yet, try again later";
+                    SendTo(new BadInputPacket { Reason = reason }, senderId);
+                    return;
+                } // todo this crashes the client, make it a popup instead
                 userRepo.OnConnected(claims);
                 if (_peerIds.Add(senderId))
                     PeerConnected(senderId);

@@ -173,7 +173,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
             var reason = "Not accepting player connections yet, try again later";
             peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = reason } )).ThrowIfError();
             return;
-        }
+        } // todo this crashes the client, make it a popup instead
      
         if (_userIdsByWsPeerId.Inverse.TryGetValue(userId, out int oldWsPeerId))
         {
