@@ -117,19 +117,6 @@ explore the classes mentioned in the docs or the ones you are interested in.
 
 If you'd like to contribute, join the Discord server and let me know.
 
-## To-do
-
-- [ ] Staging polygon
-- [ ] Stress test / optimization
-- [ ] Extra data dictionary
-- [ ] Shard capacity limits
-- [ ] Travel between shards
-- [ ] Navigation
-- [ ] Items
-- [ ] Building
-- [ ] Singleplayer scenarios
-- [ ] Email sending
-
 ## License
 
 Shards of the Empire Online (Soteo)

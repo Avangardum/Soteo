@@ -54,3 +54,5 @@ using (IServiceScope scope = app.Services.CreateScope())
     scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
 
 app.Run();
+
+// TODO email confirmation
