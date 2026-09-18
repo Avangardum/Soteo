@@ -1,13 +1,13 @@
 using Soteo.Core.Interfaces;
 using Soteo.Util;
 
-namespace Soteo.TestUtil;
+namespace Soteo.Core.Services.Repositories;
 
-public sealed class FakeInitializationRepo : IInitializationRepository
+public sealed class InitializationRepository : IInitializationRepository
 {
     private TaskCompletionSource _waitForInitTcs = new();
     
-    public required bool IsInitialized
+    public bool IsInitialized
     {
         get;
         set

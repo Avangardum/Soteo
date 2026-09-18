@@ -23,7 +23,7 @@ using Path = System.IO.Path;
 
 namespace Soteo.Main.CampaignServer;
 
-public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver, IInitializationRepository
+public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
 {
     private readonly Dictionary<Guid, TaskCompletionSource> _shardServerLocalInitDoneTcs = new();
     
@@ -37,27 +37,10 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     private readonly LateInit<ISynchronizedCampaignStateRepository> _synchronizedCampaignStateRepo = new();
     private readonly LateInit<TimeProvider> _timeProvider = new();
     private readonly LateInit<ILogger<CampaignServerMain>> _logger = new();
+    private readonly LateInit<IInitializationRepository> _initRepo = new();
     
     private IProcessPublisher? _processPublisher;
     
-    private TaskCompletionSource _waitForInitTcs = new();
-    
-    public bool IsInitialized
-    {
-        get;
-        private set
-        {
-            if (value == field) return;
-            field = value;
-            if (value)
-            {
-                TaskCompletionSource oldTcs = _waitForInitTcs;
-                _waitForInitTcs = new TaskCompletionSource();
-                oldTcs.SetResult();
-            }
-        }
-    }
-
     private IServiceProvider ServiceProvider => _serviceProvider.Value;
     private bool IsSingleplayer => ServiceProvider.GetRequiredService<SingleplayerOptions>().IsSingleplayer;
     
@@ -90,7 +73,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         
         await WaitForShardServersLocalInit();
         _communicator.Value.BroadcastToShardServers(new CampaignInitializedPacket());
-        IsInitialized = true;
+        _initRepo.Value.IsInitialized = true;
         
         const int initialPauseDuration = 15;
         _logger.Value.LogInformation("Initialized, unpausing in {duration} seconds", initialPauseDuration);
@@ -116,6 +99,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             ServiceProvider.GetRequiredService<ISynchronizedCampaignStateRepository>();
         _timeProvider.Value = ServiceProvider.GetRequiredService<TimeProvider>();
         _logger.Value = ServiceProvider.GetRequiredService<ILogger<CampaignServerMain>>();
+        _initRepo.Value = ServiceProvider.GetRequiredService<IInitializationRepository>();
     }
     
     private async Task TryLoadSnapshotAsync()
@@ -180,7 +164,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     private void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton<ICampaignServerInitPacketReceiver>(this);
-        services.AddSingleton<IInitializationRepository>(this);
+        services.AddSingleton<IInitializationRepository, InitializationRepository>();
         services.AddSingleton<IUserRepository, UserRepository>();
         services.AddSingleton<IPlayerCharacterTrackerRepository, PlayerCharacterTrackerRepository>();
         services.AddSingleton<IPacketHandler, CampaignServerRoutingPacketHandler>();
@@ -226,11 +210,5 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     public void ReceiveShardServerInitAwaitingCampaignServerInitPacket(Guid senderId)
     {
         _shardServerLocalInitDoneTcs[senderId].SetResult();
-    }
-    
-    public async Task WaitForInitAsync()
-    {
-        if (!IsInitialized)
-            await _waitForInitTcs.Task;
     }
 }

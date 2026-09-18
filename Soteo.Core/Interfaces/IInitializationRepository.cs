@@ -2,6 +2,6 @@ namespace Soteo.Core.Interfaces;
 
 public interface IInitializationRepository
 {
-    bool IsInitialized { get; }
+    bool IsInitialized { get; set; }
     Task WaitForInitAsync();
 }

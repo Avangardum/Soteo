@@ -25,7 +25,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay;
 
-public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketReceiver, IInitializationRepository
+public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketReceiver
 {
     // Client and shard server entry point.
     // Handles scene loading and dependency injection.
@@ -49,29 +49,12 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     private ProcessPublisher? _processPublisher;
     private SoteoCamera? _camera;
     private ILogger<GameplayMain>? _logger;
+    private IInitializationRepository? _initRepo;
     
     private readonly PackedScene? _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
     private IServiceProvider? _rootServiceProvider;
     private ShardNode? _newScopeShard;
     private readonly Dictionary<Guid, IServiceScope> _shardServiceScopes = [];
-    
-    private TaskCompletionSource _waitForInitTcs = new();
-    
-    public bool IsInitialized
-    {
-        get;
-        private set
-        {
-            if (value == field) return;
-            field = value;
-            if (value)
-            {
-                TaskCompletionSource oldTcs = _waitForInitTcs;
-                _waitForInitTcs = new TaskCompletionSource();
-                oldTcs.SetResult();
-            }
-        }
-    }
     
     public override void _Ready()
     {
@@ -108,7 +91,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             .SendReliable(new ShardServerLocalInitDonePacket(), Const.CampaignServerId);
         _logger.Required.LogInformation("Local initializing done, waiting for others");
         await _campaignInitializedTcs.Task;
-        IsInitialized = true;
+        _initRepo.Required.IsInitialized = true;
         _logger.Required.LogInformation("Initialized");
     }
     
@@ -133,7 +116,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     {
         services.AddSingleton(this);
         services.AddSingleton<IShardLoader>(this);
-        services.AddSingleton<IInitializationRepository>(this);
+        services.AddSingleton<IInitializationRepository, InitializationRepository>();
         services.AddSingleton<IGameplayInitPacketReceiver>(this);
         services.AddSingleton(GetTree());
         services.AddSingleton<IShardServiceProviders>(new ShardServiceProviders(_shardServiceScopes));
@@ -272,6 +255,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     private void CreateSingletonServices()
     {
         _logger = _rootServiceProvider.Required.GetRequiredService<ILogger<GameplayMain>>();
+        _initRepo = _rootServiceProvider.Required.GetRequiredService<IInitializationRepository>();
         _rootServiceProvider.Required.GetRequiredService<SceneTreePauser>();
         
         if (Config.Side == Side.Client)
@@ -326,11 +310,5 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     public void ReceiveCampaignInitializedPacket()
     {
         _campaignInitializedTcs.SetResult();
-    }
-
-    public async Task WaitForInitAsync()
-    {
-        if (!IsInitialized)
-            await _waitForInitTcs.Task;
     }
 }
