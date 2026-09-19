@@ -200,8 +200,8 @@ public abstract class Ability
         
         return format
             .PassTo(it => FillDescriptionProperties(it, level))
-            .PassTo(it => FillDescriptionPluralization(it, localizer)) +
-            DescriptionFooter(level);
+            .PassTo(it => FillDescriptionPluralization(it, localizer))
+            + DescriptionFooter(level);
     }
     
     private string FillDescriptionProperties(string value, int? level)
@@ -240,8 +240,12 @@ public abstract class Ability
             {
                 string propertyName = match.Groups[1].Value;
                 object? propertyValue = GetType().GetProperty(propertyName)?.GetValue(this);
-                double? doubleValue = propertyValue is IConvertible ? Convert.ToDouble(propertyValue) : null;
-                if (doubleValue == null) return "ERROR";
+                double? doubleValue = propertyValue switch
+                {
+                    IConvertible => Convert.ToDouble(propertyValue),
+                    Scalable s => s.ToDoubleOrNull(),
+                    _ => null
+                };
                 int pluralizationIndex = localizer.GetPluralisationIndex(doubleValue);
                 return match.Groups[2].Captures[pluralizationIndex].Value;
             }

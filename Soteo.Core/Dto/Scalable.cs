@@ -11,6 +11,8 @@ public abstract class Scalable
     public static Scalable<T> Create<T>(params ReadOnlySpan<T> values) where T : notnull => new(values);
     
     public abstract string ToBbcode(int? highlightLevel = null, string? format = null);
+    
+    public abstract double? ToDoubleOrNull();
 }
 
 /// <summary>
@@ -46,4 +48,12 @@ public sealed class Scalable<T> : Scalable, IEnumerable<T> where T : notnull
     
     private string Format(T value, string? format) =>
         value is IFormattable f && format != null ? f.ToString(format, CultureInfo.CurrentCulture) : value.ToString();
+
+    public override double? ToDoubleOrNull()
+    {
+        if (_values.Length != 1) return null;
+        T value = _values[0];
+        if (value is not IConvertible) return null;
+        return Convert.ToDouble(value);
+    }
 }

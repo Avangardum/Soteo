@@ -6,8 +6,6 @@ namespace Soteo.Core.Abilities;
 
 public sealed class HealAbility : Ability
 {
-    // todo fix broken description
-    
     public override int MaxLevel => 4;
     public override Scalable<double> StaticManaCost => [100, 120, 160, 180];
     public Scalable<double> Heal => [200, 300, 400, 500];
