@@ -77,6 +77,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     
     private async Task ServerInitAsync()
     {
+        // todo crash on timeout
         LoadShard(_rootServiceProvider.Required.GetRequiredService<ICurrentUserIdRepository>().Value.Required);
         Guid shardId = _rootServiceProvider.GetRequiredService<ShardOptions>().ShardId;
         _rootServiceProvider = _shardServiceScopes[shardId].ServiceProvider;

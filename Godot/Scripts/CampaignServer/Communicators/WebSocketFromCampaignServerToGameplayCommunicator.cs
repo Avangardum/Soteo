@@ -135,6 +135,8 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
     
     private void HandleHandshakePacket(Packet packet, int wsPeerId, WebSocketPeer peer)
     {
+        // TODO close ws connection on fail
+        
         if (packet is not CampaignServerHandshakePacket handshake)
         {
             peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Handshake expected" } ))
