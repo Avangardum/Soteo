@@ -23,6 +23,8 @@ public sealed class JsmqFromCampaignServerCommunicator
 
     public void Poll()
     {
+        // TODO split
+        
         while (true)
         {
             var base64 = (string?)JavaScript.Eval($"""jsmq.receive("{Const.CampaignServerId}")""");
@@ -43,7 +45,7 @@ public sealed class JsmqFromCampaignServerCommunicator
                 {
                     var reason = "Not accepting player connections yet, try again later";
                     SendTo(new BadInputPacket { Reason = reason }, senderId);
-                    return;
+                    continue;
                 } // todo this crashes the client, make it a popup instead
                 userRepo.OnConnected(claims);
                 if (_peerIds.Add(senderId))
