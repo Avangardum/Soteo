@@ -182,8 +182,8 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddSingleton<ILocalizer, Localizer>();
         services.AddSingleton<ICurrentCharacterIdRepository, CurrentCharacterIdRepository>();
         services.AddSingleton<IVisibleShardIdRepository, VisibleShardIdRepository>();
-        
         services.AddScoped<IShardSynchronizationClient, ShardSynchronizationClient>();
+        services.AddSingleton<ClientInitializer>();
     }
     
     private void RegisterJsmqServices(IServiceCollection services)
@@ -264,6 +264,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             _rootServiceProvider.Required.GetRequiredService<DebugScreen>();
             _rootServiceProvider.Required.GetRequiredService<IHud>();
             _rootServiceProvider.Required.GetRequiredService<CampaignScreen>();
+            _rootServiceProvider.Required.GetRequiredService<ClientInitializer>();
         }
     }
     

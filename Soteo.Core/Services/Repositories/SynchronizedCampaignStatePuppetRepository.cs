@@ -1,6 +1,7 @@
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
+using Soteo.Util;
 
 namespace Soteo.Core.Services.Repositories;
 
@@ -32,4 +33,10 @@ public sealed class SynchronizedCampaignStatePuppetRepository :
     }
     
     public bool IsPaused => Value.IsPaused;
+    
+    public async Task WaitForInitAsync()
+    {
+        if (_value == null)
+            await Wait.ForEventAsync(it => Changed += it, it => Changed -= it);
+    }
 }

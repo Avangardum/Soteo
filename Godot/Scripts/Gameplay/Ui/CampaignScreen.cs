@@ -25,7 +25,7 @@ public sealed class CampaignScreen
     public CampaignScreen
     (
         CampaignScreenNode node,
-        ICampaignServerConnector campaignServerConnector,
+        IInitializationRepository initRepo,
         IShardServerConnector shardServerConnector,
         IFromGameplayPacketSender packetSender,
         IShardLoader shardLoader,
@@ -44,7 +44,6 @@ public sealed class CampaignScreen
         _characterButtons = node.GetNode("CharacterButtons").GetChildren().Cast<Button>().ToImmutableList();
         _shardButtons = node.GetNode("ShardButtons").GetChildren().Cast<Button>().ToImmutableList();
         
-        campaignServerConnector.Connected += () => _node.Visible = true;
         node.GetNode<Button>("DeployButton").Connect("pressed", Deploy);
         node.GetNode<Button>("SpectateButton").Connect("pressed", Spectate);
         
@@ -53,6 +52,8 @@ public sealed class CampaignScreen
         
         foreach (Button button in _shardButtons)
             button.Connect("pressed", () => SelectShard(Guid.Parse(button.Text)));
+        
+        initRepo.WaitForInitAsync().ContinueWithinContext(() => node.Visible = true).CollectException();
     }
     
     private void SelectCharacter(Guid id)
