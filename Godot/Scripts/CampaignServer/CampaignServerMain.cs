@@ -127,7 +127,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             .Where(it => !it.Value.Task.IsCompleted)
             .Select(it => it.Key)
             .ToImmutableList();
-        if (uninitializedShardServerIds.Count > 1)
+        if (uninitializedShardServerIds.Count > 0)
         {
             string idsStr = uninitializedShardServerIds.JoinToString(", ");
             throw new TimeoutException($"Shard servers {idsStr} didn't finish local initializing in time");
