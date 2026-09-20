@@ -5,6 +5,7 @@ using System.Text;
 using Soteo.Core.Abilities;
 using Soteo.Core.Delegates;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Exceptions;
@@ -18,6 +19,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 {
     private readonly IReadOnlyList<Type> _abilityTypes = typeLocator.ConcreteSubclassesOf<Ability>();
     private readonly IReadOnlyList<Type> _statusTypes = typeLocator.ConcreteSubclassesOf<Status>();
+    private readonly IReadOnlyList<Type> _packetTypes = typeLocator.ConcreteSubclassesOf<Packet>();
 
     public void SerializeByte(byte value, Stream stream) => stream.WriteByte(value);
 
@@ -320,6 +322,19 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     
     public Status DeserializeStatus(Stream stream) =>
         Status.Instance(_statusTypes[DeserializeInt(stream)]);
+    
+    public void SerializePacketType(Type type, Stream stream)
+    {
+        if (!type.IsAssignableTo(typeof(Packet)))
+            throw new ArgumentException($"{type} is not a packet");
+        int index = _packetTypes.IndexOf(type);
+        // todo remove this constraint
+        if (index > byte.MaxValue)
+            throw new Exception("More than 255 packet types is not supported");
+        SerializeByte((byte)index, stream);
+    }
+    
+    public Type DeserializePacketType(Stream stream) => _packetTypes[DeserializeByte(stream)];
     
     public void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
     {

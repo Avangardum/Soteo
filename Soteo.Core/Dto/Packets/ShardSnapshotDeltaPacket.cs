@@ -4,7 +4,6 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Core.Dto.Packets;
 
-[PacketTypeCode(PacketTypeCode.ShardSnapshotDelta)]
 public sealed record ShardSnapshotDeltaPacket : Packet
 {
     public required double ServerLoad { get; init; }

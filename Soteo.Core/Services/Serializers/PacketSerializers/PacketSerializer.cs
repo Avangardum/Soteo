@@ -9,12 +9,12 @@ namespace Soteo.Core.Services.Serializers.PacketSerializers;
 
 public static class PacketSerializer
 {
-    private static ImmutableDictionary<PacketTypeCode, Type>? _typesByPacketType;
+    private static ImmutableDictionary<Type, Type>? _typesByPacketType;
     
-    public static Type? TypeFor(PacketTypeCode packetTypeCode, ITypeLocator typeLocator)
+    public static Type? TypeFor(Type packetType, ITypeLocator typeLocator)
     {
         _typesByPacketType ??= InitTypesByPacketType(typeLocator);
-        return _typesByPacketType.GetOrDefault(packetTypeCode);
+        return _typesByPacketType.GetOrDefault(packetType);
     }
     
     public static IReadOnlyList<Type> AllTypes(ITypeLocator typeLocator)
@@ -23,25 +23,23 @@ public static class PacketSerializer
         return _typesByPacketType.Values.ToImmutableList();
     }
     
-    private static ImmutableDictionary<PacketTypeCode, Type> InitTypesByPacketType(ITypeLocator typeLocator)
+    private static ImmutableDictionary<Type, Type> InitTypesByPacketType(ITypeLocator typeLocator)
     {
         return typeLocator
+            // TODO filtering by generic base type is used to filter out the routing serializer, make it explicit
             .ConcreteSubclassesOf<IPacketSerializer>(where: it => it.BaseType.Required.IsGenericType)
-            .ToImmutableDictionary<Type, PacketTypeCode>(it => it.GetPacketType(typeof(PacketSerializer<>)));
+            .ToImmutableDictionary<Type, Type>(it => it.GetPacketType(typeof(PacketSerializer<>)));
     }
 }
 
 public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Packet
 {
-    public static readonly PacketTypeCode PacketTypeCode =
-        typeof(TPacket).GetRequiredAttribute<PacketTypeCodeAttribute>().TypeCode;
-    
     byte[] IPacketSerializer.Serialize(Packet packet) => Serialize((TPacket)packet);
     
     public byte[] Serialize(TPacket packet)
     {
         var stream = new MemoryStream();
-        s.SerializeEnum(packet.TypeCode, stream);
+        s.SerializePacketType(packet.GetType(), stream);
         SerializeInternal(packet, stream);
         return stream.ToArray();
     }
@@ -55,8 +53,8 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
         try
         {
             var stream = new MemoryStream(bytes.ToArray());
-            var typeCode = s.DeserializeEnum<PacketTypeCode>(stream);
-            if (typeCode != PacketTypeCode)
+            Type type = s.DeserializePacketType(stream);
+            if (type != typeof(TPacket))
                 throw new InvalidOperationException("Wrong serializer");
             TPacket packet = DeserializeInternal(stream);
             if (stream.Position != bytes.Length)

@@ -4,5 +4,4 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Core.Dto.Packets;
 
-[PacketTypeCode(PacketTypeCode.Stop)]
 public sealed record StopPacket : CommandPacket<StopCommand>;

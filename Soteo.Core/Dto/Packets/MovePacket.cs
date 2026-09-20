@@ -4,5 +4,4 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Core.Dto.Packets;
 
-[PacketTypeCode(PacketTypeCode.Move)]
 public sealed record MovePacket : CommandPacket<MoveCommand>;

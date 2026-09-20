@@ -3,7 +3,6 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Core.Dto.Packets;
 
-[PacketTypeCode(PacketTypeCode.Ping)]
 public sealed record PingPacket : Packet
 {
     public required Guid Id { get; init; }

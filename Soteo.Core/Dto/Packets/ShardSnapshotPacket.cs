@@ -4,7 +4,6 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Core.Dto.Packets;
 
-[PacketTypeCode(PacketTypeCode.ShardSnapshot)]
 public sealed record ShardSnapshotPacket : Packet
 {
     public required ShardSnapshot Snapshot { get; init; }

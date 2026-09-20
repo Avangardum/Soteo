@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Services.Serializers.PacketSerializers;
 using Soteo.Core.StaticHelpers;
@@ -10,18 +9,18 @@ public static class ServiceProviderExtensions
 {
     extension (IServiceProvider self)
     {
-        public IPacketHandler? GetPacketHandlerFor<TAttribute>(PacketTypeCode packetTypeCode)
-            where TAttribute : Attribute
+        public IPacketHandler? GetPacketHandlerFor<THandlerAttribute>(Type packetType)
+            where THandlerAttribute : Attribute
         {
             var typeLocator = self.GetRequiredService<ITypeLocator>();
-            return (IPacketHandler?)PacketHandlerLocator<TAttribute>.TypeFor(packetTypeCode, typeLocator)
+            return (IPacketHandler?)PacketHandlerLocator<THandlerAttribute>.TypeFor(packetType, typeLocator)
                 ?.PassTo(self.GetRequiredService);
         }
         
-        public IPacketSerializer? GetPacketSerializerFor(PacketTypeCode packetTypeCode)
+        public IPacketSerializer? GetPacketSerializerFor(Type packetType)
         {
             var typeLocator = self.GetRequiredService<ITypeLocator>();
-            return (IPacketSerializer?)PacketSerializer.TypeFor(packetTypeCode, typeLocator)
+            return (IPacketSerializer?)PacketSerializer.TypeFor(packetType, typeLocator)
                 ?.PassTo(self.GetRequiredService);
         }
     }

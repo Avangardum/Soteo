@@ -8,5 +8,4 @@ namespace Soteo.Core.Dto.Packets;
 /// ensuring that other servers are initialized and waits for <see cref="CampaignInitializedPacket"/> to fully
 /// finish initialization
 /// </summary>
-[PacketTypeCode(PacketTypeCode.ShardServerInitAwaitingCampaignServerInit)]
 public sealed record ShardServerLocalInitDonePacket : Packet;

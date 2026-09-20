@@ -95,6 +95,8 @@ public interface ISerializationHelper
     Ability DeserializeAbility(Stream stream);
     void SerializeStatus(Status value, Stream stream);
     Status DeserializeStatus(Stream stream);
+    void SerializePacketType(Type value, Stream stream);
+    Type DeserializePacketType(Stream stream);
     void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream);
     PuppetStatusContext DeserializePuppetStatusContext(Stream stream);
     void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream);

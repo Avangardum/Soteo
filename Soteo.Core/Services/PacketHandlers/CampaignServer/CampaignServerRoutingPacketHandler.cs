@@ -12,9 +12,9 @@ public sealed class CampaignServerRoutingPacketHandler(IServiceProvider serviceP
     public async Task HandleAsync(Packet packet, Guid senderId)
     {
         IPacketHandler? handler =
-            serviceProvider.GetPacketHandlerFor<CampaignServerPacketHandlerAttribute>(packet.TypeCode);
-        if (handler == null)
-            throw ExceptionFactory.PacketHandlerNotFound(packet.TypeCode, typeof(CampaignServerPacketHandlerAttribute));
+            serviceProvider.GetPacketHandlerFor<CampaignServerPacketHandlerAttribute>(packet.GetType());
+        if (handler == null) throw
+            ExceptionFactory.PacketHandlerNotFound(packet.GetType(), typeof(CampaignServerPacketHandlerAttribute));
         User sender = serviceProvider.GetRequiredService<IUserRepository>()[senderId];
         if (sender.IsPlayer && !handler.GetType().HasAttribute<AllowClientPacketsAttribute>())
             throw ExceptionFactory.ClientPacketsNotAllowed(handler.GetType());

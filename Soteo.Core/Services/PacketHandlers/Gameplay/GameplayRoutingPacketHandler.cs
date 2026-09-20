@@ -23,8 +23,8 @@ public sealed class GameplayRoutingPacketHandler
             shardServiceProviders.GetOrDefault(senderId);
         if (serviceProvider == null) return;
         
-        IPacketHandler handler = serviceProvider.GetPacketHandlerFor<GameplayPacketHandlerAttribute>(packet.TypeCode) ??
-            throw ExceptionFactory.PacketHandlerNotFound(packet.TypeCode, typeof(GameplayPacketHandlerAttribute));
+        IPacketHandler handler = serviceProvider.GetPacketHandlerFor<GameplayPacketHandlerAttribute>(packet.GetType()) ??
+            throw ExceptionFactory.PacketHandlerNotFound(packet.GetType(), typeof(GameplayPacketHandlerAttribute));
         
         if
         (

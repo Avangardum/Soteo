@@ -4,5 +4,4 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Core.Dto.Packets;
 
-[PacketTypeCode(PacketTypeCode.UseAbility)]
 public sealed record UseAbilityPacket : CommandPacket<UseAbilityCommand>;

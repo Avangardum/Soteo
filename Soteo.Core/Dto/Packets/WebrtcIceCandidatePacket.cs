@@ -6,7 +6,6 @@ namespace Soteo.Core.Dto.Packets;
 /// <summary>
 /// WebRTC ICE candidate info in the Godot format.
 /// </summary>
-[PacketTypeCode(PacketTypeCode.WebrtcIceCandidate)]
 public sealed record WebrtcIceCandidatePacket : RelayedPacket
 {
     public required string Media { get; init; }
