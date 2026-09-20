@@ -328,13 +328,10 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         if (!type.IsAssignableTo(typeof(Packet)))
             throw new ArgumentException($"{type} is not a packet");
         int index = _packetTypes.IndexOf(type);
-        // todo remove this constraint
-        if (index > byte.MaxValue)
-            throw new Exception("More than 255 packet types is not supported");
-        SerializeByte((byte)index, stream);
+        SerializeInt(index, stream);
     }
     
-    public Type DeserializePacketType(Stream stream) => _packetTypes[DeserializeByte(stream)];
+    public Type DeserializePacketType(Stream stream) => _packetTypes[DeserializeInt(stream)];
     
     public void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
     {
