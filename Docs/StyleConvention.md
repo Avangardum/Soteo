@@ -136,12 +136,11 @@ public class Foo
 Having a single newline between members of a type is always acceptable. However, it is possible to omit it if
 both members occupy only 1 line each (including comments, attributes, initializers).
 
-Use trailing commas in multiline comma-separated lists, avoid them in inline lists.
+Don't use trailing commas.
 
 In a comma-separated or semicolon-separated list, each delimiter should be followed by a space or a newline.
 
-When doing a line break on an operator, the operator should be at the end of a line, not at the beginning.
-The exceptions are the `.`, `?.`, `!.` operators, which should be at the beginning of a line.
+When doing a line break on an operator, the operator should be at the beginning of the next line.
 
 When having an inline block of `()`, `[]` or `<>`, there should be no space between
 the opening and closing symbols and the content.
