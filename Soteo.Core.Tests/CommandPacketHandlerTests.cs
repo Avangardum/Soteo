@@ -30,7 +30,7 @@ public sealed class CommandPacketHandlerTests
         _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [_unitId] = _unit } );
         _command = new TestCommand();
     }
-    
+
     [Fact]
     public async Task HandlingPacketFromControllingPlayerSetsUnitCommand()
     {
@@ -38,7 +38,7 @@ public sealed class CommandPacketHandlerTests
         await _sut.HandleAsync(packet, _controllingPlayerId);
         _unit.Received(1).SetCommand(_command);
     }
-    
+
     [Fact]
     public async Task HandlingPacketFromControllingPlayerWhilePausedDoesNotSetUnitCommand()
     {
@@ -47,7 +47,7 @@ public sealed class CommandPacketHandlerTests
         await _sut.HandleAsync(packet, _controllingPlayerId);
         _unit.Received(0).SetCommand(_command);
     }
-    
+
     [Fact]
     public async Task HandlingPacketFromNonControllingPlayerDoesNotSetsUnitCommand()
     {
@@ -55,7 +55,7 @@ public sealed class CommandPacketHandlerTests
         await _sut.HandleAsync(packet, Guid.NewGuid());
         _unit.Received(0).SetCommand(Arg.Any<ICommand>());
     }
-    
+
     [Fact]
     public async Task HandlingPacketWithNonexistentUnitIdDoesNotSetUnitCommand()
     {
@@ -63,11 +63,11 @@ public sealed class CommandPacketHandlerTests
         await _sut.HandleAsync(packet, _controllingPlayerId);
         _unit.Received(0).SetCommand(Arg.Any<ICommand>());
     }
-    
+
     private class Sut(IEntityManager entityManager, ISynchronizedCampaignStatePuppetRepository pauseRepo) :
         CommandPacketHandler<TestCommandPacket, TestCommand>(entityManager, pauseRepo);
 
     private record TestCommandPacket : CommandPacket<TestCommand>;
-    
+
     private record TestCommand : ICommand;
 }

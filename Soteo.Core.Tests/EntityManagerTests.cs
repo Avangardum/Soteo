@@ -19,7 +19,7 @@ public sealed class EntityManagerTests
     private readonly EntityManager _sut;
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityNodeManager _entityNodeManager;
-    
+
     private readonly IUnit _projectileSourceChar;
     private readonly IUnit _projectileTargetChar;
     private readonly IUnit _bystanderChar;
@@ -34,7 +34,7 @@ public sealed class EntityManagerTests
         _projectileSourceChar = _sut.SpawnPlayerCharacter(Guid.NewGuid(), Guid.NewGuid());
         _projectileTargetChar = _sut.SpawnPlayerCharacter(Guid.NewGuid(), Guid.NewGuid());
         _bystanderChar = _sut.SpawnPlayerCharacter(Guid.NewGuid(), Guid.NewGuid());
-        
+
         var abilityContext = new AbilityContext
         {
             Ability = Ability.Instance<TestAbility>(),
@@ -44,32 +44,32 @@ public sealed class EntityManagerTests
             ServiceProvider = _serviceProvider,
             TargetUnit = _projectileTargetChar,
         };
-        
+
         _projectile = _sut.SpawnProjectile(abilityContext, speed: 1, _projectileTargetChar);
     }
-    
+
     [Fact]
     public void GetEntitySnapshotsReturnsSnapshotsForAllNotRemovedEntities()
     {
         IReadOnlyDictionary<Guid, EntitySnapshot> snapshots = _sut.CreateEntitySnapshots();
-        
+
         snapshots[_projectileSourceChar.Id].Id.Should().Be(_projectileSourceChar.Id);
         snapshots[_projectileTargetChar.Id].Id.Should().Be(_projectileTargetChar.Id);
         snapshots[_bystanderChar.Id].Id.Should().Be(_bystanderChar.Id);
         snapshots[_projectile.Id].Id.Should().Be(_projectile.Id);
     }
-    
+
     [Fact]
     public void GetEntitySnapshotsReturnsSnapshotsForRemovedReferencedEntities()
     {
         _projectileSourceChar.Remove();
         _projectileTargetChar.Remove();
         IReadOnlyDictionary<Guid, EntitySnapshot> snapshots = _sut.CreateEntitySnapshots();
-        
+
         snapshots[_projectileSourceChar.Id].Id.Should().Be(_projectileSourceChar.Id);
         snapshots[_projectileTargetChar.Id].Id.Should().Be(_projectileTargetChar.Id);
     }
-    
+
     [Fact]
     public void RemovingReferencedUnitAndSpawningAnotherWithSameIdReturnsReferenceToSameNotRemovedInstance()
     {
@@ -79,20 +79,20 @@ public sealed class EntityManagerTests
             _sut.SpawnPlayerCharacter(_projectileSourceChar.Id, _projectileSourceChar.ControllingPlayerIds.Single());
         IUnit newProjectileTargetChar =
             _sut.SpawnPlayerCharacter(_projectileTargetChar.Id, _projectileTargetChar.ControllingPlayerIds.Single());
-        
+
         newProjectileSourceChar.Should().BeSameAs(_projectileSourceChar);
         newProjectileSourceChar.IsRemoved.Should().BeFalse();
         newProjectileTargetChar.Should().BeSameAs(_projectileTargetChar);
         newProjectileTargetChar.IsRemoved.Should().BeFalse();
-    } 
-    
+    }
+
     [Fact]
     public void SpawningPlayerCharacterWithSameIdAsProjectileThrows()
     {
         _sut.Invoking(it => it.SpawnPlayerCharacter(_projectile.Id, _projectile.Id))
             .Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public void SpawningPlayerCharacterWithSameIdAsRemovedProjectileThrows()
     {
@@ -100,14 +100,14 @@ public sealed class EntityManagerTests
         _sut.Invoking(it => it.SpawnPlayerCharacter(_projectile.Id, _projectile.Id))
             .Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public void SpawningPlayerCharacterWithSameIdAsAnotherPlayerCharacterThrows()
     {
         _sut.Invoking(it => it.SpawnPlayerCharacter(_bystanderChar.Id, _bystanderChar.ControllingPlayerIds.Single()))
             .Should().Throw<InvalidOperationException>();
     }
-    
+
     public sealed class TestAbility : Ability
     {
         public override Targeting Targeting => Targeting.Passive;

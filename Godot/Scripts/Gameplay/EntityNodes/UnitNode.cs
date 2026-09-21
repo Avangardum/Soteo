@@ -7,13 +7,13 @@ namespace Soteo.Main.Gameplay.EntityNodes;
 public sealed class UnitNode : KinematicBody2D, IUnitNode
 {
     public Unit? Unit { get; set; }
-    
+
     public IEntity? Entity
     {
         get => Unit;
         set => Unit = (Unit?)value;
     }
-    
+
     public Vector2 PositionM
     {
         get => Position.ToSys() / Const.PixelsInMeter;

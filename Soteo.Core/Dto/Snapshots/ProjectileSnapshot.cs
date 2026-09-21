@@ -4,8 +4,8 @@ public sealed record ProjectileSnapshot : EntitySnapshot<ProjectileSnapshot>
 {
     public required AbilityContextSnapshot AbilityContext { get; init; }
     public required double Speed { get; init; }
-    public required ProjectileTargetSnapshot Target { get; init; } 
-    
+    public required ProjectileTargetSnapshot Target { get; init; }
+
     public override EntitySnapshot ToPuppet()
     {
         return new ProjectilePuppetSnapshot
@@ -16,7 +16,7 @@ public sealed record ProjectileSnapshot : EntitySnapshot<ProjectileSnapshot>
             Azimuth = Azimuth
         };
     }
-    
+
     public override EntitySnapshotDelta DeltaFrom(ProjectileSnapshot? from) =>
         throw new NotSupportedException();
 }

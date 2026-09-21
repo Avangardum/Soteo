@@ -10,7 +10,7 @@ namespace Soteo.Core.Services.Repositories;
 public sealed class SynchronizedCampaignStateRepository : ISynchronizedCampaignStateRepository
 {
     private readonly IFromCampaignServerPacketSender _packetSender;
-    
+
     private bool _isChanged;
     private readonly HashSet<Guid> _valueRequesterIds = [];
 
@@ -23,11 +23,11 @@ public sealed class SynchronizedCampaignStateRepository : ISynchronizedCampaignS
     {
         _packetSender = packetSender;
         connectionNotifier.PeerConnected += OnPeerConnected;
-        
+
         processPublisher
             .SubscribeToPhysicsProcess(Tick, ProcessPriorityEnum.SynchronizationServer, callWhenPaused: true);
     }
-    
+
     public SynchronizedCampaignState Value
     {
         get;
@@ -38,10 +38,10 @@ public sealed class SynchronizedCampaignStateRepository : ISynchronizedCampaignS
             _isChanged = true;
         }
     } = new();
-    
+
     public void Pause() => Value = Value with { IsPaused = true };
     public void Unpause() => Value = Value with { IsPaused = false };
-    
+
     private void Tick()
     {
         if (_isChanged)
@@ -51,7 +51,7 @@ public sealed class SynchronizedCampaignStateRepository : ISynchronizedCampaignS
         _isChanged = false;
         _valueRequesterIds.Clear();
     }
-    
+
     private void OnPeerConnected(Guid id)
     {
         if (id != Const.CampaignServerId)

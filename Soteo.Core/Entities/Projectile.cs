@@ -8,18 +8,18 @@ namespace Soteo.Core.Entities;
 public sealed class Projectile : Entity<IProjectileNode>
 {
     private readonly IServiceProvider _serviceProvider;
-    
+
     private AbilityContext _abilityContext;
     private double _speed;
     private ProjectileTarget _target;
     private bool _didHit;
-    
+
     /// <summary>
     /// If true, the projectile is in invalid state due to some non-nullable fields having null value, which are
     /// expected to be set via snapshot replication immediately
     /// </summary>
     private bool _isSnapshotReplicationPendingToFinishInit;
-    
+
     public Projectile
     (
         Guid id,
@@ -35,7 +35,7 @@ public sealed class Projectile : Entity<IProjectileNode>
         _target = target;
         _serviceProvider = serviceProvider;
     }
-    
+
     public static Projectile FromSnapshot
     (
         ProjectileSnapshot snapshot,
@@ -69,7 +69,7 @@ public sealed class Projectile : Entity<IProjectileNode>
             Node?.PositionM = value;
         }
     }
-    
+
     public override EntitySnapshot ToSnapshot()
     {
         return new ProjectileSnapshot
@@ -98,13 +98,13 @@ public sealed class Projectile : Entity<IProjectileNode>
     {
         if (_isSnapshotReplicationPendingToFinishInit)
             throw new InvalidOperationException("Snapshot replication is pending to finish initialization");
-        
+
         if (_didHit)
         {
             Remove();
             return;
         }
-        
+
         Vector2 targetPosition = _target.IsUnit ? _target.Unit.Position : _target.Position.Value;
         Vector2 directionToTarget = targetPosition - Position;
         double movementLength = _speed * delta;

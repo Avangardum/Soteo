@@ -20,7 +20,7 @@ public sealed class CampaignSnapshotManagerTests
     private readonly FakeTimeProvider _timeProvider;
     private readonly FakeConsistencyValidator _consistencyValidator;
     private readonly CampaignSnapshotManager _sut;
-    
+
     public CampaignSnapshotManagerTests()
     {
         _timeProvider = new FakeTimeProvider();
@@ -37,13 +37,13 @@ public sealed class CampaignSnapshotManagerTests
     {
         User user1 = CreatePlayer();
         User user2 = CreatePlayer();
-        
+
         CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
-        
+
         snapshot.CampaignServer.Users[user1.Id].Should().Be(user1.ToSnapshot());
         snapshot.CampaignServer.Users[user2.Id].Should().Be(user2.ToSnapshot());
     }
-    
+
     [Fact]
     public async Task SnapshotContainsPlayerCharacterTrackersFromRepository()
     {
@@ -51,25 +51,25 @@ public sealed class CampaignSnapshotManagerTests
         User shard = CreateShard();
         PlayerCharacterTracker char1Tracker = CreatePlayerCharacterTracker(shard, player);
         PlayerCharacterTracker char2Tracker = CreatePlayerCharacterTracker(null, player);
-        
+
         CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
-        
+
         snapshot.CampaignServer.PlayerCharacterTrackers[char1Tracker.Id].Should().Be(char1Tracker.ToSnapshot());
         snapshot.CampaignServer.PlayerCharacterTrackers[char2Tracker.Id].Should().Be(char2Tracker.ToSnapshot());
     }
-    
+
     [Fact]
     public async Task SnapshotContainsShardSnapshotsSentByShardServers()
     {
         var shard1 = CreateShard();
         var shard2 = CreateShard();
-        
+
         CampaignSnapshot snapshot = await _sut.CreateSnapshotAsync();
-        
+
         snapshot.Shards[shard1.Id].Tick.Should().Be(shard1.Id.ToString()[^1]);
         snapshot.Shards[shard2.Id].Tick.Should().Be(shard2.Id.ToString()[^1]);
     }
-    
+
     [Fact]
     public async Task ReceivingUnrequestedShardSnapshotPacketThrows()
     {
@@ -89,41 +89,41 @@ public sealed class CampaignSnapshotManagerTests
             )
         ).Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public async Task ReceivingDuplicatedShardSnapshotPacketThrows()
     {
         CreateShard();
         CreateShard();
-        
+
         _packetSender.DuplicateResponse = true;
-        
-        await _sut.Awaiting(it => it.CreateSnapshotAsync()).Should().ThrowAsync<InvalidOperationException>(); 
+
+        await _sut.Awaiting(it => it.CreateSnapshotAsync()).Should().ThrowAsync<InvalidOperationException>();
     }
-    
+
     [Fact]
     public async Task NotReceivingAllShardSnapshotsInTimeThrows()
     {
         CreateShard();
         CreateUnresponsiveShard();
-        
+
         var assertTask = FluentActions.Awaiting(_sut.CreateSnapshotAsync).Should().ThrowAsync<TimeoutException>();
         _timeProvider.Advance(TimeSpan.FromSeconds(CampaignSnapshotManager.ShardServerResponseTimeout * 1.1));
         await assertTask;
     }
-    
+
     [Fact]
     public async Task AlwaysFailingConsistencyValidationThrows()
     {
         CreateShard();
         _consistencyValidator.FailuresRemaining = int.MaxValue;
-        
+
         var assertTask = FluentActions.Awaiting(_sut.CreateSnapshotAsync).Should().ThrowAsync<Exception>();
         for (int i = 0; i < 510; i++)
             _timeProvider.Advance(TimeSpan.FromDays(365));
         await assertTask;
     }
-    
+
     [Fact]
     public async Task FailingConsistencyValidationRetriesAfterDelayUntilSuccess()
     {
@@ -131,7 +131,7 @@ public sealed class CampaignSnapshotManagerTests
         _consistencyValidator.FailuresRemaining = 2;
 
         Task actTask = _sut.CreateSnapshotAsync();
-        
+
         _consistencyValidator.FailuresRemaining.Should().Be(1);
         _timeProvider.Advance(TimeSpan.FromSeconds(CampaignSnapshotManager.InconsistencyRetryDelay * 1.1));
         _consistencyValidator.FailuresRemaining.Should().Be(0);
@@ -139,16 +139,16 @@ public sealed class CampaignSnapshotManagerTests
         _consistencyValidator.FailuresRemaining.Should().Be(-1);
         actTask.Status.Should().Be(TaskStatus.RanToCompletion);
     }
-    
+
     [Fact]
     public async Task SnapshotReplicationPopulatesRepositories()
     {
         // Arrange
-        
+
         var shardId = Guid.NewGuid();
         var playerId = Guid.NewGuid();
         var characterId = Guid.NewGuid();
-        
+
         var snapshot = new CampaignSnapshot
         {
             CampaignServer = new CampaignServerSnapshot
@@ -182,13 +182,13 @@ public sealed class CampaignSnapshotManagerTests
             },
             Shards = ImmutableDictionary<Guid, ShardSnapshot>.Empty,
         };
-        
+
         // Act
-        
+
         await _sut.ReplicateSnapshotAsync(snapshot);
-        
+
         // Assert
-        
+
         _userRepo.Should().HaveCount(2);
         var expectedShard = new User
         {
@@ -206,7 +206,7 @@ public sealed class CampaignSnapshotManagerTests
             IsShard = false,
         };
         _userRepo.Should().ContainValue(expectedPlayer);
-        
+
         _trackerRepo.Should().HaveCount(1);
         var expectedCharTracker = new PlayerCharacterTracker
         {
@@ -216,14 +216,14 @@ public sealed class CampaignSnapshotManagerTests
         };
         _trackerRepo.Should().ContainValue(expectedCharTracker);
     }
-    
+
     [Fact]
     public async Task SnapshotReplicationSendsShardSnapshotsToShardServersAndWaitsForResponse()
     {
         (Guid shard1Id, Guid shard2Id, CampaignSnapshot snapshot) = CreateSnapshotWith2ShardSnapshots();
-        
+
         Task task = _sut.ReplicateSnapshotAsync(snapshot);
-        
+
         _packetSender.SendHistory.Should().BeEquivalentTo
         ([
             (
@@ -235,46 +235,46 @@ public sealed class CampaignSnapshotManagerTests
                 shard2Id
             ),
         ]);
-        
+
         task.IsCompleted.Should().BeFalse();
         _sut.ReceiveShardSnapshotReplicatedPacket(shard1Id);
         task.IsCompleted.Should().BeFalse();
         _sut.ReceiveShardSnapshotReplicatedPacket(shard2Id);
         task.IsCompleted.Should().BeTrue();
     }
-    
+
     [Fact]
     public void ReceivingUnrequestedShardSnapshotReplicatedPacketThrows()
     {
         _sut.Invoking(it => it.ReceiveShardSnapshotReplicatedPacket(Guid.NewGuid()))
             .Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public void ReceivingDuplicateShardSnapshotReplicatedPacketThrows()
     {
         (Guid shard1Id, Guid shard2Id, CampaignSnapshot snapshot) = CreateSnapshotWith2ShardSnapshots();
-        
+
         Task task = _sut.ReplicateSnapshotAsync(snapshot);
-        
+
         _sut.ReceiveShardSnapshotReplicatedPacket(shard1Id);
         _sut.Invoking(it => it.ReceiveShardSnapshotReplicatedPacket(shard1Id))
             .Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public async Task NeverGettingSnapshotReplicatedPacketThrows()
     {
         (Guid shard1Id, Guid shard2Id, CampaignSnapshot snapshot) = CreateSnapshotWith2ShardSnapshots();
-        
+
         Task task = _sut.ReplicateSnapshotAsync(snapshot);
-        
+
         for (int i = 0; i < 510; i++)
             _timeProvider.Advance(TimeSpan.FromDays(365));
-        
+
         await FluentActions.Awaiting(() => task).Should().ThrowAsync<TimeoutException>();
     }
-    
+
     private User CreatePlayer()
     {
         var user = new User
@@ -287,7 +287,7 @@ public sealed class CampaignSnapshotManagerTests
         _userRepo[user.Id] = user;
         return user;
     }
-    
+
     private User CreateShard()
     {
         var shard = CreateUnresponsiveShard();
@@ -299,21 +299,21 @@ public sealed class CampaignSnapshotManagerTests
         _packetSender.ShardSnapshots[shard.Id] = shard1Snapshot;
         return shard;
     }
-    
+
     private User CreateUnresponsiveShard()
     {
         var shard = new User { Id = Guid.NewGuid(), IsConnected = true, IsPlayer = false, IsShard = true };
         _userRepo[shard.Id] = shard;
         return shard;
     }
-    
+
     private PlayerCharacterTracker CreatePlayerCharacterTracker(User? shard, User player)
     {
         var tracker = new PlayerCharacterTracker { Id = Guid.NewGuid(), Shard = shard, Player = player };
         _trackerRepo.Add(tracker);
         return tracker;
     }
-    
+
     private (Guid Shard1Id, Guid Shard2Id, CampaignSnapshot Snapshot) CreateSnapshotWith2ShardSnapshots()
     {
         var shard1Id = Guid.NewGuid();
@@ -341,21 +341,21 @@ public sealed class CampaignSnapshotManagerTests
         };
         return (shard1Id, shard2Id, snapshot);
     }
-    
+
     private sealed class FakePacketSender(Func<CampaignSnapshotManager> sut) : IFromCampaignServerPacketSender
     {
         public IDictionary<Guid, ShardSnapshot> ShardSnapshots { get; } =
             new Dictionary<Guid, ShardSnapshot>();
-        
+
         public bool DuplicateResponse { get; set; }
-        
+
         public List<(Packet Packet, Guid ReceiverId)> SendHistory { get; } = [];
-        
+
         public void SendTo(Packet packet, params IEnumerable<Guid> receiverIds)
         {
             foreach (Guid receiverId in receiverIds)
                 SendHistory.Add((packet, receiverId));
-            
+
             if (packet is ShardSnapshotRequestPacket)
             {
                 foreach (Guid id in receiverIds)
@@ -372,11 +372,11 @@ public sealed class CampaignSnapshotManagerTests
         public void BroadcastToClients(Packet packet) => throw new NotSupportedException();
         public void RelayFrom(RelayedPacket packet, Guid senderId) => throw new NotSupportedException();
     }
-    
+
     private sealed class FakeConsistencyValidator : ICampaignSnapshotCrossServerConsistencyValidator
     {
         public int FailuresRemaining { get; set; }
-        
+
         public bool IsConsistent(CampaignSnapshot snapshot) => FailuresRemaining-- <= 0;
     }
 }

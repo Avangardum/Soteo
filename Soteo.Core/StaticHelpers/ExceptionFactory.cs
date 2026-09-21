@@ -10,7 +10,7 @@ public static class ExceptionFactory
         var message = $"{type} was not found. Make sure it's public and its assembly is passed to TypeLocator.";
         return new Exception(message);
     }
-    
+
     public static BadPacketException PacketHandlerNotFound(Type packetType, Type requiredAttributeType)
     {
         var message = $"Packet handler for packet type {packetType} was not found. " +
@@ -18,7 +18,7 @@ public static class ExceptionFactory
             $"and its assembly is passed to TypeLocator.";
         return new BadPacketException(message);
     }
-    
+
     public static BadPacketException ClientPacketsNotAllowed(Type handlerType)
     {
         var message = $"{handlerType} does not allow client packets. Add [AllowClientPackets] if it should allow them.";

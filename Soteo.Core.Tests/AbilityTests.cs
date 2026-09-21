@@ -18,13 +18,13 @@ public sealed class AbilityTests
         var instance2 = Ability.Instance<TestAbility>();
         instance1.Should().BeSameAs(instance2);
     }
-    
+
     [Fact]
     public void InstancingAbilityWithNewThrows()
     {
         FluentActions.Invoking(() => new TestAbility()).Should().Throw<InvalidOperationException>();
     }
-    
+
     public static readonly object?[][] ValidationSucceedsOnlyForCorrectTargetData =
     [
         [Vector2.One, false, AbilityValidationResult.Ok],
@@ -32,7 +32,7 @@ public sealed class AbilityTests
         [Vector2.One, true, AbilityValidationResult.InvalidTarget],
         [null, true, AbilityValidationResult.Ok],
     ];
-    
+
     [Theory]
     [MemberData(nameof(ValidationSucceedsOnlyForCorrectTargetData))]
     public void ValidationSucceedsOnlyForCorrectTarget
@@ -57,7 +57,7 @@ public sealed class AbilityTests
         };
         Ability.Instance<TestAbility>().Validate(context, strict: true).Should().Be(expectedResult);
     }
-    
+
     private class TestAbility : Ability
     {
         public override Targeting Targeting => Targeting.Position;

@@ -29,11 +29,11 @@ public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, 
     {
         Position = snapshot.Position;
         Azimuth = snapshot.Azimuth;
-        
+
         if (snapshot.IsRemoved)
             Remove();
     }
-    
+
     public virtual void ApplyDelta(EntitySnapshotDelta delta, double interpolationWeight)
     {
         if (delta.Position.HasChanged)
@@ -50,7 +50,7 @@ public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, 
         Node = null;
         Removed();
     }
-    
+
     public void Respawn(TNode node)
     {
         if (!IsRemoved) throw new InvalidOperationException("Only removed entities can be respawned");

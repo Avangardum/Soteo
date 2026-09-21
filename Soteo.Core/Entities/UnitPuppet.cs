@@ -12,7 +12,7 @@ namespace Soteo.Core.Entities;
 public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 {
     private readonly ICamera _camera;
-    
+
     public UnitPuppet(Guid id, IUnitPuppetNode node, ICamera camera) : base(id, node)
     {
         _camera = camera;
@@ -45,7 +45,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             UpdateNodePosition();
         }
     }
-    
+
     public override double Azimuth
     {
         get => base.Azimuth;
@@ -55,10 +55,10 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.Zoom);
         }
     }
-    
+
     private Dictionary<Guid, PuppetStatusContext> StatusesInternal { get; set; } = [];
     public IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses => StatusesInternal;
-    
+
     private void UpdateNodePosition()
     {
         Node?.PositionM = NodeHelper.RoundPositionToPixelPerfect
@@ -120,13 +120,13 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         UpdateNodePosition();
         Node?.CalculateAzimuthIndicatorPoints(Azimuth, _camera.Zoom);
     }
-    
+
     private void UpdateAnimation()
     {
         if (IsRemoved) return;
-        
+
         Node.FlipSpriteH = Azimuth >= 180;
-        
+
         if (IsDead)
         {
             Node.Animation = "Death";
@@ -148,7 +148,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             Node.AnimationSpeedScale = 1;
         }
     }
-    
+
     private void UpdateAbilityAnimation(IUnitPuppetNode node, AbilityUseProgress abilityUseProgress)
     {
         Ability ability = AbilitySlotStates[abilityUseProgress.Slot].Ability;
@@ -165,6 +165,6 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             node.AnimationSpeedScale = 0;
         }
     }
-    
+
     public bool IsAlliedTo(IUnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
 }

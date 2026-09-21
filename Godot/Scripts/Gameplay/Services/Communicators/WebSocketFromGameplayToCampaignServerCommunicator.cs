@@ -13,20 +13,20 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     Node, IFromGameplayToCampaignServerPacketSender, ICampaignServerConnector
 {
     // TODO remove any duplication between different communicators
-    
+
     private readonly WebSocketClient _wsClient = new();
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 15 };
-    
+
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
     private readonly SideOptions _sideOptions;
-    
+
     private readonly ToAuthServerConnectionOptions _toAuthServerConnectionOptions;
     private readonly ToCampaignServerConnectionOptions _toCampaignServerConnectionOptions;
     private readonly CertificateVerificationOptions _certificateVerificationOptions;
     private readonly ServerDependency<IntercomOptions> _intercomOptions;
-    
+
     private string? _token;
     private Status _status;
 
@@ -50,18 +50,18 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         _toCampaignServerConnectionOptions = toCampaignServerConnectionOptions;
         _certificateVerificationOptions = certificateVerificationOptions;
         _intercomOptions = intercomOptions;
-        
+
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
         PauseMode = PauseModeEnum.Process;
     }
-    
+
     public event Action Connected = delegate {};
-    
+
     // Disabling certificate validation doesn't work in browser, so it's always enabled.
     // If the development certificate is trusted, it should be verified without problems.
     private bool VerifyCertificate => _certificateVerificationOptions.VerifyCertificate || OS.HasFeature("web");
-    
+
     public override void _Ready()
     {
         _wsClient.VerifySsl = VerifyCertificate;
@@ -69,7 +69,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         _wsClient.Connect("connection_error", this, nameof(OnConnectionError));
         _wsClient.Connect("connection_established", this, nameof(OnConnectionEstablished));
         _wsClient.Connect("data_received", this, nameof(OnDataReceived));
-        
+
         AddChild(_httpRequest);
         _httpRequest.Connect("request_completed", this, nameof(OnAuthRequestCompleted));
     }
@@ -80,12 +80,12 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         if (_sideOptions.Side == Side.ShardServer)
             _wsClient.Poll();
     }
-    
+
     public override void _Process(float delta)
     {
         if (_sideOptions.Side == Side.ShardServer && _status == Status.Disconnected)
             ConnectAsShardServer();
-        
+
         // Client polls in _Process to minimize latency
         if (_sideOptions.Side == Side.Client)
             _wsClient.Poll();
@@ -97,18 +97,18 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         if (_sideOptions.Side == Side.Client)
             _currentUserIdRepository.Value = null;
     }
-    
+
     public void OnConnectionError()
     {
         // todo replace throw with UI popups
-        
+
 // Unreachable code detected
 #pragma warning disable CS0162
-        
+
         throw new Exception("WebSocket connection error");
         _status = Status.Disconnected;
     }
-    
+
     public void OnConnectionEstablished(string protocol)
     {
         _status = Status.Connected;
@@ -117,14 +117,14 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         Connected();
         // TODO become connected only after receiving an acknowledgement of a successful handshake
     }
-    
+
     public void OnDataReceived()
     {
         byte[] bytes = _wsClient.GetPeer(1).GetPacket();
         Packet packet = _packetSerializer.Deserialize(bytes);
         _packetHandler.HandleAsync(packet, Const.CampaignServerId).CollectException();
     }
-    
+
     public void ConnectAsPlayer(string email, string password)
     {
         if (_sideOptions.Side == Side.ShardServer) throw new InvalidOperationException();
@@ -142,12 +142,12 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
             sslValidateDomain: VerifyCertificate
         );
     }
-    
+
     public void ConnectAsShardServer()
     {
         if (_sideOptions.Side == Side.Client) throw new InvalidOperationException();
         if (_status != Status.Disconnected) return;
-        
+
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         Guid id = _currentUserIdRepository.Value.Required;
@@ -163,11 +163,11 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
             sslValidateDomain: VerifyCertificate
         );
     }
-    
+
     public void OnAuthRequestCompleted(int result, int responseCode, string[] headers, byte[] body)
     {
         // todo replace throw with UI popups
-        
+
         if (result != (int)HTTPRequest.Result.Success)
         {
             throw new Exception($"Authentication error: {(HTTPRequest.Result)result}");
@@ -190,7 +190,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
             _wsClient.ConnectToUrl(_toCampaignServerConnectionOptions.CampaignServerUrl);
         }
     }
-    
+
     private Guid GetPlayerIdFromTrustedToken(string token)
     {
         var claims = new JwtBuilder().DoNotVerifySignature().Decode<Dictionary<string, object>>(token);
@@ -202,6 +202,6 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         byte[] bytes = _packetSerializer.Serialize(packet);
         _wsClient.GetPeer(1).PutPacket(bytes).ThrowIfError();
     }
-    
+
     private enum Status { Disconnected, Connecting, Connected }
 }

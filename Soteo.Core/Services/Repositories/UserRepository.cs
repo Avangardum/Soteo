@@ -14,17 +14,17 @@ public class UserRepository
 ) : Dictionary<Guid, User>, IUserRepository
 {
     private TaskCompletionSource _userConnectedTcs = new();
-    
+
     public void Add(User user) => Add(user.Id, user);
-    
+
     public void OnConnected(IDictionary<string, object> claims)
     {
         Guid id = Guid.Parse((string)claims["sub"]);
         bool isShard = claims.ContainsKey("shard");
-        
+
         if (isShard && shardServerAllowlist.IsEnabled && !shardServerAllowlist.AllowedShardIds.Contains(id))
             throw new Exception($"Unexpected connection from shard server {id}");
-        
+
         if (TryGetValue(id, out User? user))
         {
             user.IsConnected = true;
@@ -40,32 +40,32 @@ public class UserRepository
             };
             Add(id, user);
         }
-        
+
         var oldUserConnectedTcs = _userConnectedTcs;
         _userConnectedTcs = new();
         oldUserConnectedTcs.SetResult();
     }
-    
+
     public void OnDisconnected(Guid id)
     {
         if (TryGetValue(id, out User? user))
             user.IsConnected = false;
     }
-    
+
     public IReadOnlyDictionary<Guid, UserSnapshot> ToSnapshot() =>
         this.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot());
-    
+
     public void ReplicateSnapshot(IReadOnlyDictionary<Guid, UserSnapshot> snapshot)
     {
         Clear();
         foreach (UserSnapshot userSnapshot in snapshot.Values)
             Add(User.FromSnapshot(userSnapshot));
     }
-    
+
     public async Task WaitForUsersToConnectAsync(IReadOnlyList<Guid> ids, double timeout)
     {
         Task timeoutTask = timeProvider.Delay(TimeSpan.FromSeconds(timeout));
-        
+
     retry:
         foreach (Guid id in ids)
         {

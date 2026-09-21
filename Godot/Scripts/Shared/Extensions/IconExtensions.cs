@@ -10,11 +10,11 @@ public static class IconExtensions
     {
         public Texture ResolveIcon(PuppetStatusContext context) =>
             self.Icon ?? context.Ability?.Icon ?? ResourceLoader.Load<Texture>("res://Textures/Icons/Placeholder.png");
-        
+
         public Texture? Icon =>
             self.IconPath == null ? null : ResourceLoader.Load<Texture>($"res://Textures/Icons/{self.IconPath}.png");
     }
-    
+
     extension (Ability self)
     {
         public Texture Icon => ResourceLoader.Load<Texture>($"res://Textures/Icons/{self.IconPath}.png");

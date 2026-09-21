@@ -13,7 +13,7 @@ public sealed class ChunkCollector : IChunkCollector
     {
         if (DateTime.UtcNow >= _nextCleanupTime)
             CleanupTimedOutGroups();
-        
+
         if (_groups.TryGetValue(chunk.GroupId, out Group? group))
         {
             if (senderId != group.SenderId) return null;
@@ -25,10 +25,10 @@ public sealed class ChunkCollector : IChunkCollector
             DateTime timeOutAfter = DateTime.UtcNow.AddSeconds(10);
             _groups[chunk.GroupId] = group = new Group(senderId, timeOutAfter, [chunk]);
         }
-        
+
         if (chunk.IsLast)
             group.TargetSize = chunk.Index + 1;
-        
+
         if (group.Chunks.Count == group.TargetSize)
         {
             byte[] restoredPacketBytes = group.Chunks
@@ -38,10 +38,10 @@ public sealed class ChunkCollector : IChunkCollector
             _groups.Remove(chunk.GroupId);
             return restoredPacketBytes;
         }
-        
+
         return null;
     }
-    
+
     private void CleanupTimedOutGroups()
     {
         List<Guid> timedOutGroupIds = _groups
@@ -52,7 +52,7 @@ public sealed class ChunkCollector : IChunkCollector
             _groups.Remove(id);
         _nextCleanupTime = DateTime.UtcNow.AddMinutes(1);
     }
-    
+
     private record Group(Guid SenderId, DateTime TimeOutAfter, List<ChunkPacket> Chunks)
     {
         public int? TargetSize { get; set; }

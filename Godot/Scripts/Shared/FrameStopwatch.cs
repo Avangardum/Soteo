@@ -24,7 +24,7 @@ public sealed class FrameStopwatch : IFrameStopwatch
             callWhenPaused: true
         );
     }
-    
+
     public double ElapsedSinceProcess => _processStopwatch.Elapsed.TotalSeconds;
     public double ElapsedSincePhysicsProcess => _physicsProcessStopwatch.Elapsed.TotalSeconds;
 }

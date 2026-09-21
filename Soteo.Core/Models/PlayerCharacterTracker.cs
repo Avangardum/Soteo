@@ -11,7 +11,7 @@ public sealed record PlayerCharacterTracker
     public required Guid Id { get; init; }
     public required User Player { get; set; }
     public User? Shard { get; set; }
-    
+
     public static PlayerCharacterTracker FromSnapshot
     (
         PlayerCharacterTrackerSnapshot snapshot,
@@ -25,7 +25,7 @@ public sealed record PlayerCharacterTracker
             Shard = snapshot.ShardId?.PassTo(it => userRepository[it]),
         };
     }
-    
+
     public PlayerCharacterTrackerSnapshot ToSnapshot()
     {
         return new PlayerCharacterTrackerSnapshot

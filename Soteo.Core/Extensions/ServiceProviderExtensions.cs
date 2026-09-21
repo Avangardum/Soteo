@@ -16,7 +16,7 @@ public static class ServiceProviderExtensions
             return (IPacketHandler?)PacketHandlerLocator<THandlerAttribute>.TypeFor(packetType, typeLocator)
                 ?.PassTo(self.GetRequiredService);
         }
-        
+
         public IPacketSerializer? GetPacketSerializerFor(Type packetType)
         {
             var typeLocator = self.GetRequiredService<ITypeLocator>();

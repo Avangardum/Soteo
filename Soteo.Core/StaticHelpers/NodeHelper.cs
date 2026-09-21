@@ -34,7 +34,7 @@ public static class NodeHelper
         // which persists at any zoom, so it's compensated regardless of zoom.
         if (!isCamera && Maths.IsMultipleOf(2, zoom))
             halfPixelXOffset = halfPixelYOffset = false;
-        
+
         Vector2 valueInWorldPixels = value * Const.PixelsInMeter;
         double screenPixelSizeInWorldPixels = 1 / zoom;
         double roundedXInWorldPixels = halfPixelXOffset ?

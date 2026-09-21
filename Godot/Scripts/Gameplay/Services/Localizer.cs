@@ -19,7 +19,7 @@ public sealed class Localizer : ILocalizer
         }
         _pluralizers = pluralizers.ToImmutableDictionary();
     }
-    
+
     public string GetString(string key) => TranslationServer.Translate(key);
 
     public int GetPluralisationIndex(double? amount)

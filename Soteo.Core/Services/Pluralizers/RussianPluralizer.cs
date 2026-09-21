@@ -7,7 +7,7 @@ public sealed class RussianPluralizer : IPluralizer
     private const int One = 0; // 1 секунда
     private const int Few = 1; // 2 секунды
     private const int Many = 2; // 5 секунд
-    
+
     public IReadOnlyList<string> LanguageCodes => ["ru"];
 
     public int GetPluralisationIndex(double? amount)

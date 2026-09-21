@@ -13,9 +13,9 @@ public sealed record ProjectilePuppetSnapshot : EntitySnapshot<ProjectilePuppetS
                 Azimuth = Azimuth,
             };
         }
-        
+
         if (from.Id != Id) throw new ArgumentException();
-        
+
         return new ProjectilePuppetSnapshotDelta
         {
             Id = Id,

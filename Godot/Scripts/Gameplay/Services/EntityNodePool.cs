@@ -13,10 +13,10 @@ public sealed class EntityNodePool : IEntityNodePool
         [typeof(IUnitPuppetNode)] = "res://Scenes/Entities/UnitPuppet.tscn",
         [typeof(IProjectilePuppetNode)] = "res://Scenes/Entities/ProjectilePuppet.tscn",
     }.ToImmutableDictionary(it => it.Key, it => ResourceLoader.Load<PackedScene>(it.Value));
-    
+
     private readonly ImmutableDictionary<Type, Stack<IEntityNode>> _stacks =
         Scenes.ToImmutableDictionary(it => it.Key, _ => new Stack<IEntityNode>());
-    
+
     public T GetNode<T>() where T : class, IEntityNode
     {
         Stack<IEntityNode> stack = _stacks[typeof(T)];
@@ -24,7 +24,7 @@ public sealed class EntityNodePool : IEntityNodePool
             return (T)stack.Pop();
         return Scenes[typeof(T)].Instance<T>();
     }
-    
+
     public void ReturnNode(IEntityNode node)
     {
         foreach ((Type type, Stack<IEntityNode> stack) in _stacks)

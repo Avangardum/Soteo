@@ -19,15 +19,15 @@ public static class ServiceCollectionExtensions
             IContainer container = builder.Build();
             return new AutofacServiceProvider(container);
         }
-        
+
         // Null forgiving operator used instead of Required to preserve the behavior where attempting to get
         // a nonexistent service returns null instead of throwing.
         public IServiceCollection AddAlias<TAlias, TRefersTo>() where TRefersTo : TAlias where TAlias : class =>
             self.AddTransient<TAlias>(sp => sp.GetService<TRefersTo>()!);
-        
+
         public IServiceCollection AddSingletonNode<TService>(string path) where TService : class =>
             self.AddSingleton<TService>(sp => sp.GetRequiredService<GameplayMain>().GetNode<TService>(path));
-        
+
         public IServiceCollection AddSingletonNode<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
@@ -37,14 +37,14 @@ public static class ServiceCollectionExtensions
 
         public IServiceCollection AddShardScopedNode<TService>(string path) where TService : class =>
             self.AddScoped<TService>(sp => sp.GetRequiredService<ShardNode>().GetNode<TService>(path));
-        
+
         public IServiceCollection AddShardScopedNode<TService, TImplementation>()
             where TImplementation : class, TService
             where TService : class
         {
             return self.AddShardScopedNode<TService>(typeof(TImplementation).Name);
         }
-        
+
         public IServiceCollection UnwrapOptions<T>() where T : class =>
             self.AddSingleton<T>(sp => sp.GetRequiredService<IOptions<T>>().Value);
     }

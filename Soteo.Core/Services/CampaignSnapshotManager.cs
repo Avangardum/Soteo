@@ -18,11 +18,11 @@ public sealed class CampaignSnapshotManager
     public const double ShardServerResponseTimeout = 10;
     public const int InconsistencyRetryMaxCount = 10;
     public const int InconsistencyRetryDelay = 5;
-    
+
     private readonly Dictionary<Guid, TaskCompletionSource<ShardSnapshot>> _shardSnapshotTcs = [];
     private readonly Dictionary<Guid, TaskCompletionSource> _shardSnapshotReplicatedTcs = [];
     private readonly SemaphoreSlim _mutex = new(1);
-    
+
     public async Task<CampaignSnapshot> CreateSnapshotAsync()
     {
         await _mutex.WaitAsync();
@@ -44,7 +44,7 @@ public sealed class CampaignSnapshotManager
             _mutex.Release();
         }
     }
-    
+
     private async Task<CampaignSnapshot> CreateUnvalidatedCampaignSnapshot()
     {
         var campaignServerSnapshot = new CampaignServerSnapshot
@@ -59,7 +59,7 @@ public sealed class CampaignSnapshotManager
             Shards = await GetShardSnapshotsAsync(campaignServerSnapshot),
         };
     }
-    
+
     private async Task<IReadOnlyDictionary<Guid, ShardSnapshot>> GetShardSnapshotsAsync
     (
         CampaignServerSnapshot campaignServerSnapshot
@@ -76,7 +76,7 @@ public sealed class CampaignSnapshotManager
         if (completedTask == timeout) throw ShardServerSnapshotCreationTimeoutException();
         return _shardSnapshotTcs.ToImmutableDictionary(it => it.Key, it => it.Value.Task.Result);
     }
-    
+
     private Exception ShardServerSnapshotCreationTimeoutException()
     {
         string timedOutShardIds = _shardSnapshotTcs
@@ -97,7 +97,7 @@ public sealed class CampaignSnapshotManager
     public async Task ReplicateSnapshotAsync(CampaignSnapshot snapshot)
     {
         await _mutex.WaitAsync();
-        
+
         try
         {
             userRepo.ReplicateSnapshot(snapshot.CampaignServer.Users);
@@ -109,7 +109,7 @@ public sealed class CampaignSnapshotManager
                 var packet = new ShardSnapshotPacket { Snapshot = shardSnapshot };
                 packetSender.SendTo(packet, shardId);
             }
-            
+
             Task timeout = timeProvider.Delay(TimeSpan.FromSeconds(ShardServerResponseTimeout));
             Task completedTask =
                 await Task.WhenAny(timeout, Task.WhenAll(_shardSnapshotReplicatedTcs.Values.Select(it => it.Task)));
@@ -121,7 +121,7 @@ public sealed class CampaignSnapshotManager
             _mutex.Release();
         }
     }
-    
+
     private Exception ShardServerSnapshotReplicationTimeoutException()
     {
         string timedOutShardIds = _shardSnapshotReplicatedTcs

@@ -64,7 +64,7 @@ public interface ISerializationHelper
         Stream stream
     );
 
-    ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue> 
+    ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue>
     (
         Deserializer<TKey> deserializeKey,
         Deserializer<TValue> deserializeValue,

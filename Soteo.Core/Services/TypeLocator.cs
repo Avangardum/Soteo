@@ -7,18 +7,18 @@ namespace Soteo.Core.Services;
 public class TypeLocator : ITypeLocator
 {
     public static readonly TypeLocator Empty = new([], []);
-    
+
     public IReadOnlyList<Type> Types { get; }
-    
+
     public TypeLocator(params IReadOnlyList<Type> types) : this([], types) { }
-    
+
     public TypeLocator(params IReadOnlyList<Assembly> assemblies) : this(assemblies, []) { }
-    
+
     public TypeLocator(IReadOnlyList<Assembly> assemblies, IReadOnlyList<Type> types)
     {
         Types = assemblies.SelectMany(it => it.ExportedTypes).Union(types).ToImmutableList();
     }
-    
+
     public IReadOnlyList<Type> ConcreteSubclassesOf<T>(Func<Type, bool>? where = null)
     {
         where ??= _ => true;
@@ -28,7 +28,7 @@ public class TypeLocator : ITypeLocator
             .OrderBy(it => it.FullName)
             .ToImmutableList();
     }
-    
+
     public IReadOnlyList<T> InstanceSubclassesOf<T>(Func<Type, bool>? where = null)
     {
         return ConcreteSubclassesOf<T>(where)

@@ -24,24 +24,24 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEnti
             [Stat.AttackRange] = (1, 10, double.PositiveInfinity),
             [Stat.AttackProjectileSpeed] = (5, 50, 500),
         }.ToImmutableDictionary();
-    
+
     protected UnitBase(Guid id, TNode node) : base(id, node)
     {
         foreach (Stat stat in Stat.All)
             StatsInternal[stat] = StatConst[stat].Default;
-        
+
         Faction = Id.ToString()[^1] % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
-    
+
     public virtual bool IsDead { get; protected set; }
     protected bool IsMoving { get; set; }
-    
+
     protected Dictionary<Stat, double> StatsInternal { get; set; } = [];
     public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
-    
+
     protected Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = [];
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
-    
+
     public AbilityUseProgress? AbilityUseProgress { get; protected set; }
     public Faction Faction { get; }
 }

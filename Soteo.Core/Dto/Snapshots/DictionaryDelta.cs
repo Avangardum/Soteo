@@ -16,7 +16,7 @@ public static class DictionaryDelta
         ImmutableList<TKey> removedKeys = from.Keys.Except(to.Keys).ToImmutableList();
         return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
     }
-    
+
     public static DictionaryDelta<TKey, TValue> FromNewDictionary<TKey, TValue>
     (
         IReadOnlyDictionary<TKey, TValue> dictionary
@@ -30,9 +30,9 @@ public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
 {
     public IReadOnlyDictionary<TKey, TValue> Changes { get; init; } = ImmutableDictionary<TKey, TValue>.Empty;
     public IReadOnlyList<TKey> RemovedKeys { get; init; } = [];
-    
+
     public bool HasChanged => Changes.Count > 0 || RemovedKeys.Count > 0;
-    
+
     public void MutateDictionary
     (
         IDictionary<TKey, TValue> dictionary,
@@ -42,7 +42,7 @@ public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
     {
         foreach ((TKey key, TValue newValue) in Changes)
         {
-            if 
+            if
             (
                 interpolationWeight == 1 ||
                 interpolateValue == null ||

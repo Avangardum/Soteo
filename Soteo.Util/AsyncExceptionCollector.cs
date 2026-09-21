@@ -14,6 +14,6 @@ public static class AsyncExceptionCollector
             ExceptionDispatchInfo.Capture(Exceptions.Dequeue()).Throw();
         }
     }
-    
+
     public static void Collect(Exception e) => Exceptions.Enqueue(e);
 }

@@ -19,7 +19,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
     private ShardSnapshot? _prevShardSnapshot;
     private readonly HashSet<Guid> _snapshotRequesters = [];
     private readonly IDisposable _physicsProcessSubscription;
-    
+
     public ShardSynchronizationServer
     (
         IEntitySnapshotManager entitySnapshotManager,
@@ -39,7 +39,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
         _pauseRepo = pauseRepo;
         _tickRepo = tickRepo;
         _initRepo = initRepo;
-        
+
         connectionNotifier.PeerConnected += OnPeerConnected;
         _physicsProcessSubscription = processPublisher
             .SubscribeToPhysicsProcess(Tick, ProcessPriorityEnum.SynchronizationServer, callWhenPaused: true);
@@ -50,7 +50,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
         _connectionNotifier.PeerConnected -= OnPeerConnected;
         _physicsProcessSubscription.Dispose();
     }
-    
+
     private void OnPeerConnected(Guid peerId)
     {
         if (peerId != Const.CampaignServerId)
@@ -60,13 +60,13 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
     public void Tick()
     {
         if (!_initRepo.IsInitialized) return;
-        
+
         if (_pauseRepo.IsPaused)
             PausedTick();
         else
             UnpausedTick();
     }
-    
+
     private void UnpausedTick()
     {
         var shardSnapshot = new ShardSnapshot
@@ -81,10 +81,10 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
             _packetSender.SendReliable(shardSnapshotPacket, _snapshotRequesters);
             _snapshotRequesters.Clear();
         }
-        
+
         ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
             ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
-        
+
         if (shardSnapshotDelta != null)
         {
             var shardSnapshotDeltaPacket = new ShardSnapshotDeltaPacket
@@ -94,10 +94,10 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
             };
             _packetSender.BroadcastReliable(shardSnapshotDeltaPacket);
         }
-        
+
         _prevShardSnapshot = shardSnapshot;
     }
-    
+
     private void PausedTick()
     {
         if (_snapshotRequesters.Count > 0)
@@ -107,7 +107,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
                 Tick = _tickRepo.Tick - 1,
                 Entities = _entitySnapshotManager.CreateEntityPuppetSnapshots()
             };
-            
+
             var shardSnapshotPacket = new ShardSnapshotPacket { Snapshot = _prevShardSnapshot };
             _packetSender.SendReliable(shardSnapshotPacket, _snapshotRequesters);
             _snapshotRequesters.Clear();

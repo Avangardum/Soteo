@@ -27,7 +27,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 
     public void SerializeBool(bool value, Stream stream) =>
         SerializeByte(value ? (byte)1 : (byte)0, stream);
-    
+
     public bool DeserializeBool(Stream stream)
     {
         return DeserializeByte(stream) switch
@@ -51,7 +51,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         stream.ReadExactly(buffer);
         return BinaryPrimitives.ReadInt32BigEndian(buffer);
     }
-    
+
     public void SerializeLong(long value, Stream stream)
     {
         Span<byte> buffer = stackalloc byte[sizeof(long)];
@@ -94,14 +94,14 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         if (BitConverter.IsLittleEndian) buffer.Reverse();
         return BitConverter.ToSingle(buffer, 0);
     }
-    
+
     public void SerializeDouble(double value, Stream stream)
     {
         byte[] buffer = BitConverter.GetBytes(value);
         if (BitConverter.IsLittleEndian) buffer.Reverse();
         stream.Write(buffer);
     }
-    
+
     public double DeserializeDouble(Stream stream)
     {
         byte[] buffer = new byte[sizeof(double)];
@@ -176,7 +176,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     )
     {
         SerializeInt(value.Count, stream);
-        
+
         if (value is byte[] bytes)
         {
             stream.Write(bytes);
@@ -225,7 +225,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         stream.ReadExactly(buffer);
         return Encoding.UTF8.GetString(buffer);
     }
-    
+
     public void SerializeNullableStruct<T>(T? nullable, Serializer<T> serializer, Stream stream)
         where T : struct
     {
@@ -233,14 +233,14 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         if (nullable != null)
             serializer(nullable.Value, stream);
     }
-    
+
     public T? DeserializeNullableStruct<T>(Deserializer<T> deserializer, Stream stream)
         where T : struct
     {
         bool hasValue = DeserializeBool(stream);
         return hasValue ? deserializer(stream) : null;
     }
-    
+
     public void SerializeNullableClass<T>(T? nullable, Serializer<T> serializer, Stream stream)
         where T : class
     {
@@ -248,7 +248,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         if (nullable != null)
             serializer(nullable, stream);
     }
-    
+
     public T? DeserializeNullableClass<T>(Deserializer<T> deserializer, Stream stream)
         where T : class
     {
@@ -271,7 +271,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         }, stream);
     }
 
-    public ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue> 
+    public ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue>
     (
         Deserializer<TKey> deserializeKey,
         Deserializer<TValue> deserializeValue,
@@ -284,7 +284,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             stream
         ).ToImmutableDictionary();
     }
-    
+
     /// <summary>
     /// Serialize a dictionary where keys are derived from values
     /// </summary>
@@ -297,7 +297,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     {
         SerializeList(dictionary.Values.ToList(), serializeValue, stream);
     }
-    
+
     /// <summary>
     /// Deserialize a dictionary where keys are derived from values
     /// </summary>
@@ -310,19 +310,19 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     {
         return DeserializeList(deserializeValue, stream).ToImmutableDictionary(keySelector, it => it);
     }
-    
+
     public void SerializeAbility(Ability value, Stream stream) =>
         SerializeInt(_abilityTypes.IndexOf(value.GetType()), stream);
-    
+
     public Ability DeserializeAbility(Stream stream) =>
         Ability.Instance(_abilityTypes[DeserializeInt(stream)]);
-    
+
     public void SerializeStatus(Status value, Stream stream) =>
         SerializeInt(_statusTypes.IndexOf(value.GetType()), stream);
-    
+
     public Status DeserializeStatus(Stream stream) =>
         Status.Instance(_statusTypes[DeserializeInt(stream)]);
-    
+
     public void SerializePacketType(Type type, Stream stream)
     {
         if (!type.IsAssignableTo(typeof(Packet)))
@@ -330,9 +330,9 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         int index = _packetTypes.IndexOf(type);
         SerializeInt(index, stream);
     }
-    
+
     public Type DeserializePacketType(Stream stream) => _packetTypes[DeserializeInt(stream)];
-    
+
     public void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
     {
         SerializeGuid(value.Id, stream);
@@ -342,7 +342,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeDouble(value.RemainingTime, stream);
         SerializeLong(value.Ordinal, stream);
     }
-    
+
     public PuppetStatusContext DeserializePuppetStatusContext(Stream stream)
     {
         return new PuppetStatusContext
@@ -355,14 +355,14 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Ordinal = DeserializeLong(stream),
         };
     }
-    
+
     public void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream)
     {
         SerializeEnum(value.Slot, stream);
         SerializeDouble(value.ElapsedTime, stream);
         SerializeDouble(value.RemainingTime, stream);
     }
-    
+
     public AbilityUseProgress DeserializeAbilityUseProgress(Stream stream)
     {
         return new AbilityUseProgress
@@ -372,7 +372,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             RemainingTime = DeserializeDouble(stream),
         };
     }
-    
+
     public void SerializeAbilitySlotState(AbilitySlotState value, Stream stream)
     {
         SerializeAbility(value.Ability, stream);
@@ -380,7 +380,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeDouble(value.Cooldown, stream);
         SerializeDouble(value.MaxCooldown, stream);
     }
-    
+
     public AbilitySlotState DeserializeAbilitySlotState(Stream stream)
     {
         return new AbilitySlotState
@@ -424,7 +424,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             _ => throw new ArgumentOutOfRangeException(),
         };
     }
-    
+
     private void SerializeBaseEntitySnapshot(EntitySnapshot entity, Stream stream)
     {
         SerializeGuid(entity.Id, stream);
@@ -629,13 +629,13 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Countdown = countdown,
         };
     }
-    
+
     public void SerializeShardSnapshot(ShardSnapshot value, Stream stream)
     {
         SerializeLong(value.Tick, stream);
         SerializeIndexedDictionary(value.Entities, SerializeEntitySnapshot, stream);
     }
-    
+
     public ShardSnapshot DeserializeShardSnapshot(Stream stream)
     {
         return new ShardSnapshot

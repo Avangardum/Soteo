@@ -7,7 +7,7 @@ public sealed class FakeFromGameplayPacketSender : IFromGameplayPacketSender
 {
     private readonly Dictionary<Guid, List<Packet>> _personalPackets = [];
     private readonly List<Packet> _broadcastPackets = [];
-    
+
     public void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds)
     {
         foreach (Guid id in receiverIds)
@@ -24,7 +24,7 @@ public sealed class FakeFromGameplayPacketSender : IFromGameplayPacketSender
     public void BroadcastReliable(Packet packet) => _broadcastPackets.Add(packet);
 
     public void BroadcastUnreliable(Packet packet) => BroadcastReliable(packet);
-    
+
     public IReadOnlyList<Packet> PacketsSentTo(Guid id)
     {
         if (!_personalPackets.ContainsKey(id))

@@ -10,22 +10,22 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
 {
     private double? _removalCountdown;
     private TaskCompletionSource _waitUntilCanRemoveSource = new();
-    
+
     private readonly LateInit<AnimatedSprite> _sprite = new();
     private readonly LateInit<AzimuthIndicator> _azimuthIndicator = new();
-    
+
     private AnimatedSprite Sprite => _sprite;
     private AzimuthIndicator AzimuthIndicator => _azimuthIndicator;
-    
+
     // If a sprite has pixel position with .5 as the fractional part in any dimension
     // (used to center sprites with odd sizes), the following fields help compensate
     // it for pixel perfect rendering. See NodeHelper for details.
     [Export] private bool _halfPixelXVisualOffset;
     [Export] private bool _halfPixelYVisualOffset;
-    
+
     public bool HalfPixelXVisualOffset => _halfPixelXVisualOffset;
     public bool HalfPixelYVisualOffset => _halfPixelYVisualOffset;
-    
+
     public UnitPuppet? UnitPuppet
     {
         get;
@@ -40,36 +40,36 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
                 OnDetached();
         }
     }
-    
+
     private void OnAttached()
     {
         _removalCountdown = null;
         _waitUntilCanRemoveSource = new TaskCompletionSource();
         AzimuthIndicator.Visible = true;
     }
-    
+
     private void OnDetached()
     {
         _removalCountdown = 5;
     }
-    
+
     public IEntity? Entity
     {
         get => UnitPuppet;
         set => UnitPuppet = (UnitPuppet?)value;
     }
-    
+
     public Vector2 PositionM
     {
         get => Position.ToSys() / Const.PixelsInMeter;
         set => Position = value.ToGd() * Const.PixelsInMeter;
     }
-    
+
     public override void _Ready()
     {
         _sprite.Value = GetNode<AnimatedSprite>("AnimatedSprite");
         _azimuthIndicator.Value = GetNode<AzimuthIndicator>("AzimuthIndicator");
-        
+
         Sprite.Playing = true;
     }
 

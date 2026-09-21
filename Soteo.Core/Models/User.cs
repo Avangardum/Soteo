@@ -23,7 +23,7 @@ public sealed record User
             IsShard = snapshot.IsShard,
         };
     }
-    
+
     public UserSnapshot ToSnapshot()
     {
         return new UserSnapshot

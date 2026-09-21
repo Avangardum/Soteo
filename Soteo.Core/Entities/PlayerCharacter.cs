@@ -23,7 +23,7 @@ public sealed class PlayerCharacter : Unit
         SetAbility<RecallAbility>(AbilitySlot.Recall, 1);
         SetAbility<RangedAttackAbility>(AbilitySlot.Attack, 1);
     }
-    
+
     public static PlayerCharacter FromSnapshot
     (
         UnitSnapshot snapshot,

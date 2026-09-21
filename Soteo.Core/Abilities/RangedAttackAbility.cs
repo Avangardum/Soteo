@@ -8,7 +8,7 @@ namespace Soteo.Core.Abilities;
 public sealed class RangedAttackAbility : AttackAbility
 {
     // TODO chasing a running target interrupts the use
-    
+
     public override void TakeEffect(AbilityContext context)
     {
         base.TakeEffect(context);

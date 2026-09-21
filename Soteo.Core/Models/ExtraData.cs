@@ -27,7 +27,7 @@ public sealed class ExtraData(object?[] values, ISerializationHelper s)
         }
         return (T)value;
     }
-    
+
     public void Serialize(Stream stream)
     {
         s.SerializeInt(values.Length, stream);
@@ -63,7 +63,7 @@ public sealed class ExtraData(object?[] values, ISerializationHelper s)
             }
         }
     }
-    
+
     public static ExtraData Deserialize(Stream stream)
     {
         var s = new SerializationHelper(TypeLocator.Empty);
@@ -87,36 +87,36 @@ public sealed class ExtraData(object?[] values, ISerializationHelper s)
         }
         return new ExtraData(values, s);
     }
-    
+
     public sealed class Schema
     {
         private readonly List<object?> _values = [];
         private bool _isInstanced;
-        
+
         public Key<int> AddIntLateInit() => Add<int>(false);
         public Key<long> AddLongLateInit() => Add<long>(false);
         public Key<double> AddDoubleLateInit() => Add<double>(false);
         public Key<Guid> AddGuidLateInit() => Add<Guid>(false);
         public Key<Vector2> AddVector2LateInit() => Add<Vector2>(false);
-        
+
         public Key<int> AddIntWithDefault(int defaultValue = 0) => Add(false, defaultValue);
         public Key<long> AddLongWithDefault(long defaultValue = 0) => Add(false, defaultValue);
         public Key<double> AddDoubleWithDefault(double defaultValue = 0) => Add(false, defaultValue);
         public Key<Guid> AddGuidWithDefault(Guid defaultValue = default) => Add(false, defaultValue);
         public Key<Vector2> AddVector2WithDefault(Vector2 defaultValue = default) => Add(false, defaultValue);
-        
+
         public Key<int?> AddNullableInt() => Add<int?>(true, null);
         public Key<long?> AddNullableLong() => Add<long?>(true, null);
         public Key<double?> AddNullableDouble() => Add<double?>(true, null);
         public Key<Guid?> AddNullableGuid() => Add<Guid?>(true, null);
         public Key<Vector2?> AddNullableVector2() => Add<Vector2?>(true, null);
-        
+
         public Key<int?> AddNullableIntWithDefault(int defaultValue) => Add<int?>(true, defaultValue);
         public Key<long?> AddNullableLongWithDefault(long defaultValue) => Add<long?>(true, defaultValue);
         public Key<double?> AddNullableDoubleWithDefault(double defaultValue) => Add<double?>(true, defaultValue);
         public Key<Guid?> AddNullableGuidWithDefault(Guid defaultValue) => Add<Guid?>(true, defaultValue);
         public Key<Vector2?> AddNullableVector2WithDefault(Vector2 defaultValue) => Add<Vector2?>(true, defaultValue);
-        
+
         public ExtraData Instance()
         {
             _isInstanced = true;
@@ -129,32 +129,32 @@ public sealed class ExtraData(object?[] values, ISerializationHelper s)
             _values.Add(null);
             return new Key<T>(_values.Count - 1, isNullable);
         }
-        
+
         private Key<T> Add<T>(bool isNullable, T defaultValue)
         {
             ThrowIfIsInstanced();
             _values.Add(defaultValue);
             return new Key<T>(_values.Count - 1, isNullable);
         }
-        
+
         private void ThrowIfIsInstanced()
         {
             if (_isInstanced)
                 throw new InvalidOperationException("Adding values after instancing is not allowed");
         }
     }
-    
+
     public sealed class Key<T>
     {
         internal int Index { get; }
         internal bool IsNullable { get; }
-        
+
         internal Key(int index, bool isNullable)
         {
             Index = index;
             IsNullable = isNullable;
         }
     }
-    
+
     private enum TypeCode : byte { Null, Int, Long, Double, Guid, Vector2 }
 }

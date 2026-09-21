@@ -14,7 +14,7 @@ public sealed class DebugScreen
     private readonly double[] _unrolledRing = new double[RingLength];
     private int _ringNextIndex;
     private int _pendingProcessCount;
-    
+
     private readonly INetworkDebugger _networkDebugger;
     private readonly IShardServiceProviders _shardServiceProviders;
     private readonly IVisibleShardIdRepository _visibleShardIdRepository;
@@ -24,7 +24,7 @@ public sealed class DebugScreen
     private readonly Graph _fpsGraph;
     private readonly Graph _serverLoadGraph;
     private readonly Graph _entityCountGraph;
-    
+
     public DebugScreen
     (
         DebugScreenNode node,
@@ -46,12 +46,12 @@ public sealed class DebugScreen
         _serverLoadGraph = node.GetNode<Graph>("ServerLoadGraph");
         _entityCountGraph = node.GetNode<Graph>("EntityCountGraph");
     }
-    
+
     public void PhysicsProcess(double delta)
     {
         _pendingProcessCount++;
     }
-    
+
     public void Process(double delta)
     {
         while (_pendingProcessCount > 0)
@@ -77,21 +77,21 @@ public sealed class DebugScreen
         _fpsRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
         _fpsGraph.SetData(_unrolledRing, "N0", 0);
     }
-    
+
     private void ProcessEntityCountGraph(IEntityManager? entityManager)
     {
         _entityCountRing[_ringNextIndex] = entityManager?.Entities.Count ?? 0;
         _entityCountRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
         _entityCountGraph.SetData(_unrolledRing, "N0", 0);
     }
-    
+
     private void ProcessServerLoadGraph(IShardSynchronizationClient? syncClient)
     {
         _serverLoadRing[_ringNextIndex] = syncClient?.ServerLoad ?? 0;
         _serverLoadRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
         _serverLoadGraph.SetData(_unrolledRing, "N2", min: 0, max: 1);
     }
-    
+
     private void UpdateText(double delta, IShardSynchronizationClient? synchronizationClient, IEntityManager? entityManager)
     {
         _label.Text =
@@ -106,7 +106,7 @@ public sealed class DebugScreen
              entities: {entityManager?.Entities.Count ?? 0 :N0}
              """;
     }
-    
+
     private string ToMillisecondsString(double? seconds) =>
         seconds == null ? "?" : (seconds.Value * 1000).ToString("N0") + "ms";
 

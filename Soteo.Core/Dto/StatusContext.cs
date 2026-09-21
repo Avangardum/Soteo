@@ -20,16 +20,16 @@ public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
     public required double RemainingTime { get; init; }
     public required long Ordinal { get; init; }
     public required IServiceProvider ServiceProvider { get; init; }
-    
+
     IUnit? ISourceUnitAndAbility.Unit => SourceUnit;
     Ability? ISourceUnitAndAbility.Ability => SourceAbilityContext?.Ability;
     AbilityContext? ISourceUnitAndAbility.AbilityContext => SourceAbilityContext;
-    
+
     public object? GetService(Type type) => ServiceProvider.GetService(type);
-    
+
     [MemberNotNull(nameof(SourceAbilityContext))]
     public T SourceAbilityAs<T>() where T : Ability => (T)SourceAbilityContext.Required.Ability;
-    
+
     public StatusContextSnapshot ToSnapshot()
     {
         return new StatusContextSnapshot
@@ -46,7 +46,7 @@ public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
             Ordinal = Ordinal
         };
     }
-    
+
     public static StatusContext FromSnapshot(StatusContextSnapshot snapshot, IServiceProvider serviceProvider)
     {
         var entityManager = serviceProvider.GetRequiredService<IEntityManager>();

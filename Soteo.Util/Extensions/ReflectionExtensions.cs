@@ -7,14 +7,14 @@ public static class ReflectionExtensions
     extension (MemberInfo self)
     {
         public bool HasAttribute<T>() where T : Attribute => self.GetCustomAttribute<T>() != null;
-        
+
         public T? GetCustomAttribute<T>() where T : Attribute =>
             (T)self.GetCustomAttribute(typeof(T));
-        
+
         public T GetRequiredAttribute<T>() where T : Attribute =>
             self.GetCustomAttribute<T>() ?? throw new ArgumentException($"{typeof(T)} not found on {self}.");
     }
-    
+
     extension (Type self)
     {
         public IEnumerable<Type> BaseTypes
@@ -25,7 +25,7 @@ public static class ReflectionExtensions
                 {
                     yield return i;
                 }
-                
+
                 Type? currentBaseType = self.BaseType;
                 while (currentBaseType != null)
                 {
@@ -34,7 +34,7 @@ public static class ReflectionExtensions
                 }
             }
         }
-        
+
         public bool IsAssignableTo(Type other) => other.IsAssignableFrom(self);
     }
 }

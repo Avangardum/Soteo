@@ -9,9 +9,9 @@ namespace Soteo.Core.Dto;
 public abstract class Scalable
 {
     public static Scalable<T> Create<T>(params ReadOnlySpan<T> values) where T : notnull => new(values);
-    
+
     public abstract string ToBbcode(int? highlightLevel = null, string? format = null);
-    
+
     public abstract double? ToDoubleOrNull();
 }
 
@@ -22,14 +22,14 @@ public abstract class Scalable
 public sealed class Scalable<T> : Scalable, IEnumerable<T> where T : notnull
 {
     private readonly ImmutableArray<T> _values;
-    
+
     public Scalable(ReadOnlySpan<T> values)
     {
         _values = [..values];
     }
-    
+
     public T this[int level] => _values[level - 1];
-    
+
     public IEnumerator<T> GetEnumerator() =>
         ((IEnumerable<T>)_values).GetEnumerator();
 
@@ -45,7 +45,7 @@ public sealed class Scalable<T> : Scalable, IEnumerable<T> where T : notnull
         return string.Join(" / ",
             this.Select((v, i) => i + 1 == highlightLevel ? $"[b]{Format(v, format)}[/b]" : Format(v, format)));
     }
-    
+
     private string Format(T value, string? format) =>
         value is IFormattable f && format != null ? f.ToString(format, CultureInfo.CurrentCulture) : value.ToString();
 

@@ -24,7 +24,7 @@ public sealed class JsmqFromCampaignServerCommunicator
     public void Poll()
     {
         // TODO split
-        
+
         while (true)
         {
             var base64 = (string?)JavaScript.Eval($"""jsmq.receive("{Const.CampaignServerId}")""");
@@ -57,7 +57,7 @@ public sealed class JsmqFromCampaignServerCommunicator
             }
         }
     }
-    
+
     public void SendTo(Packet packet, params IEnumerable<Guid> receiverIds)
     {
         string base64 = ToBase64(packet);
@@ -71,14 +71,14 @@ public sealed class JsmqFromCampaignServerCommunicator
         foreach (Guid id in _peerIds)
             JavaScript.Eval($"""jsmq.send("{base64}", "{id}");""");
     }
-    
+
     public void BroadcastToShardServers(Packet packet)
     {
         string base64 = ToBase64(packet);
         foreach (Guid id in userRepo.Values.Where(it => it.IsShard).Select(it => it.Id))
             JavaScript.Eval($"""jsmq.send("{base64}", "{id}");""");
     }
-    
+
     public void BroadcastToClients(Packet packet)
     {
         string base64 = ToBase64(packet);
@@ -91,7 +91,7 @@ public sealed class JsmqFromCampaignServerCommunicator
         byte[] bytes = [..Const.CampaignServerId.ToByteArray(), ..packetSerializer.Serialize(packet)];
         return Convert.ToBase64String(bytes);
     }
-    
+
     public void RelayFrom(RelayedPacket packet, Guid senderId)
     {
         SendTo(packet with { PeerId = senderId }, packet.PeerId);

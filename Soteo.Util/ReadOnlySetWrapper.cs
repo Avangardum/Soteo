@@ -6,7 +6,7 @@ namespace Soteo.Util;
 public class ReadOnlySetWrapper<T>(ISet<T> inner) : IReadOnlySet<T>
 {
     public static readonly ReadOnlySetWrapper<T> Empty = new(new HashSet<T>());
-    
+
     public IEnumerator<T> GetEnumerator() => inner.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

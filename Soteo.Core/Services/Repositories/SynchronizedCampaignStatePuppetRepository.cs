@@ -12,9 +12,9 @@ public sealed class SynchronizedCampaignStatePuppetRepository :
     IPauseRepository
 {
     public event Action Changed = delegate {};
-    
+
     private SynchronizedCampaignState? _value;
-    
+
     /// <inheritdoc/>
     public SynchronizedCampaignState Value
     {
@@ -31,9 +31,9 @@ public sealed class SynchronizedCampaignStatePuppetRepository :
         _value = packet.Value;
         Changed();
     }
-    
+
     public bool IsPaused => Value.IsPaused;
-    
+
     public async Task WaitForInitAsync()
     {
         if (_value == null)

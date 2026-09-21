@@ -13,7 +13,7 @@ public sealed class ShardPersistenceSnapshotManager
 ) : IShardPersistenceSnapshotManager
 {
     public event Action SnapshotReplicated = delegate { };
-    
+
     public ShardSnapshot CreateSnapshot()
     {
         return new ShardSnapshot

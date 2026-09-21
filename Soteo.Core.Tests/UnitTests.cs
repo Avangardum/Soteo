@@ -29,7 +29,7 @@ public sealed class UnitTests
         _serviceProvider = new ServiceCollection().AddSingleton(_entityManager).BuildServiceProvider();
         _sut = new Sut(Guid.NewGuid(), _node, _entityManager, _serviceProvider);
     }
-    
+
     [Fact]
     public void AbilityTargetingNonexistentUnitIsNotUsed()
     {
@@ -39,7 +39,7 @@ public sealed class UnitTests
 
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0, TargetUnitId = Guid.NewGuid() });
         _sut.Tick(Const.TickInterval);
-        
+
         useCount.Should().Be(0);
     }
 
@@ -68,10 +68,10 @@ public sealed class UnitTests
             _serviceProvider
         );
         _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [projectileId] = projectile });
-        
+
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0, TargetUnitId = projectileId });
         _sut.Tick(Const.TickInterval);
-        
+
         useCount.Should().Be(0);
     }
 
@@ -88,9 +88,9 @@ public sealed class UnitTests
         const double buffValue = StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff.BuffValue;
         _sut.Stats[Stat.MoveSpeed].Should().Be(Unit.StatConst[Stat.MoveSpeed].Default + buffValue);
         _sut.Stats[Stat.AttackSpeed].Should().Be(Unit.StatConst[Stat.AttackSpeed].Default);
-        
+
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1.5);
-        
+
         _sut.Stats[Stat.MoveSpeed].Should().Be(Unit.StatConst[Stat.MoveSpeed].Default);
         _sut.Stats[Stat.AttackSpeed].Should().Be(Unit.StatConst[Stat.AttackSpeed].Default + buffValue);
     }
@@ -100,23 +100,23 @@ public sealed class UnitTests
     {
         int statusTickCount = 0;
         SpyStatus.Ticked += () => statusTickCount++;
-        
+
         _sut.AddStatus<SpyStatus>(time: 10, tickInterval: 1, source: null);
         statusTickCount.Should().Be(0);
-        
+
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
         statusTickCount.Should().Be(1);
-        
+
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
         statusTickCount.Should().Be(2);
-        
+
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(0.5);
         statusTickCount.Should().Be(2);
-        
+
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(0.5);
         statusTickCount.Should().Be(3);
     }
-    
+
     [Fact]
     public void StatusRemovedOnDealAttackDamageIsRemovedAccordingly()
     {
@@ -125,7 +125,7 @@ public sealed class UnitTests
         _sut.DealAttackDamageTo(_sut, Ability.Instance<MeleeAttackAbility>());
         _sut.Statuses.Should().BeEmpty();
     }
-    
+
     [Fact]
     public void DieOnTickStatusKillsItsUnitWhenTicked()
     {
@@ -133,20 +133,20 @@ public sealed class UnitTests
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
         _sut.IsDead.Should().BeTrue();
     }
-    
+
     private sealed class Sut : Unit
     {
         public Sut(Guid id, IUnitNode node, IEntityManager entityManager, IServiceProvider serviceProvider) :
             base(id, controllingPlayerId: id, node, entityManager, serviceProvider) { }
-        
+
         public new void SetAbility<T>(AbilitySlot slot, int level) where T : Ability, new() =>
             base.SetAbility<T>(slot, level);
     }
-    
+
     public sealed class SpyAbility : Ability
     {
         public event Action Used = delegate { };
-        
+
         public override Targeting Targeting
         {
             get
@@ -162,11 +162,11 @@ public sealed class UnitTests
             Used();
         }
     }
-    
+
     public sealed class StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff : Status
     {
         public const double BuffValue = 5;
-        
+
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
 
         public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context)
@@ -175,11 +175,11 @@ public sealed class UnitTests
             return [new StatModifier(stat, StatModifierKind.Add, BuffValue)];
         }
     }
-    
+
     public sealed class SpyStatus : Status
     {
         public static event Action Ticked = delegate { };
-        
+
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
 
         public override void Tick(StatusContext context, double delta)
@@ -188,7 +188,7 @@ public sealed class UnitTests
             Ticked();
         }
     }
-    
+
     public sealed class StatusRemovedOnDealAttackDamage : Status
     {
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
@@ -199,7 +199,7 @@ public sealed class UnitTests
             context.Unit.RemoveStatus(context.Id);
         }
     }
-    
+
     public sealed class DieOnTickStatus : Status
     {
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;

@@ -26,9 +26,9 @@ namespace Soteo.Main.CampaignServer;
 public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
 {
     private readonly Dictionary<Guid, TaskCompletionSource> _shardServerLocalInitDoneTcs = new();
-    
+
     private readonly bool _useJsmq = OS.HasFeature("web") && Config.IsSingleplayer;
-    
+
     private readonly LateInit<IFromCampaignServerCommunicator> _communicator = new();
     private readonly LateInit<IServiceProvider> _serviceProvider = new();
     private readonly LateInit<CampaignSnapshotManager> _snapshotManager = new();
@@ -38,17 +38,17 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     private readonly LateInit<TimeProvider> _timeProvider = new();
     private readonly LateInit<ILogger<CampaignServerMain>> _logger = new();
     private readonly LateInit<IInitializationRepository> _initRepo = new();
-    
+
     private IProcessPublisher? _processPublisher;
-    
+
     private IServiceProvider ServiceProvider => _serviceProvider.Value;
     private bool IsSingleplayer => ServiceProvider.GetRequiredService<SingleplayerOptions>().IsSingleplayer;
-    
+
     public override void _Ready()
     {
         InitAsync().CollectException();
     }
-    
+
     private async Task InitAsync()
     {
         GlobalInit.Init();
@@ -57,7 +57,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         CreateSingletonNodes();
         _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
         CreateSingletonServices();
-        
+
         IReadOnlyList<Guid> shardIds = ServiceProvider.GetRequiredService<CampaignOptions>().ShardIds;
 
         _logger.Value.LogInformation("Waiting for shard servers to connect");
@@ -68,27 +68,27 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         // tell them to complete initialization.
         foreach (Guid id in shardIds)
             _shardServerLocalInitDoneTcs[id] = new TaskCompletionSource();
-        
+
         await TryLoadSnapshotAsync();
-        
+
         await WaitForShardServersLocalInit();
         _communicator.Value.BroadcastToShardServers(new CampaignInitializedPacket());
         _initRepo.Value.IsInitialized = true;
-        
+
         const int initialPauseDuration = 15;
         _logger.Value.LogInformation("Initialized, unpausing in {duration} seconds", initialPauseDuration);
         await _timeProvider.Value.Delay(TimeSpan.FromSeconds(initialPauseDuration));
         _synchronizedCampaignStateRepo.Value.Unpause();
-        
+
         const int sessionDuration = 60;
         _logger.Value.LogInformation("Unpaused, the session ends in {duration} seconds", sessionDuration);
         await _timeProvider.Value.Delay(TimeSpan.FromSeconds(sessionDuration));
         _synchronizedCampaignStateRepo.Value.Pause();
-        
+
         await TrySaveSnapshotAsync();
         _logger.Value.LogInformation("Session ended");
     }
-    
+
     private void CreateSingletonServices()
     {
         _communicator.Value = ServiceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
@@ -101,7 +101,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         _logger.Value = ServiceProvider.GetRequiredService<ILogger<CampaignServerMain>>();
         _initRepo.Value = ServiceProvider.GetRequiredService<IInitializationRepository>();
     }
-    
+
     private async Task TryLoadSnapshotAsync()
     {
         if (!IsSingleplayer && File.Exists(SnapshotPath))
@@ -117,7 +117,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             _communicator.Value.BroadcastToShardServers(new NoInitialShardSnapshotPacket());
         }
     }
-    
+
     private async Task WaitForShardServersLocalInit()
     {
         _logger.Value.LogInformation("Waiting for shard servers to finish local initializing");
@@ -133,7 +133,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             throw new TimeoutException($"Shard servers {idsStr} didn't finish local initializing in time");
         }
     }
-    
+
     private async Task TrySaveSnapshotAsync()
     {
         if (!IsSingleplayer)
@@ -143,7 +143,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             File.WriteAllBytes(SnapshotPath, bytes);
         }
     }
-    
+
     private string SnapshotPath
     {
         get
@@ -160,7 +160,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     {
         _communicator.Value.Poll();
     }
-    
+
     private void RegisterServices(IServiceCollection services)
     {
         services.AddSingleton<ICampaignServerInitPacketReceiver>(this);
@@ -186,22 +186,22 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             ShardServerAllowlist.Enabled(sp.GetRequiredService<CampaignOptions>().ShardIds));
         services.AddSingleton<ISynchronizedCampaignStateRepository, SynchronizedCampaignStateRepository>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
-        
+
         if (_useJsmq)
             services.AddSingleton<IFromCampaignServerCommunicator, JsmqFromCampaignServerCommunicator>();
         else
             services.AddSingleton<IFromCampaignServerCommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
-        
+
         foreach (Type type in PacketSerializer.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
             services.AddSingleton(type);
-        
+
         foreach (Type type in PacketHandlerLocator<CampaignServerPacketHandlerAttribute>.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
             services.AddSingleton(type);
-        
+
         Config.AddToServiceCollection(services);
         Logging.AddToServiceCollection(services);
     }
-    
+
     private void CreateSingletonNodes()
     {
         _processPublisher = new ProcessPublisher().Also(it => AddChild(it));

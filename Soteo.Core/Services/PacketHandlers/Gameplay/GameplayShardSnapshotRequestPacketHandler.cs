@@ -22,7 +22,7 @@ public sealed class GameplayShardSnapshotRequestPacketHandler
         else
             synchronizationServer.ReceiveSnapshotRequest(senderId);
     }
-    
+
     private void HandlePersistenceSnapshotRequest()
     {
         ShardSnapshot snapshot = shardPersistenceSnapshotManager.CreateSnapshot();

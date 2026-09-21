@@ -24,7 +24,7 @@ public sealed class SimpleConsoleLogger(string categoryName) : ILogger
     public bool IsEnabled(LogLevel logLevel) => true;
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
-    
+
     public sealed class Provider : ILoggerProvider
     {
         public void Dispose() { }

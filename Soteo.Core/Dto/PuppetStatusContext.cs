@@ -12,7 +12,7 @@ public record PuppetStatusContext
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
     public required long Ordinal { get; init; }
-    
+
     public double DisplayNormalizedRemainingTime
     {
         get
@@ -23,7 +23,7 @@ public record PuppetStatusContext
             return RemainingTime / totalDisplayTime;
         }
     }
-    
+
     public static PuppetStatusContext Interpolate(PuppetStatusContext from, PuppetStatusContext to, double weight)
     {
         return to with

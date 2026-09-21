@@ -19,7 +19,7 @@ public sealed class InputHandler : Node2D
     private readonly IHud _hud;
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
-    
+
     public InputHandler
     (
         IFromGameplayPacketSender packetSender,
@@ -32,7 +32,7 @@ public sealed class InputHandler : Node2D
         _hud = hud;
         _entityLocator = entityLocator;
         _currentCharIdRepo = currentCharIdRepo;
-        
+
         Name = nameof(InputHandler);
         PauseMode = PauseModeEnum.Process;
     }
@@ -45,7 +45,7 @@ public sealed class InputHandler : Node2D
             HandleInteract();
         if (e.IsActionPressed("stop"))
             HandleStop();
-        
+
         foreach (var slot in Enum.GetValues<AbilitySlot>().Distinct())
         {
             var action = "use_ability_" + slot.ToString().ToLower();
@@ -55,27 +55,27 @@ public sealed class InputHandler : Node2D
             }
         }
     }
-    
+
     private void HandleSelect()
     {
         IUnitPuppet? unit = GetUnitsUnderMouse().FirstOrDefault();
         if (unit != null)
             _hud.SelectedUnit = unit;
     }
-    
+
     private void HandleInteract()
     {
         if (_currentCharIdRepo.Value == null) return;
         _hud.TrySelectCurrentUnit();
         if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? user, out Guid? shardId))
             return;
-        
+
         IUnitPuppet? targetUnit = GetUnitsUnderMouse().FirstOrDefault
         (
             it => ValidateAbility(user: user, slot: AbilitySlot.Attack, targetUnit: it, alt: false) ==
                 AbilityValidationResult.Ok
         );
-        
+
         if (targetUnit != null)
         {
             var command = new UseAbilityCommand
@@ -103,7 +103,7 @@ public sealed class InputHandler : Node2D
             );
         }
     }
-    
+
     private void HandleStop()
     {
         if (_currentCharIdRepo.Value == null) return;
@@ -171,10 +171,10 @@ public sealed class InputHandler : Node2D
     )
     {
         // This method only validates target to select a valid target in a crowd
-        
+
         AbilitySlotState state = user.AbilitySlotStates[command.Slot];
         Targeting targeting = command.Alt ? state.Ability.AltTargeting : state.Ability.Targeting;
-        
+
         if (command.TargetUnitId != null)
         {
             if (!_entityLocator.TryFindEntity(command.TargetUnitId.Value, out IUnitPuppet? targetUnit, out _))
@@ -184,7 +184,7 @@ public sealed class InputHandler : Node2D
             if (!targetUnit.IsAlliedTo(user) && !targeting.HasFlag(Targeting.Enemy))
                 return AbilityValidationResult.InvalidTarget;
         }
-        
+
         return AbilityValidationResult.Ok;
     }
 

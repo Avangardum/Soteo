@@ -11,7 +11,7 @@ public static class ProcessPublisherExtensions
         {
             return self.SubscribeToProcess(_ => handler(), priority, callWhenPaused);
         }
-        
+
         public IDisposable SubscribeToPhysicsProcess(Action handler, ProcessPriorityEnum priority, bool callWhenPaused)
         {
             return self.SubscribeToPhysicsProcess(_ => handler(), priority, callWhenPaused);

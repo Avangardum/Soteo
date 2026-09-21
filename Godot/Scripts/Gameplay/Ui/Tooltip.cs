@@ -9,7 +9,7 @@ public sealed class Tooltip : Control, ITooltip
     private readonly LateInit<HSeparator> _separator = new();
     private readonly LateInit<RichTextLabel> _bodyLabel = new();
     private readonly LateInit<float> _bodyDefaultMinWidth = new();
-    
+
     public Label HeaderLabel => _headerLabel;
     public HSeparator Separator => _separator;
     public RichTextLabel BodyLabel => _bodyLabel;
@@ -19,7 +19,7 @@ public sealed class Tooltip : Control, ITooltip
         _headerLabel.Value = GetNode<Label>("PanelContainer/MarginContainer/VBoxContainer/Header");
         _separator.Value = GetNode<HSeparator>("PanelContainer/MarginContainer/VBoxContainer/HSeparator");
         _bodyLabel.Value = GetNode<RichTextLabel>("PanelContainer/MarginContainer/VBoxContainer/Body");
-        
+
         _bodyDefaultMinWidth.Value = BodyLabel.RectMinSize.x;
     }
 
@@ -34,18 +34,18 @@ public sealed class Tooltip : Control, ITooltip
         Separator.Visible = header != "" && body != "";
         UpdateBodyMinWidth();
     }
-    
+
     private void UpdateBodyMinWidth()
     {
         BodyLabel.RectMinSize = new GdVector2(_bodyDefaultMinWidth, 0);
         BodyLabel.RectSize = BodyLabel.RectSize with { x = _bodyDefaultMinWidth };
-        
+
         string text = BodyLabel.BbcodeText;
         BodyLabel.BbcodeText = "Lorem ipsum";
         int lineHeight = BodyLabel.GetContentHeight();
         BodyLabel.BbcodeText = text;
-        
-        const int step = 10; 
+
+        const int step = 10;
         while (BodyLabel.GetContentHeight() == lineHeight && BodyLabel.RectMinSize.x > step)
         {
             BodyLabel.RectMinSize -= new GdVector2(step, 0);
@@ -53,6 +53,6 @@ public sealed class Tooltip : Control, ITooltip
         }
         BodyLabel.RectMinSize += new GdVector2(step, 0);
     }
-    
+
     public new void Hide() => Visible = false;
 }

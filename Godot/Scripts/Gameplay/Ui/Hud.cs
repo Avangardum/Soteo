@@ -20,13 +20,13 @@ public sealed class Hud : IHud
     private readonly Label _manaLabel;
     private readonly ImmutableList<AbilityButton> _abilityButtons;
     private readonly ImmutableList<StatusIndicator> _statusIndicators;
-    
+
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentCharacterIdRepository _currentCharIdRepository;
     private readonly IPalette _palette;
     private readonly ITooltip _tooltip;
     private readonly ILocalizer _localizer;
-    
+
     public IUnitPuppet? SelectedUnit { get; set; }
 
     public Hud
@@ -66,7 +66,7 @@ public sealed class Hud : IHud
             _abilityButtons[i].Connect("mouse_entered", () => OnMouseEnteredAbilityButton(index));
             _abilityButtons[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
         }
-        
+
         for (int i = 0; i < _statusIndicators.Count; i++)
         {
             int index = i;
@@ -80,40 +80,40 @@ public sealed class Hud : IHud
         if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepository.Value)
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = true });
     }
-    
+
     public void OnAbilityButtonUp(int buttonIndex)
     {
         if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepository.Value)
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
     }
-    
+
     public void OnMouseEnteredAbilityButton(int buttonIndex)
     {
         if (SelectedUnit == null) return;
         AbilitySlot slot = AbilitySlot.Class0 + (byte)buttonIndex;
         if (!SelectedUnit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
-        
+
         Vector2 position = _abilityButtons[buttonIndex].RectGlobalPosition.ToSys() +
             new Vector2(_abilityButtons[buttonIndex].RectSize.x / 2, 0);
         string header = state.Ability.Name;
         string body = state.Ability.Description(_localizer, state.Level);
         _tooltip.Show(position, header, body);
     }
-    
+
     public void OnMouseEnteredStatusIndicator(int indicatorIndex)
     {
         if (SelectedUnit == null) return;
         ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(SelectedUnit);
         if (indicatorIndex >= contexts.Count) return;
         Status status = contexts[indicatorIndex].Status;
-        
+
         Vector2 position = _statusIndicators[indicatorIndex].RectGlobalPosition.ToSys() +
             new Vector2(_statusIndicators[indicatorIndex].RectSize.x / 2, 0);
         string header = "";
         string body = status.Description(_localizer);
         _tooltip.Show(position, header, body);
     }
-    
+
     public void OnMouseExitedTooltipableControl()
     {
         _tooltip.Hide();
@@ -132,22 +132,22 @@ public sealed class Hud : IHud
         ProcessAbilities(SelectedUnit);
         ProcessStatuses(SelectedUnit);
     }
-    
+
     [MemberNotNullWhen(true, nameof(SelectedUnit))]
     public bool TrySelectCurrentUnit()
     {
         if (_currentCharIdRepository.Value == null) return false;
         if (!_entityLocator.TryFindEntity(_currentCharIdRepository.Required, out IUnitPuppet? unit, out _))
             return false;
-        
+
         SelectedUnit = unit;
         return true;
     }
-    
+
     private void ProcessBars(IUnitPuppet unit)
     {
         _healthBar.TintProgress = _palette.FactionColor(unit.Faction);
-        
+
         _healthBar.Value = unit.Stats[Stat.CurrentHealth];
         _healthBar.MaxValue = unit.Stats[Stat.MaxHealth];
         _healthLabel.Text = $"{Maths.CeilToInt(unit.Stats[Stat.CurrentHealth])} / " +
@@ -157,7 +157,7 @@ public sealed class Hud : IHud
         _manaLabel.Text = $"{Maths.CeilToInt(unit.Stats[Stat.CurrentMana])} / " +
             $"{Maths.CeilToInt(unit.Stats[Stat.MaxMana])}";
     }
-    
+
     private void ProcessAbilities(IUnitPuppet unit)
     {
         for (var slot = AbilitySlot.Class0; slot <= AbilitySlot.ClassLast; slot++)
@@ -168,27 +168,27 @@ public sealed class Hud : IHud
                 button.Visible = false;
                 continue;
             }
-            
+
             button.Visible = true;
             button.IconRect.Texture = state.Ability.Icon;
-            
+
             button.CooldownIndicator.Value = state.Cooldown;
             button.CooldownIndicator.MaxValue = state.MaxCooldown == 0 ? 1 : state.MaxCooldown;
 
             button.UseProgressIndicator.Value = unit.AbilityUseProgress?.Slot != slot ? 0 :
                 unit.AbilityUseProgress.NormalizedProgress;
             button.UseProgressIndicator.MaxValue = 1;
-            
+
             double healthCost = state.Ability.StaticHealthCost[state.Level];
             button.HealthCostLabel.Text = Maths.CeilToInt(healthCost).ToString();
             button.HealthCostLabel.Visible = healthCost > 0;
-            
+
             double manaCost = state.Ability.StaticManaCost[state.Level];
             button.ManaCostLabel.Text = Maths.CeilToInt(manaCost).ToString();
             button.ManaCostLabel.Visible = manaCost > 0;
         }
     }
-    
+
     private void ProcessStatuses(IUnitPuppet unit)
     {
         ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(unit);
@@ -203,7 +203,7 @@ public sealed class Hud : IHud
             _statusIndicators[i].Visible = false;
         }
     }
-    
+
     private ImmutableList<PuppetStatusContext> GetVisibleStatusContexts(IUnitPuppet unit)
     {
         return unit.Statuses.Values

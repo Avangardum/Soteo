@@ -32,10 +32,10 @@ public static class UnitExtensions
 
         public void RestoreHealth(double amount, ISourceUnitAndAbility? source) =>
             self.RestoreHealth(amount, source?.Unit, source?.Ability);
-        
+
         public void RestoreMana(double amount, ISourceUnitAndAbility? source) =>
             self.RestoreMana(amount, source?.Unit, source?.Ability);
-        
+
         public void TakeDamage(double amount, ISourceUnitAndAbility? source) =>
             self.TakeDamage(amount, source?.Unit, source?.Ability);
     }

@@ -7,7 +7,7 @@ namespace Soteo.Util;
 public sealed class LateInit<T>
 {
     private bool _hasValue;
-    
+
     public T Value
     {
         // Null forgiving operator is used instead of Required since value can actually be null,
@@ -21,6 +21,6 @@ public sealed class LateInit<T>
             _hasValue = true;
         }
     }
-    
+
     public static implicit operator T(LateInit<T> self) => self.Value;
 }

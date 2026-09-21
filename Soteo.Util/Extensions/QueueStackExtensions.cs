@@ -6,7 +6,7 @@ public static class QueueStackExtensions
     {
         public T? PeekOrDefault() => self.Count == 0 ? default : self.Peek();
     }
-    
+
     extension<T> (Stack<T> self)
     {
         public T? PeekOrDefault() => self.Count == 0 ? default : self.Peek();

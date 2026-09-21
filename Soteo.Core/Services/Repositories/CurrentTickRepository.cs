@@ -9,7 +9,7 @@ namespace Soteo.Core.Services.Repositories;
 public sealed class CurrentTickRepository : ICurrentTickRepository, IDisposable
 {
     private readonly IDisposable _physicsProcessSubscription;
-    
+
     public long Tick { get; set; }
 
     public CurrentTickRepository(IProcessPublisher processPublisher)
@@ -17,7 +17,7 @@ public sealed class CurrentTickRepository : ICurrentTickRepository, IDisposable
         _physicsProcessSubscription = processPublisher
             .SubscribeToPhysicsProcess(() => Tick++, ProcessPriorityEnum.CurrentTickRepository, callWhenPaused: false);
     }
-        
+
     public void Dispose()
     {
         _physicsProcessSubscription.Dispose();

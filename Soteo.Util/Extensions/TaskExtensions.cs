@@ -21,7 +21,7 @@ public static class TaskExtensions
                 action(self);
             }
         }
-        
+
         /// <summary>
         /// Executes the action after the task is completed. Unlike ContinueWith, respects SynchronizationContext.
         /// If the task throws, this method throws instead of calling the action.
@@ -31,7 +31,7 @@ public static class TaskExtensions
             await self;
             action();
         }
-        
+
         public async void CollectException()
         {
             try

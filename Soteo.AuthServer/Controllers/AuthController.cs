@@ -45,7 +45,7 @@ public sealed class AuthController : Controller
         string accessToken = new JsonWebTokenHandler().CreateToken(tokenDescriptor);
         return Ok(accessToken);
     }
-    
+
     [HttpPost("/token/service")]
     public async Task<IActionResult> GetServiceToken(string id, string role, string intercomSecret)
     {

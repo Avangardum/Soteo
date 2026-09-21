@@ -10,7 +10,7 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
     public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses { get; init; }
-    
+
     public override EntitySnapshotDelta DeltaFrom(UnitPuppetSnapshot? from)
     {
         if (from == null)
@@ -28,9 +28,9 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
                 Statuses = DictionaryDelta.FromNewDictionary(Statuses)
             };
         }
-        
+
         if (from.Id != Id) throw new ArgumentException();
-        
+
         return new UnitPuppetSnapshotDelta
         {
             Id = Id,
@@ -44,6 +44,6 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
             Statuses = DictionaryDelta.Between(from.Statuses, Statuses)
         };
     }
-    
+
     public override EntitySnapshot ToPuppet() => this;
 }

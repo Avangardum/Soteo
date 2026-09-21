@@ -20,7 +20,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
         IEnumerable<Guid> shardSnapshotIds = snapshot.Shards.Keys;
         return shardUserIds.SequenceEqual(shardSnapshotIds);
     }
-    
+
     private bool DoPlayerCharacterTrackersWithShardIdHaveCorrespondingCharsInShardSnapshots(CampaignSnapshot snapshot)
     {
         IEnumerable<PlayerCharacterTrackerSnapshot> deployedPlayerCharacters =
@@ -30,10 +30,10 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
             ShardSnapshot shard = snapshot.Shards[character.ShardId.Required];
             if (!shard.Entities.ContainsKey(character.Id)) return false;
         }
-        
+
         return true;
     }
-    
+
     private bool DoPlayerCharactersInShardSnapshotsHaveCorrespondingTrackers(CampaignSnapshot snapshot)
     {
         foreach ((Guid shardId, ShardSnapshot shard) in snapshot.Shards)
@@ -46,7 +46,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
                     return false;
             }
         }
-        
+
         return true;
     }
 }

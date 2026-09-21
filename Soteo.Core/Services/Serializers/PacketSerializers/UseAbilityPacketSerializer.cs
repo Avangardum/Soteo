@@ -10,11 +10,11 @@ public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketS
     protected override void SerializeInternal(UseAbilityPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.UnitId, stream);
-        
+
         s.SerializeEnum(packet.Command.Slot, stream);
         s.SerializeBool(packet.Command.Repeat, stream);
         s.SerializeBool(packet.Command.Alt, stream);
-        
+
         s.SerializeNullableStruct(packet.Command.TargetPosition, s.SerializeVector2, stream);
         s.SerializeNullableStruct(packet.Command.TargetUnitId, s.SerializeGuid, stream);
         s.SerializeNullableStruct(packet.Command.TargetDirection, s.SerializeVector2, stream);

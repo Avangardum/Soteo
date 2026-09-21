@@ -11,19 +11,19 @@ namespace Soteo.Core.Abilities;
 public abstract class Ability
 {
     private static readonly Dictionary<Type, Ability> Instances = [];
-    
+
     private static Type? _currentlyConstructedType;
-    
+
     public static T Instance<T>() where T : Ability, new() => (T)Instance(typeof(T));
-    
+
     public static Ability Instance(Type type)
     {
         if (!type.IsAssignableTo(typeof(Ability)))
             throw new ArgumentException($"{type} is not an ability");
-        
+
         if (Instances.TryGetValue(type, out Ability existingInstance))
             return existingInstance;
-        
+
         _currentlyConstructedType = type;
         var newInstance = (Ability)Activator.CreateInstance(type);
         _currentlyConstructedType = null;
@@ -41,24 +41,24 @@ public abstract class Ability
             );
         }
     }
-    
+
     public virtual string Name =>
         GetType().Name.ReplaceRegex("Ability$", "").PascalCaseToCapitalizedText();
-    
+
     public virtual int MaxLevel => 1;
     public virtual Status? PassiveStatus => null;
     public virtual double? PassiveTickInterval => null;
     public abstract Targeting Targeting { get; }
     public virtual Targeting AltTargeting => Targeting;
-    
+
     public virtual string Animation => "Ability";
     public virtual bool LoopAnimation => false;
-    
+
     /// <summary>
     /// Path to the ability icon relative to res://Textures/Icons, without an extension
     /// </summary>
     public virtual string IconPath => "Placeholder";
-    
+
     // Static values define what is shown in the ability description. They are constant and independent of context.
     public virtual Scalable<double> StaticHealthCost => 0;
     public virtual Scalable<double> StaticManaCost => 0;
@@ -66,7 +66,7 @@ public abstract class Ability
     public virtual Scalable<double> StaticRange => 0;
     public virtual Scalable<double> StaticAngularRange => 30;
     public virtual Scalable<double> StaticUseTime => 0;
-   
+
     // Dynamic values are context dependent values declared by the ability before applying status effect modifiers.
     // By default, they are same as static values, but if an ability has a value that can't be declared statically, it
     // should override the matching dynamic value method, in which case the static value is used for ability description
@@ -77,7 +77,7 @@ public abstract class Ability
     protected virtual double DynamicRange(AbilityContext context) => StaticRange[context.Level];
     protected virtual double DynamicAngularRange(AbilityContext context) => StaticAngularRange[context.Level];
     protected virtual double DynamicUseTime(AbilityContext context) => StaticUseTime[context.Level];
-    
+
     // Unprefixed values are values after applying status modifiers and are used in actual gameplay
     // (the modifiers are not yet implemented)
     public double HealthCost(AbilityContext context) => DynamicHealthCost(context);
@@ -86,7 +86,7 @@ public abstract class Ability
     public double Range(AbilityContext context) => DynamicRange(context);
     public double AngularRange(AbilityContext context) => DynamicAngularRange(context);
     public double UseTime(AbilityContext context) => DynamicUseTime(context);
-    
+
     /// <summary>
     /// Called when an ability use is completed and it takes effect.
     /// This should be called only immediately after non-strict validation succeeds.
@@ -101,7 +101,7 @@ public abstract class Ability
     }
 
     public virtual void OnProjectileHit(AbilityContext context) { }
-    
+
     /// <summary>
     /// Checks whether an ability can be used and returns a reason if not.
     /// Strict mode is used to determine whether use can be initiated.
@@ -110,19 +110,19 @@ public abstract class Ability
     public virtual AbilityValidationResult Validate(AbilityContext context, bool strict = true)
     {
         if (context.Level < 1 || context.Level > MaxLevel) return AbilityValidationResult.InvalidLevel;
-        
+
         AbilityValidationResult targetValidationResult = ValidateTarget(context);
         if (targetValidationResult != AbilityValidationResult.Ok) return targetValidationResult;
-        
+
         AbilityValidationResult costValidationResult = ValidateCost(context);
         if (costValidationResult != AbilityValidationResult.Ok) return costValidationResult;
-        
+
         AbilityValidationResult rangeValidationResult = ValidateRange(context, strict);
         if (rangeValidationResult != AbilityValidationResult.Ok) return rangeValidationResult;
 
         return AbilityValidationResult.Ok;
     }
-    
+
     private AbilityValidationResult ValidateTarget(AbilityContext context)
     {
         Targeting targeting = context.Alt ? AltTargeting : Targeting;
@@ -145,7 +145,7 @@ public abstract class Ability
             return AbilityValidationResult.InvalidTarget;
         return AbilityValidationResult.Ok;
     }
-    
+
     private AbilityValidationResult ValidateTargetUnit(IUnit user, IUnit target, Targeting targeting)
     {
         if (user.IsAlliedTo(target))
@@ -158,10 +158,10 @@ public abstract class Ability
             if (!targeting.HasFlag(Targeting.Enemy))
                 return AbilityValidationResult.InvalidTarget;
         }
-        
+
         return AbilityValidationResult.Ok;
     }
-    
+
     private AbilityValidationResult ValidateCost(AbilityContext context)
     {
         if (HealthCost(context) > 0 && context.User.Stats[Stat.CurrentHealth] <= HealthCost(context))
@@ -170,10 +170,10 @@ public abstract class Ability
             return AbilityValidationResult.NotEnoughMana;
         return AbilityValidationResult.Ok;
     }
-    
+
     private AbilityValidationResult ValidateRange(AbilityContext context, bool strict)
     {
-        if 
+        if
         (
             (context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition &&
             targetPosition != context.User.Position
@@ -183,32 +183,32 @@ public abstract class Ability
             double rangeMultiplier = strict ? 1 : 1.5;
             if (deltaPosition.Length() > Range(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfRange;
-            
+
             double deltaAzimuth =
                 Maths.ModularDelta(context.User.Azimuth, Maths.DirectionToAzimuth(deltaPosition), 360);
             if (Math.Abs(deltaAzimuth) > AngularRange(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfAngularRange;
         }
-        
+
         return AbilityValidationResult.Ok;
     }
-    
+
     public string Description(ILocalizer localizer, int? level = null)
     {
         string formatKey = GetType().Name.PascalCaseToSnakeCase().ToUpper() + "_DESCRIPTION";
         string format = localizer.GetString(formatKey);
-        
+
         return format
             .PassTo(it => FillDescriptionProperties(it, level))
             .PassTo(it => FillDescriptionPluralization(it, localizer))
             + DescriptionFooter(level);
     }
-    
+
     private string FillDescriptionProperties(string value, int? level)
     {
         // example: {Duration:N2}
         const string propertyRegex = @"\{([A-Za-z0-9_]+)(?:\:([^\{\}\|\:]+))?\}";
-        
+
         return value.ReplaceRegex
         (
             propertyRegex,
@@ -227,12 +227,12 @@ public abstract class Ability
             }
         );
     }
-    
+
     private string FillDescriptionPluralization(string value, ILocalizer localizer)
     {
         // example: {Duration|second|seconds}
         const string pluralisationRegex = @"\{([A-Za-z0-9_]+)(?:\|([^\{\}\|]+))+\}";
-        
+
         return value.ReplaceRegex
         (
             pluralisationRegex,
@@ -251,7 +251,7 @@ public abstract class Ability
             }
         );
     }
-    
+
     private string DescriptionFooter(int? level)
     {
         List<string> parts = [];

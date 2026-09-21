@@ -12,7 +12,7 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
         s.SerializeDictionary(snapshot.Shards, s.SerializeGuid, s.SerializeShardSnapshot, stream);
         return stream.ToArray();
     }
-    
+
     public CampaignSnapshot Deserialize(byte[] bytes)
     {
         var stream = new MemoryStream(bytes);
@@ -22,13 +22,13 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
             Shards = s.DeserializeDictionary(s.DeserializeGuid, s.DeserializeShardSnapshot, stream),
         };
     }
-    
+
     private void SerializeCampaignServerSnapshot(CampaignServerSnapshot value, Stream stream)
     {
         s.SerializeIndexedDictionary(value.Users, SerializeUserSnapshot, stream);
         s.SerializeIndexedDictionary(value.PlayerCharacterTrackers, SerializePlayerCharacterTrackerSnapshot, stream);
     }
-    
+
     private CampaignServerSnapshot DeserializeCampaignServerSnapshot(Stream stream)
     {
         var snapshot = new CampaignServerSnapshot
@@ -39,7 +39,7 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
         };
         return snapshot;
     }
-    
+
     private void SerializeUserSnapshot(UserSnapshot value, Stream stream)
     {
         s.SerializeGuid(value.Id, stream);
@@ -47,7 +47,7 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
         s.SerializeBool(value.IsPlayer, stream);
         s.SerializeBool(value.IsShard, stream);
     }
-    
+
     private UserSnapshot DeserializeUserSnapshot(Stream stream)
     {
         return new()
@@ -58,14 +58,14 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
             IsShard = s.DeserializeBool(stream),
         };
     }
-    
+
     private void SerializePlayerCharacterTrackerSnapshot(PlayerCharacterTrackerSnapshot value, Stream stream)
     {
         s.SerializeGuid(value.Id, stream);
         s.SerializeGuid(value.PlayerId, stream);
         s.SerializeNullableStruct(value.ShardId, s.SerializeGuid, stream);
     }
-    
+
     private PlayerCharacterTrackerSnapshot DeserializePlayerCharacterTrackerSnapshot(Stream stream)
     {
         return new()

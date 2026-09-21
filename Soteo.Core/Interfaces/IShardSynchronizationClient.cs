@@ -8,7 +8,7 @@ public interface IShardSynchronizationClient
     int WaitFrameCount { get; }
     int FastForwardCount { get; }
     double? ServerLoad { get; }
-    
+
     void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet);
     void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet);
 }

@@ -6,7 +6,7 @@ namespace Soteo.Core.Services.Repositories;
 public sealed class InitializationRepository : IInitializationRepository
 {
     private TaskCompletionSource _waitForInitTcs = new();
-    
+
     public bool IsInitialized
     {
         get;

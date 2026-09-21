@@ -13,13 +13,13 @@ public sealed class StatusTests
         var instance2 = Status.Instance<TestStatus>();
         instance1.Should().BeSameAs(instance2);
     }
-    
+
     [Fact]
     public void InstancingStatusWithNewThrows()
     {
         FluentActions.Invoking(() => new TestStatus()).Should().Throw<InvalidOperationException>();
     }
-    
+
     private class TestStatus : Status
     {
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;

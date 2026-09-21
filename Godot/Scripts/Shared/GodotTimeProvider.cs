@@ -9,24 +9,24 @@ public sealed class GodotTimeProvider(SceneTree sceneTree) : TimeProvider
     public override ITimer CreateTimer(TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
     {
         var timer = new Timer();
-        
+
         if (dueTime == TimeSpan.Zero)
         {
             OnTimeout(callback, state, period, timer);
         }
         else if (dueTime == Timeout.InfiniteTimeSpan)
         {
-            
+
         }
         else
         {
             SceneTreeTimer sceneTreeTimer = sceneTree.CreateTimer((float)dueTime.TotalSeconds);
             sceneTreeTimer.Connect("timeout", () => OnTimeout(callback, state, period, timer));
         }
-        
+
         return timer;
     }
-    
+
     private void OnTimeout(TimerCallback callback, object? state, TimeSpan period, Timer timer)
     {
         if (timer.IsDisposed) return;
@@ -35,11 +35,11 @@ public sealed class GodotTimeProvider(SceneTree sceneTree) : TimeProvider
         SceneTreeTimer sceneTreeTimer = sceneTree.CreateTimer((float)period.TotalSeconds);
         sceneTreeTimer.Connect("timeout", () => OnTimeout(callback, state, period, timer));
     }
-    
+
     private class Timer : ITimer
     {
         public bool IsDisposed { get; private set; }
-        
+
         public void Dispose() => IsDisposed = true;
 
         public async ValueTask DisposeAsync() => Dispose();

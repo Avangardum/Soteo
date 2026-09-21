@@ -16,14 +16,14 @@ public static class StreamExtensions
             }
             return bytesRead;
         }
-        
+
         public void ReadExactly(Span<byte> buffer)
         {
             int bytesRead = self.Read(buffer);
             if (bytesRead != buffer.Length)
                 throw new EndOfStreamException();
         }
-        
+
         public byte ReadExactlyByte()
         {
             int value = self.ReadByte();
@@ -31,13 +31,13 @@ public static class StreamExtensions
                 throw new EndOfStreamException();
             return (byte)value;
         }
-        
+
         public void Write(ReadOnlySpan<byte> buffer)
         {
             foreach (byte b in buffer)
                 self.WriteByte(b);
         }
-        
+
         public void ShouldBeEndOfStream()
         {
             long extraBytes = self.Length - self.Position;

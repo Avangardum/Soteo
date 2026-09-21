@@ -24,13 +24,13 @@ public sealed class JsmqFromGameplayCommunicator :
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     private readonly SideOptions _sideOptions;
-    
+
     public event Action Connected = delegate { };
     public event Action<Guid> PeerConnected = delegate { };
     public event Action<Guid> PeerDisconnected = delegate { };
 
     private readonly HashSet<Guid> _connectedPeers = [];
-    
+
     public JsmqFromGameplayCommunicator
     (
         ICurrentUserIdRepository currentUserIdRepository,
@@ -43,7 +43,7 @@ public sealed class JsmqFromGameplayCommunicator :
         _packetSerializer = packetSerializer;
         _packetHandler = packetHandler;
         _sideOptions = sideOptions;
-        
+
         Name = nameof(JsmqFromGameplayCommunicator);
         PauseMode = PauseModeEnum.Process;
     }
@@ -86,7 +86,7 @@ public sealed class JsmqFromGameplayCommunicator :
         );
         Connected();
     }
-    
+
     private void Poll()
     {
         while (true)
@@ -135,12 +135,12 @@ public sealed class JsmqFromGameplayCommunicator :
     public long BytesReceived => 0;
 
     public double? Ping(Guid peerId) => 0;
-    
+
     public void ConnectToShardServer(Guid id)
     {
         if (_connectedPeers.Add(id))
             PeerConnected(id);
-        
+
         // Send ping to trigger PeerConnected on the server
         SendReliable(new PingPacket { Id = Guid.Empty, IsResponse = false }, id);
     }

@@ -13,12 +13,12 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
     public required int Level { get; init; }
     public required IUnit User { get; init; }
     public bool Alt { get; init; }
-    
+
     /// <summary>
     /// Snapshot of user stats at the moment the ability took effect. Use this instead of User.Stats.
     /// </summary>
     public required IReadOnlyDictionary<Stat, double> UserStats { get; init; }
-    
+
     public required IServiceProvider ServiceProvider { get; init; }
     public Vector2? TargetPosition { get; init; }
     public IUnit? TargetUnit { get; init; }
@@ -27,9 +27,9 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
 
     IUnit ISourceUnitAndAbility.Unit => User;
     AbilityContext ISourceUnitAndAbility.AbilityContext => this;
-    
+
     public object? GetService(Type serviceType) => ServiceProvider.GetService(serviceType);
-    
+
     public AbilityContextSnapshot ToSnapshot()
     {
         return new AbilityContextSnapshot
@@ -45,7 +45,7 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
             TargetShardId = TargetShardId,
         };
     }
-    
+
     public static AbilityContext FromSnapshot(AbilityContextSnapshot snapshot, IServiceProvider serviceProvider)
     {
         var entityManager = serviceProvider.GetRequiredService<IEntityManager>();

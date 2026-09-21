@@ -22,10 +22,10 @@ public sealed class GameplayRoutingPacketHandler
             senderId == Const.CampaignServerId ? rootServiceProvider :
             shardServiceProviders.GetOrDefault(senderId);
         if (serviceProvider == null) return;
-        
+
         IPacketHandler handler = serviceProvider.GetPacketHandlerFor<GameplayPacketHandlerAttribute>(packet.GetType()) ??
             throw ExceptionFactory.PacketHandlerNotFound(packet.GetType(), typeof(GameplayPacketHandlerAttribute));
-        
+
         if
         (
             sideOptions.Side == Side.ShardServer &&
@@ -35,7 +35,7 @@ public sealed class GameplayRoutingPacketHandler
         {
             throw ExceptionFactory.ClientPacketsNotAllowed(handler.GetType());
         }
-        
+
         await handler.HandleAsync(packet, senderId);
     }
 }

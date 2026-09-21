@@ -8,9 +8,9 @@ public abstract record EntitySnapshot
     public required bool IsRemoved { get; init; }
     public required Vector2 Position { get; init; }
     public required double Azimuth { get; init; }
-    
+
     public abstract EntitySnapshot ToPuppet();
-    
+
     public abstract EntitySnapshotDelta DeltaFrom(EntitySnapshot? from);
 }
 

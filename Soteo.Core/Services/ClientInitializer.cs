@@ -6,7 +6,7 @@ public sealed class ClientInitializer
 {
     private readonly ISynchronizedCampaignStatePuppetRepository _synchronizedCampaignStateRepo;
     private readonly IInitializationRepository _initRepo;
-    
+
     public ClientInitializer
     (
         ICampaignServerConnector campaignServerConnector,
@@ -16,15 +16,15 @@ public sealed class ClientInitializer
     {
         _synchronizedCampaignStateRepo = synchronizedCampaignStateRepo;
         _initRepo = initRepo;
-        
+
         campaignServerConnector.Connected += OnConnected;
     }
-    
+
     private void OnConnected()
     {
         InitAsync().CollectException();
     }
-    
+
     private async Task InitAsync()
     {
         await _synchronizedCampaignStateRepo.WaitForInitAsync();

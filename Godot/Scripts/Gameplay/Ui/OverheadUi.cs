@@ -11,7 +11,7 @@ public sealed class OverheadUi
     private readonly IUnitPuppet _unit;
     private readonly ICamera _camera;
     private readonly IPalette _palette;
-    
+
     private readonly OverheadUiNode _node;
     private readonly Control _playerCharacterPanel;
     private readonly Label _playerCharacterNameLabel;
@@ -20,15 +20,15 @@ public sealed class OverheadUi
     private readonly TextureProgress _playerCharacterManaBar;
     private readonly Control _tinyHealthPanel;
     private readonly TextureProgress _tinyHealthBar;
-    
+
     private Vector2 _offsetPx;
-    
+
     public OverheadUi(OverheadUiNode node, IUnitPuppet unit, ICamera camera, IPalette palette)
     {
         _unit = unit;
         _camera = camera;
         _palette = palette;
-        
+
         node.Name = $"{nameof(OverheadUi)} {unit.Id}";
         node.ProcessPriority = (int)ProcessPriorityEnum.OverheadUi;
         node.OverheadUi = this;
@@ -40,12 +40,12 @@ public sealed class OverheadUi
         _playerCharacterManaBar = node.GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Mana");
         _tinyHealthPanel = node.GetNode<Control>("TinyHealth");
         _tinyHealthBar = node.GetNode<TextureProgress>("TinyHealth/MarginContainer/Health");
-        
+
         unit.Removed += OnUnitRemoved;
-        
-        _playerCharacterNameLabel.Text = unit.Id.ToString()[^12..]; 
+
+        _playerCharacterNameLabel.Text = unit.Id.ToString()[^12..];
     }
-    
+
     private Variant CurrentVariant
     {
         get;
@@ -84,7 +84,7 @@ public sealed class OverheadUi
         SetHealth((float)_unit.Stats[Stat.CurrentHealth], (float)_unit.Stats[Stat.MaxHealth]);
         SetMana((float)_unit.Stats[Stat.CurrentMana], (float)_unit.Stats[Stat.MaxMana]);
     }
-    
+
     private void SelectVariant()
     {
         const double tinyHealthMinZoom = 0.9;
@@ -93,7 +93,7 @@ public sealed class OverheadUi
             _camera.Zoom <= tinyHealthMaxZoom ? Variant.TinyHealth :
             Variant.PlayerCharacter;
     }
-    
+
     private void SetFaction(Faction faction)
     {
         Color color = _palette.FactionColor(faction);
@@ -107,7 +107,7 @@ public sealed class OverheadUi
                 break;
         }
     }
-    
+
     private void SetHealth(float current, float max)
     {
         switch (CurrentVariant)
@@ -122,7 +122,7 @@ public sealed class OverheadUi
                 break;
         }
     }
-    
+
     private void SetMana(float current, float max)
     {
         switch (CurrentVariant)
@@ -133,13 +133,13 @@ public sealed class OverheadUi
                 break;
         }
     }
-    
+
     private void OnUnitRemoved()
     {
         _node.SetProcess(false);
         _node.QueueFree();
     }
-    
+
     private enum Variant
     {
         None,

@@ -9,7 +9,7 @@ public sealed class AbilityButton : TextureButton
     private readonly LateInit<TextureProgress> _useProgressIndicator = new();
     private readonly LateInit<Label> _healthCostLabel = new();
     private readonly LateInit<Label> _manaCostLabel = new();
-    
+
     public TextureRect IconRect => _iconRect;
     public TextureProgress CooldownIndicator => _cooldownIndicator;
     public TextureProgress UseProgressIndicator => _useProgressIndicator;

@@ -12,7 +12,7 @@ public abstract class AttackAbility : Ability
 
     protected sealed override double DynamicUseTime(AbilityContext context) =>
         AttackInterval(context) * context.UserStats[Stat.AttackUseTimeFraction];
-    
+
     protected sealed override double DynamicCooldown(AbilityContext context) =>
         AttackInterval(context) * (1 - context.UserStats[Stat.AttackUseTimeFraction]);
 

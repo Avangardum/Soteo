@@ -12,6 +12,6 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
         if (shardOptions.Value != null)
             Value = shardOptions.Value.ShardId;
     }
-    
+
     public Guid? Value { get; set; }
 }

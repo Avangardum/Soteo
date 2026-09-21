@@ -15,32 +15,32 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     Node, IShardServerConnector, IFromGameplayPacketSender, IWebrtcPacketReceiver, INetworkDebugger, IConnectionNotifier
 {
     private const double PingInterval = 1;
-    
+
     // Web export has a bug that seemingly corrupts memory when receiving a large packet.
     // Chunking is used as a workaround.
     // TODO report the bug to Godot
     private const int MaxChunkSize = 32000;
-    
+
     private double _timeSinceLastPing;
     private Guid? _lastPingId;
     private bool _didPollThisFrame;
     private bool _isPhysicsProcess;
-    
+
     private readonly Dictionary<Guid, PeerConnectionAndChannels> _peerConnectionsAndChannels = [];
     private readonly Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
     private readonly HashSet<Guid> _connectedPeerIds = [];
 
     public event Action<Guid> PeerConnected = delegate { };
     public event Action<Guid> PeerDisconnected = delegate { };
-    
+
     private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
-    
+
     private readonly IFromGameplayToCampaignServerPacketSender _campaignServerPacketSender;
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     private readonly IChunkCollector _chunkCollector;
     private readonly SideOptions _sideOptions;
-    
+
     public long BytesSent { get; private set; }
     public long BytesReceived { get; private set; }
 
@@ -48,7 +48,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     (
         IFromGameplayToCampaignServerPacketSender campaignServerPacketSender,
         IPacketHandler packetHandler,
-        IPacketSerializer packetSerializer, 
+        IPacketSerializer packetSerializer,
         IChunkCollector chunkCollector,
         SideOptions sideOptions
     )
@@ -67,11 +67,11 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     public override void _PhysicsProcess(float delta)
     {
         _isPhysicsProcess = true;
-        
+
         // Poll() is duplicated in _PhysicsProcess because it runs before _Process, so any packets received during
         // _Process would be delayed to the next physics frame otherwise.
         Poll(delta);
-        
+
         if (_sideOptions.Side == Side.ShardServer)
         {
             while (_packetQueue.Count > 0)
@@ -80,7 +80,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
                 HandlePacket(packet, senderId);
             }
         }
-        
+
         _isPhysicsProcess = false;
     }
 
@@ -88,15 +88,15 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     {
         Poll(delta);
         ProcessPing(delta);
-        
+
         _didPollThisFrame = false;
     }
-    
+
     private void Poll(double delta)
     {
         if (_didPollThisFrame) return;
         _didPollThisFrame = true;
-        
+
         foreach
         (
             (Guid peerId, PeerConnectionAndChannels peerConnectionAndChannels) in
@@ -120,7 +120,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             DeserializeAndHandlePackets(peerConnectionAndChannels.UnreliableChannel, peerId);
         }
     }
-    
+
     private void OnPeerDisconnected(Guid peerId)
     {
         _peerConnectionsAndChannels.Remove(peerId);
@@ -128,7 +128,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         if (_connectedPeerIds.Remove(peerId))
             PeerDisconnected(peerId);
     }
-    
+
     private void ProcessPing(double delta)
     {
         if (_sideOptions.Side == Side.ShardServer) return;
@@ -143,7 +143,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             BroadcastUnreliable(new PingPacket { Id = _lastPingId.Value, IsResponse = false });
         }
     }
-    
+
     private void DeserializeAndHandlePackets(WebRTCDataChannel channel, Guid senderId)
     {
         while (channel.GetAvailablePacketCount() > 0)
@@ -153,14 +153,14 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             DeserializeAndHandlePacket(bytes, senderId);
         }
     }
-    
+
     private void DeserializeAndHandlePacket(byte[] bytes, Guid senderId)
     {
         Packet? packet = DeserializePacket(bytes, senderId);
         if (packet == null) return;
         HandlePacket(packet, senderId);
     }
-    
+
     private Packet? DeserializePacket(byte[] bytes, Guid senderId)
     {
         try
@@ -177,7 +177,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             throw;
         }
     }
-    
+
     private async void HandlePacket(Packet packet, Guid senderId)
     {
         try
@@ -194,7 +194,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
                     DeserializeAndHandlePacket(restoredPacketBytes, senderId);
                 return;
             }
-            
+
             // Server defers packet handling to _PhysicsProcess to ensure that all game logic is executed in it only
             if (_sideOptions.Side == Side.ShardServer && !_isPhysicsProcess)
                 _packetQueue.Enqueue((packet, senderId));
@@ -213,7 +213,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             AsyncExceptionCollector.Collect(e);
         }
     }
-    
+
     private void HandlePingPacket(PingPacket packet, Guid senderId)
     {
         if (packet.IsResponse)
@@ -228,15 +228,15 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             SendUnreliable(packet with { IsResponse = true }, senderId);
         }
     }
-    
+
     public void ConnectToShardServer(Guid id)
     {
         if (_sideOptions.Side == Side.ShardServer) throw new InvalidOperationException();
-        
+
         WebRTCPeerConnection connection = CreateConnection(id);
         connection.CreateOffer();
     }
-    
+
     private WebRTCPeerConnection CreateConnection(Guid peerId)
     {
         if (_peerConnectionsAndChannels.TryGetValue(peerId, out PeerConnectionAndChannels existing))
@@ -249,7 +249,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         byte[] peerIdBytes = peerId.ToByteArray();
         connection.Connect("session_description_created", this, nameof(OnSessionDescriptionCreated), [peerIdBytes]);
         connection.Connect("ice_candidate_created", this, nameof(OnIceCandidateCreated), [peerIdBytes]);
-        
+
         WebRTCDataChannel reliableChannel = connection.CreateDataChannel("reliable", new GdDictionary
         {
             ["negotiated"] = true,
@@ -262,19 +262,19 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             ["maxRetransmits"] = 0,
             ["ordered"] = false
         });
-        
+
         _peerConnectionsAndChannels[peerId] =
             new PeerConnectionAndChannels(connection, reliableChannel, unreliableChannel);
         return connection;
     }
-    
+
     private void OnSessionDescriptionCreated(string type, string sdp, byte[] peerIdBytes)
     {
         var peerId = new Guid(peerIdBytes);
         _peerConnectionsAndChannels[peerId].Connection.SetLocalDescription(type, sdp);
         _campaignServerPacketSender.SendPacket(new WebrtcSdpPacket { Sdp = sdp, PeerId = peerId } );
     }
-    
+
     private void OnIceCandidateCreated(string media, int index, String name, byte[] peerIdBytes)
     {
         var peerId = new Guid(peerIdBytes);
@@ -298,7 +298,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     public void BroadcastUnreliable(Packet packet) =>
         SendToMany(packet, _peerConnectionsAndChannels.Keys, it => it.UnreliableChannel);
-    
+
     private void SendToMany
     (
         Packet packet,
@@ -334,7 +334,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         channel.PutPacket(bytes).ThrowIfError();
         BytesSent += bytes.Length;
     }
-    
+
     private byte[][] SplitIntoChunks(Span<byte> bytes)
     {
         var groupId = Guid.NewGuid();
@@ -355,7 +355,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         }
         return chunks;
     }
-    
+
     public void ReceiveWebrtcSdpPacket(WebrtcSdpPacket packet)
     {
         string type = _sideOptions.Side == Side.ShardServer ? "offer" : "answer";
@@ -363,7 +363,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
             _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
         connection?.SetRemoteDescription(type, packet.Sdp);
     }
-    
+
     public void ReceiveWebrtcIceCandidatePacket(WebrtcIceCandidatePacket packet)
     {
         WebRTCPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
@@ -372,7 +372,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     public double? Ping(Guid peerId) =>
         _ping.TryGetValue(peerId, out var tuple) ? tuple.ResponseTime : null;
-    
+
     private record PeerConnectionAndChannels
     (
         WebRTCPeerConnection Connection,

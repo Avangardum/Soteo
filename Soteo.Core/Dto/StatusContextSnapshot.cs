@@ -17,7 +17,7 @@ public sealed record StatusContextSnapshot
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
     public required long Ordinal { get; init; }
-    
+
     public PuppetStatusContext ToPuppet()
     {
         return new PuppetStatusContext

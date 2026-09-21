@@ -9,7 +9,7 @@ public static class ListExtensions
             for (int i = 0; i < self.Count; i++)
                 if (Equals(self[i], item))
                     return i;
-            
+
             return -1;
         }
     }

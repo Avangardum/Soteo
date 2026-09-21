@@ -24,7 +24,7 @@ public sealed class EntityLocator(IShardServiceProviders shardServiceProviders) 
                 return true;
             }
         }
-        
+
         entity = null;
         shardId = null;
         return false;

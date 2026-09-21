@@ -18,14 +18,14 @@ public static class Config
     // example, Soteo__Foo__Bar sets value Bar in section Foo)
     // - command line arguments in the Key=Value format (for distinction against Godot arguments, which use the
     // --key value format) (use the : separator to declare hierarchical values)
-    
+
     private static readonly string Environment = BuildConfiguration(null)["Environment"].Required;
     private static readonly IConfiguration Configuration = BuildConfiguration(Environment);
-    
+
     // Static fields are only for accessing the configuration in main classes before a service provider is built
     internal static readonly Side Side = Side.Parse(Configuration["Side"].Required);
     internal static readonly bool IsSingleplayer = bool.Parse(Configuration["IsSingleplayer"].Required);
-    
+
     private static IConfiguration BuildConfiguration(string? environment)
     {
         var builder = new ConfigurationBuilder();
@@ -36,7 +36,7 @@ public static class Config
         builder.AddEnvironmentVariables("Soteo__");
         return builder.Build();
     }
-    
+
     public static void AddToServiceCollection(IServiceCollection services)
     {
         // Register all options regardless of side, because omitting a registration would implicitly register a
@@ -55,7 +55,7 @@ public static class Config
         services.AddOptions<LogInOptions>().Bind(Configuration).ValidateDataAnnotations();
         services.AddOptions<PortOptions>().Bind(Configuration).ValidateDataAnnotations();
         services.AddOptions<CampaignOptions>().Bind(Configuration).ValidateDataAnnotations();
-        
+
         // Unwrap (register as plain object without IOptions<T> wrapper) only the options that must be present on the
         // current side. Options should be injected directly, without using IOptions<T> interface, this way trying to
         // inject an option that's not supposed to be defined on that side will throw even if it is coincidentally

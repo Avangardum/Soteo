@@ -8,13 +8,13 @@ public static class Delta
 public readonly record struct Delta<T>
 {
     public static readonly Delta<T> Unchanged = default;
-    
+
     public Delta(T newValue)
     {
         HasChanged = true;
         NewValue = newValue;
     }
-    
+
     public bool HasChanged { get; }
     public T NewValue => HasChanged ? field : throw new InvalidOperationException("Value has not changed");
 

@@ -10,19 +10,19 @@ namespace Soteo.Core.Services.Serializers.PacketSerializers;
 public static class PacketSerializer
 {
     private static ImmutableDictionary<Type, Type>? _typesByPacketType;
-    
+
     public static Type? TypeFor(Type packetType, ITypeLocator typeLocator)
     {
         _typesByPacketType ??= InitTypesByPacketType(typeLocator);
         return _typesByPacketType.GetOrDefault(packetType);
     }
-    
+
     public static IReadOnlyList<Type> AllTypes(ITypeLocator typeLocator)
     {
         _typesByPacketType ??= InitTypesByPacketType(typeLocator);
         return _typesByPacketType.Values.ToImmutableList();
     }
-    
+
     private static ImmutableDictionary<Type, Type> InitTypesByPacketType(ITypeLocator typeLocator)
     {
         return typeLocator
@@ -35,7 +35,7 @@ public static class PacketSerializer
 public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Packet
 {
     byte[] IPacketSerializer.Serialize(Packet packet) => Serialize((TPacket)packet);
-    
+
     public byte[] Serialize(TPacket packet)
     {
         var stream = new MemoryStream();
@@ -43,11 +43,11 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
         SerializeInternal(packet, stream);
         return stream.ToArray();
     }
-    
+
     protected abstract void SerializeInternal(TPacket packet, Stream stream);
-    
+
     Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
-    
+
     public TPacket Deserialize(Span<byte> bytes)
     {
         try
@@ -71,6 +71,6 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
             throw new BadSerializedDataException($"Bad packet\n{BitConverter.ToString(bytes.ToArray())}\n", e);
         }
     }
-    
+
     protected abstract TPacket DeserializeInternal(Stream stream);
 }

@@ -11,7 +11,7 @@ public sealed class AzimuthIndicator : Line2D
     private const double ArrowTipMultiplier = 1.4;
     private const double LineWidth = 2;
     private const double ZoomFactor = 0.1;
-    
+
     private readonly GdVector2[] _points = new GdVector2[SectorCount + 2 - 2 * (ArrowHalfWidthSectors - 1)];
 
     public void CalculatePoints(double azimuth, double zoom)
@@ -31,7 +31,7 @@ public sealed class AzimuthIndicator : Line2D
         }
         _points[^2] = _points[0];
         _points[^1] = _points[1];
-        
+
         Points = _points;
         Width = (float)Maths.Lerp(LineWidth / zoom, LineWidth, ZoomFactor);
     }

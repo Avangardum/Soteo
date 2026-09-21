@@ -17,7 +17,7 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
     {
         return Subscribe(it => it.Process, handler, priority, callWhenPaused);
     }
-    
+
     public IDisposable SubscribeToPhysicsProcess
     (
         Action<double> handler,
@@ -49,7 +49,7 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
                     handler(it);
             };
         }
-        
+
         if (!_subscriptionsByPriority.ContainsKey(priority))
         {
             var subscriptions = new Subscriptions([], []);
@@ -57,14 +57,14 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
             var processListener = new ProcessListener(subscriptions, priority);
             AddChild(processListener);
         }
-        
+
         List<Action<double>> list = listSelector(_subscriptionsByPriority[priority]);
         list.Add(processedHandler);
         return new DelegateDisposable(() => list.Remove(processedHandler));
     }
-    
+
     private sealed record Subscriptions(List<Action<double>> Process, List<Action<double>> PhysicsProcess);
-    
+
     private sealed class ProcessListener(Subscriptions subscriptions, ProcessPriorityEnum priority) : Node
     {
         public override void _Ready()
@@ -79,7 +79,7 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
             foreach (Action<double> sub in subscriptions.Process.ToList())
                 sub(delta);
         }
-        
+
         public override void _PhysicsProcess(float delta)
         {
             foreach (Action<double> sub in subscriptions.PhysicsProcess.ToList())

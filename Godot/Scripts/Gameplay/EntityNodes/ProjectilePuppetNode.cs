@@ -11,18 +11,18 @@ public sealed class ProjectilePuppetNode : Node2D, IProjectilePuppetNode
     // it for pixel perfect rendering. See NodeHelper for details.
     [Export] private bool _halfPixelXVisualOffset;
     [Export] private bool _halfPixelYVisualOffset;
-    
+
     public bool HalfPixelXVisualOffset => _halfPixelXVisualOffset;
     public bool HalfPixelYVisualOffset => _halfPixelYVisualOffset;
-    
+
     public ProjectilePuppet? ProjectilePuppet { get; set; }
-    
+
     public IEntity? Entity
     {
         get => ProjectilePuppet;
         set => ProjectilePuppet = (ProjectilePuppet?)value;
     }
-    
+
     public Vector2 PositionM
     {
         get => Position.ToSys() / Const.PixelsInMeter;

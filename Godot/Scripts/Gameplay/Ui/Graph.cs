@@ -11,14 +11,14 @@ public sealed class Graph : Control
     private readonly LateInit<Label> _maxLabel = new();
     private readonly LateInit<Label> _lastLabel = new();
     private readonly LateInit<GdVector2[]> _frame = new();
-    
+
     private Control DataRect => _dataRect;
     private Line2D Line => _line;
     private Label MinLabel => _minLabel;
     private Label MaxLabel => _maxLabel;
     private Label LastLabel => _lastLabel;
     private GdVector2[] Frame => _frame;
-    
+
     public override void _Ready()
     {
         _dataRect.Value = GetNode<Control>("DataRect");
@@ -26,8 +26,8 @@ public sealed class Graph : Control
         _minLabel.Value = GetNode<Label>("Min");
         _maxLabel.Value = GetNode<Label>("Max");
         _lastLabel.Value = GetNode<Label>("Last");
-        
-        _frame.Value = 
+
+        _frame.Value =
         [
             new GdVector2(DataRect.RectPosition.x, RectSize.y),
             new GdVector2(DataRect.RectPosition.x, 0),
@@ -42,15 +42,15 @@ public sealed class Graph : Control
             new GdVector2(DataRect.RectPosition.x - DataRect.RectPosition.y, DataRect.RectPosition.y),
             new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y),
         ];
-        
+
         SetData([0, 0], "N0", 0, 1);
     }
-    
+
     public void SetData(IReadOnlyList<double> data, string format, double? min = null, double? max = null)
     {
         if (data.Count < 2)
             data = [data.FirstOrDefault(), data.FirstOrDefault()];
-        
+
         var dataPoints = new GdVector2[data.Count];
         min ??= data.Min();
         max ??= data.Max();
@@ -64,7 +64,7 @@ public sealed class Graph : Control
             point.y = Mathf.Clamp(point.y, 0, RectSize.y);
             dataPoints[i] = point;
         }
-        
+
         Line.Points = [..Frame, ..dataPoints, dataPoints[^1] + new GdVector2(DataRect.RectPosition.y, 0)];
         LastLabel.Text = data[^1].ToString(format);
         LastLabel.RectPosition = LastLabel.RectPosition with { y = dataPoints[^1].y - LastLabel.RectSize.y / 2 };

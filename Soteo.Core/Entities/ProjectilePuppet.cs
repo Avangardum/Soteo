@@ -30,7 +30,7 @@ public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>
             UpdateNodePosition();
         }
     }
-    
+
     private void UpdateNodePosition()
     {
         Node?.PositionM = NodeHelper.RoundPositionToPixelPerfect
@@ -42,8 +42,8 @@ public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>
             Node.HalfPixelYVisualOffset
         );
     }
-    
+
     public override EntitySnapshot ToSnapshot() => throw new NotSupportedException();
-    
+
     private void OnZoomChanged() => UpdateNodePosition();
 }

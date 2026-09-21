@@ -131,7 +131,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         if (delta.HasChanged)
             s.SerializeNullableClass(delta.NewValue, serializer, stream);
     }
-    
+
     private Delta<T?> DeserializeNullableClassDelta<T>(Deserializer<T> deserializer, Stream stream)
         where T : class
     {
@@ -161,7 +161,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         var removedKeys = s.DeserializeList(deserializeKey, stream);
         return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
     }
-    
+
     private void SerializeIndexedDictionaryDelta<TKey, TValue>
     (
         DictionaryDelta<TKey, TValue> delta,
@@ -173,7 +173,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         s.SerializeIndexedDictionary(delta.Changes, serializeValue, stream);
         s.SerializeList(delta.RemovedKeys, serializeKey, stream);
     }
-    
+
     private DictionaryDelta<TKey, TValue> DeserializeIndexedDictionaryDelta<TKey, TValue>
     (
         Deserializer<TKey> deserializeKey,
