@@ -32,7 +32,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     // A service scope corresponds to a shard.
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
-    
+
     private readonly bool _useJsmq = OS.HasFeature("web") && Config.IsSingleplayer;
     private readonly TaskCompletionSource _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs = new();
     private readonly TaskCompletionSource _synchronizedCampaignStateInitializedTcs = new();
@@ -50,17 +50,17 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     private SoteoCamera? _camera;
     private ILogger<GameplayMain>? _logger;
     private IInitializationRepository? _initRepo;
-    
+
     private readonly PackedScene? _shardScene = ResourceLoader.Load<PackedScene>("res://Scenes/Shard.tscn");
     private IServiceProvider? _rootServiceProvider;
     private ShardNode? _newScopeShard;
     private readonly Dictionary<Guid, IServiceScope> _shardServiceScopes = [];
-    
+
     public override void _Ready()
     {
         InitAsync().CollectException();
     }
-    
+
     private async Task InitAsync()
     {
         GlobalInit.Init();
@@ -74,7 +74,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         if (Config.Side == Side.ShardServer)
             await ServerInitAsync();
     }
-    
+
     private async Task ServerInitAsync()
     {
         // todo crash on timeout
@@ -86,6 +86,12 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         _rootServiceProvider.GetRequiredService<ISynchronizedCampaignStatePuppetRepository>().Changed +=
             () => _synchronizedCampaignStateInitializedTcs.TrySetResult();
         _logger.Required.LogInformation("Initializing");
+        using var timeout = new DisposableTimeout
+        (
+            _rootServiceProvider.GetRequiredService<TimeProvider>(),
+            TimeSpan.FromSeconds(30),
+            () => throw new TimeoutException("Initialization timed out")
+        );
         await _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.Task;
         await _synchronizedCampaignStateInitializedTcs.Task;
         _rootServiceProvider.GetRequiredService<IFromGameplayPacketSender>()
@@ -95,24 +101,24 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         _initRepo.Required.IsInitialized = true;
         _logger.Required.LogInformation("Initialized");
     }
-    
+
     private void RegisterServices(IServiceCollection services)
     {
         Config.AddToServiceCollection(services);
         Logging.AddToServiceCollection(services);
         RegisterSharedServices(services);
-        
+
         if (Config.Side == Side.ShardServer)
             RegisterServerServices(services);
         else
             RegisterClientServices(services);
-        
+
         if (_useJsmq)
             RegisterJsmqServices(services);
         else
             RegisterWebServices(services);
     }
-    
+
     private void RegisterSharedServices(IServiceCollection services)
     {
         services.AddSingleton(this);
@@ -145,29 +151,29 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddAlias<ISynchronizedCampaignStatePacketReceiver, SynchronizedCampaignStatePuppetRepository>();
         services.AddAlias<IPauseRepository, SynchronizedCampaignStatePuppetRepository>();
         services.AddSingleton<SceneTreePauser>();
-        
+
         foreach (Type type in PacketSerializer.AllTypes(typeLocator))
             services.AddSingleton(type);
-        
+
         foreach (Type type in PacketHandlerLocator<GameplayPacketHandlerAttribute>.AllTypes(typeLocator))
             services.AddScoped(type);
     }
-    
+
     private void RegisterServerServices(IServiceCollection services)
     {
         services.AddTransient(typeof(ServerDependency<>), typeof(ServerDependency<>.NotNull));
         services.AddTransient(typeof(ClientDependency<>), typeof(ClientDependency<>.Null));
-        
+
         services.AddScoped<IShardSynchronizationServer, ShardSynchronizationServer>();
         services.AddScoped<ICurrentTickRepository, CurrentTickRepository>();
         services.AddScoped<IShardPersistenceSnapshotManager, ShardPersistenceSnapshotManager>();
     }
-    
+
     private void RegisterClientServices(IServiceCollection services)
     {
         services.AddTransient(typeof(ServerDependency<>), typeof(ServerDependency<>.Null));
         services.AddTransient(typeof(ClientDependency<>), typeof(ClientDependency<>.NotNull));
-        
+
         services.AddSingleton<LogInScreenNode>(_ => _logIScreenNode.Required);
         services.AddSingleton<LogInScreen>();
         services.AddSingleton<ICamera>(_ => _camera.Required);
@@ -186,7 +192,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddScoped<IShardSynchronizationClient, ShardSynchronizationClient>();
         services.AddSingleton<ClientInitializer>();
     }
-    
+
     private void RegisterJsmqServices(IServiceCollection services)
     {
         services.AddSingleton<ICampaignServerConnector>(_ => _jsmqCommunicator.Required);
@@ -196,7 +202,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddSingleton<IConnectionNotifier>(_ => _jsmqCommunicator.Required);
         services.AddSingleton<IShardServerConnector>(_ => _jsmqCommunicator.Required);
     }
-    
+
     private void RegisterWebServices(IServiceCollection services)
     {
         services.AddSingleton<ICampaignServerConnector>(_ => _webSocketCampaignServerCommunicator.Required);
@@ -215,16 +221,16 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddSingleton<IShardServerConnector>(_ => _webRtcGameplayCommunicator.Required);
         services.AddSingleton<IChunkCollector, ChunkCollector>();
     }
-    
+
     private void GetNodes()
     {
         _shardRoot = GetNode<Node2D>("Shards");
     }
-    
+
     private void CreateSingletonNodes()
     {
         _processPublisher = new ProcessPublisher().Also(it => AddChild(it));
-        
+
         if (_useJsmq)
         {
             _jsmqCommunicator = ActivatorUtilities
@@ -240,7 +246,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
                 .CreateInstance<WebRtcFromGameplayToGameplayCommunicator>(_rootServiceProvider)
                 .Also(it => AddChild(it));
         }
-        
+
         if (Config.Side == Side.Client)
         {
             _camera = ActivatorUtilities.CreateInstance<SoteoCamera>(_rootServiceProvider).Also(it => AddChild(it));
@@ -252,13 +258,13 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             _campaignScreenNode = CampaignScreenNode.Instance().Also(it => ui.AddChild(it));
         }
     }
-    
+
     private void CreateSingletonServices()
     {
         _logger = _rootServiceProvider.Required.GetRequiredService<ILogger<GameplayMain>>();
         _initRepo = _rootServiceProvider.Required.GetRequiredService<IInitializationRepository>();
         _rootServiceProvider.Required.GetRequiredService<SceneTreePauser>();
-        
+
         if (Config.Side == Side.Client)
         {
             _rootServiceProvider.Required.GetRequiredService<LogInScreen>();
@@ -268,19 +274,19 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             _rootServiceProvider.Required.GetRequiredService<ClientInitializer>();
         }
     }
-    
+
     private void CreateShardScopedNodes(ShardNode shard, IServiceProvider serviceProvider)
     {
         if (Config.Side == Side.ShardServer) return;
         shard.GetNode("Ui").AddChild(ActivatorUtilities.CreateInstance<OverheadUiManager>(serviceProvider));
     }
-    
+
     private void CreateShardScopedServices(IServiceProvider serviceProvider)
     {
         if (Config.Side == Side.ShardServer)
             serviceProvider.GetRequiredService<IShardSynchronizationServer>();
     }
-    
+
     public void LoadShard(Guid id)
     {
         string mapPath = $"res://Scenes/Maps/Test{id.ToString()[^1]}.tscn";
@@ -291,10 +297,10 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         shard.Name = id.ToString();
         shard.Position = position.ToGd();
         _shardRoot.Required.AddChild(shard);
-        
+
         var map = ResourceLoader.Load<PackedScene>(mapPath).Instance<Node2D>();
         shard.GetNode<Node2D>("Map").AddChild(map);
-        
+
         var scope = _rootServiceProvider.Required.CreateScope();
         _newScopeShard = shard;
         scope.ServiceProvider.GetRequiredService<ShardNode>();
