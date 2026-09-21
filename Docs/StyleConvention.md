@@ -124,7 +124,7 @@ public class Foo
     TQux qux
 )
 {
-    private object[] _objects = 
+    private object[] _objects =
     [
         bar,
         baz,
@@ -167,13 +167,8 @@ When choosing between `var` and target-typed `new`, prefer `var`. (`var obj = ne
 
 Use explicit access modifiers where possible. The exception are interface members, they should be implicitly public.
 
-Use modifiers in the following order (modifiers on the same line are mutually exclusive):
-
-- `private`, `private protected`, `protected`, `internal`, `protected internal`, `public`
-- `new`
-- `static`, `sealed`, `abstract`, `virtual`, `override`
-- `extern`, `unsafe`, `async`, `const`, `readonly`, `volatile`
-- `partial`
+Use modifiers in the following order: public, private, protected, internal, file, new, static, abstract, virtual,
+sealed, readonly, override, extern, unsafe, volatile, async, required.
 
 Declare type members in the following order:
 
