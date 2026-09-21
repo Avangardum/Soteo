@@ -10,7 +10,7 @@
             -->
             CS9107,
         </NoWarn>
-        
+
         <!--
         This suppresses warnings like when using Microsoft.Extensions.TimeProvider.Testing with net472 because
         the package doesnt specify net472 specifically as a target framework, but only specifies net462. This is a
@@ -18,6 +18,8 @@
         unsupported use case just because a newer .NET Framework version is used.
         -->
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-        
+
+        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+
     </PropertyGroup>
 </Project>
