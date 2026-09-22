@@ -140,14 +140,14 @@ Don't use trailing commas.
 
 In a comma-separated or semicolon-separated list, each delimiter should be followed by a space or a newline.
 
-When doing a line break on an operator, the operator should be at the beginning of the next line.
+When doing a line break on an operator, the operator should be at the end of a line (except `.`, `?.`, !.`, `->`).
 
 When having an inline block of `()`, `[]` or `<>`, there should be no space between
-the opening and closing symbols and the content.
+opening and closing symbols and content.
 
-When having an inline block of `{}`, there should be a space between the opening and closing braces and the content.
+When having an inline block of `{}`, there should be a space between opening and closing braces and content.
 
-There should be a space or a newline between a binary/ternary operator and its operands (except `.`, `?.`, `!.`).
+There should be a space or a newline between a binary/ternary operator and its operands (except `.`, `?.`, `!.`, `->`).
 
 There should be no space between a unary operator and its operand.
 

@@ -200,8 +200,8 @@ public abstract class Ability
 
         return format
             .PassTo(it => FillDescriptionProperties(it, level))
-            .PassTo(it => FillDescriptionPluralization(it, localizer))
-            + DescriptionFooter(level);
+            .PassTo(it => FillDescriptionPluralization(it, localizer)) +
+            DescriptionFooter(level);
     }
 
     private string FillDescriptionProperties(string value, int? level)
