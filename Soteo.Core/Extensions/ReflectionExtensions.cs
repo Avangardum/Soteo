@@ -7,10 +7,11 @@ public static class ReflectionExtensions
     extension (Type self)
     {
         /// <summary>
-        /// For a type inheriting from a base generic type with a single type parameter being a packet type
-        /// (PacketSerializer, PacketHandler), get the packet type
+        /// For a type inheriting from a base generic type using the given definition with a single type argument,
+        /// get the argument. Null if not inherited from a generic type using the given definition.
+        /// Example: typeof(List<int>).SingleTypeArgOfGenericDefinitionOrNull(typeof(List<>)) returns typeof(int).
         /// </summary>
-        public Type GetPacketType(Type baseGenericClassDefinition)
+        public Type? SingleTypeArgOfGenericDefinitionOrNull(Type baseGenericClassDefinition)
         {
             if (!baseGenericClassDefinition.IsGenericTypeDefinition)
                 throw new ArgumentException($"{baseGenericClassDefinition} is not a generic class definition");
@@ -21,12 +22,8 @@ public static class ReflectionExtensions
                 (
                     bt => bt.IsConstructedGenericType && bt.GetGenericTypeDefinition() == baseGenericClassDefinition
                 );
-            if (baseGenericClass == null)
-                throw new ArgumentException($"{self} is not derived from {baseGenericClassDefinition}");
-            Type packetType = baseGenericClass.GenericTypeArguments.Single();
-            if (!packetType.IsAssignableTo(typeof(Packet)))
-                throw new ArgumentException($"The generic argument {packetType} is not a packet");
-            return packetType;
+            if (baseGenericClass == null) return null;
+            return baseGenericClass.GenericTypeArguments.Single();
         }
     }
 }

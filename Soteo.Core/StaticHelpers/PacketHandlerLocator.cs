@@ -25,6 +25,6 @@ public static class PacketHandlerLocator<TAttribute> where TAttribute : Attribut
     {
         return typeLocator
             .ConcreteSubclassesOf<IPacketHandler>(where: it => it.HasAttribute<TAttribute>())
-            .ToImmutableDictionary<Type, Type>(it => it.GetPacketType(typeof(PacketHandler<>)));
+            .ToImmutableDictionary<Type, Type>(it => it.SingleTypeArgOfGenericDefinitionOrNull(typeof(PacketHandler<>)));
     }
 }

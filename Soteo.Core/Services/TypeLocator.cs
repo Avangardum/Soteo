@@ -23,7 +23,9 @@ public class TypeLocator : ITypeLocator
     {
         where ??= _ => true;
         return Types
-            .Where(it => !it.IsAbstract && it.IsAssignableTo(typeof(T)))
+            .Where(it => !it.IsAbstract)
+            .Where(it => !it.IsGenericTypeDefinition)
+            .Where(it => it.IsAssignableTo(typeof(T)))
             .Where(where)
             .OrderBy(it => it.FullName)
             .ToImmutableList();

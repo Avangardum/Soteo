@@ -25,10 +25,43 @@ public static class PacketSerializer
 
     private static ImmutableDictionary<Type, Type> InitTypesByPacketType(ITypeLocator typeLocator)
     {
+        IReadOnlyList<Type> locatedSerializerTypes = typeLocator.ConcreteSubclassesOf<IPacketSerializer>();
         return typeLocator
-            // TODO filtering by generic base type is used to filter out the routing serializer, make it explicit
-            .ConcreteSubclassesOf<IPacketSerializer>(where: it => it.BaseType.Required.IsGenericType)
-            .ToImmutableDictionary<Type, Type>(it => it.GetPacketType(typeof(PacketSerializer<>)));
+            .ConcreteSubclassesOf<Packet>()
+            .ToImmutableDictionary(it => it, it => InitTypeFor(it, locatedSerializerTypes));
+    }
+
+    private static Type InitTypeFor(Type packetType, IReadOnlyList<Type> locatedSerializerTypes)
+    {
+        Type? typeFromPacketSerializerAttribute =
+            packetType.GetCustomAttribute<PacketSerializerAttribute>()?.SerializerType;
+        Type? typeFromEmptyPacketAttribute = packetType.HasAttribute<EmptyPacketAttribute>() ?
+            typeof(EmptyPacketSerializer<>).MakeGenericType(packetType) :
+            null;
+        IReadOnlyList<Type> typesFromLocator = locatedSerializerTypes
+            .Where(it => it.SingleTypeArgOfGenericDefinitionOrNull(typeof(PacketSerializer<>)) == packetType)
+            .ToImmutableList();
+        if (typesFromLocator.Count > 1)
+            throw new Exception($"Found multiple classes inheriting from PacketSerializer<{packetType}>");
+        Type? typeFromLocator = typesFromLocator.SingleOrDefault();
+
+        ImmutableList<Type> types =
+            ImmutableList.Create(typeFromPacketSerializerAttribute, typeFromEmptyPacketAttribute, typeFromLocator)
+            .WhereNotNull()
+            .ToImmutableList();
+        if (types.Count == 1) return types[0];
+
+        var x1 = typeFromPacketSerializerAttribute != null ? "x" : " ";
+        var x2 = typeFromEmptyPacketAttribute != null ? "x" : " ";
+        var x3 = typeFromLocator != null ? "x" : " ";
+        var message =
+            $"""
+             Failed to find a serializer for {packetType}. Exactly one of the following conditions should be fulfilled:
+             [{x1}] Packet is decorated with [PacketSerializer(...)]
+             [{x2}] Packet is decorated with [EmptyPacket]
+             [{x3}] Serializer inheriting from PacketSerializer<{packetType}> exists and visible to TypeLocator
+             """;
+        throw new Exception(message);
     }
 }
 

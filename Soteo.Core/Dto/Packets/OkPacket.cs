@@ -3,4 +3,5 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Core.Dto.Packets;
 
+[EmptyPacket]
 public sealed record OkPacket : Packet;
