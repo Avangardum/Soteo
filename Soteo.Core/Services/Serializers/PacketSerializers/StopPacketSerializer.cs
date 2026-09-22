@@ -16,7 +16,7 @@ public sealed class StopPacketSerializer(ISerializationHelper s) : PacketSeriali
         return new StopPacket
         {
             UnitId = s.DeserializeGuid(stream),
-            Command = new StopCommand(),
+            Command = new StopCommand()
         };
     }
 }

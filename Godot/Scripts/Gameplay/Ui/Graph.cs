@@ -40,7 +40,7 @@ public sealed class Graph : Control
             new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y + DataRect.RectSize.y),
             new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y),
             new GdVector2(DataRect.RectPosition.x - DataRect.RectPosition.y, DataRect.RectPosition.y),
-            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y),
+            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y)
         ];
 
         SetData([0, 0], "N0", 0, 1);

@@ -352,7 +352,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Ability = DeserializeNullableClass(DeserializeAbility, stream),
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
-            Ordinal = DeserializeLong(stream),
+            Ordinal = DeserializeLong(stream)
         };
     }
 
@@ -369,7 +369,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         {
             Slot = DeserializeEnum<AbilitySlot>(stream),
             ElapsedTime = DeserializeDouble(stream),
-            RemainingTime = DeserializeDouble(stream),
+            RemainingTime = DeserializeDouble(stream)
         };
     }
 
@@ -388,7 +388,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Ability = DeserializeAbility(stream),
             Level = DeserializeInt(stream),
             Cooldown = DeserializeDouble(stream),
-            MaxCooldown = DeserializeDouble(stream),
+            MaxCooldown = DeserializeDouble(stream)
         };
     }
 
@@ -421,7 +421,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             EntityKind.Projectile => DeserializeProjectileSnapshot(stream),
             EntityKind.UnitPuppet => DeserializeUnitPuppetSnapshot(stream),
             EntityKind.ProjectilePuppet => DeserializeProjectilePuppetSnapshot(stream),
-            _ => throw new ArgumentOutOfRangeException(),
+            _ => throw new ArgumentOutOfRangeException()
         };
     }
 
@@ -461,7 +461,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
                 DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializeDeflatedStatusContext, it => it.Id, stream),
-            ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream),
+            ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream)
         };
     }
 
@@ -514,7 +514,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Azimuth = DeserializeDouble(stream),
             Speed = DeserializeDouble(stream),
             AbilityContext = DeserializeAbilityContextSnapshot(stream),
-            Target = DeserializeProjectileTarget(stream),
+            Target = DeserializeProjectileTarget(stream)
         };
     }
 
@@ -609,7 +609,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             ElapsedTime = DeserializeDouble(stream),
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
-            Ordinal = DeserializeLong(stream),
+            Ordinal = DeserializeLong(stream)
         };
     }
 

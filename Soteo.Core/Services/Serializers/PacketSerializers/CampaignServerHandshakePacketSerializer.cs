@@ -17,7 +17,7 @@ public sealed class CampaignServerHandshakePacketSerializer(ISerializationHelper
         return new CampaignServerHandshakePacket
         {
             Token = s.DeserializeString(stream),
-            Version = s.DeserializeString(stream),
+            Version = s.DeserializeString(stream)
         };
     }
 }

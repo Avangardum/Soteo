@@ -16,7 +16,7 @@ public sealed class SpawnCharacterPacketSerializer(ISerializationHelper s) : Pac
         return new SpawnCharacterPacket
         {
             PeerId = s.DeserializeGuid(stream),
-            CharacterId = s.DeserializeGuid(stream),
+            CharacterId = s.DeserializeGuid(stream)
         };
     }
 }

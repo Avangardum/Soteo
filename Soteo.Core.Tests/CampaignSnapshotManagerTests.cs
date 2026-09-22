@@ -82,7 +82,7 @@ public sealed class CampaignSnapshotManagerTests
                     Snapshot = new ShardSnapshot
                     {
                         Tick = 123,
-                        Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+                        Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
                     }
                 },
                 Guid.NewGuid()
@@ -160,14 +160,14 @@ public sealed class CampaignSnapshotManagerTests
                         Id = shardId,
                         IsConnected = false,
                         IsPlayer = false,
-                        IsShard = true,
+                        IsShard = true
                     },
                     [playerId] = new()
                     {
                         Id = playerId,
                         IsConnected = false,
                         IsPlayer = true,
-                        IsShard = false,
+                        IsShard = false
                     }
                 }.ToImmutableDictionary(),
                 PlayerCharacterTrackers = new Dictionary<Guid, PlayerCharacterTrackerSnapshot>
@@ -176,11 +176,11 @@ public sealed class CampaignSnapshotManagerTests
                     {
                         Id = characterId,
                         PlayerId = playerId,
-                        ShardId = shardId,
-                    },
-                }.ToImmutableDictionary(),
+                        ShardId = shardId
+                    }
+                }.ToImmutableDictionary()
             },
-            Shards = ImmutableDictionary<Guid, ShardSnapshot>.Empty,
+            Shards = ImmutableDictionary<Guid, ShardSnapshot>.Empty
         };
 
         // Act
@@ -195,7 +195,7 @@ public sealed class CampaignSnapshotManagerTests
             Id = shardId,
             IsConnected = false,
             IsPlayer = false,
-            IsShard = true,
+            IsShard = true
         };
         _userRepo.Should().ContainValue(expectedShard);
         var expectedPlayer = new User
@@ -203,7 +203,7 @@ public sealed class CampaignSnapshotManagerTests
             Id = playerId,
             IsConnected = false,
             IsPlayer = true,
-            IsShard = false,
+            IsShard = false
         };
         _userRepo.Should().ContainValue(expectedPlayer);
 
@@ -212,7 +212,7 @@ public sealed class CampaignSnapshotManagerTests
         {
             Id = characterId,
             Player = expectedPlayer,
-            Shard = expectedShard,
+            Shard = expectedShard
         };
         _trackerRepo.Should().ContainValue(expectedCharTracker);
     }
@@ -233,7 +233,7 @@ public sealed class CampaignSnapshotManagerTests
             (
                 new ShardSnapshotPacket { Snapshot = snapshot.Shards[shard2Id] },
                 shard2Id
-            ),
+            )
         ]);
 
         task.IsCompleted.Should().BeFalse();
@@ -294,7 +294,7 @@ public sealed class CampaignSnapshotManagerTests
         var shard1Snapshot = new ShardSnapshot
         {
             Tick = shard.Id.ToString()[^1],
-            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
         };
         _packetSender.ShardSnapshots[shard.Id] = shard1Snapshot;
         return shard;
@@ -323,21 +323,21 @@ public sealed class CampaignSnapshotManagerTests
             CampaignServer = new CampaignServerSnapshot
             {
                 Users = ImmutableDictionary<Guid, UserSnapshot>.Empty,
-                PlayerCharacterTrackers = ImmutableDictionary<Guid, PlayerCharacterTrackerSnapshot>.Empty,
+                PlayerCharacterTrackers = ImmutableDictionary<Guid, PlayerCharacterTrackerSnapshot>.Empty
             },
             Shards = new Dictionary<Guid, ShardSnapshot>
             {
                 [shard1Id] = new()
                 {
                     Tick = 123,
-                    Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
+                    Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
                 },
                 [shard2Id] = new()
                 {
                     Tick = 321,
-                    Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
-                },
-            },
+                    Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
+                }
+            }
         };
         return (shard1Id, shard2Id, snapshot);
     }

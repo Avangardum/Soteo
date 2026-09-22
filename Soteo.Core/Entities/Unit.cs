@@ -77,7 +77,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             AbilitySlotStates = AbilitySlotStatesInternal.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress,
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot()),
-            ControllingPlayerId = _controllingPlayerId,
+            ControllingPlayerId = _controllingPlayerId
         };
     }
 
@@ -580,7 +580,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             Tick = tickInterval == null ? null : new StatusTickContext
             {
                 Interval = tickInterval.Value,
-                Countdown = tickInterval.Value,
+                Countdown = tickInterval.Value
             },
             ElapsedTime = 0,
             DisplayElapsedTime = 0,

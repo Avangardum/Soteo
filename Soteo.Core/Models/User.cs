@@ -20,7 +20,7 @@ public sealed record User
             Id = snapshot.Id,
             IsConnected = false,
             IsPlayer = snapshot.IsPlayer,
-            IsShard = snapshot.IsShard,
+            IsShard = snapshot.IsShard
         };
     }
 
@@ -31,7 +31,7 @@ public sealed record User
             Id = Id,
             IsConnected = IsConnected,
             IsPlayer = IsPlayer,
-            IsShard = IsShard,
+            IsShard = IsShard
         };
     }
 }

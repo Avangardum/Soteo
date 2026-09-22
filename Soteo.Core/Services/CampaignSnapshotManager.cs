@@ -50,13 +50,13 @@ public sealed class CampaignSnapshotManager
         var campaignServerSnapshot = new CampaignServerSnapshot
         {
             PlayerCharacterTrackers = trackerRepo.ToSnapshot(),
-            Users = userRepo.ToSnapshot(),
+            Users = userRepo.ToSnapshot()
         };
 
         return new CampaignSnapshot
         {
             CampaignServer = campaignServerSnapshot,
-            Shards = await GetShardSnapshotsAsync(campaignServerSnapshot),
+            Shards = await GetShardSnapshotsAsync(campaignServerSnapshot)
         };
     }
 

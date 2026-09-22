@@ -16,7 +16,7 @@ public sealed class SynchronizedCampaignStatePacketSerializer(ISerializationHelp
     {
         return new SynchronizedCampaignStatePacket(new SynchronizedCampaignState
         {
-            IsPaused = s.DeserializeBool(stream),
+            IsPaused = s.DeserializeBool(stream)
         });
     }
 }

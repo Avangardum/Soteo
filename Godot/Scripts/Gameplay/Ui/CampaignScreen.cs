@@ -81,7 +81,7 @@ public sealed class CampaignScreen
             new SpawnCharacterPacket
             {
                 CharacterId = _selectedCharacterId.Value,
-                PeerId = _selectedShardId.Value,
+                PeerId = _selectedShardId.Value
             },
             Const.CampaignServerId
         );

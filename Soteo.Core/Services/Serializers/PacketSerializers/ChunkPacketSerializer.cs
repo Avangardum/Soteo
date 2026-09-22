@@ -20,7 +20,7 @@ public sealed class ChunkPacketSerializer(ISerializationHelper s) : PacketSerial
             GroupId = s.DeserializeGuid(stream),
             Index = s.DeserializeInt(stream),
             IsLast = s.DeserializeBool(stream),
-            Bytes = s.DeserializeList(s.DeserializeByte, stream),
+            Bytes = s.DeserializeList(s.DeserializeByte, stream)
         };
     }
 }

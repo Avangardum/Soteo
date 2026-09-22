@@ -38,7 +38,7 @@ public sealed class JsmqFromCampaignServerCommunicator
                 {
                     ["sub"] = senderId.ToString(),
                     // When using JSMQ, role is sent instead of token
-                    [handshake.Token] = true,
+                    [handshake.Token] = true
                 };
                 bool isPlayer = claims.TryGetValue("player", out object value) && value is true;
                 if (isPlayer && !initRepo.IsInitialized)

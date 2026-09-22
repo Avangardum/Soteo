@@ -19,7 +19,7 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
         return new()
         {
             CampaignServer = DeserializeCampaignServerSnapshot(stream),
-            Shards = s.DeserializeDictionary(s.DeserializeGuid, s.DeserializeShardSnapshot, stream),
+            Shards = s.DeserializeDictionary(s.DeserializeGuid, s.DeserializeShardSnapshot, stream)
         };
     }
 
@@ -35,7 +35,7 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
         {
             Users = s.DeserializeIndexedDictionary(DeserializeUserSnapshot, it => it.Id, stream),
             PlayerCharacterTrackers =
-                s.DeserializeIndexedDictionary(DeserializePlayerCharacterTrackerSnapshot, it => it.Id, stream),
+                s.DeserializeIndexedDictionary(DeserializePlayerCharacterTrackerSnapshot, it => it.Id, stream)
         };
         return snapshot;
     }
@@ -55,7 +55,7 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
             Id = s.DeserializeGuid(stream),
             IsConnected = s.DeserializeBool(stream),
             IsPlayer = s.DeserializeBool(stream),
-            IsShard = s.DeserializeBool(stream),
+            IsShard = s.DeserializeBool(stream)
         };
     }
 
@@ -72,7 +72,7 @@ public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampai
         {
             Id = s.DeserializeGuid(stream),
             PlayerId = s.DeserializeGuid(stream),
-            ShardId = s.DeserializeNullableStruct(s.DeserializeGuid, stream),
+            ShardId = s.DeserializeNullableStruct(s.DeserializeGuid, stream)
         };
     }
 }

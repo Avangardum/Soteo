@@ -82,7 +82,7 @@ public sealed class ExtraData(object?[] values, ISerializationHelper s)
                 TypeCode.Double => s.DeserializeDouble(stream),
                 TypeCode.Guid => s.DeserializeGuid(stream),
                 TypeCode.Vector2 => s.DeserializeVector2(stream),
-                _ => throw new ArgumentOutOfRangeException(),
+                _ => throw new ArgumentOutOfRangeException()
             };
         }
         return new ExtraData(values, s);

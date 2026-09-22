@@ -30,7 +30,7 @@ public sealed class AbilityTests
         [Vector2.One, false, AbilityValidationResult.Ok],
         [null, false, AbilityValidationResult.InvalidTarget],
         [Vector2.One, true, AbilityValidationResult.InvalidTarget],
-        [null, true, AbilityValidationResult.Ok],
+        [null, true, AbilityValidationResult.Ok]
     ];
 
     [Theory]
@@ -53,7 +53,7 @@ public sealed class AbilityTests
             TargetPosition = targetPosition,
             TargetUnit = null,
             TargetDirection = null,
-            TargetShardId = null,
+            TargetShardId = null
         };
         Ability.Instance<TestAbility>().Validate(context, strict: true).Should().Be(expectedResult);
     }

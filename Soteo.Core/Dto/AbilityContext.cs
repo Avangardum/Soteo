@@ -42,7 +42,7 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
             TargetPosition = TargetPosition,
             TargetUnitId = TargetUnit?.Id,
             TargetDirection = TargetDirection,
-            TargetShardId = TargetShardId,
+            TargetShardId = TargetShardId
         };
     }
 
@@ -61,7 +61,7 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
             TargetUnit = snapshot.TargetUnitId == null ? null :
                 entityManager.GetEntity<Unit>(snapshot.TargetUnitId.Value).Required,
             TargetDirection = snapshot.TargetDirection,
-            TargetShardId = snapshot.TargetShardId,
+            TargetShardId = snapshot.TargetShardId
         };
     }
 }

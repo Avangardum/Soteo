@@ -97,7 +97,7 @@ public sealed class InputHandler : Node2D
                 new MovePacket
                 {
                     UnitId = _currentCharIdRepo.Required,
-                    Command = new MoveCommand(GetGlobalMousePosition().ToSys() / Const.PixelsInMeter),
+                    Command = new MoveCommand(GetGlobalMousePosition().ToSys() / Const.PixelsInMeter)
                 },
                 shardId.Value
             );

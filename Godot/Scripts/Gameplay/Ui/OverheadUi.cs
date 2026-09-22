@@ -144,6 +144,6 @@ public sealed class OverheadUi
     {
         None,
         PlayerCharacter,
-        TinyHealth,
+        TinyHealth
     }
 }

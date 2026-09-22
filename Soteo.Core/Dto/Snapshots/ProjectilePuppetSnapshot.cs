@@ -10,7 +10,7 @@ public sealed record ProjectilePuppetSnapshot : EntitySnapshot<ProjectilePuppetS
             {
                 Id = Id,
                 Position = Position,
-                Azimuth = Azimuth,
+                Azimuth = Azimuth
             };
         }
 
@@ -20,7 +20,7 @@ public sealed record ProjectilePuppetSnapshot : EntitySnapshot<ProjectilePuppetS
         {
             Id = Id,
             Position = Delta.Between(from.Position, Position),
-            Azimuth = Delta.Between(from.Azimuth, Azimuth),
+            Azimuth = Delta.Between(from.Azimuth, Azimuth)
         };
     }
 

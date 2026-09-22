@@ -29,7 +29,7 @@ public record PuppetStatusContext
         return to with
         {
             DisplayElapsedTime = Maths.LerpIncrease(from.DisplayElapsedTime, to.DisplayElapsedTime, weight),
-            RemainingTime = Maths.LerpDecrease(from.RemainingTime, to.RemainingTime, weight),
+            RemainingTime = Maths.LerpDecrease(from.RemainingTime, to.RemainingTime, weight)
         };
     }
 }

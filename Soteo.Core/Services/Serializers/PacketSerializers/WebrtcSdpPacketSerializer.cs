@@ -16,7 +16,7 @@ public sealed class WebrtcSdpPacketSerializer(ISerializationHelper s) : PacketSe
         return new WebrtcSdpPacket
         {
             PeerId = s.DeserializeGuid(stream),
-            Sdp = s.DeserializeString(stream),
+            Sdp = s.DeserializeString(stream)
         };
     }
 }

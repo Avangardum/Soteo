@@ -33,7 +33,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 [Player3Id] = CreatePlayerUserSnapshot(Player3Id),
                 [Shard1Id] = CreateShardUserSnapshot(Shard1Id),
                 [Shard2Id] = CreateShardUserSnapshot(Shard2Id),
-                [Shard3Id] = CreateShardUserSnapshot(Shard3Id),
+                [Shard3Id] = CreateShardUserSnapshot(Shard3Id)
             }.ToImmutableDictionary(),
             PlayerCharacterTrackers = new Dictionary<Guid, PlayerCharacterTrackerSnapshot>
             {
@@ -41,21 +41,21 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 {
                     Id = Char1Id,
                     PlayerId = Player1Id,
-                    ShardId = Shard1Id,
+                    ShardId = Shard1Id
                 },
                 [Char2Id] = new()
                 {
                     Id = Char2Id,
                     PlayerId = Player2Id,
-                    ShardId = Shard2Id,
+                    ShardId = Shard2Id
                 },
                 [Char3Id] = new()
                 {
                     Id = Char3Id,
                     PlayerId = Player3Id,
-                    ShardId = null,
-                },
-            }.ToImmutableDictionary(),
+                    ShardId = null
+                }
+            }.ToImmutableDictionary()
         },
         Shards = new Dictionary<Guid, ShardSnapshot>
         {
@@ -65,8 +65,8 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 Entities = new Dictionary<Guid, EntitySnapshot>
                 {
                     [Char1Id] = CreatePlayerCharacterEntitySnapshot(Char1Id),
-                    [ProjectileId] = CreateProjectileEntitySnapshot(ProjectileId),
-                }.ToImmutableDictionary(),
+                    [ProjectileId] = CreateProjectileEntitySnapshot(ProjectileId)
+                }.ToImmutableDictionary()
             },
             [Shard2Id] = new()
             {
@@ -74,14 +74,14 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 Entities = new Dictionary<Guid, EntitySnapshot>
                 {
                     [Char2Id] = CreatePlayerCharacterEntitySnapshot(Char2Id)
-                }.ToImmutableDictionary(),
+                }.ToImmutableDictionary()
             },
             [Shard3Id] = new()
             {
                 Tick = 0,
-                Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
-            },
-        }.ToImmutableDictionary(),
+                Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
+            }
+        }.ToImmutableDictionary()
     };
 
     [Fact]
@@ -103,10 +103,10 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 {
                     [Shard1Id] = ConsistentSnapshot.Shards[Shard1Id] with
                     {
-                        Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty,
-                    },
+                        Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
+                    }
                 }
-            ),
+            )
         };
 
         sut.IsConsistent(snapshot).Should().BeFalse();
@@ -124,14 +124,14 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 {
                     [Shard1Id] = ConsistentSnapshot.Shards[Shard1Id] with
                     {
-                        Entities = ConsistentSnapshot.Shards[Shard2Id].Entities,
+                        Entities = ConsistentSnapshot.Shards[Shard2Id].Entities
                     },
                     [Shard2Id] = ConsistentSnapshot.Shards[Shard2Id] with
                     {
-                        Entities = ConsistentSnapshot.Shards[Shard1Id].Entities,
-                    },
+                        Entities = ConsistentSnapshot.Shards[Shard1Id].Entities
+                    }
                 }
-            ),
+            )
         };
 
         sut.IsConsistent(snapshot).Should().BeFalse();
@@ -151,10 +151,10 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                     {
                         Entities = ConsistentSnapshot.Shards[Shard1Id].Entities
                             .Concat(ConsistentSnapshot.Shards[Shard2Id].Entities)
-                            .ToImmutableDictionary(),
-                    },
+                            .ToImmutableDictionary()
+                    }
                 }
-            ),
+            )
         };
 
         sut.IsConsistent(snapshot).Should().BeFalse();
@@ -175,7 +175,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                         [Char1Id] = ConsistentSnapshot.CampaignServer.PlayerCharacterTrackers[Char1Id] with { ShardId = null }
                     }
                 )
-            },
+            }
         };
 
         sut.IsConsistent(snapshot).Should().BeFalse();
@@ -187,7 +187,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
         var sut = new CampaignSnapshotCrossServerConsistencyValidator();
         CampaignSnapshot snapshot = ConsistentSnapshot with
         {
-            Shards = ConsistentSnapshot.Shards.Without(Shard3Id),
+            Shards = ConsistentSnapshot.Shards.Without(Shard3Id)
         };
 
         sut.IsConsistent(snapshot).Should().BeFalse();
@@ -202,8 +202,8 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
         {
             Shards = ConsistentSnapshot.Shards.With(new Dictionary<Guid, ShardSnapshot>
             {
-                [extraShardId] = ConsistentSnapshot.Shards[Shard3Id],
-            }),
+                [extraShardId] = ConsistentSnapshot.Shards[Shard3Id]
+            })
         };
 
         sut.IsConsistent(snapshot).Should().BeFalse();
@@ -216,7 +216,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             Id = id,
             IsConnected = true,
             IsPlayer = true,
-            IsShard = false,
+            IsShard = false
         };
     }
 
@@ -227,7 +227,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             Id = id,
             IsConnected = true,
             IsPlayer = false,
-            IsShard = true,
+            IsShard = true
         };
     }
 
@@ -245,7 +245,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             IsRemoved = false,
             Position = default,
             Azimuth = 0,
-            ControllingPlayerId = null,
+            ControllingPlayerId = null
         };
     }
 

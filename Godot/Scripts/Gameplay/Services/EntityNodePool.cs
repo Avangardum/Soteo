@@ -11,7 +11,7 @@ public sealed class EntityNodePool : IEntityNodePool
         [typeof(IUnitNode)] = "res://Scenes/Entities/Unit.tscn",
         [typeof(IProjectileNode)] = "res://Scenes/Entities/Projectile.tscn",
         [typeof(IUnitPuppetNode)] = "res://Scenes/Entities/UnitPuppet.tscn",
-        [typeof(IProjectilePuppetNode)] = "res://Scenes/Entities/ProjectilePuppet.tscn",
+        [typeof(IProjectilePuppetNode)] = "res://Scenes/Entities/ProjectilePuppet.tscn"
     }.ToImmutableDictionary(it => it.Key, it => ResourceLoader.Load<PackedScene>(it.Value));
 
     private readonly ImmutableDictionary<Type, Stack<IEntityNode>> _stacks =

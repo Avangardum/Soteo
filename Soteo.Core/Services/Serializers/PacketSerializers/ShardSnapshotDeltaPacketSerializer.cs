@@ -30,8 +30,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
                     DeserializeEntityDelta,
                     it => it.Id,
                     stream
-                ),
-            },
+                )
+            }
         };
     }
 
@@ -56,7 +56,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         {
             EntityKind.UnitPuppet => DeserializeUnitPuppetDelta(stream),
             EntityKind.ProjectilePuppet => DeserializeProjectilePuppetDelta(stream),
-            _ => throw new ArgumentOutOfRangeException(),
+            _ => throw new ArgumentOutOfRangeException()
         };
     }
 

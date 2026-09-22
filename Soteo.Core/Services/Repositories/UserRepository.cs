@@ -36,7 +36,7 @@ public class UserRepository
                 Id = id,
                 IsConnected = true,
                 IsPlayer = claims.ContainsKey("player"),
-                IsShard = isShard,
+                IsShard = isShard
             };
             Add(id, user);
         }

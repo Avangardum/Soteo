@@ -16,7 +16,7 @@ public class PingPacketSerializer(ISerializationHelper s) : PacketSerializer<Pin
         return new PingPacket
         {
             Id = s.DeserializeGuid(stream),
-            IsResponse = s.DeserializeBool(stream),
+            IsResponse = s.DeserializeBool(stream)
         };
     }
 }

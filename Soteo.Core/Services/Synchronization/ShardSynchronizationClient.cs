@@ -201,7 +201,7 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
     {
         Desynchronized,
         Synchronizing,
-        Synchronized,
+        Synchronized
     }
 
     private record SynchronizationData

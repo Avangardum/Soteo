@@ -80,7 +80,7 @@ public sealed class Projectile : Entity<IProjectileNode>
             Azimuth = Azimuth,
             AbilityContext = _abilityContext.ToSnapshot(),
             Speed = _speed,
-            Target = _target.ToSnapshot(),
+            Target = _target.ToSnapshot()
         };
     }
 

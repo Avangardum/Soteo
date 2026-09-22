@@ -22,7 +22,7 @@ public sealed record PlayerCharacterTracker
         {
             Id = snapshot.Id,
             Player = userRepository[snapshot.PlayerId],
-            Shard = snapshot.ShardId?.PassTo(it => userRepository[it]),
+            Shard = snapshot.ShardId?.PassTo(it => userRepository[it])
         };
     }
 
@@ -32,7 +32,7 @@ public sealed record PlayerCharacterTracker
         {
             Id = Id,
             PlayerId = Player.Id,
-            ShardId = Shard?.Id,
+            ShardId = Shard?.Id
         };
     }
 }

@@ -26,7 +26,7 @@ public sealed record AbilityUseProgress
         return to with
         {
             ElapsedTime = Maths.LerpIncrease(from.ElapsedTime, to.ElapsedTime, weight),
-            RemainingTime = Maths.LerpDecrease(from.RemainingTime, to.RemainingTime, weight),
+            RemainingTime = Maths.LerpDecrease(from.RemainingTime, to.RemainingTime, weight)
         };
     }
 }

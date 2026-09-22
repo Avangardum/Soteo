@@ -42,7 +42,7 @@ public sealed class EntityManagerTests
             User = _projectileSourceChar,
             UserStats = _projectileSourceChar.Stats.ToImmutableDictionary(),
             ServiceProvider = _serviceProvider,
-            TargetUnit = _projectileTargetChar,
+            TargetUnit = _projectileTargetChar
         };
 
         _projectile = _sut.SpawnProjectile(abilityContext, speed: 1, _projectileTargetChar);
