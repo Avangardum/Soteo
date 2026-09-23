@@ -134,6 +134,42 @@ public sealed class UnitTests
         _sut.IsDead.Should().BeTrue();
     }
 
+    [Fact]
+    public void UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing()
+    {
+        _sut.SetAbility<SpyAbilityWithUseTime>(AbilitySlot.Class0, 1);
+        int validatedStrictlyCount = 0;
+        int validatedNonStrictlyCount = 0;
+        Ability.Instance<SpyAbilityWithUseTime>().ValidatedStrictly += () => validatedStrictlyCount++;
+        Ability.Instance<SpyAbilityWithUseTime>().ValidatedNonStrictly += () => validatedNonStrictlyCount++;
+
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0 });
+        _sut.Tick(Const.TickInterval);
+
+        validatedStrictlyCount.Should().Be(1);
+        validatedNonStrictlyCount.Should().Be(0);
+
+        _sut.Tick(Const.TickInterval);
+
+        validatedStrictlyCount.Should().Be(1);
+        validatedNonStrictlyCount.Should().Be(1);
+
+        _sut.Tick(Const.TickInterval);
+
+        validatedStrictlyCount.Should().Be(1);
+        validatedNonStrictlyCount.Should().Be(2);
+    }
+
+    [Fact]
+    public void UsingAbilityWhileAnotherAbilityIsBeingUsedValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing()
+    {
+        _sut.SetAbility<AbilityWithUseTime>(AbilitySlot.Class1, 1);
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class1 });
+        _sut.Tick(Const.TickInterval);
+
+        UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing();
+    }
+
     private sealed class Sut : Unit
     {
         public Sut(Guid id, IUnitNode node, IEntityManager entityManager, IServiceProvider serviceProvider) :
@@ -143,17 +179,19 @@ public sealed class UnitTests
             base.SetAbility<T>(slot, level);
     }
 
-    public sealed class SpyAbility : Ability
+    public class SpyAbility : Ability
     {
         public event Action Used = delegate { };
+        public event Action ValidatedStrictly = delegate { };
+        public event Action ValidatedNonStrictly = delegate { };
 
-        public override Targeting Targeting
+        public override Targeting Targeting => Targeting.Anything;
+
+        public override AbilityValidationResult Validate(AbilityContext context, bool strict)
         {
-            get
-            {
-                return Targeting.Character | Targeting.Building | Targeting.Ally | Targeting.Enemy |
-                    Targeting.Position | Targeting.Nothing;
-            }
+            if (strict) ValidatedStrictly();
+            else ValidatedNonStrictly();
+            return base.Validate(context, strict);
         }
 
         public override void TakeEffect(AbilityContext context)
@@ -161,6 +199,17 @@ public sealed class UnitTests
             base.TakeEffect(context);
             Used();
         }
+    }
+
+    public class SpyAbilityWithUseTime : SpyAbility
+    {
+        public override Scalable<double> StaticUseTime => 1;
+    }
+
+    public class AbilityWithUseTime : Ability
+    {
+        public override Targeting Targeting => Targeting.Anything;
+        public override Scalable<double> StaticUseTime => 1;
     }
 
     public sealed class StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff : Status

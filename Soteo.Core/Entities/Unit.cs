@@ -454,7 +454,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         do
         {
             iterations++;
-            abilityValidationResult = ability.Validate(context);
+            bool strict = AbilityUseProgress == null;
+            abilityValidationResult = ability.Validate(context, strict);
             switch (abilityValidationResult)
             {
                 case AbilityValidationResult.Ok:

@@ -93,7 +93,7 @@ public abstract class Ability
     /// </summary>
     public virtual void TakeEffect(AbilityContext context)
     {
-        AbilityValidationResult validationResult = Validate(context);
+        AbilityValidationResult validationResult = Validate(context, strict: false);
         if (validationResult != AbilityValidationResult.Ok)
             throw new InvalidOperationException($"Ability validation failed: {validationResult}");
         context.User.SpendHealth(HealthCost(context), this);
@@ -107,7 +107,7 @@ public abstract class Ability
     /// Strict mode is used to determine whether use can be initiated.
     /// Non-strict mode is used to determine whether in-progress use should be interrupted.
     /// </summary>
-    public virtual AbilityValidationResult Validate(AbilityContext context, bool strict = true)
+    public virtual AbilityValidationResult Validate(AbilityContext context, bool strict)
     {
         if (context.Level < 1 || context.Level > MaxLevel) return AbilityValidationResult.InvalidLevel;
 

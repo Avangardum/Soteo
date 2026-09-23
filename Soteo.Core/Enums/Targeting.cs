@@ -17,6 +17,9 @@ public enum Targeting
     WithDirection = 1 << 6,
     WithShard = 1 << 7,
 
+    // Composite values for convenience
+    Anything = Nothing | Position | Ally | Enemy | Character | Building
+
     // Example: Position | Enemy | Character | WithDirection - Can target either a position or an enemy character and
     // should specify a direction from the target
 }
