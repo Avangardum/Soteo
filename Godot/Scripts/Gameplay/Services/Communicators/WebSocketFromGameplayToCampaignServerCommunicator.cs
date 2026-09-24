@@ -12,8 +12,6 @@ namespace Soteo.Main.Gameplay.Services.Communicators;
 public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     Node, IFromGameplayToCampaignServerPacketSender, ICampaignServerConnector
 {
-    // TODO remove any duplication between different communicators
-
     private readonly WebSocketClient _wsClient = new();
     private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 15 };
 

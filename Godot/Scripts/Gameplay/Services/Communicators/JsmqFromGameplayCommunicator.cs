@@ -120,8 +120,7 @@ public sealed class JsmqFromGameplayCommunicator :
             SendReliable(packet, receiverId);
     }
 
-    public void SendUnreliable(Packet packet, IEnumerable<Guid> receiverIds) =>
-        SendReliable(packet, receiverIds);
+    public void SendUnreliable(Packet packet, IEnumerable<Guid> receiverIds) => SendReliable(packet, receiverIds);
 
     public void BroadcastReliable(Packet packet) => SendReliable(packet, Const.SingleplayerPlayerId);
 
