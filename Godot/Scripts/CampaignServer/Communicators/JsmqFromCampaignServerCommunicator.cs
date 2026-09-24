@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Soteo.Core;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Interfaces;
@@ -23,39 +24,49 @@ public sealed class JsmqFromCampaignServerCommunicator
 
     public void Poll()
     {
-        // TODO split
-
         while (true)
         {
-            var base64 = (string?)JavaScript.Eval($"""jsmq.receive("{Const.CampaignServerId}")""");
-            if (base64 == null) return;
-            byte[] bytes = Convert.FromBase64String(base64);
-            var senderId = new Guid(bytes.AsSpan()[..Const.BytesInGuid].ToArray());
-            Packet packet = packetSerializer.Deserialize(bytes.AsSpan()[Const.BytesInGuid..]);
+            if (!TryReceivePacket(out Packet? packet, out Guid senderId)) return;
             if (packet is CampaignServerHandshakePacket handshake)
-            {
-                var claims = new Dictionary<string, object>
-                {
-                    ["sub"] = senderId.ToString(),
-                    // When using JSMQ, role is sent instead of token
-                    [handshake.Token] = true
-                };
-                bool isPlayer = claims.TryGetValue("player", out object value) && value is true;
-                if (isPlayer && !initRepo.IsInitialized)
-                {
-                    var reason = "Not accepting player connections yet, try again later";
-                    SendTo(new BadInputPacket { Reason = reason }, senderId);
-                    continue;
-                } // todo this crashes the client, make it a popup instead
-                userRepo.OnConnected(claims);
-                if (_peerIds.Add(senderId))
-                    PeerConnected(senderId);
-            }
+                HandleHandshakePacket(handshake, senderId);
             else
-            {
                 packetHandler.HandleAsync(packet, senderId).CollectException();
-            }
         }
+    }
+
+    private bool TryReceivePacket([NotNullWhen(true)] out Packet? packet, out Guid senderId)
+    {
+        var base64 = (string?)JavaScript.Eval($"""jsmq.receive("{Const.CampaignServerId}")""");
+        if (base64 == null)
+        {
+            packet = null;
+            senderId = Guid.Empty;
+            return false;
+        }
+        byte[] bytes = Convert.FromBase64String(base64);
+        senderId = new Guid(bytes.AsSpan()[..Const.BytesInGuid].ToArray());
+        packet = packetSerializer.Deserialize(bytes.AsSpan()[Const.BytesInGuid..]);
+        return true;
+    }
+
+    private void HandleHandshakePacket(CampaignServerHandshakePacket packet, Guid senderId)
+    {
+        var claims = new Dictionary<string, object>
+        {
+            ["sub"] = senderId.ToString(),
+            // When using JSMQ, role is sent instead of token
+            [packet.Token] = true
+        };
+        bool isPlayer = claims.TryGetValue("player", out object value) && value is true;
+        if (isPlayer && !initRepo.IsInitialized)
+        {
+            var reason = "Not accepting player connections yet, try again later";
+            SendTo(new BadInputPacket { Reason = reason }, senderId);
+            return;
+        } // todo this crashes the client, make it a popup instead
+        userRepo.OnConnected(claims);
+        if (_peerIds.Add(senderId))
+            PeerConnected(senderId);
     }
 
     public void SendTo(Packet packet, params IEnumerable<Guid> receiverIds)
