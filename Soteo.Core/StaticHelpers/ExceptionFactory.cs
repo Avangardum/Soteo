@@ -13,8 +13,9 @@ public static class ExceptionFactory
 
     public static BadPacketException PacketHandlerNotFound(Type packetType, Type requiredAttributeType)
     {
+        var attributeStr = "[" + requiredAttributeType.Name[..^"Attribute".Length] + "]";
         var message = $"Packet handler for packet type {packetType} was not found. " +
-            $"Make sure the handler exists, is public, decorated with {requiredAttributeType.Name} " +
+            $"Make sure the handler exists, is public, decorated with {attributeStr} " +
             $"and its assembly is passed to TypeLocator.";
         return new BadPacketException(message);
     }

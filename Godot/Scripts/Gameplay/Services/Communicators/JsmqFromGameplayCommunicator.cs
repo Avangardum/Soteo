@@ -74,7 +74,6 @@ public sealed class JsmqFromGameplayCommunicator :
             new CampaignServerHandshakePacket { Token = "player", Version = Const.Version },
             Const.CampaignServerId
         );
-        Connected();
     }
 
     public void ConnectAsShardServer()
@@ -84,7 +83,6 @@ public sealed class JsmqFromGameplayCommunicator :
             new CampaignServerHandshakePacket { Token = "shard", Version = Const.Version },
             Const.CampaignServerId
         );
-        Connected();
     }
 
     private void Poll()
@@ -99,8 +97,18 @@ public sealed class JsmqFromGameplayCommunicator :
             if (_connectedPeers.Add(senderId))
                 PeerConnected(senderId);
             Packet packet = _packetSerializer.Deserialize(bytes.AsSpan()[Const.BytesInGuid..]);
-            if (packet is PingPacket) return;
-            _packetHandler.HandleAsync(packet, senderId).CollectException();
+
+            switch (packet)
+            {
+                case PingPacket:
+                    break;
+                case CampaignServerHandshakeAckPacket:
+                    Connected();
+                    break;
+                default:
+                    _packetHandler.HandleAsync(packet, senderId).CollectException();
+                    break;
+            }
         }
     }
 

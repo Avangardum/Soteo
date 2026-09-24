@@ -109,18 +109,24 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
 
     public void OnConnectionEstablished(string protocol)
     {
-        _status = Status.Connected;
         SendPacket(new CampaignServerHandshakePacket { Token = _token.Required, Version = Const.Version });
         _token = null;
-        Connected();
-        // TODO become connected only after receiving an acknowledgement of a successful handshake
     }
 
     public void OnDataReceived()
     {
         byte[] bytes = _wsClient.GetPeer(1).GetPacket();
         Packet packet = _packetSerializer.Deserialize(bytes);
-        _packetHandler.HandleAsync(packet, Const.CampaignServerId).CollectException();
+
+        if (packet is CampaignServerHandshakeAckPacket)
+        {
+            _status = Status.Connected;
+            Connected();
+        }
+        else
+        {
+            _packetHandler.HandleAsync(packet, Const.CampaignServerId).CollectException();
+        }
     }
 
     public void ConnectAsPlayer(string email, string password)

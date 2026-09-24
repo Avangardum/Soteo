@@ -27,8 +27,8 @@ public sealed class JsmqFromCampaignServerCommunicator
         while (true)
         {
             if (!TryReceivePacket(out Packet? packet, out Guid senderId)) return;
-            if (packet is CampaignServerHandshakePacket handshake)
-                HandleHandshakePacket(handshake, senderId);
+            if (!_peerIds.Contains(senderId))
+                HandleHandshakePacket(packet, senderId);
             else
                 packetHandler.HandleAsync(packet, senderId).CollectException();
         }
@@ -49,13 +49,15 @@ public sealed class JsmqFromCampaignServerCommunicator
         return true;
     }
 
-    private void HandleHandshakePacket(CampaignServerHandshakePacket packet, Guid senderId)
+    private void HandleHandshakePacket(Packet packet, Guid senderId)
     {
+        if (packet is not CampaignServerHandshakePacket handshake)
+            throw new Exception("Handshake packet expected");
         var claims = new Dictionary<string, object>
         {
             ["sub"] = senderId.ToString(),
             // When using JSMQ, role is sent instead of token
-            [packet.Token] = true
+            [handshake.Token] = true
         };
         bool isPlayer = claims.TryGetValue("player", out object value) && value is true;
         if (isPlayer && !initRepo.IsInitialized)
@@ -65,8 +67,9 @@ public sealed class JsmqFromCampaignServerCommunicator
             return;
         } // todo this crashes the client, make it a popup instead
         userRepo.OnConnected(claims);
-        if (_peerIds.Add(senderId))
-            PeerConnected(senderId);
+        _peerIds.Add(senderId);
+        PeerConnected(senderId);
+        SendTo(new CampaignServerHandshakeAckPacket(), senderId);
     }
 
     public void SendTo(Packet packet, params IEnumerable<Guid> receiverIds)

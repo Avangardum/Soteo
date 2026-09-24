@@ -187,6 +187,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         _userIdsByWsPeerId[wsPeerId] = userId;
         _userRepo.OnConnected(claims);
         PeerConnected(userId);
+        SendTo(new CampaignServerHandshakeAckPacket(), userId);
     }
 
     private async void HandlePacket(Packet packet, Guid senderId)
