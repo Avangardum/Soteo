@@ -18,6 +18,7 @@ public sealed class JsmqFromCampaignServerCommunicator
 ) : GdObject, IFromCampaignServerCommunicator
 {
     private readonly HashSet<Guid> _peerIds = [];
+    private readonly Dictionary<Guid, Task> _inProgressHandshakeTasksByPeerId = [];
 
     public event Action<Guid> PeerConnected = delegate {};
     public event Action<Guid> PeerDisconnected = delegate {};
@@ -27,11 +28,31 @@ public sealed class JsmqFromCampaignServerCommunicator
         while (true)
         {
             if (!TryReceivePacket(out Packet? packet, out Guid senderId)) return;
-            if (!_peerIds.Contains(senderId))
-                HandleHandshakePacket(packet, senderId);
-            else
-                packetHandler.HandleAsync(packet, senderId).CollectException();
+            HandlePacketAsync(packet, senderId).CollectException();
         }
+    }
+
+    private async Task HandlePacketAsync(Packet packet, Guid senderId)
+    {
+        if (!_peerIds.Contains(senderId))
+        {
+            if (_inProgressHandshakeTasksByPeerId.TryGetValue(senderId, out Task handshakeTask))
+            {
+                await handshakeTask;
+            }
+            else
+            {
+                handshakeTask = HandleHandshakePacketAsync(packet, senderId);
+                if (!handshakeTask.IsCompleted)
+                {
+                    _inProgressHandshakeTasksByPeerId[senderId] = handshakeTask;
+                    _ = handshakeTask.ContinueWithinContext(_ => _inProgressHandshakeTasksByPeerId.Remove(senderId));
+                    handshakeTask.CollectException();
+                }
+                return;
+            }
+        }
+        packetHandler.HandleAsync(packet, senderId).CollectException();
     }
 
     private bool TryReceivePacket([NotNullWhen(true)] out Packet? packet, out Guid senderId)
@@ -49,7 +70,7 @@ public sealed class JsmqFromCampaignServerCommunicator
         return true;
     }
 
-    private void HandleHandshakePacket(Packet packet, Guid senderId)
+    private async Task HandleHandshakePacketAsync(Packet packet, Guid senderId)
     {
         if (packet is not CampaignServerHandshakePacket handshake)
             throw new Exception("Handshake packet expected");
@@ -61,11 +82,7 @@ public sealed class JsmqFromCampaignServerCommunicator
         };
         bool isPlayer = claims.TryGetValue("player", out object value) && value is true;
         if (isPlayer && !initRepo.IsInitialized)
-        {
-            var reason = "Not accepting player connections yet, try again later";
-            SendTo(new BadInputPacket { Reason = reason }, senderId);
-            return;
-        } // todo this crashes the client, make it a popup instead
+            await initRepo.WaitForInitAsync();
         userRepo.OnConnected(claims);
         _peerIds.Add(senderId);
         PeerConnected(senderId);

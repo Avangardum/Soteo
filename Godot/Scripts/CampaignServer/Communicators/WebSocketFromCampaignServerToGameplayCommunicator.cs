@@ -21,6 +21,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
     private readonly IInitializationRepository _initRepo;
 
     private readonly BidirectionalDictionary<int, Guid> _userIdsByWsPeerId = [];
+    private readonly Dictionary<WebSocketPeer, Task> _inProgressHandshakeTasksByWsPeer = [];
 
     public event Action<Guid> PeerConnected = delegate {};
     public event Action<Guid> PeerDisconnected = delegate {};
@@ -108,15 +109,31 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         WebSocketPeer wsPeer = _wsServer.GetPeer(wsPeerId);
         Packet? packet = GetPacket(wsPeer);
         if (packet == null) return;
+        HandlePacketAsync(packet, wsPeerId, wsPeer).CollectException();
+    }
 
+    private async Task HandlePacketAsync(Packet packet, int wsPeerId, WebSocketPeer wsPeer)
+    {
         if (!_userIdsByWsPeerId.TryGetValue(wsPeerId, out Guid userId))
         {
-            HandleHandshakePacket(packet, wsPeerId, wsPeer);
+            if (_inProgressHandshakeTasksByWsPeer.TryGetValue(wsPeer, out Task handshakeTask))
+            {
+                await handshakeTask;
+            }
+            else
+            {
+                handshakeTask = HandleHandshakePacketAsync(packet, wsPeerId, wsPeer);
+                if (!handshakeTask.IsCompleted)
+                {
+                    _inProgressHandshakeTasksByWsPeer[wsPeer] = handshakeTask;
+                    _ = handshakeTask.ContinueWithinContext(() => _inProgressHandshakeTasksByWsPeer.Remove(wsPeer));
+                    handshakeTask.CollectException();
+                }
+                return;
+            }
         }
-        else
-        {
-            HandlePacket(packet, userId);
-        }
+
+        HandlePacket(packet, userId);
     }
 
     private Packet? GetPacket(WebSocketPeer peer)
@@ -133,7 +150,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         }
     }
 
-    private void HandleHandshakePacket(Packet packet, int wsPeerId, WebSocketPeer peer)
+    private async Task HandleHandshakePacketAsync(Packet packet, int wsPeerId, WebSocketPeer peer)
     {
         // TODO close ws connection on fail
 
@@ -163,7 +180,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
                 .ThrowIfError();
             return;
         }
-        var userId = Guid.Parse((string)claims["sub"]);
+        Guid userId = Guid.Parse((string)claims["sub"]);
         bool isPlayer =
             claims.TryGetValue("player", out object value) &&
             value is string strValue &&
@@ -171,11 +188,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
             parsedValue;
 
         if (isPlayer && !_initRepo.IsInitialized)
-        {
-            var reason = "Not accepting player connections yet, try again later";
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = reason } )).ThrowIfError();
-            return;
-        } // todo this crashes the client, make it a popup instead
+            await _initRepo.WaitForInitAsync();
 
         if (_userIdsByWsPeerId.Inverse.TryGetValue(userId, out int oldWsPeerId))
         {
