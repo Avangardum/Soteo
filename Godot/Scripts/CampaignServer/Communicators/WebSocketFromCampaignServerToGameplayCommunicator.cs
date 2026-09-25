@@ -150,20 +150,22 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         }
     }
 
-    private async Task HandleHandshakePacketAsync(Packet packet, int wsPeerId, WebSocketPeer peer)
+    private async Task HandleHandshakePacketAsync(Packet packet, int wsPeerId, WebSocketPeer wsPeer)
     {
-        // TODO close ws connection on fail
+        void Fail(string reason)
+        {
+            wsPeer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = reason })).ThrowIfError();
+            _wsServer.DisconnectPeer(wsPeerId, reason: reason);
+        }
 
         if (packet is not CampaignServerHandshakePacket handshake)
         {
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Handshake expected" } ))
-                .ThrowIfError();
+            Fail("Handshake expected");
             return;
         }
         if (handshake.Version != Const.Version)
         {
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Version mismatch" } ))
-                .ThrowIfError();
+            Fail("Version mismatch");
             return;
         }
 
@@ -176,10 +178,10 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         {
             if (e is not (TokenNotYetValidException or TokenExpiredException or SignatureVerificationException))
                 throw;
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = "Invalid token" } ))
-                .ThrowIfError();
+            Fail("Invalid token");
             return;
         }
+
         Guid userId = Guid.Parse((string)claims["sub"]);
         bool isPlayer =
             claims.TryGetValue("player", out object value) &&
@@ -192,7 +194,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
 
         if (_userIdsByWsPeerId.Inverse.TryGetValue(userId, out int oldWsPeerId))
         {
-            _wsServer.DisconnectPeer(oldWsPeerId, 1000, "New connection opened");
+            _wsServer.DisconnectPeer(oldWsPeerId, reason: "New connection opened");
             _userIdsByWsPeerId.Remove(oldWsPeerId);
             PeerDisconnected(userId);
         }
