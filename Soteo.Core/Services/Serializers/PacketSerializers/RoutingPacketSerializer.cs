@@ -7,7 +7,6 @@ namespace Soteo.Core.Services.Serializers.PacketSerializers;
 public sealed class RoutingPacketSerializer
 (
     IServiceProvider serviceProvider,
-    ITypeLocator typeLocator,
     ISerializationHelper s
 ) : IPacketSerializer
 {
