@@ -8,40 +8,8 @@ using Soteo.Util;
 
 namespace Soteo.Core.Abilities;
 
-public abstract class Ability
+public abstract class Ability : SingletonHierarchyBase<Ability>
 {
-    private static readonly Dictionary<Type, Ability> Instances = [];
-
-    private static Type? _currentlyConstructedType;
-
-    public static T Instance<T>() where T : Ability, new() => (T)Instance(typeof(T));
-
-    public static Ability Instance(Type type)
-    {
-        if (!type.IsAssignableTo(typeof(Ability)))
-            throw new ArgumentException($"{type} is not an ability");
-
-        if (Instances.TryGetValue(type, out Ability existingInstance))
-            return existingInstance;
-
-        _currentlyConstructedType = type;
-        var newInstance = (Ability)Activator.CreateInstance(type);
-        _currentlyConstructedType = null;
-        Instances[type] = newInstance;
-        return newInstance;
-    }
-
-    protected Ability()
-    {
-        if (GetType() != _currentlyConstructedType)
-        {
-            throw new InvalidOperationException
-            (
-                "Abilities should not be created with new, use Ability.Instance instead"
-            );
-        }
-    }
-
     public virtual string Name =>
         GetType().Name.ReplaceRegex("Ability$", "").PascalCaseToCapitalizedText();
 

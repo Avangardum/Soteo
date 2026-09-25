@@ -4,39 +4,8 @@ using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Statuses;
 
-public abstract class Status
+public abstract class Status : SingletonHierarchyBase<Status>
 {
-    private static readonly Dictionary<Type, Status> Instances = [];
-    private static Type? _currentlyConstructedType;
-
-    public static T Instance<T>() where T : Status, new() => (T)Instance(typeof(T));
-
-    public static Status Instance(Type type)
-    {
-        if (!type.IsAssignableTo(typeof(Status)))
-            throw new ArgumentException($"{type} is not a status");
-
-        if (Instances.TryGetValue(type, out Status existingStatus))
-            return existingStatus;
-
-        _currentlyConstructedType = type;
-        var newInstance = (Status)Activator.CreateInstance(type);
-        _currentlyConstructedType = null;
-        Instances[type] = newInstance;
-        return newInstance;
-    }
-
-    protected Status()
-    {
-        if (GetType() != _currentlyConstructedType)
-        {
-            throw new InvalidOperationException
-            (
-                "Statuses should not be created with new, use Status.Instance instead"
-            );
-        }
-    }
-
     public abstract DuplicateStatusResolution DuplicateResolution { get; }
 
     /// <summary>
