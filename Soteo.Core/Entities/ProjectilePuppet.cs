@@ -33,7 +33,7 @@ public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>
 
     private void UpdateNodePosition()
     {
-        Node?.PositionM = NodeHelper.RoundPositionToPixelPerfect
+        Node?.PositionMeters = NodeHelper.RoundPositionToPixelPerfect
         (
             Position,
             _camera.Zoom,

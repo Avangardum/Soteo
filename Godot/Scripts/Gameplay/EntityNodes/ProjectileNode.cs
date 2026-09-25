@@ -14,7 +14,7 @@ public sealed class ProjectileNode : Area2D, IProjectileNode
         set => Projectile = (Projectile?)value;
     }
 
-    public Vector2 PositionM
+    public Vector2 PositionMeters
     {
         get => Position.ToSys() / Const.PixelsInMeter;
         set => Position = value.ToGd() * Const.PixelsInMeter;

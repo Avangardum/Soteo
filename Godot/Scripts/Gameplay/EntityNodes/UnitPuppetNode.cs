@@ -59,7 +59,7 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
         set => UnitPuppet = (UnitPuppet?)value;
     }
 
-    public Vector2 PositionM
+    public Vector2 PositionMeters
     {
         get => Position.ToSys() / Const.PixelsInMeter;
         set => Position = value.ToGd() * Const.PixelsInMeter;

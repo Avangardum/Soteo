@@ -4,6 +4,7 @@ namespace Soteo.Core;
 /// Base class for a hierarchy of singleton classes like Ability, Status, Item. Ensures that each concrete derived type
 /// has a single instance. Provides the static Instance method to get it and enforces its use instead of new.
 /// </summary>
+// TODO document the reasoning behind this design
 public abstract class SingletonHierarchyBase<TBase> where TBase : class
 {
     private static readonly Dictionary<Type, TBase> Instances = [];
