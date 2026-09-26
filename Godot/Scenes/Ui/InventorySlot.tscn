@@ -1,0 +1,7 @@
+[gd_scene format=2]
+
+[node name="InventorySlot" type="ColorRect"]
+margin_right = 80.0
+margin_bottom = 80.0
+rect_min_size = Vector2( 80, 80 )
+color = Color( 0.252, 0.252, 0.3, 1 )

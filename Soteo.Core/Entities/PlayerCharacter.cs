@@ -1,12 +1,16 @@
 using Soteo.Core.Abilities;
+using Soteo.Core.Dto;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
+using Soteo.Core.Items;
 
 namespace Soteo.Core.Entities;
 
 public sealed class PlayerCharacter : Unit
 {
+    public Inventory Inventory { get; } = new(8); // todo include in snapshots
+
     public PlayerCharacter
     (
         Guid id,
@@ -22,6 +26,8 @@ public sealed class PlayerCharacter : Unit
         SetAbility<VampireAbility>(AbilitySlot.Class3, 1);
         SetAbility<RecallAbility>(AbilitySlot.Recall, 1);
         SetAbility<RangedAttackAbility>(AbilitySlot.Attack, 1);
+
+        Inventory.TryAdd(ItemStack.Of<RockItem>(1));
     }
 
     public static PlayerCharacter FromSnapshot
