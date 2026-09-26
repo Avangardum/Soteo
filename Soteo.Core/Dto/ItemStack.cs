@@ -4,7 +4,7 @@ namespace Soteo.Core.Dto;
 
 public sealed record ItemStack
 {
-    public Item Item { get;}
+    public Item Item { get; }
     public int Size { get; }
 
     public ItemStack(Item item, int size)
