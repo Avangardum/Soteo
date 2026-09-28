@@ -98,8 +98,6 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
 
     public void OnConnectionError()
     {
-        // todo replace throw with UI popups
-
 // Unreachable code detected
 #pragma warning disable CS0162
 
@@ -170,8 +168,6 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
 
     public void OnAuthRequestCompleted(int result, int responseCode, string[] headers, byte[] body)
     {
-        // todo replace throw with UI popups
-
         if (result != (int)HTTPRequest.Result.Success)
         {
             throw new Exception($"Authentication error: {(HTTPRequest.Result)result}");
