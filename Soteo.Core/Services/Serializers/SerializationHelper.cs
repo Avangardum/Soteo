@@ -322,7 +322,6 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public void SerializeStatus(Status value, Stream stream) =>
         SerializeInt(_statusTypes.IndexOf(value.GetType()), stream);
 
-    // TODO handle invalid type codes (for similar methods too)
     public Status DeserializeStatus(Stream stream) =>
         Status.Instance(_statusTypes[DeserializeInt(stream)]);
 

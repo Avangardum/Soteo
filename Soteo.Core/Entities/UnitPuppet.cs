@@ -97,7 +97,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             IsDead = d.IsDead.NewValue;
         if (d.IsMoving.HasChanged)
             IsMoving = d.IsMoving.NewValue;
-        d.Stats.MutateDictionary(StatsInternal, interpolationWeight, null);
+        d.Stats.MutateDictionary(StatsInternal);
         d.AbilitySlotStates.MutateDictionary
         (
             AbilitySlotStatesInternal,

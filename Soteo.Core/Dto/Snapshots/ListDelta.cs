@@ -31,7 +31,7 @@ public sealed class ListDelta<T>
     public IReadOnlyDictionary<int, T> Changes { get; init; } = ImmutableDictionary<int, T>.Empty;
     public required bool HasChanged { get; init; }
 
-    public void MutateList(IList<T> list, double interpolationWeight, Func<T, T, double, T>? interpolateValue)
+    public void MutateList(IList<T> list, double interpolationWeight, Func<T, T, double, T> interpolateValue)
     {
         while (list.Count < Count)
             list.Add(Changes[list.Count]);
@@ -39,12 +39,11 @@ public sealed class ListDelta<T>
         while (list.Count > Count)
             list.RemoveAt(list.Count - 1);
 
-        interpolateValue ??= (_, to, _) => to;
         foreach ((int index, T value) in Changes)
             list[index] = interpolateValue(list[index], value, interpolationWeight);
     }
 
-    public void MutateList(IList<T> list) => MutateList(list, 1, null);
+    public void MutateList(IList<T> list) => MutateList(list, 1, (_, to, _) => to);
 
     public override string ToString()
     {

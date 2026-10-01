@@ -21,5 +21,7 @@
 
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
 
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
     </PropertyGroup>
 </Project>

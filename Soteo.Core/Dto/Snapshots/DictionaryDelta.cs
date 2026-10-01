@@ -37,33 +37,21 @@ public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
     (
         IDictionary<TKey, TValue> dictionary,
         double interpolationWeight,
-        Func<TValue, TValue, double, TValue>? interpolateValue
+        Func<TValue, TValue, double, TValue> interpolateValue
     )
     {
         foreach ((TKey key, TValue newValue) in Changes)
-        {
-            if
-            (
-                interpolationWeight == 1 ||
-                interpolateValue == null ||
-                !dictionary.TryGetValue(key, out TValue oldValue)
-            )
-            {
-                dictionary[key] = newValue;
-            }
-            else
-            {
+            if (dictionary.TryGetValue(key, out TValue oldValue))
                 dictionary[key] = interpolateValue(oldValue, newValue, interpolationWeight);
-            }
-        }
+            else
+                dictionary[key] = newValue;
 
         foreach (TKey key in RemovedKeys)
             dictionary.Remove(key);
     }
 
-    public void MutateDictionary(IDictionary<TKey, TValue> dictionary) => MutateDictionary(dictionary, 1, null);
-
-    // todo refactor mutation here and in ListDelta
+    public void MutateDictionary(IDictionary<TKey, TValue> dictionary) =>
+        MutateDictionary(dictionary, 1, (_, to, _) => to);
 
     public override string ToString()
     {
