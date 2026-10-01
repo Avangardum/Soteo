@@ -167,7 +167,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         {
             return _packetSerializer.Deserialize(bytes);
         }
-        catch (BadSerializedDataException e)
+        catch (Exception e)
         {
             if (_sideOptions.Side == Side.ShardServer)
             {

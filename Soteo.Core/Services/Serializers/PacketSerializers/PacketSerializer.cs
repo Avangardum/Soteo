@@ -99,7 +99,7 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
             }
             return packet;
         }
-        catch (BadSerializedDataException e)
+        catch (Exception e)
         {
             throw new BadSerializedDataException($"Bad packet\n{BitConverter.ToString(bytes.ToArray())}\n", e);
         }

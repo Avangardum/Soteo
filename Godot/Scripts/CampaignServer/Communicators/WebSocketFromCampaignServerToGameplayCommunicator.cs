@@ -143,7 +143,7 @@ public sealed class WebSocketFromCampaignServerToGameplayCommunicator : GdObject
         {
             return _packetSerializer.Deserialize(bytes);
         }
-        catch (BadSerializedDataException e)
+        catch (Exception e)
         {
             peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = e.Message } )).ThrowIfError();
             return null;
