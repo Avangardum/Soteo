@@ -1,5 +1,6 @@
 using System.Numerics;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;

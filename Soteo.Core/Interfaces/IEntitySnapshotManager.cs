@@ -1,3 +1,4 @@
+using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Snapshots;
 
 namespace Soteo.Core.Interfaces;

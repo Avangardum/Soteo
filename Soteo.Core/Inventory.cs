@@ -1,5 +1,6 @@
 using System.Collections;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Snapshots;
 
 namespace Soteo.Core;

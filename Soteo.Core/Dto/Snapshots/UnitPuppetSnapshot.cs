@@ -1,3 +1,4 @@
+using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Enums;
 
 namespace Soteo.Core.Dto.Snapshots;

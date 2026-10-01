@@ -1,6 +1,6 @@
 using Soteo.Core.Enums;
 
-namespace Soteo.Core.Dto.Snapshots;
+namespace Soteo.Core.Dto.Deltas;
 
 public sealed record UnitPuppetSnapshotDelta : EntitySnapshotDelta
 {

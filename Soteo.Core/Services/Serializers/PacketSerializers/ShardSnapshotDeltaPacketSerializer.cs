@@ -1,4 +1,5 @@
 using Soteo.Core.Delegates;
+using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;

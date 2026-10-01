@@ -1,3 +1,5 @@
+using Soteo.Core.Dto.Deltas;
+
 namespace Soteo.Core.Dto.Snapshots;
 
 public sealed record ProjectilePuppetSnapshot : EntitySnapshot<ProjectilePuppetSnapshot>
