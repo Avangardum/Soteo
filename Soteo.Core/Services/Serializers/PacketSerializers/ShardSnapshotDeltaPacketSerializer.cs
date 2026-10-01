@@ -77,6 +77,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         SerializeDictionaryDelta(delta.AbilitySlotStates, s.SerializeEnum, s.SerializeAbilitySlotState, stream);
         SerializeNullableClassDelta(delta.AbilityUseProgress, s.SerializeAbilityUseProgress, stream);
         SerializeDictionaryDelta(delta.Statuses, s.SerializeGuid, s.SerializePuppetStatusContext, stream);
+        SerializeListDelta(delta.Items, (v, _) => s.SerializeNullableClass(v, s.SerializeItemStack, stream), stream);
     }
 
     private UnitPuppetSnapshotDelta DeserializeUnitPuppetDelta(Stream stream)
@@ -92,7 +93,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
             AbilitySlotStates =
                 DeserializeDictionaryDelta(s.DeserializeEnum<AbilitySlot>, s.DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClassDelta(s.DeserializeAbilityUseProgress, stream),
-            Statuses = DeserializeDictionaryDelta(s.DeserializeGuid, s.DeserializePuppetStatusContext, stream)
+            Statuses = DeserializeDictionaryDelta(s.DeserializeGuid, s.DeserializePuppetStatusContext, stream),
+            Items = DeserializeListDelta(_ => s.DeserializeNullableClass(s.DeserializeItemStack, stream), stream)
         };
     }
 
@@ -185,5 +187,22 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         var changes = s.DeserializeIndexedDictionary(deserializeValue, keySelector, stream);
         var removedKeys = s.DeserializeList(deserializeKey, stream);
         return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
+    }
+
+    private void SerializeListDelta<T>(ListDelta<T> delta, Serializer<T> serializeValue, Stream stream)
+    {
+        s.SerializeInt(delta.Count, stream);
+        s.SerializeDictionary(delta.Changes, s.SerializeInt, serializeValue, stream);
+        s.SerializeBool(delta.HasChanged, stream);
+    }
+
+    private ListDelta<T> DeserializeListDelta<T>(Deserializer<T> deserializeValue, Stream stream)
+    {
+        return new ListDelta<T>
+        {
+            Count = s.DeserializeInt(stream),
+            Changes = s.DeserializeDictionary(s.DeserializeInt, deserializeValue, stream),
+            HasChanged = s.DeserializeBool(stream)
+        };
     }
 }

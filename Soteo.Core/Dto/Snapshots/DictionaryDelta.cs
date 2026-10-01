@@ -61,6 +61,10 @@ public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
             dictionary.Remove(key);
     }
 
+    public void MutateDictionary(IDictionary<TKey, TValue> dictionary) => MutateDictionary(dictionary, 1, null);
+
+    // todo refactor mutation here and in ListDelta
+
     public override string ToString()
     {
         if (!HasChanged) return "Unchanged";

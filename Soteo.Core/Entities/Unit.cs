@@ -38,6 +38,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
 
+    public Inventory Inventory { get; } = new(8);
+
     public Unit
     (
         Guid id,
@@ -77,7 +79,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             AbilitySlotStates = AbilitySlotStatesInternal.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress,
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot()),
-            ControllingPlayerId = _controllingPlayerId
+            ControllingPlayerId = _controllingPlayerId,
+            Items = Inventory.ToImmutableList()
         };
     }
 
@@ -94,6 +97,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _serviceProvider));
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
+        Inventory.ReplicateSnapshot(s.Items);
     }
 
     public void Tick(double delta)

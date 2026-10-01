@@ -4,6 +4,7 @@ using Soteo.Core.Abilities;
 using Soteo.Core.Delegates;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Items;
 using Soteo.Core.Statuses;
 
 namespace Soteo.Core.Interfaces;
@@ -95,6 +96,8 @@ public interface ISerializationHelper
     Ability DeserializeAbility(Stream stream);
     void SerializeStatus(Status value, Stream stream);
     Status DeserializeStatus(Stream stream);
+    void SerializeItem(Item item, Stream stream);
+    Item DeserializeItem(Stream stream);
     void SerializePacketType(Type value, Stream stream);
     Type DeserializePacketType(Stream stream);
     void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream);
@@ -117,10 +120,12 @@ public interface ISerializationHelper
     ProjectilePuppetSnapshot DeserializeProjectilePuppetSnapshot(Stream stream);
     void SerializeAbilityContextSnapshot(AbilityContextSnapshot context, Stream stream);
     AbilityContextSnapshot DeserializeAbilityContextSnapshot(Stream stream);
-    void SerializeDeflatedStatusContext(StatusContextSnapshot value, Stream stream);
+    void SerializeStatusContextSnapshot(StatusContextSnapshot value, Stream stream);
     StatusContextSnapshot DeserializeDeflatedStatusContext(Stream stream);
     void SerializeStatusTickContext(StatusTickContext value, Stream stream);
     StatusTickContext DeserializeStatusTickContext(Stream stream);
     void SerializeShardSnapshot(ShardSnapshot value, Stream stream);
     ShardSnapshot DeserializeShardSnapshot(Stream stream);
+    void SerializeItemStack(ItemStack value, Stream stream);
+    ItemStack DeserializeItemStack(Stream stream);
 }

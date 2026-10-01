@@ -13,6 +13,8 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 {
     private readonly ICamera _camera;
 
+    private Inventory Inventory { get; } = new(0);
+
     public UnitPuppet(Guid id, IUnitPuppetNode node, ICamera camera) : base(id, node)
     {
         _camera = camera;
@@ -83,6 +85,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
         StatusesInternal = s.Statuses.ToDictionary();
+        Inventory.ReplicateSnapshot(s.Items);
         UpdateAnimation();
     }
 
@@ -112,6 +115,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             );
         }
         d.Statuses.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
+        Inventory.ApplyDelta(d.Items);
         UpdateAnimation();
     }
 

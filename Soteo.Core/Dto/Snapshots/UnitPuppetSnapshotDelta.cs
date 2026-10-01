@@ -10,13 +10,15 @@ public sealed record UnitPuppetSnapshotDelta : EntitySnapshotDelta
     public required DictionaryDelta<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
     public required Delta<AbilityUseProgress?> AbilityUseProgress { get; init; }
     public required DictionaryDelta<Guid, PuppetStatusContext> Statuses { get; init; }
+    public required ListDelta<ItemStack?> Items { get; init; }
 
     public override bool HasChanged
     {
         get
         {
             return base.HasChanged || IsDead.HasChanged || IsMoving.HasChanged || Stats.HasChanged ||
-                AbilitySlotStates.HasChanged || AbilityUseProgress.HasChanged || Statuses.HasChanged;
+                AbilitySlotStates.HasChanged || AbilityUseProgress.HasChanged || Statuses.HasChanged ||
+                Items.HasChanged;
         }
     }
 }

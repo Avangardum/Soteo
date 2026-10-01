@@ -1,34 +1,35 @@
 using System.Collections;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Snapshots;
 
 namespace Soteo.Core;
 
 public sealed class Inventory : IReadOnlyList<ItemStack?>
 {
-    private readonly ItemStack?[] _stacks;
+    private List<ItemStack?> _stacks;
 
     public Inventory(int size)
     {
-        _stacks = new ItemStack?[size];
+        _stacks = Enumerable.Repeat<ItemStack?>(null, size).ToList();
     }
 
     public Inventory(IReadOnlyList<ItemStack?> stacks)
     {
-        _stacks = stacks.ToArray();
+        _stacks = stacks.ToList();
     }
 
     public IEnumerator<ItemStack?> GetEnumerator() => _stacks.AsEnumerable().GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public int Count => _stacks.Length;
+    public int Count => _stacks.Count;
 
     public ItemStack? this[int index] => _stacks[index];
 
     public bool TryAdd(ItemStack stack)
     {
         // todo merge stacks
-        for (int i = 0; i < _stacks.Length; i++)
+        for (int i = 0; i < _stacks.Count; i++)
         {
             if (_stacks[i] == null)
             {
@@ -38,4 +39,8 @@ public sealed class Inventory : IReadOnlyList<ItemStack?>
         }
         return false;
     }
+
+    public void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks) => _stacks = stacks.ToList();
+
+    public void ApplyDelta(ListDelta<ItemStack?> delta) => delta.MutateList(_stacks);
 }

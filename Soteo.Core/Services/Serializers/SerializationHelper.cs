@@ -10,6 +10,7 @@ using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Exceptions;
 using Soteo.Core.Interfaces;
+using Soteo.Core.Items;
 using Soteo.Core.StaticHelpers;
 using Soteo.Core.Statuses;
 
@@ -19,6 +20,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 {
     private readonly IReadOnlyList<Type> _abilityTypes = typeLocator.ConcreteSubclassesOf<Ability>();
     private readonly IReadOnlyList<Type> _statusTypes = typeLocator.ConcreteSubclassesOf<Status>();
+    private readonly IReadOnlyList<Type> _itemTypes = typeLocator.ConcreteSubclassesOf<Item>();
     private readonly IReadOnlyList<Type> _packetTypes = typeLocator.ConcreteSubclassesOf<Packet>();
 
     public void SerializeByte(byte value, Stream stream) => stream.WriteByte(value);
@@ -320,8 +322,15 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public void SerializeStatus(Status value, Stream stream) =>
         SerializeInt(_statusTypes.IndexOf(value.GetType()), stream);
 
+    // TODO handle invalid type codes (for similar methods too)
     public Status DeserializeStatus(Stream stream) =>
         Status.Instance(_statusTypes[DeserializeInt(stream)]);
+
+    public void SerializeItem(Item item, Stream stream) =>
+        SerializeInt(_itemTypes.IndexOf(item.GetType()), stream);
+
+    public Item DeserializeItem(Stream stream) =>
+        Item.Instance(_itemTypes[DeserializeInt(stream)]);
 
     public void SerializePacketType(Type type, Stream stream)
     {
@@ -442,8 +451,9 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeDouble, stream);
         SerializeDictionary(unit.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
         SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
-        SerializeIndexedDictionary(unit.Statuses, SerializeDeflatedStatusContext, stream);
+        SerializeIndexedDictionary(unit.Statuses, SerializeStatusContextSnapshot, stream);
         SerializeNullableStruct(unit.ControllingPlayerId, SerializeGuid, stream);
+        SerializeList(unit.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
     }
 
     public UnitSnapshot DeserializeUnitSnapshot(Stream stream)
@@ -461,7 +471,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
                 DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializeDeflatedStatusContext, it => it.Id, stream),
-            ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream)
+            ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream),
+            Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream)
         };
     }
 
@@ -475,6 +486,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeDictionary(unitPuppet.AbilitySlotStates, SerializeEnum, SerializeAbilitySlotState, stream);
         SerializeNullableClass(unitPuppet.AbilityUseProgress, SerializeAbilityUseProgress, stream);
         SerializeIndexedDictionary(unitPuppet.Statuses, SerializePuppetStatusContext, stream);
+        SerializeList(unitPuppet.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
     }
 
     public UnitPuppetSnapshot DeserializeUnitPuppetSnapshot(Stream stream)
@@ -491,7 +503,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             AbilitySlotStates =
                 DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
-            Statuses = DeserializeIndexedDictionary(DeserializePuppetStatusContext, it => it.Id, stream)
+            Statuses = DeserializeIndexedDictionary(DeserializePuppetStatusContext, it => it.Id, stream),
+            Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream)
         };
     }
 
@@ -582,7 +595,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         };
     }
 
-    public void SerializeDeflatedStatusContext(StatusContextSnapshot value, Stream stream)
+    public void SerializeStatusContextSnapshot(StatusContextSnapshot value, Stream stream)
     {
         SerializeGuid(value.Id, stream);
         SerializeStatus(value.Status, stream);
@@ -643,5 +656,20 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Tick = DeserializeLong(stream),
             Entities = DeserializeIndexedDictionary(DeserializeEntitySnapshot, it => it.Id, stream),
         };
+    }
+
+    public void SerializeItemStack(ItemStack value, Stream stream)
+    {
+        SerializeItem(value.Item, stream);
+        SerializeInt(value.Size, stream);
+    }
+
+    public ItemStack DeserializeItemStack(Stream stream)
+    {
+        return new ItemStack
+        (
+            item: DeserializeItem(stream),
+            size: DeserializeInt(stream)
+        );
     }
 }

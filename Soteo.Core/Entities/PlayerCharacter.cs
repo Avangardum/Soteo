@@ -9,8 +9,6 @@ namespace Soteo.Core.Entities;
 
 public sealed class PlayerCharacter : Unit
 {
-    public Inventory Inventory { get; } = new(8); // todo include in snapshots
-
     public PlayerCharacter
     (
         Guid id,
