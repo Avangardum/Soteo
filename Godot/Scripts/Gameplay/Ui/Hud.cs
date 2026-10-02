@@ -101,31 +101,27 @@ public sealed class Hud : IHud
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
     }
 
-    private void OnMouseEnteredAbilityButton(int buttonIndex)
+    private void OnMouseEnteredAbilityButton(int index)
     {
         if (SelectedUnit == null) return;
-        AbilitySlot slot = AbilitySlot.Class0 + buttonIndex;
+        AbilitySlot slot = AbilitySlot.Class0 + index;
         if (!SelectedUnit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
-        Vector2 position = _abilityButtons[buttonIndex].RectGlobalPosition.ToSys() +
-            new Vector2(_abilityButtons[buttonIndex].RectSize.x / 2, 0);
         string header = state.Ability.Name;
         string body = state.Ability.Description(_localizer, state.Level);
-        _tooltip.Show(position, header, body);
+        _tooltip.Show(_abilityButtons[index].TopCenterGlobalPosition.ToSys(), header, body);
     }
 
-    private void OnMouseEnteredStatusIndicator(int indicatorIndex)
+    private void OnMouseEnteredStatusIndicator(int index)
     {
         if (SelectedUnit == null) return;
         ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(SelectedUnit);
-        if (indicatorIndex >= contexts.Count) return;
-        Status status = contexts[indicatorIndex].Status;
+        if (index >= contexts.Count) return;
+        Status status = contexts[index].Status;
 
-        Vector2 position = _statusIndicators[indicatorIndex].RectGlobalPosition.ToSys() +
-            new Vector2(_statusIndicators[indicatorIndex].RectSize.x / 2, 0);
         string header = "";
         string body = status.Description(_localizer);
-        _tooltip.Show(position, header, body);
+        _tooltip.Show(_statusIndicators[index].TopCenterGlobalPosition.ToSys(), header, body);
     }
 
     private void OnMouseEnteredInventorySlot(int index)
@@ -136,10 +132,7 @@ public sealed class Hud : IHud
         Item? item = SelectedUnit.Inventory[index]?.Item;
         if (item == null) return;
 
-        // todo extract position calculation
-        Vector2 position = _inventorySlots[index].RectGlobalPosition.ToSys() +
-            new Vector2(_inventorySlots[index].RectSize.x / 2, 0);
-        _tooltip.Show(position, item.Name, "");
+        _tooltip.Show(_inventorySlots[index].TopCenterGlobalPosition.ToSys(), item.Name, "");
     }
 
     public void OnMouseExitedTooltipableControl()
