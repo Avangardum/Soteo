@@ -245,9 +245,9 @@ public sealed class Hud : IHud
             if (stack != null)
             {
                 _inventorySlots[i].TextureRect.Texture = stack.Item.Icon;
-                _inventorySlots[i].CountBackground.Visible = stack.Size > 1;
-                if (stack.Size > 1)
-                    _inventorySlots[i].CountLabel.Text = stack.Size.ToString();
+                _inventorySlots[i].CountBackground.Visible = stack.Count > 1;
+                if (stack.Count > 1)
+                    _inventorySlots[i].CountLabel.Text = stack.Count.ToString();
             }
         }
         for (int i = unit.Inventory.Count; i < _inventorySlots.Count; i++)

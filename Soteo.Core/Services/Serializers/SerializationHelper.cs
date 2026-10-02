@@ -660,7 +660,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public void SerializeItemStack(ItemStack value, Stream stream)
     {
         SerializeItem(value.Item, stream);
-        SerializeInt(value.Size, stream);
+        SerializeLong(value.Count, stream);
     }
 
     public ItemStack DeserializeItemStack(Stream stream)
@@ -668,7 +668,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         return new ItemStack
         (
             item: DeserializeItem(stream),
-            size: DeserializeInt(stream)
+            count: DeserializeLong(stream)
         );
     }
 }

@@ -5,14 +5,14 @@ namespace Soteo.Core.Dto;
 public sealed record ItemStack
 {
     public Item Item { get; }
-    public int Size { get; } // todo long Count
+    public long Count { get; }
 
-    public ItemStack(Item item, int size)
+    public ItemStack(Item item, long count)
     {
-        if (size <= 0) throw new ArgumentException("Size must be positive");
+        if (count <= 0) throw new ArgumentException("Size must be positive");
 
         Item = item;
-        Size = size;
+        Count = count;
     }
 
     public static ItemStack Of<T>(int count) where T : Item, new() => new(Item.Instance<T>(), count);
