@@ -1,5 +1,6 @@
 using Soteo.Core.Abilities;
 using Soteo.Core.Dto;
+using Soteo.Core.Items;
 using Soteo.Core.Statuses;
 
 namespace Soteo.Main.Shared.Extensions;
@@ -16,6 +17,11 @@ public static class IconExtensions
     }
 
     extension (Ability self)
+    {
+        public Texture Icon => ResourceLoader.Load<Texture>($"res://Textures/Icons/{self.IconPath}.png");
+    }
+
+    extension (Item self)
     {
         public Texture Icon => ResourceLoader.Load<Texture>($"res://Textures/Icons/{self.IconPath}.png");
     }

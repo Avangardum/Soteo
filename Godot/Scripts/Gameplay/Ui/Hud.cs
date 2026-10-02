@@ -4,6 +4,7 @@ using Soteo.Core.Dto;
 using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
+using Soteo.Core.Items;
 using Soteo.Core.Statuses;
 using Soteo.Main.Gameplay.Interfaces;
 using Soteo.Main.Shared.Extensions;
@@ -20,6 +21,8 @@ public sealed class Hud : IHud
     private readonly Label _manaLabel;
     private readonly ImmutableList<AbilityButton> _abilityButtons;
     private readonly ImmutableList<StatusIndicator> _statusIndicators;
+    private readonly GridContainer _inventoryGrid;
+    private readonly ImmutableList<InventorySlot> _inventorySlots;
 
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentCharacterIdRepository _currentCharIdRepository;
@@ -57,6 +60,10 @@ public sealed class Hud : IHud
         _statusIndicators = node.GetNode("VBoxContainer/Statuses").GetChildren()
             .Cast<StatusIndicator>()
             .ToImmutableList();
+        _inventoryGrid = node.GetNode<GridContainer>("Inventory/MarginContainer/Slots");
+        _inventorySlots = _inventoryGrid.GetChildren()
+            .Cast<InventorySlot>()
+            .ToImmutableList();
 
         for (int i = 0; i < _abilityButtons.Count; i++)
         {
@@ -73,6 +80,13 @@ public sealed class Hud : IHud
             _statusIndicators[i].Connect("mouse_entered", () => OnMouseEnteredStatusIndicator(index));
             _statusIndicators[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
         }
+
+        for (int i = 0; i < _inventorySlots.Count; i++)
+        {
+            int index = i;
+            _inventorySlots[i].Connect("mouse_entered", () => OnMouseEnteredInventorySlot(index));
+            _inventorySlots[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
+        }
     }
 
     public void OnAbilityButtonDown(int buttonIndex)
@@ -87,10 +101,10 @@ public sealed class Hud : IHud
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
     }
 
-    public void OnMouseEnteredAbilityButton(int buttonIndex)
+    private void OnMouseEnteredAbilityButton(int buttonIndex)
     {
         if (SelectedUnit == null) return;
-        AbilitySlot slot = AbilitySlot.Class0 + (byte)buttonIndex;
+        AbilitySlot slot = AbilitySlot.Class0 + buttonIndex;
         if (!SelectedUnit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
         Vector2 position = _abilityButtons[buttonIndex].RectGlobalPosition.ToSys() +
@@ -100,7 +114,7 @@ public sealed class Hud : IHud
         _tooltip.Show(position, header, body);
     }
 
-    public void OnMouseEnteredStatusIndicator(int indicatorIndex)
+    private void OnMouseEnteredStatusIndicator(int indicatorIndex)
     {
         if (SelectedUnit == null) return;
         ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(SelectedUnit);
@@ -112,6 +126,20 @@ public sealed class Hud : IHud
         string header = "";
         string body = status.Description(_localizer);
         _tooltip.Show(position, header, body);
+    }
+
+    private void OnMouseEnteredInventorySlot(int index)
+    {
+        if (SelectedUnit == null) return;
+        if (index >= SelectedUnit.Inventory.Count) return;
+
+        Item? item = SelectedUnit.Inventory[index]?.Item;
+        if (item == null) return;
+
+        // todo extract position calculation
+        Vector2 position = _inventorySlots[index].RectGlobalPosition.ToSys() +
+            new Vector2(_inventorySlots[index].RectSize.x / 2, 0);
+        _tooltip.Show(position, item.Name, "");
     }
 
     public void OnMouseExitedTooltipableControl()
@@ -131,6 +159,7 @@ public sealed class Hud : IHud
         ProcessBars(SelectedUnit);
         ProcessAbilities(SelectedUnit);
         ProcessStatuses(SelectedUnit);
+        ProcessInventory(SelectedUnit);
     }
 
     [MemberNotNullWhen(true, nameof(SelectedUnit))]
@@ -201,6 +230,29 @@ public sealed class Hud : IHud
         for (int i = contexts.Count; i < _statusIndicators.Count; i++)
         {
             _statusIndicators[i].Visible = false;
+        }
+    }
+
+    private void ProcessInventory(IUnitPuppet unit)
+    {
+        _inventoryGrid.Columns = Maths.CeilToInt(unit.Inventory.Count / 2.0);
+
+        for (int i = 0; i < unit.Inventory.Count; i++)
+        {
+            _inventorySlots[i].Visible = true;
+            ItemStack? stack = unit.Inventory[i];
+            _inventorySlots[i].TextureRect.Visible = stack != null;
+            if (stack != null)
+            {
+                _inventorySlots[i].TextureRect.Texture = stack.Item.Icon;
+                _inventorySlots[i].CountBackground.Visible = stack.Size > 1;
+                if (stack.Size > 1)
+                    _inventorySlots[i].CountLabel.Text = stack.Size.ToString();
+            }
+        }
+        for (int i = unit.Inventory.Count; i < _inventorySlots.Count; i++)
+        {
+            _inventorySlots[i].Visible = false;
         }
     }
 

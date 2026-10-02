@@ -1,6 +1,6 @@
 namespace Soteo.Core.Enums;
 
-public enum AbilitySlot : byte
+public enum AbilitySlot
 {
     Attack,
     Recall,
@@ -10,7 +10,8 @@ public enum AbilitySlot : byte
     Class3,
     Class4,
     Class5,
-    ClassLast = Class5,
+    Class6,
+    ClassLast = Class6,
     MainHandPrimary,
     MainHandSecondary,
     Offhand,

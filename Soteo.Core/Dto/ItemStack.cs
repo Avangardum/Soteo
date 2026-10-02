@@ -5,7 +5,7 @@ namespace Soteo.Core.Dto;
 public sealed record ItemStack
 {
     public Item Item { get; }
-    public int Size { get; }
+    public int Size { get; } // todo long Count
 
     public ItemStack(Item item, int size)
     {

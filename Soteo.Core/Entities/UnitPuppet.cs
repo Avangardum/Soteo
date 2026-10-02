@@ -14,7 +14,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 {
     private readonly ICamera _camera;
 
-    private Inventory Inventory { get; } = new(0);
+    public Inventory Inventory { get; } = new(0);
 
     public UnitPuppet(Guid id, IUnitPuppetNode node, ICamera camera) : base(id, node)
     {
