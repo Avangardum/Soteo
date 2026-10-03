@@ -1,7 +1,6 @@
 using System.Collections;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Deltas;
-using Soteo.Core.Dto.Snapshots;
 
 namespace Soteo.Core;
 
@@ -29,12 +28,26 @@ public sealed class Inventory : IReadOnlyList<ItemStack?>
 
     public bool TryAdd(ItemStack stack)
     {
-        // todo merge stacks
+        long remainingCount = stack.Count;
+        for (int i = 0; i < _stacks.Count && remainingCount > 0; i++)
+        {
+            ItemStack? existingStack = _stacks[i];
+            if (existingStack?.Item == stack.Item && existingStack.Count < existingStack.Item.MaxStackCount)
+            {
+                long freeSpace = existingStack.Item.MaxStackCount - existingStack.Count;
+                long transferredCount = Math.Min(remainingCount, freeSpace);
+                remainingCount -= transferredCount;
+                _stacks[i] = new ItemStack(existingStack.Item, existingStack.Count + transferredCount);
+            }
+        }
+
+        if (remainingCount == 0) return true;
+
         for (int i = 0; i < _stacks.Count; i++)
         {
             if (_stacks[i] == null)
             {
-                _stacks[i] = stack;
+                _stacks[i] = new ItemStack(stack.Item, remainingCount);
                 return true;
             }
         }

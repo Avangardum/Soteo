@@ -6,7 +6,7 @@ namespace Soteo.Core.Items;
 
 public abstract class Item : SingletonHierarchyBase<Item>
 {
-    public virtual int StackSize => 1;
+    public virtual long MaxStackCount => 1;
 
     public virtual EquipmentSlot? EquipmentSlot => null;
 

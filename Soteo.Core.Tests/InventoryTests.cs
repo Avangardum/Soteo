@@ -38,13 +38,39 @@ public sealed class InventoryTests
         sut[0].Should().Be(ItemStack.Of<Item1>(1));
     }
 
+    [Fact]
+    public void AddingItemStackThatCanBeFullyMergedWithExistingStacksIsFullyMerged()
+    {
+        var sut = new Inventory([null, ItemStack.Of<Item1>(8), ItemStack.Of<Item1>(9), null]);
+
+        sut.TryAdd(ItemStack.Of<Item1>(3)).Should().BeTrue();
+
+        sut[0].Should().Be(null);
+        sut[1].Should().Be(ItemStack.Of<Item1>(10));
+        sut[2].Should().Be(ItemStack.Of<Item1>(10));
+        sut[3].Should().Be(null);
+    }
+
+    [Fact]
+    public void AddingItemStackThatCanBePartiallyMergedWithExistingStacksIsMergedAndRemainderIsAddedToFirstEmptySlot()
+    {
+        var sut = new Inventory([null, ItemStack.Of<Item1>(8), ItemStack.Of<Item1>(9), null]);
+
+        sut.TryAdd(ItemStack.Of<Item1>(5)).Should().BeTrue();
+
+        sut[0].Should().Be(ItemStack.Of<Item1>(2));
+        sut[1].Should().Be(ItemStack.Of<Item1>(10));
+        sut[2].Should().Be(ItemStack.Of<Item1>(10));
+        sut[3].Should().Be(null);
+    }
+
     private class Item1 : Item
     {
-        public override int StackSize => 10;
+        public override long MaxStackCount => 10;
     }
 
     private class Item2 : Item
     {
-        public override int StackSize => 10;
+        public override long MaxStackCount => 10;
     }
 }
