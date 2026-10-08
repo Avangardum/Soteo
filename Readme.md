@@ -4,8 +4,8 @@ Shard of the Empire Online (Soteo) is a game that fits between classical MMOs an
 A campaign that lasts for hours is played over many short sessions so that any dedicated player can play from the
 beginning to the end.
 
-The project aims to provide MMO level scale while keeping the gameplay engaging and concentrated. It aims to avoid
-the grind, long downtime and filler content which are common in the MMO genre.
+The project aims to provide an MMO level scale while keeping gameplay engaging and concentrated. It aims to avoid
+grind, long downtime and filler content which are common in the MMO genre.
 
 Two factions: Empire and Syndicate fight for shards of a shattered world.
 Players pick a side and work alongside their allies to destroy the enemy.
@@ -15,7 +15,10 @@ In Soteo there is no fog of war, every player or spectator can observe any point
 A secondary game mode called challenges lets you try yourself in a series of trials at your own pace either alone or
 in a party.
 
-The game is currently in early development.
+See Vision.md for a detailed description of Soteo ideology, values and design goals.
+
+The game is currently in early development, working towards its first v0.1 demo release containing a
+singleplayer challenge showcasing core mechanics.
 
 [Discord](https://discord.gg/kJzPpwdwrc)
 
