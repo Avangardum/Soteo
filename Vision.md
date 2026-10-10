@@ -173,7 +173,14 @@ world is one of the greatest experiences an MMO can give. We should facilitate a
 
 ## PvP Specifics
 
-
+So, we decided to focus on PvP, but what kind of PvP will it be? Most popular competitive games organize their players
+in 2 opposing teams, and it seems that this approach works the best. Other formats exist in the industry: from multiple
+teams to free-for-all with or without teaming. Having more than 2 teams often end up disouraging active plays,
+as attacking someone else weakens both of you, while third parties benefit the most as the others destroy each other,
+a third party can even intervene into a finished fight destroying the weakened victor, which encourages boring and
+passive gameplay. Meanwhile free teaming often results in teams being wildly unbalanced, with stronger teams stomping
+over the weaker. Soteo divides players into 2 teams: Empire and Syndicate to take advantage of the most successful,
+straightforward and reliable PvP format.
 
 ## Target audience
 
