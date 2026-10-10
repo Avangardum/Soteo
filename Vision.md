@@ -148,7 +148,13 @@ the expected number of players and then adjust it as it changes.
 
 ## Simple visuals
 
+Soteo uses simple graphics: 2D pixel art. As Soteo is highly experimental it needs to be able to iterate quickly to find
+what works and what doesn't, simple visuals minimize the workload. Simple graphics are also beneficial for performance,
+which is important to keep the gameplay smooth even through the most numerous battles.
+
 ## Sourcing content
+
+
 
 ## PVP Specifics
 
