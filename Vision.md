@@ -16,8 +16,8 @@ offer, you will see that it's actually quite bad: boring "kill X mobs" and "clic
 poorly written story, that most players end up not reading it at all, monotonous and
 lengthy grinds where you have to repeat same simple actions over and over for an outrageous amount of time, dungeons
 and bosses that you clear without any effort simply by spamming spells and occasionally walking out of a red circle
-on a ground, even PVP, fighting other players devolves into a form where you spend most of the time of so-called
-"PVP activities" not interacting with other human beings.
+on a ground, even PvP, fighting other players devolves into a form where you spend most of the time of so-called
+"PvP activities" not interacting with other human beings.
 
 Nowadays other generes offer gameplay of substantially more quality. Games like Dark Souls, Elden Ring and
 Hollow Knight offer worlds that are interesting and challenging to explore and bosses that require you to learn
@@ -152,11 +152,26 @@ Soteo uses simple graphics: 2D pixel art. As Soteo is highly experimental it nee
 what works and what doesn't, simple visuals minimize the workload. Simple graphics are also beneficial for performance,
 which is important to keep the gameplay smooth even through the most numerous battles.
 
-## Sourcing content
+## Content
 
+Even though we somewhat reduced temporal scale, we still need a lot of content. What kind of content will it be and
+how to produce it in both high quantity and high quality? MMO content is mainly divided between PvE and PvP, let's
+consider how we make massive amount of content for each one. For PvE we'd have to adopt roguelike elements, as
+procedural generation greatly increases replayability, allowing to enternain players more with less development effort.
+And while procedural generation does increase content longevity, its impact is limited. Even if levels are new each
+time, elements are the same. As PvE is mainly about learning systems behind computer controlled enemies, players will
+eventually master them to the point where they begin to lose their challenge and become boring. PvP on the other
+hand produces content from other players. Competing against a living person is always deeper than any computer opponent,
+people are unpredictable, adaptive, each with their own strengths and weaknesses, and most importantly, they never let
+you "master" them, no matter how much you advance, there is always someone equal or more powerful than you. PvP is
+a bottomless well of high quality content created by players themselves, while all developers have to do is give them
+tools and adjust the rules to maximize fun. Soteo, therefore, declares PvP as its primary focus.
 
+Also, regardless of a type of content, it's perhaps, even more important to focus on allies, as they also can be
+viewed as content. Communicating with your friends, forming bonds and overcoming difficulties together in a shared
+world is one of the greatest experiences an MMO can give. We should facilitate and encourage such bonding.
 
-## PVP Specifics
+## PvP Specifics
 
 ## Target audience
 
@@ -170,7 +185,7 @@ which is important to keep the gameplay smooth even through the most numerous ba
 
 ## Streamsniping and secrecy
 
-## Free-for-all and unbalanced PVP
+## Free-for-all and unbalanced PvP
 
 ## Aimlessness
 
