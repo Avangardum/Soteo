@@ -173,7 +173,12 @@ world is one of the greatest experiences an MMO can give. We should facilitate a
 
 ## PvP Specifics
 
+
+
 ## Target audience
+
+Soteo is targeted at MMO players who are upset with the genre stagnation and need innovation as well as at match-based
+game players who don't find classical MMOs interesting.
 
 # All things bad and how to fix them
 
