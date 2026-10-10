@@ -135,7 +135,18 @@ MMOs and match-based games, a new genre, a Discrete Massively Multiplayer Online
 
 ### Space: the delicate balance
 
-## Into the unknown
+When it comes to designing the size of a playing space, it should be dictated by gameplay and number of players.
+Match-based games know the importance of getting it right and carefully craft their maps to be big enough to feel
+spacious, yet small enough to keep players close to each other, so they don't feel empty. Games that feature modes
+with various number of players have differently sized maps for them. Battle rolayes where the number of players in a
+game decreases over time also shrink playing area accordingly. Some classical MMOs use sharding to distribute their
+players between servers, yet the number of players on such servers can fluctutate wildly over their lifetime, often
+missing the optimal count. Other ones, which have a single world, often feel barren with too much space and too little
+people. Worlds existing for a limited time window somewhat help to alleviate this, yet some fluctuations should still be
+expected. We should have a system for dynamically adjusting the play area and use it to initialize size according to
+the expected number of players and then adjust it as it changes.
+
+## Simple visuals
 
 ## Sourcing content
 
@@ -145,7 +156,7 @@ MMOs and match-based games, a new genre, a Discrete Massively Multiplayer Online
 
 # All things bad and how to fix them
 
-## Grind
+## Grinding
 
 ## Griefing
 
