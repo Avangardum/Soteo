@@ -1,7 +1,5 @@
 # What is Soteo?
 
-Hello, I am Avangardum, and I don't like MMOs.
-
 MMO, massively multiplayer online games, is a genre of videogames
 characterized by taking the multiplayer aspect to its extreme, to a truly massive level in all possible dimensions:
 massive playing space, massive time for which the game is on, massive player count. Sounds impressive, doesn't it?
@@ -24,7 +22,7 @@ on a ground, even PVP, fighting other players devolves into a form where you spe
 Nowadays other generes offer gameplay of substantially more quality. Games like Dark Souls, Elden Ring and
 Hollow Knight offer worlds that are interesting and challenging to explore and bosses that require you to learn
 their patterns and find openings for counterattacks. Detroit: Become Human and Baldur's Gate 3 captivate you with
-their amazingly written story where your choices matter. Dota 2, Valorant and Marvel: Rivals put you into intensive
+their amazingly written stories where your choices matter. Dota 2, Valorant and Marvel: Rivals put you into intensive
 and saturated battles of skill against other players, pushing you to the edge of your abilities.
 
 Why is it like that? How did it come that MMOs all as one take this path of producing bland, boring, repetitive,
@@ -34,7 +32,7 @@ weakness of the genre comes from the same origin as its greatest strength: massi
 developers face when making content is that they are trying to fill all of that massive spacetime so that a massive
 number of players can play in a massive world for a massive amount of time. In trying to do this they end up spreading
 too thin, aiming for so much quantity that they can no longer afford proper quality. And thus again and again we see
-games that are wide as an ocean and deep as a puddle, where quality suffer so much, that quantity doesn't even
+games that are wide as an ocean and deep as a puddle, where quality suffers so much, that quantity doesn't even
 matter anymore.
 
 Yet the MMO genre has something unique, something no other can offer. An opportunity to exist in a world
@@ -51,3 +49,57 @@ gameplay of the best modern non-MMO games, committing to getting this merge done
 ruthlessly demolishing any standards, dogmas and traditions standing in the way?
 
 This is what Soteo is going to answer. This is Soteo.
+
+# Some important implications
+
+With the goal established, let's consider a number of important implications coming out of it:
+
+## Deconstructing scale
+
+As established earlier, the massive scale of MMOs are both their blessing and their curse, it makes them unique,
+but often leads to gameplay being watered down as a result of content being spread too thin. How are we going to
+solve this dilemma? Let's deconstruct the notion of massive scale into the dimensions identified earlier: player count,
+time and space.
+
+### Player count: the more, the merrier
+
+Massive player count is the first thing that comes to mind when "MMO" is mentioned and is the main pillar of it,
+MMO is the only genre in the industry that offers you an opportunity to be among hundrens and thousand of players at
+the same time. It's the genre's most powerful appeal, to be able to participate not just in small scale skirmish, but
+in a full scale war with hundreds and thousands on either side, a truly mesmerizing experience whether you are a
+participant or an observer. And the more people participate, the more exciting it usually feels.
+
+But what about the cons? What's the backside of being in a crowd? It can be described as the loss of individuality.
+One part of this is that while in a smaller group a mind can process each person individually: you can consider
+each of your friends and foes, inspect what are they doing and theorize of what they may think about and plan to
+do in the future, something impossible to do in a crowd. Another part is about you and your personal impact on the game,
+being in a small team means that while an outcome isn't entirely in your hands, your impact is still sizable, while
+being one of hundreds or thousands greatly diminishes it, which may have a negative effect on player engagement and
+satisfaction. The severity of this issue grows with the number of players, but only up to a certain point, after which
+the individuality is gone and you only see the crowd, so further growth doesn't make much difference, whether a crowd
+is 100 people or 1000 people, it's still a faceless crowd. And since MMOs have crowds as an integral part of their
+design, we aren't getting this individuality behind each specific player thing anyway, so that's not a concern to worry
+about.
+
+But not all individuality is lost. When people are in a big group for a long time, they tend to form their
+own small connections within it: they find friends, form squads, establish clans and thus regain the lost individuality.
+And the bigger the overall community, ther more intensive this process is.
+
+There are many things MMO players complain about, "too many players" is not one of them. The more the merrier, that's
+the attitude the genre traditinoally has towards player count. There is no reason for Soteo to reject it, so
+we'll aim for the sky and do what we can to bring as much people as possible together, while encouraging formation
+of tighter and more individual groups inside the bigger whole.
+
+### Time: a treasure not to be wasted
+
+### Space: the delicate balance
+
+## Into the unknown
+
+## Sourcing content
+
+## PVP Specifics
+
+## Target audience
+
+# All things bad and how to fix them
