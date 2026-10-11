@@ -286,3 +286,10 @@ To minimize effect of griefing, mechanics are designed to minimize opportunities
 such as not having friendly fire.
 
 # Roadmap
+
+Soteo is a small indie project without a big budget or fame to use in marketing.
+As MMO, however, it needs a big community to support its intended gameplay.
+Therefore Soteo uses the strategy of iterative growth, starting small and growing together with its community.
+That's why the first mode to be released is the challenge mode designed for a single player or small groups.
+As more people become interested, more massive challenges will be released as well as small scale PvP events, gradually
+working towards the MMO scale.
