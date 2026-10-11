@@ -6,7 +6,7 @@ massive playing space, massive time for which the game is on, massive player cou
 Sounds impressive, doesn't it?
 
 Such a marvellous concept had a massive success thanks to its novelty in the early 2000s, but as time went by, the genre
-lost its mainstream position, largely replaced by singleplayer and match-based multiplayer games.
+have lost its mainstream position, largely replaced by singleplayer and match-based multiplayer games.
 As of 2026, when this is being written, MMO is a stagnating genre without much innovation, with some of the most popular
 and praised titles being rollbacks to an earlier version of an existing MMO, suggesting that these games not only didn't
 improve, but even became worse than they were originally, while newly released games often suffer from poor quality and
@@ -74,7 +74,7 @@ Let's deconstruct the concept of massive scale into the dimensions identified ea
 Massive player count is the first thing that comes to mind when MMO is mentioned, and is the main pillar of it,
 MMO is the only genre in the industry that offers you an opportunity to be among hundreds and thousands of players at
 the same time.
-It's the genre's most powerful appeal, to be able to participate not just in small scale skirmish, but
+It's the genre's most powerful appeal, to be able to participate not just in a small skirmish, but
 in a full-scale war with hundreds and thousands on either side, a truly mesmerizing experience, whether you are a
 participant or an observer.
 And the more people participate, the more exciting it usually feels.
@@ -165,7 +165,7 @@ can fluctuate wildly over their lifetime, often missing the optimal count.
 Other ones, which have a single world, often feel barren with too much space and too little people.
 Worlds existing for a limited time window somewhat help to alleviate this, yet some fluctuations should still be
 expected.
-We should have a system for dynamically adjusting the play area and use it to initialize size according to an expected
+We should have a system for dynamically adjusting play area and use it to initialize size according to an expected
 number of players and then adjust it as it changes.
 
 ## Simple visuals
@@ -192,7 +192,7 @@ Competing against a living person is always deeper than any computer opponent, p
 with their own strengths and weaknesses, and most importantly, they never let you "master" them, no matter how much you
 advance, there is always someone equal or more powerful than you.
 PvP is a bottomless well of high-quality content created by players themselves, while all developers have to do is give
-them tools and adjust the rules to maximize fun.
+them tools and adjust rules to maximize fun.
 Soteo, therefore, declares PvP as its primary focus.
 
 Also, regardless of a type of content, it's perhaps even more important to focus on allies, as they also can be
@@ -291,8 +291,8 @@ those who still decide to go there despite penalties don't have to wait.
 
 ## Zerging
 
-As described earlier, a massive number of players can lead to loss of individuality, which is then regained by becoming
-a part of a subset of a crowd, like a clan.
+As described earlier, a massive number of players can lead to the loss of individuality,
+which is then regained by becoming a part of a subset of a crowd, like a clan.
 A similar thing can happen when you encounter an enemy in a battle:
 your focus narrows down to only those who partake in the fight, and you can perceive each player individually.
 This is not just about social vibes, it also affects tactical depth by seeing the battlefield as a multitude of
@@ -305,7 +305,7 @@ at each other, throwing attacks in each other's general direction.
 Playing in a zerg is a shallow experience: it all comes down to following simple orders of your leader, with no room
 for personal choice, tactics and skill.
 A zerg looks like a single unit and plays like a single unit, which is not the kind of experience we want from fights.
-Thankfully, a tight clump of people looks like a very vulnerable target if you have the right tools to punish that.
+Thankfully, a tight clump of people looks like a very vulnerable target if you have right tools to punish that.
 Soteo provides these tools plentifully to discourage zerging and encourage large groups to spread out into smaller
 and more independent groups.
 
@@ -325,7 +325,7 @@ such as not having friendly fire.
 
 ## Two factions
 
-Soteo divides all players into one of two opposing factions: Empire and Syndicate.
+Soteo divides all players into two opposing factions: Empire and Syndicate.
 Each faction has the concrete goal of winning the war by capturing enemy territory.
 Every player is placed from the start into its faction's society, the game immediately gives them allies to rely on and
 enemies to fight.
@@ -355,7 +355,8 @@ There is no fog of war, and the camera can be moved freely.
 Any player or spectator can take a look at any point of any shard: see all the units, look into their inventories.
 Not only this simplifies the technical aspect, eliminates steamsniping as well as a whole class of cheats, it also
 greatly deepens the strategic aspect: with all that data in front of you eyes, the opportunities for planning and
-analysis are boundless, and even if by some unfortunate game design mistake you find yourself having to do something not
+analysis are boundless.
+And even if by some unfortunate game design mistake you find yourself having to do something not
 very exciting, there is always something to observe in the meanwhile.
 
 ## Free and open-source
