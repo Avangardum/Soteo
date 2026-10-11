@@ -2,53 +2,62 @@
 
 MMO, massively multiplayer online games, is a genre of videogames
 characterized by taking the multiplayer aspect to its extreme, to a truly massive level in all possible dimensions:
-massive playing space, massive time for which the game is on, massive player count. Sounds impressive, doesn't it?
+massive playing space, massive time for which the game is on, massive player count.
+Sounds impressive, doesn't it?
 
 Such a marvellous concept had a massive success thanks to its novelty in the early 2000s, but as time went by, the genre
-lost its mainstream position, largely replaced by singleplayer and match-based multiplayer games. As of 2026, when this
-is being written, MMO is a stagnating genre without much innovation, with some of the most popular and praised titles
-being rollbacks to an earlier version of an existing MMO, suggesting that these games not only didn't improve,
-but even became worse than they were originally, while newly released games often suffer from poor quality and lack
-of novel ideas, doing the same things older game did (but often worse), and thus fail to gain praise and popularity.
+lost its mainstream position, largely replaced by singleplayer and match-based multiplayer games.
+As of 2026, when this is being written, MMO is a stagnating genre without much innovation, with some of the most popular
+and praised titles being rollbacks to an earlier version of an existing MMO, suggesting that these games not only didn't
+improve, but even became worse than they were originally, while newly released games often suffer from poor quality and
+lack of novel ideas, doing the same things older game did (but often worse), and thus fail to gain praise and
+popularity.
 
-What's the main reason behind this? Quality. Gameplay quality specifically. If you look at what kind of gameplay MMOs
-offer, you will see that it's actually quite bad: boring "kill X mobs" and "click on X objects" quests with such a
-poorly written story, that most players end up not reading it at all, monotonous and
-lengthy grinds where you have to repeat same simple actions over and over for an outrageous amount of time, dungeons
-and bosses that you clear without any effort simply by spamming spells and occasionally walking out of a red circle
-on a ground, even PvP, fighting other players devolves into a form where you spend most of the time of so-called
-"PvP activities" not interacting with other human beings.
+What's the main reason behind this?
+Quality.
+Gameplay quality specifically.
+If you look at what kind of gameplay MMOs offer, you will see that it's actually quite bad: boring "kill X mobs" and
+"click on X objects" quests with such a poorly written story, that most players end up not reading it at all,
+monotonous and lengthy grinds where you have to repeat same simple actions over and over for an outrageous amount of
+time, dungeons and bosses that you clear without any effort simply by spamming spells and occasionally walking out of a
+red circle on a ground, even PvP, fighting other players devolves into a form where you spend most of the time of
+so-called "PvP activities" not interacting with other human beings.
 
-Nowadays other generes offer gameplay of substantially more quality. Games like Dark Souls, Elden Ring and
-Hollow Knight offer worlds that are interesting and challenging to explore and bosses that require you to learn
-their patterns and find openings for counterattacks. Detroit: Become Human and Baldur's Gate 3 captivate you with
-their amazingly written stories where your choices matter. Dota 2, Valorant and Marvel: Rivals put you into intensive
-and saturated battles of skill against other players, pushing you to the edge of your abilities.
+Nowadays other generes offer gameplay of substantially more quality.
+Games like Dark Souls, Elden Ring and Hollow Knight offer worlds that are interesting and challenging to explore and
+bosses that require you to learn their patterns and find openings for counterattacks.
+Detroit: Become Human and Baldur's Gate 3 captivate you with their amazingly written stories where your choices matter.
+Dota 2, Valorant and Marvel: Rivals put you into intensive and saturated battles of skill against other players, pushing
+you to the edge of your abilities.
 
 Why is it like that? How did it come that MMOs all as one take this path of producing bland, boring, repetitive,
 uninspired, watered down gameplay experience, digging themselves into irrelevance year after year, while
-other genres regularly present the world with something novel, brilliant and captivating? It seems that the greatest
-weakness of the genre comes from the same origin as its greatest strength: massive scale. The problem most MMO
-developers face when making content is that they are trying to fill all of that massive spacetime so that a massive
-number of players can play in a massive world for a massive amount of time. In trying to do this they end up spreading
-too thin, aiming for so much quantity that they can no longer afford proper quality. And thus again and again we see
-games that are wide as an ocean and deep as a puddle, where quality suffers so much, that quantity doesn't even
-matter anymore.
+other genres regularly present the world with something novel, brilliant and captivating?
+It seems that the greatest weakness of the genre comes from the same origin as its greatest strength: massive scale.
+The problem most MMO developers face when making content is that they are trying to fill all of that massive spacetime
+so that a massive number of players can play in a massive world for a massive amount of time.
+In trying to do this they end up spreading too thin, aiming for so much quantity that they can no longer afford proper
+quality.
+And thus again and again we see games that are wide as an ocean and deep as a puddle, where quality suffers so much,
+that quantity doesn't even matter anymore.
 
-Yet the MMO genre has something unique, something no other can offer. An opportunity to exist in a world
-with its own unique society of hundreds and thousands of players who share it with you and shape it alongside you.
+Yet the MMO genre has something unique, something no other can offer.
+An opportunity to exist in a world with its own unique society of hundreds and thousands of players who share it with
+you and shape it alongside you.
 It's this feeling of being a part of something huge, of a massive living world, where you can make long-term friends and
 enemies, that rose the genre to glory in its prime days.
-It's what still keeps it afloat even after being left hopelessly behind in terms of gameplay quality
-by other genres. It's what makes countless people around the world remember their experience with it with warmth and
-dream of a new golden age. Ironically, it's this social aspect that's many modern MMOs have been removing for the
-sake of convenience, devoiding themselves of that one spark that distinguishes the genre and gives it purpose.
+It's what still keeps it afloat even after being left hopelessly behind in terms of gameplay quality by other genres.
+It's what makes countless people around the world remember their experience with it with warmth and dream of a new
+golden age.
+Ironically, it's this social aspect that's many modern MMOs have been removing for the sake of convenience,
+devoiding themselves of that one spark that distinguishes the genre and gives it purpose.
 
 But what if it doesn't have to be that way? What if we took the massive social aspect of MMOs and merged it with
 gameplay of the best modern non-MMO games, committing to getting this merge done as well as possible at any cost,
 ruthlessly demolishing any standards, dogmas and traditions standing in the way?
 
-This is what Soteo is going to answer. This is Soteo.
+This is what Soteo is going to answer.
+This is Soteo.
 
 # Some important implications
 
@@ -57,57 +66,63 @@ With the goal established, let's consider a number of important implications com
 ## Deconstructing scale
 
 As established earlier, the massive scale of MMOs are both their blessing and their curse, it makes them unique,
-but often leads to gameplay being watered down as a result of content being spread too thin. How are we going to
-solve this dilemma? Let's deconstruct the notion of massive scale into the dimensions identified earlier: player count,
-time and space.
+but often leads to gameplay being watered down as a result of content being spread too thin.
+How are we going to solve this dilemma?
+Let's deconstruct the notion of massive scale into the dimensions identified earlier: player count, time and space.
 
 ### Players: the more, the merrier
 
 Massive player count is the first thing that comes to mind when "MMO" is mentioned and is the main pillar of it,
 MMO is the only genre in the industry that offers you an opportunity to be among hundrens and thousand of players at
-the same time. It's the genre's most powerful appeal, to be able to participate not just in small scale skirmish, but
+the same time.
+It's the genre's most powerful appeal, to be able to participate not just in small scale skirmish, but
 in a full scale war with hundreds and thousands on either side, a truly mesmerizing experience whether you are a
-participant or an observer. And the more people participate, the more exciting it usually feels.
+participant or an observer.
+And the more people participate, the more exciting it usually feels.
 
 But what about the cons? What's the backside of being in a crowd? It can be described as the loss of individuality.
 One part of this is that while in a smaller group a mind can process each person individually: you can consider
 each of your friends and foes, inspect what are they doing and theorize of what they may think about and plan to
-do in the future, something impossible to do in a crowd. Another part is about you and your personal impact on the game,
-being in a small team means that while an outcome isn't entirely in your hands, your impact is still sizable, while
-being one of hundreds or thousands greatly diminishes it, which may have a negative effect on player engagement and
-satisfaction. The severity of this issue grows with the number of players, but only up to a certain point, after which
-the individuality is gone and you only see the crowd, so further growth doesn't make much difference, whether a crowd
-is 100 people or 1000 people, it's still a faceless crowd. And since MMOs have crowds as an integral part of their
-design, we aren't getting this individuality behind each specific player thing anyway, so that's not a concern to worry
-about.
+do in the future, something impossible to do in a crowd.
+Another part is about you and your personal impact on the game, being in a small team means that while an outcome isn't
+entirely in your hands, your impact is still sizable, while being one of hundreds or thousands greatly diminishes it,
+which may have a negative effect on player engagement and satisfaction.
+The severity of this issue grows with the number of players, but only up to a certain point, after which
+individuality is gone and you only see a crowd, so further growth doesn't make much difference, whether a crowd
+is 100 people or 1000 people, it's still a faceless crowd.
+And since MMOs have crowds as an integral part of their design, we aren't getting this individuality behind each
+specific player thing anyway, so that's not a concern to worry about.
 
-But not all individuality is lost. When people are in a big group for a long time, they tend to form their
+But not all individuality is lost.
+When people are in a big group for a long time, they tend to form their
 own small connections within it: they find friends, form squads, establish clans and thus regain the lost individuality.
-And the bigger the overall community, ther more intensive this process is.
+And the bigger the overall community, the more intensive this process is.
 
-There are many things MMO players complain about, "too many players" is not one of them. The more the merrier, that's
-the attitude the genre traditinoally has towards player count. There is no reason for Soteo to reject it, so
-we'll aim for the sky and do what we can to bring as much people as possible together, while encouraging formation
-of tighter and more individual groups inside the bigger whole.
+There are many things MMO players complain about, "too many players" is not one of them.
+The more the merrier, that's the attitude the genre traditinoally has towards player count.
+There is no reason for Soteo to reject it, so we'll aim for the sky and do what we can to bring as much people as
+possible together, while encouraging formation of tighter and more individual groups inside the bigger whole.
 
 ### Time: a treasure not to be wasted
 
-Time is a personal, valuable and finite resource. People value their time, they want to spend it efficienty and hate
-when it's wasted. Time is also one of the integral aspects of MMO scale: battle royale games, despite their massive
+Time is a personal, valuable and finite resource.
+People value their time, they want to spend it efficienty and hate when it's wasted.
+Time is also one of the integral aspects of MMO scale: battle royale games, despite their massive
 space and player count compared to other match-based games are not considered MMO specifically because they miss the
-time component, as each session lasts only a few minutes with no persistence between them. So, if we are going to
-make an MMO, we should have some form of persistence over a long time, longer than any match-based game.
+time component, as each session lasts only a few minutes with no persistence between them.
+So, if we are going to make an MMO, we should have some form of persistence over a long time, longer than any
+match-based game.
 
 Classical MMOs take this to the extreme, they have persistent worlds that are online 24/7 for as long as possible,
 for years and decades.
 That means that players are not always online: they log in and log out when they choose to, yet still, amount
 of time expected from any single player is huge, and while players choose on their own how much time to spend in them,
-their competitiveness often encourages long hours, since those who play more earn more power. Fear of missing out also
-plays a signifinact role in making people play more. This leads to
-an unfortunate consequence: if players spend all of that enormous time playing the game, the game needs to provide
-them with something to do, some content, a lot of content, and that what causes the aforementined gameplay quality
-issue, developers prioritize quantity to such an extent that quality drops to a truly pathetic level, faced with the
-task of making something to fill hundreds of hours of gameplay they resort to copy-paste quests, mobs and locations.
+their competitiveness often encourages long hours, since those who play more earn more power.
+Fear of missing out also plays a signifinact role in making people play more.
+This leads to an unfortunate consequence: if players spend all of that enormous time playing the game, the game needs to
+provide them with something to do, some content, a lot of content, and that what causes the aforementined gameplay
+quality issue, developers prioritize quantity to such an extent that quality drops to a truly pathetic level, faced with
+the task of making something to fill hundreds of hours of gameplay they resort to copy-paste quests, mobs and locations.
 If a game offers some way to alter the game world, it also means the game must be designed so that the changes happen
 gradually over several days, which means that from the perspective of someone actively playing, events happen at
 a snail's pace, so any player-generated content is watered down in the same way.
@@ -116,71 +131,86 @@ Resulting games excels at one thing - wasting players' time, keeping them playin
 which is one of the most atrocious things a game can do.
 
 Therefore, we need to abolish the extreme idea of an always online, perpetually persistent world and lean towards
-something more balanced, which keeps the MMO scale, without going too far. Competitive players want to play
-efficiently, so when a game gives you a choice of how much time you are going to spend in a match, the obvious choice
-is "as much is possible". Match-based games don't have this problem, their duration rarely exceeds 1 hour, there
-is no choice, you play from a beginning to an end. Compared to that, being a competitive player in an always online MMO
-means that no matter what you do, if you are looking for a way to improve, the most efficient measure is to play more,
+something more balanced, which keeps the MMO scale, without going too far.
+Competitive players want to play efficiently, so when a game gives you a choice of how much time you are going to spend
+in a match, the obvious choice is "as much is possible".
+Match-based games don't have this problem, their duration rarely exceeds 1 hour, there is no choice, you play from a
+beginning to an end.
+Compared to that, being a competitive player in an always online MMO means that no matter what you do, if you are
+looking for a way to improve, the most efficient measure is to play more,
 after all, if you play more, you progress more, there is no going around it, playing more gives you a direct advantage.
 One of the duties of a game designer is protecting players from themselves, because given an opportunity, they will
-optimize fun out of it, so the optimal way must also be the intended way, the fun way. Which means that the amount
-of time a player can spend it a game world must have a reasonable limit, such as 1 hour. It wouldn't be wise to make it
-a personal timer, as being forcefully kicked in a middle of something important, while the game continues without
-you, would cause immense frustration and encourage creating multiple accounts to circumvent this. Instead, the timer
-should be tied to the world, so that it operates on a schedule, going online at a certain time for 1 hour and then
-pausing until the next session. This way, it's possible to have a world persist for several game hours total, reaching a
-temporal scale much greater than other match-based games, yet much less than other MMOs,
-but since this is the fun way, we are doing this anyway, aiming at the uncharted void between existing
-MMOs and match-based games, a new genre, a Discrete Massively Multiplayer Online game, or DMMO.
+optimize fun out of it, so the optimal way must also be the intended way, the fun way.
+Which means that the amount of time a player can spend it a game world must have a reasonable limit, such as 1 hour.
+It wouldn't be wise to make it a personal timer, as being forcefully kicked in a middle of something important, while
+the game continues without you, would cause immense frustration and encourage creating multiple accounts to circumvent
+this.
+Instead, the timer should be tied to the world, so that it operates on a schedule, going online at a certain time for 1
+hour and then pausing until the next session.
+This way, it's possible to have a world persist for several game hours total, reaching a temporal scale much greater
+than other match-based games, yet much less than other MMOs, but since this is the fun way, we are doing this anyway,
+aiming at the uncharted void between existing MMOs and match-based games, a new genre,
+a Discrete Massively Multiplayer Online game, or DMMO.
 
-### Space: the delicate balance
+### Space: a delicate balance
 
 When it comes to designing the size of a playing space, it should be dictated by gameplay and number of players.
 Match-based games know the importance of getting it right and carefully craft their maps to be big enough to feel
-spacious, yet small enough to keep players close to each other, so they don't feel empty. Games that feature modes
-with various number of players have differently sized maps for them. Battle rolayes where the number of players in a
-game decreases over time also shrink playing area accordingly. Some classical MMOs use sharding to distribute their
-players between servers, yet the number of players on such servers can fluctutate wildly over their lifetime, often
-missing the optimal count. Other ones, which have a single world, often feel barren with too much space and too little
-people. Worlds existing for a limited time window somewhat help to alleviate this, yet some fluctuations should still be
-expected. We should have a system for dynamically adjusting the play area and use it to initialize size according to
-the expected number of players and then adjust it as it changes.
+spacious, yet small enough to keep players close to each other, so they don't feel empty.
+Games that feature modes with various number of players have differently sized maps for them.
+Battle rolayes where the number of players in a game decreases over time also shrink playing area accordingly.
+Some classical MMOs use sharding to distribute their players between servers, yet the number of players on such servers
+can fluctutate wildly over their lifetime, often missing the optimal count.
+Other ones, which have a single world, often feel barren with too much space and too little people.
+Worlds existing for a limited time window somewhat help to alleviate this, yet some fluctuations should still be
+expected.
+We should have a system for dynamically adjusting the play area and use it to initialize size according to the expected
+number of players and then adjust it as it changes.
 
 ## Simple visuals
 
-Soteo uses simple graphics: 2D pixel art. As Soteo is highly experimental it needs to be able to iterate quickly to find
-what works and what doesn't, simple visuals minimize the workload. Simple graphics are also beneficial for performance,
-which is important to keep the gameplay smooth even through the most numerous battles.
+Soteo uses simple graphics: 2D pixel art.
+As Soteo is highly experimental it needs to be able to iterate quickly to find what works and what doesn't, simple
+visuals minimize the workload.
+Simple graphics are also beneficial for performance, which is important to keep the gameplay smooth even through the
+most numerous battles.
 
 ## Content
 
-Even though we somewhat reduced temporal scale, we still need a lot of content. What kind of content will it be and
-how to produce it in both high quantity and high quality? MMO content is mainly divided between PvE and PvP, let's
-consider how we make massive amount of content for each one. For PvE we'd have to adopt roguelike elements, as
-procedural generation greatly increases replayability, allowing to enternain players more with less development effort.
-And while procedural generation does increase content longevity, its impact is limited. Even if levels are new each
-time, elements are the same. As PvE is mainly about learning systems behind computer controlled enemies, players will
-eventually master them to the point where they begin to lose their challenge and become boring. PvP on the other
-hand produces content from other players. Competing against a living person is always deeper than any computer opponent,
-people are unpredictable, adaptive, each with their own strengths and weaknesses, and most importantly, they never let
-you "master" them, no matter how much you advance, there is always someone equal or more powerful than you. PvP is
-a bottomless well of high quality content created by players themselves, while all developers have to do is give them
-tools and adjust the rules to maximize fun. Soteo, therefore, declares PvP as its primary focus.
+Even though we somewhat reduced temporal scale, we still need a lot of content.
+What kind of content will it be and how to produce it in both high quantity and high quality?
+MMO content is mainly divided between PvE and PvP, let's consider how we make massive amount of content for each one.
+For PvE we'd have to adopt roguelike elements, as procedural generation greatly increases replayability,
+allowing to enternain players more with less development effort.
+And while procedural generation does increase content longevity, its impact is limited.
+Even if levels are new each time, elements are the same.
+As PvE is mainly about learning systems behind computer controlled enemies, players will
+eventually master them to the point where they begin to lose their challenge and become boring.
+PvP on the other hand produces content from other players.
+Competing against a living person is always deeper than any computer opponent, people are unpredictable, adaptive, each
+with their own strengths and weaknesses, and most importantly, they never let you "master" them, no matter how much you
+advance, there is always someone equal or more powerful than you.
+PvP is a bottomless well of high quality content created by players themselves, while all developers have to do is give
+them tools and adjust the rules to maximize fun.
+Soteo, therefore, declares PvP as its primary focus.
 
 Also, regardless of a type of content, it's perhaps, even more important to focus on allies, as they also can be
-viewed as content. Communicating with your friends, forming bonds and overcoming difficulties together in a shared
-world is one of the greatest experiences an MMO can give. We should facilitate and encourage such bonding.
+viewed as content.
+Communicating with your friends, forming bonds and overcoming difficulties together in a shared
+world is one of the greatest experiences an MMO can give.
+We should facilitate and encourage such bonding.
 
 ## PvP Specifics
 
 So, we decided to focus on PvP, but what kind of PvP will it be? Most popular competitive games organize their players
-in 2 opposing teams, and it seems that this approach works the best. Other formats exist in the industry: from multiple
-teams to free-for-all with or without teaming. Having more than 2 teams often end up disouraging active plays,
-as attacking someone else weakens both of you, while third parties benefit the most as the others destroy each other,
-a third party can even intervene into a finished fight destroying the weakened victor, which encourages boring and
-passive gameplay. Meanwhile free teaming often results in teams being wildly unbalanced, with stronger teams stomping
-over the weaker. Soteo divides players into 2 teams: Empire and Syndicate to take advantage of the most successful,
-straightforward and reliable PvP format.
+in 2 opposing teams, and it seems that this approach works the best.
+Other formats exist in the industry: from multiple teams to free-for-all with or without teaming.
+Having more than 2 teams often end up disouraging active plays, as attacking someone else weakens both of you,
+while third parties benefit the most as the others destroy each other, a third party can even intervene into a finished
+fight destroying the weakened victor, which encourages boring and passive gameplay.
+Meanwhile free teaming often results in teams being wildly unbalanced, with stronger teams stomping over the weaker.
+Soteo divides players into 2 teams: Empire and Syndicate to take advantage of the most successful, straightforward and
+eliable PvP format.
 
 ## Target audience
 
@@ -191,9 +221,9 @@ game players who don't find classical MMOs interesting.
 
 ## Grinding
 
-Grinding is a repetitive non-challenging activity, something that's not difficult, but tedious. Grinding is an
-opposite of fun and a huge time waster, which is unfortunately widely present in the MMO genre. One of Soteo top
-priorities is eliminating grinding and replacing it with something fun and intresting.
+Grinding is a repetitive non-challenging activity, something that's not difficult, but tedious.
+Grinding is an opposite of fun and a huge time waster, which is unfortunately widely present in the MMO genre.
+One of Soteo top priorities is eliminating grinding and replacing it with something fun and intresting.
 
 ## Griefing
 
@@ -213,43 +243,47 @@ countered by designing systems to be hard to abuse and by moderation.
 
 Pay-to-win is a practice of selling items that increase your power and chances of victory agains others for real money.
 It destroys gameplay quality by violating balance and is often accompanied by create-a-problem-sell-a-solution design.
-Such practive is an atrocity again game design and an insult to players. Soteo will never sell power for real money.
+Such practive is an atrocity again game design and an insult to players.
+Soteo will never sell power for real money.
 
 ## Streamsniping and secrecy
 
 Streamsniping is the practice of using information that a player exposes by livestreaming their gameplay, which is
-usually kept in secret from enemies, against that player in an act of hostility. While smaller scale match-based games
-make streamsniping harder by matchmaking players into small-sized groups, making it hard for a potential offender to
-match themselves against their victim, games featuring massive player count like battle royales and especially MMOs with
-their massive shared worlds are much more vulnerable to it. Streamsnipers harm stream quality both directly, by
-interfering with intended gameplay and indirectly as streamers begin to exclude certain types of content, where they
-would be vulnerable to it, from their streams. Soteo fixes this radically by committing to the open-information
-principle: anyone can see anything, nothing is secret, so almost no useful extra information can be extracted from
-a stream.
+usually kept in secret from enemies, against that player in an act of hostility.
+While smaller scale match-based games make streamsniping harder by matchmaking players into small-sized groups, making
+it hard for a potential offender to match themselves against their victim, games featuring massive player count like
+battle royales and especially MMOs with their massive shared worlds are much more vulnerable to it.
+Streamsnipers harm stream quality both directly, by interfering with intended gameplay and indirectly as streamers
+begin to exclude certain types of content, where they would be vulnerable to it, from their streams.
+Soteo fixes this radically by committing to the open-information principle: anyone can see anything, nothing is secret,
+so almost no useful extra information can be extracted from a stream.
 
 ## Aimlessness
 
 Some MMOs lean to much into the sandbox philosophy, giving players some tools and systems, but severely lackng goals
-to work towards, shifting that responsibility to players. This doesn't go very well most of the time, resulting in
+to work towards, shifting that responsibility to players.
+This doesn't go very well most of the time, resulting in
 players quitting out of aimlessness or resorting to degenerate forms of gameplay such as grinding or griefing.
 
 ## Downtime
 
-MMO players commonly encounter downtime in their gameplay. Downtime is any time where you are stuck having to do
-nothing for a prolonged period of time, waiting for something: for other players to get ready for an activity, for a
-suitable gank target to appear, for some in-game timer to elapse. This is bad since it means that players who came to
-play a game are prevented from doing that and have their time wasted. Many kinds of downtime
-also prevent players from going AFK: they have to monitor their guild chat for a
+MMO players commonly encounter downtime in their gameplay.
+Downtime is any time where you are stuck having to do nothing for a prolonged period of time, waiting for something:
+for other players to get ready for an activity, for a suitable gank target to appear, for some in-game timer to elapse.
+This is bad since it means that players who came to play a game are prevented from doing that and have their time
+wasted.
+Many kinds of downtime also prevent players from going AFK: they have to monitor their guild chat for a
 command or be ready to quickly react to an event, so they have to sit there and wait, these are especially annoying,
-but even the ones where you can go AFK still prevent you from playing the game you want to play. Soteo uses its limited
-time scale to pressure players into valuing their time: if you have just an hour, you can't affort half an hour of
-waiting for someone late, or an hour of aimless roaming, your time is valueable, both in real world and in the game,
-so better spend it efficiently.
+but even the ones where you can go AFK still prevent you from playing the game you want to play.
+Soteo uses its limited time scale to pressure players into valuing their time: if you have just an hour, you can't
+afford half an hour of waiting for someone late, or an hour of aimless roaming, your time is valueable, both in real
+world and in the game, so better spend it efficiently.
 
-Some MMOs feature queues when a server is overcrowded. On paper this should encourage people to spread out more evenly
-between servers, but in reality players often find themselves pressured towards mass gathering in a single overcrowded
-location due to an important objective or their clanmates being there, which forces them to wait in a queue, leading
-to downtime. While it's important to keep too much players from coming to a server, softer measures should be employed,
+Some MMOs feature queues when a server is overcrowded.
+On paper this should encourage people to spread out more evenly between servers, but in reality players often find
+themselves pressured towards mass gathering in a single overcrowded location due to an important objective or their
+clanmates being there, which forces them to wait in a queue, leading to downtime.
+While it's important to keep too much players from coming to a server, softer measures should be employed,
 such as resource penalty for visiting overcrowded regions, so player are encouraged to go somewhere else, while the ones
 who still deside to go there despite penalties don't have to wait.
 
@@ -280,7 +314,8 @@ grief their teammates.
 The best way to fight them designing hard to abuse systems.
 Soteo uses server authoritative netcode against cheaters and discloses any information that cheats could illicitly
 extract to all players anyway.
-Botting usually thrives in grindy games which are easy to automate. Challenging PvP activities, on which Soteo focuses,
+Botting usually thrives in grindy games which are easy to automate.
+Challenging PvP activities, on which Soteo focuses,
 are not as vulnerable to bots.
 To minimize effect of griefing, mechanics are designed to minimize opportunities to abuse them,
 such as not having friendly fire.
