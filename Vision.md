@@ -246,7 +246,7 @@ It destroys gameplay quality by violating balance and is often accompanied by cr
 Such practive is an atrocity again game design and an insult to players.
 Soteo will never sell power for real money.
 
-## Streamsniping and secrecy
+## Streamsniping
 
 Streamsniping is the practice of using information that a player exposes by livestreaming their gameplay, which is
 usually kept in secret from enemies, against that player in an act of hostility.
@@ -315,10 +315,55 @@ The best way to fight them designing hard to abuse systems.
 Soteo uses server authoritative netcode against cheaters and discloses any information that cheats could illicitly
 extract to all players anyway.
 Botting usually thrives in grindy games which are easy to automate.
-Challenging PvP activities, on which Soteo focuses,
-are not as vulnerable to bots.
+Challenging PvP activities, on which Soteo focuses, are not as vulnerable to bots.
 To minimize effect of griefing, mechanics are designed to minimize opportunities to abuse them,
 such as not having friendly fire.
+
+# Core features
+
+## Two factions
+
+Soteo divides all players into one of two opposing factions: Empire and Syndicate.
+Each faction has the concrete goal of winning the war by capturing enemy territory.
+Every player is placed from the start into its faction's society, the game immeidately gives them allies to rely on and
+enemies to fight.
+
+## Campaign and sessions
+
+Soteo is played in campaigns, which are isolated events running on a schedule over several sessions.
+Sessions last around an hour and are played at predetermined times.
+This keeps the total playtime of a campaign big enough to reach MMO scale,
+but small enough to stay focused and saturated.
+Division into reasonably timed sessions gives anyone an opportunity to experience a campaign in its entirety without
+committing unreasonable time to it.
+
+## Shards and links
+
+The game world consists of shards, separate spaces connected with each other via magical links.
+Links serve both as a travel mechanic and as main objectives: capturing a certain fraction of all links wins the
+campaign.
+Shards play an important technical role, as each one can be run by a separate machine enabling scaling.
+Also, shards can be freely linked to each other, allowing to create an interconnected world of any size and adjust in
+in the process.
+
+## Open information
+
+All information in Soteo is public.
+There is no fog of war and the camera can be moved freely.
+Any player or spectator can take a look at any point of any shard: see all the units, look into their inventories.
+Not only this simplifies the technical aspect, eliminate steamsniping as well as a whole class of cheats, it also
+greatly deepens the strategic aspect: with all that data in front of you eyes, the opportunities for planning and
+analysis are boundless, and even if by some unfortunate game design mistake you find yourself having to do something not
+very exciting, there is always something to observe in the meanwhile.
+
+## Free and open-source
+
+Soteo is made with the goal of bringing something great, fun, new and exciting to the stagnant MMO genre,
+to rekindle the spark it once had.
+It can achieve this most efficiently by being free and open-source, to leverage power and passion
+of its community and become the best game it can be.
+Soteo is distributed under the AGPL v3 license, which allows anyone to copy, modify and redestribute it under the
+same license, thus giving the community freedom to contribute and experiment while keeping it open-source.
 
 # Roadmap
 
