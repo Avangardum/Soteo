@@ -191,22 +191,98 @@ game players who don't find classical MMOs interesting.
 
 ## Grinding
 
+Grinding is a repetitive non-challenging activity, something that's not difficult, but tedious. Grinding is an
+opposite of fun and a huge time waster, which is unfortunately widely present in the MMO genre. One of Soteo top
+priorities is eliminating grinding and replacing it with something fun and intresting.
+
 ## Griefing
+
+Griefing is an act of hostility towards other players where an attacker doesn't do so for their benefit or advantage,
+but just to annoy and bully others.
+Grifeing often becomes a dominant form of gameplay element in sandbox MMOs with free teaming and lack of direction and
+goals.
+In such games powerful players often find nothing better to do than to bully and terrorize the weak.
+It's an absolutely degenerate kind of gameplay which leads to frustration,
+toxicity and decaying playerbase, which is nevertheless usually considered acceptable in this kind of games for the lack
+of any rules or systems preventing that.
+Soteo eliminates that kind of gameplay by splitting players in 2 explicit teams.
+Still, this leaves room for other kind of griefers - players who sabotage their own team, that should be
+countered by designing systems to be hard to abuse and by moderation.
 
 ## Pay-to-win
 
+Pay-to-win is a practice of selling items that increase your power and chances of victory agains others for real money.
+It destroys gameplay quality by violating balance and is often accompanied by create-a-problem-sell-a-solution design.
+Such practive is an atrocity again game design and an insult to players. Soteo will never sell power for real money.
+
 ## Streamsniping and secrecy
 
-## Free-for-all and unbalanced PvP
+Streamsniping is the practice of using information that a player exposes by livestreaming their gameplay, which is
+usually kept in secret from enemies, against that player in an act of hostility. While smaller scale match-based games
+make streamsniping harder by matchmaking players into small-sized groups, making it hard for a potential offender to
+match themselves against their victim, games featuring massive player count like battle royales and especially MMOs with
+their massive shared worlds are much more vulnerable to it. Streamsnipers harm stream quality both directly, by
+interfering with intended gameplay and indirectly as streamers begin to exclude certain types of content, where they
+would be vulnerable to it, from their streams. Soteo fixes this radically by committing to the open-information
+principle: anyone can see anything, nothing is secret, so almost no useful extra information can be extracted from
+a stream.
 
 ## Aimlessness
 
+Some MMOs lean to much into the sandbox philosophy, giving players some tools and systems, but severely lackng goals
+to work towards, shifting that responsibility to players. This doesn't go very well most of the time, resulting in
+players quitting out of aimlessness or resorting to degenerate forms of gameplay such as grinding or griefing.
+
 ## Downtime
+
+MMO players commonly encounter downtime in their gameplay. Downtime is any time where you are stuck having to do
+nothing for a prolonged period of time, waiting for something: for other players to get ready for an activity, for a
+suitable gank target to appear, for some in-game timer to elapse. This is bad since it means that players who came to
+play a game are prevented from doing that and have their time wasted. Many kinds of downtime
+also prevent players from going AFK: they have to monitor their guild chat for a
+command or be ready to quickly react to an event, so they have to sit there and wait, these are especially annoying,
+but even the ones where you can go AFK still prevent you from playing the game you want to play. Soteo uses its limited
+time scale to pressure players into valuing their time: if you have just an hour, you can't affort half an hour of
+waiting for someone late, or an hour of aimless roaming, your time is valueable, both in real world and in the game,
+so better spend it efficiently.
+
+Some MMOs feature queues when a server is overcrowded. On paper this should encourage people to spread out more evenly
+between servers, but in reality players often find themselves pressured towards mass gathering in a single overcrowded
+location due to an important objective or their clanmates being there, which forces them to wait in a queue, leading
+to downtime. While it's important to keep too much players from coming to a server, softer measures should be employed,
+such as resource penalty for visiting overcrowded regions, so player are encouraged to go somewhere else, while the ones
+who still deside to go there despite penalties don't have to wait.
 
 ## Zerging
 
-## Botting
+As described earlier, a massive number of players can lead to loss of individuality, which is then regained by becoming
+a part of a subset of a crowd like a clan.
+A similar thing can happen when you encounter an enemy in a battle:
+your focus narrows down to only those who partake in the fight, and you can percept each enemy individually.
+This is not just about social vibes, it also affects tactical depth by seeing the battlefield as a multitude of
+distinct subjects rather than a one abstact blob.
+This effect, however, cannot be reached if the zerging tactic is used.
+Zerging means playing as a big dense crowd.
+In a game featuring massive teams, zerging is often the most obvious as well as the most powerfuc tactic.
+The issue with zerging is that it prevents this individualized perception of a battle, all you see is two crowds rushing
+at each other, throwing attacks in each other's general direction.
+Playing in a zerg is a shallow experience: it all comes down to following simple orders of your leader with no room
+for personal choice, tactics and skill.
+A zerg looks like a single unit and plays like a single unit, which is not the kind of experience we want from fights.
+Thankfully, a tight clump of people looks like a very vulnerable target, if you have the right tools to punish that.
+Soteo provides these tools plentifully to discourage zerging and encourage large groups to spread out into smaller
+and more independent groups.
 
-## Cheating
+## Breaking rules
+
+Any multiplayer game has to deal with those who don't want to play by its rules: they use cheats, create bot accounts,
+grief their teammates.
+The best way to fight them designing hard to abuse systems.
+Soteo uses server authoritative netcode against cheaters and discloses any information that cheats could illicitly
+extract to all players anyway.
+Botting usually thrives in grindy games which are easy to automate. Challenging PvP activities, on which Soteo focuses,
+are not as vulnerable to bots.
+To minimize effect of griefing, mechanics are designed to minimize opportunities to abuse them,
+such as not having friendly fire.
 
 # Roadmap
