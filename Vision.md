@@ -224,13 +224,13 @@ game players, who don't find classical MMOs interesting.
 
 Grinding is a repetitive, non-challenging activity, something that's not difficult, but tedious.
 Grinding is the opposite of fun and a huge time waster, which is, unfortunately, widely present in the MMO genre.
-One of Soteo'a top priorities is eliminating grinding and replacing it with something fun and interesting.
+One of Soteo's top priorities is eliminating grinding and replacing it with something fun and interesting.
 
 ## Griefing
 
 Griefing is an act of hostility towards other players where an attacker doesn't do so for their benefit or advantage,
 but just to annoy and bully others.
-Grifeing often becomes a dominant form of gameplay element in sandbox MMOs with free teaming and a lack of direction and
+Griefing often becomes a dominant form of gameplay element in sandbox MMOs with free teaming and a lack of direction and
 goals.
 In such games, powerful players often find nothing better to do than to bully and terrorize the weak.
 It's an absolutely degenerate kind of gameplay which leads to frustration,
@@ -353,7 +353,7 @@ in the process.
 All information in Soteo is public.
 There is no fog of war, and the camera can be moved freely.
 Any player or spectator can take a look at any point of any shard: see all the units, look into their inventories.
-Not only this simplifies the technical aspect, eliminates steamsniping as well as a whole class of cheats, it also
+Not only this simplifies the technical aspect, eliminates streamsniping as well as a whole class of cheats, it also
 greatly deepens the strategic aspect: with all that data in front of you eyes, the opportunities for planning and
 analysis are boundless.
 And even if by some unfortunate game design mistake you find yourself having to do something not
