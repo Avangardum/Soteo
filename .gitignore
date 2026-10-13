@@ -441,6 +441,7 @@ data_source_mapping.xml
 dataSources.xml
 sqldialects.xml
 discord.xml
+GdSdk.xml
 
 # Claude
 CLAUDE.md
