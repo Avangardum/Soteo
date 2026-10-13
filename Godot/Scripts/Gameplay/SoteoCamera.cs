@@ -13,7 +13,6 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
     private const int MaxZoomLog2 = 5;
     private const int DefaultZoomLog2 = 2;
     private const double ZoomLog2Step = 0.125;
-    private const bool RoundZoomToInt = true;
     private const double ScrollSpeed = 720;
     private const double ScrollZoneThickness = -1;
     private const double Limit = 1000;
@@ -49,14 +48,14 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
         set
         {
             // When rounding zoom to int, dead zones appear near min and max values, in which resulting zoom is
-            // the same. In this case, these dead zones are cut off, so that a single scroll tick from an edge
+            // the same. These dead zones are cut off, so that a single scroll tick from an edge
             // value changes the zoom.
-            double min = RoundZoomToInt ? Maths.Log(Maths.Pow(2, MinZoomLog2) + 0.499, 2) : MinZoomLog2;
-            double max = RoundZoomToInt ? Maths.Log(Maths.Pow(2, MaxZoomLog2) - 0.499, 2) : MaxZoomLog2;
+            double min = Maths.Log(Maths.Pow(2, MinZoomLog2) + 0.499, 2);
+            double max = Maths.Log(Maths.Pow(2, MaxZoomLog2) - 0.499, 2);
 
             field = Maths.Clamp(value, min, max);
             double targetZoom = Math.Pow(2, field);
-            Zoom = RoundZoomToInt ? Math.Round(targetZoom) : targetZoom;
+            Zoom = Math.Round(targetZoom);
         }
     }
 
