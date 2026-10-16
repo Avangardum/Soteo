@@ -37,7 +37,7 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
             if (value == Zoom) return;
             GdVector2 mousePosBefore = GetGlobalMousePosition();
             base.Zoom = GdVector2.One / value;
-            base.Position += mousePosBefore - GetGlobalMousePosition();
+            Position += mousePosBefore - GetGlobalMousePosition();
             ZoomChanged();
         }
     }

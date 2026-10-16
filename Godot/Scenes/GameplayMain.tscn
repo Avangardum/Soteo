@@ -19,6 +19,10 @@ layer = 3
 [node name="Tooltip" parent="Ui/TooltipLayer" instance=ExtResource( 1 )]
 visible = false
 
+[node name="DragAndDropLayer" type="CanvasLayer" parent="Ui"]
+pause_mode = 2
+layer = 4
+
 [node name="PauseScreen" parent="Ui" instance=ExtResource( 4 )]
 visible = false
 mouse_filter = 2
@@ -31,10 +35,10 @@ motion_scale = Vector2( 0.01, 0.01 )
 motion_mirroring = Vector2( 32000, 32000 )
 
 [node name="TextureRect" type="TextureRect" parent="ParallaxBackground/ParallaxLayer"]
-margin_left = -4000.0
-margin_top = -4000.0
-margin_right = 4000.0
-margin_bottom = 4000.0
+margin_left = -4270.0
+margin_top = -3969.0
+margin_right = 3730.0
+margin_bottom = 4031.0
 rect_scale = Vector2( 4, 4 )
 mouse_filter = 2
 texture = ExtResource( 7 )

@@ -30,6 +30,8 @@ public sealed class Hud : IHud
     private readonly ITooltip _tooltip;
     private readonly ILocalizer _localizer;
 
+    private bool _isDragging;
+
     public IUnitPuppet? SelectedUnit { get; set; }
 
     public Hud
@@ -86,7 +88,11 @@ public sealed class Hud : IHud
             int index = i;
             _inventorySlots[i].Connect("mouse_entered", () => OnMouseEnteredInventorySlot(index));
             _inventorySlots[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
+            _inventorySlots[i].DragStarted += OnDragStarted;
+            _inventorySlots[i].DragStopped += OnDragStopped;
         }
+
+        // todo split
     }
 
     public void OnAbilityButtonDown(int buttonIndex)
@@ -103,6 +109,7 @@ public sealed class Hud : IHud
 
     private void OnMouseEnteredAbilityButton(int index)
     {
+        if (_isDragging) return;
         if (SelectedUnit == null) return;
         AbilitySlot slot = AbilitySlot.Class0 + index;
         if (!SelectedUnit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
@@ -114,6 +121,7 @@ public sealed class Hud : IHud
 
     private void OnMouseEnteredStatusIndicator(int index)
     {
+        if (_isDragging) return;
         if (SelectedUnit == null) return;
         ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(SelectedUnit);
         if (index >= contexts.Count) return;
@@ -126,6 +134,7 @@ public sealed class Hud : IHud
 
     private void OnMouseEnteredInventorySlot(int index)
     {
+        if (_isDragging) return;
         if (SelectedUnit == null) return;
         if (index >= SelectedUnit.Inventory.Count) return;
 
@@ -138,6 +147,17 @@ public sealed class Hud : IHud
     public void OnMouseExitedTooltipableControl()
     {
         _tooltip.Hide();
+    }
+
+    private void OnDragStarted()
+    {
+        _isDragging = true;
+        _tooltip.Hide();
+    }
+
+    private void OnDragStopped()
+    {
+        _isDragging = false;
     }
 
     public void Process(double delta)
