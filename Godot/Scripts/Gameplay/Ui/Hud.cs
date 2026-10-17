@@ -67,6 +67,13 @@ public sealed class Hud : IHud
             .Cast<InventorySlot>()
             .ToImmutableList();
 
+        SubscribeToAbilityButtonEvents();
+        SubscribeToStatusIndicatorEvents();
+        SubscribeToInventorySlotEvents();
+    }
+
+    private void SubscribeToAbilityButtonEvents()
+    {
         for (int i = 0; i < _abilityButtons.Count; i++)
         {
             int index = i;
@@ -75,14 +82,20 @@ public sealed class Hud : IHud
             _abilityButtons[i].Connect("mouse_entered", () => OnMouseEnteredAbilityButton(index));
             _abilityButtons[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
         }
+    }
 
+    private void SubscribeToStatusIndicatorEvents()
+    {
         for (int i = 0; i < _statusIndicators.Count; i++)
         {
             int index = i;
             _statusIndicators[i].Connect("mouse_entered", () => OnMouseEnteredStatusIndicator(index));
             _statusIndicators[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
         }
+    }
 
+    private void SubscribeToInventorySlotEvents()
+    {
         for (int i = 0; i < _inventorySlots.Count; i++)
         {
             int index = i;
@@ -91,17 +104,15 @@ public sealed class Hud : IHud
             _inventorySlots[i].DragStarted += OnDragStarted;
             _inventorySlots[i].DragStopped += OnDragStopped;
         }
-
-        // todo split
     }
 
-    public void OnAbilityButtonDown(int buttonIndex)
+    private void OnAbilityButtonDown(int buttonIndex)
     {
         if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepository.Value)
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = true });
     }
 
-    public void OnAbilityButtonUp(int buttonIndex)
+    private void OnAbilityButtonUp(int buttonIndex)
     {
         if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepository.Value)
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
