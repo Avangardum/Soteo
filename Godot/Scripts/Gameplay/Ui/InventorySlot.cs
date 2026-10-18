@@ -16,7 +16,7 @@ public sealed class InventorySlot : Control
         remove => _itemStack.Value.DragStarted -= value;
     }
 
-    public event Action DragStopped
+    public event Action<GdVector2> DragStopped
     {
         add => _itemStack.Value.DragStopped += value;
         remove => _itemStack.Value.DragStopped -= value;

@@ -11,7 +11,7 @@ public sealed class ItemStackControl : Control
     private readonly LateInit<Node> _dragAndDropLayer = new();
 
     public event Action DragStarted = delegate { };
-    public event Action DragStopped = delegate { };
+    public event Action<GdVector2> DragStopped = delegate { };
 
     public override void _Ready()
     {
@@ -48,9 +48,10 @@ public sealed class ItemStackControl : Control
     {
         _isDragging = false;
         _isMouseHovering = false;
+        GdVector2 position = RectGlobalPosition + RectSize / 2;
         RectPosition = GdVector2.Zero;
         GetParent().RemoveChild(this);
         _originalParent.Value.AddChild(this);
-        DragStopped();
+        DragStopped(position);
     }
 }

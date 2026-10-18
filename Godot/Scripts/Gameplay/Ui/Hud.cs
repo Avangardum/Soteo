@@ -106,7 +106,7 @@ public sealed class Hud : IHud
             _inventorySlots[i].Connect("mouse_entered", () => OnMouseEnteredInventorySlot(index));
             _inventorySlots[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
             _inventorySlots[i].DragStarted += () => OnInventoryItemStackDragStarted(index);
-            _inventorySlots[i].DragStopped += () => OnInventoryItemStackDragStopped(index);
+            _inventorySlots[i].DragStopped += position => OnInventoryItemStackDragStopped(index, position);
         }
     }
 
@@ -170,7 +170,7 @@ public sealed class Hud : IHud
         _tooltip.Hide();
     }
 
-    private void OnInventoryItemStackDragStopped(int index)
+    private void OnInventoryItemStackDragStopped(int index, GdVector2 position)
     {
         _isDragging = false;
 
@@ -180,7 +180,11 @@ public sealed class Hud : IHud
 
         for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
         {
-            if (IsMouseInsideRect(_inventorySlots[i].DropArea)) // todo or if item stack center inside drop area
+            if
+            (
+                IsInsideRect(_node.GetGlobalMousePosition(), _inventorySlots[i].DropArea) ||
+                IsInsideRect(position, _inventorySlots[i].DropArea)
+            )
             {
                 _packetSender.SendReliable
                 (
@@ -201,13 +205,12 @@ public sealed class Hud : IHud
         }
     }
 
-    private bool IsMouseInsideRect(Control control)
+    private bool IsInsideRect(GdVector2 position, Control control)
     {
-        GdVector2 mousePos = _node.GetGlobalMousePosition();
-        return mousePos.x >= control.RectGlobalPosition.x &&
-            mousePos.x <= control.RectGlobalPosition.x + control.RectSize.x &&
-            mousePos.y >= control.RectGlobalPosition.y &&
-            mousePos.y <= control.RectGlobalPosition.y + control.RectSize.y;
+        return position.x >= control.RectGlobalPosition.x &&
+            position.x <= control.RectGlobalPosition.x + control.RectSize.x &&
+            position.y >= control.RectGlobalPosition.y &&
+            position.y <= control.RectGlobalPosition.y + control.RectSize.y;
     }
 
     public void Process(double delta)
