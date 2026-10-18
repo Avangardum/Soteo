@@ -16,6 +16,14 @@ anchor_bottom = 1.0
 mouse_filter = 2
 color = Color( 0.262745, 0.262745, 0.301961, 1 )
 
+[node name="DropArea" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 20.0
+margin_top = 20.0
+margin_right = -20.0
+margin_bottom = -20.0
+
 [node name="ItemStack" type="Control" parent="."]
 margin_right = 80.0
 margin_bottom = 80.0

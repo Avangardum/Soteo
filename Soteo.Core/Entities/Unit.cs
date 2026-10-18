@@ -274,6 +274,11 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
                 case UseAbilityCommand command:
                     UseAbility(command, ref remainingDeltaTime, node);
                     break;
+                case MoveItemStackCommand command:
+                    MoveItemStack(command);
+                    break;
+                case ICommand command:
+                    throw new Exception($"Unknown command type {command.GetType()}");
             }
         }
     }
@@ -479,6 +484,20 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             }
         } while (remainingDeltaTime > 0 && iterations < maxIterations);
         return abilityValidationResult;
+    }
+
+    private void MoveItemStack(MoveItemStackCommand command)
+    {
+        if (command.FromIndex < 0) return;
+        if (command.FromIndex >= Inventory.Count) return;
+        if (command.ToIndex < 0) return;
+        if (command.ToIndex >= Inventory.Count) return;
+
+        ItemStack? movedStack = Inventory.RemoveAt(command.FromIndex);
+        if (movedStack == null) return;
+        ItemStack? returnedStack = Inventory.PutAt(command.ToIndex, movedStack);
+        if (returnedStack != null)
+            Inventory.PutAt(command.FromIndex, returnedStack);
     }
 
     public void SetCommand(ICommand command)

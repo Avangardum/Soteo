@@ -54,6 +54,38 @@ public sealed class Inventory : IReadOnlyList<ItemStack?>
         return false;
     }
 
+    /// <summary>
+    /// Put an item stack into a target slot. If the slot contains a stack that can be fully or partially merged with
+    /// the put stack, it's merged and a remainder is returned. Otherwise, a stack that was in the slot previously is
+    /// returned.
+    /// </summary>
+    public ItemStack? PutAt(int slot, ItemStack stack)
+    {
+        ItemStack? existingStack = _stacks[slot];
+        bool canMerge = existingStack != null &&
+            stack.Item == existingStack.Item &&
+            existingStack.Count < existingStack.Item.MaxStackCount;
+
+        if (canMerge)
+        {
+            long freeSpace = existingStack.Required.Item.MaxStackCount - existingStack.Count;
+            long movedCount = Math.Min(stack.Count, freeSpace);
+            _stacks[slot] = new ItemStack(existingStack.Item, existingStack.Count + movedCount);
+            long remainder = stack.Count - movedCount;
+            return remainder == 0 ? null : new ItemStack(stack.Item, remainder);
+        }
+
+        _stacks[slot] = stack;
+        return existingStack;
+    }
+
+    public ItemStack? RemoveAt(int slot)
+    {
+        ItemStack? result = _stacks[slot];
+        _stacks[slot] = null;
+        return result;
+    }
+
     public void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks) => _stacks = stacks.ToList();
 
     public void ApplyDelta(ListDelta<ItemStack?> delta) => delta.MutateList(_stacks);

@@ -7,5 +7,6 @@ namespace Soteo.Core.Services.PacketHandlers.Gameplay;
 
 public sealed class MovePacketHandler
 (
-    IEntityManager entityManager, ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo
+    IEntityManager entityManager,
+    ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo
 ) : CommandPacketHandler<MovePacket, MoveCommand>(entityManager, synchronizedCampaignStateRepo);

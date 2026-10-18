@@ -1,13 +1,14 @@
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using Soteo.Core.Commands;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Packets;
 using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Items;
 using Soteo.Core.Statuses;
 using Soteo.Main.Gameplay.Interfaces;
-using Soteo.Main.Shared.Extensions;
 using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
@@ -25,10 +26,11 @@ public sealed class Hud : IHud
     private readonly ImmutableList<InventorySlot> _inventorySlots;
 
     private readonly IEntityLocator _entityLocator;
-    private readonly ICurrentCharacterIdRepository _currentCharIdRepository;
+    private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
     private readonly IPalette _palette;
     private readonly ITooltip _tooltip;
     private readonly ILocalizer _localizer;
+    private readonly IFromGameplayPacketSender _packetSender;
 
     private bool _isDragging;
 
@@ -38,17 +40,19 @@ public sealed class Hud : IHud
     (
         HudNode node,
         IEntityLocator entityLocator,
-        ICurrentCharacterIdRepository currentCharIdRepository,
+        ICurrentCharacterIdRepository currentCharIdRepo,
         IPalette palette,
         ITooltip tooltip,
-        ILocalizer localizer
+        ILocalizer localizer,
+        IFromGameplayPacketSender packetSender
     )
     {
         _entityLocator = entityLocator;
-        _currentCharIdRepository = currentCharIdRepository;
+        _currentCharIdRepo = currentCharIdRepo;
         _palette = palette;
         _tooltip = tooltip;
         _localizer = localizer;
+        _packetSender = packetSender;
 
         node.Hud = this;
         _node = node;
@@ -101,20 +105,20 @@ public sealed class Hud : IHud
             int index = i;
             _inventorySlots[i].Connect("mouse_entered", () => OnMouseEnteredInventorySlot(index));
             _inventorySlots[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
-            _inventorySlots[i].DragStarted += OnDragStarted;
-            _inventorySlots[i].DragStopped += OnDragStopped;
+            _inventorySlots[i].DragStarted += () => OnInventoryItemStackDragStarted(index);
+            _inventorySlots[i].DragStopped += () => OnInventoryItemStackDragStopped(index);
         }
     }
 
     private void OnAbilityButtonDown(int buttonIndex)
     {
-        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepository.Value)
+        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepo.Value)
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = true });
     }
 
     private void OnAbilityButtonUp(int buttonIndex)
     {
-        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepository.Value)
+        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepo.Value)
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
     }
 
@@ -160,15 +164,50 @@ public sealed class Hud : IHud
         _tooltip.Hide();
     }
 
-    private void OnDragStarted()
+    private void OnInventoryItemStackDragStarted(int index)
     {
         _isDragging = true;
         _tooltip.Hide();
     }
 
-    private void OnDragStopped()
+    private void OnInventoryItemStackDragStopped(int index)
     {
         _isDragging = false;
+
+        if (_currentCharIdRepo.Value == null) return; // todo rename value
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Value.Required, out IUnitPuppet? _, out Guid? shardId))
+            return; // todo maybe shardId should be empty instead of null on failure to avoid .Value?
+
+        for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
+        {
+            if (IsMouseInsideRect(_inventorySlots[i].DropArea)) // todo or if item stack center inside drop area
+            {
+                _packetSender.SendReliable
+                (
+                    new MoveItemStackPacket
+                    {
+                        UnitId = _currentCharIdRepo.Value.Required,
+                        Command = new MoveItemStackCommand
+                        {
+                            FromIndex = index,
+                            ToIndex = i
+                        }
+                    },
+                    shardId.Value
+                );
+                // todo set temp puppet unit inventory override for lag compensation
+                break;
+            }
+        }
+    }
+
+    private bool IsMouseInsideRect(Control control)
+    {
+        GdVector2 mousePos = _node.GetGlobalMousePosition();
+        return mousePos.x >= control.RectGlobalPosition.x &&
+            mousePos.x <= control.RectGlobalPosition.x + control.RectSize.x &&
+            mousePos.y >= control.RectGlobalPosition.y &&
+            mousePos.y <= control.RectGlobalPosition.y + control.RectSize.y;
     }
 
     public void Process(double delta)
@@ -189,8 +228,8 @@ public sealed class Hud : IHud
     [MemberNotNullWhen(true, nameof(SelectedUnit))]
     public bool TrySelectCurrentUnit()
     {
-        if (_currentCharIdRepository.Value == null) return false;
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepository.Required, out IUnitPuppet? unit, out _))
+        if (_currentCharIdRepo.Value == null) return false;
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? unit, out _))
             return false;
 
         SelectedUnit = unit;

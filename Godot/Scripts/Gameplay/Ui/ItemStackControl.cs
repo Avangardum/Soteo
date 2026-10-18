@@ -23,9 +23,10 @@ public sealed class ItemStackControl : Control
 
     public override void _Process(float delta)
     {
+        // todo extract all action names to const
         if (_isMouseHovering && Input.IsActionJustPressed("select"))
             StartDrag();
-        else if (Input.IsActionJustReleased("select"))
+        else if (_isDragging && Input.IsActionJustReleased("select"))
             StopDrag();
 
         if (_isDragging)
@@ -46,6 +47,7 @@ public sealed class ItemStackControl : Control
     private void StopDrag()
     {
         _isDragging = false;
+        _isMouseHovering = false;
         RectPosition = GdVector2.Zero;
         GetParent().RemoveChild(this);
         _originalParent.Value.AddChild(this);

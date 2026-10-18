@@ -30,6 +30,8 @@ public sealed class UnitTests
         _sut = new Sut(Guid.NewGuid(), _node, _entityManager, _serviceProvider);
     }
 
+    // TODO UseAbilityCommandForEmptySlotDoesNothing
+
     [Fact]
     public void AbilityTargetingNonexistentUnitIsNotUsed()
     {
@@ -168,6 +170,55 @@ public sealed class UnitTests
         _sut.Tick(Const.TickInterval);
 
         UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing();
+    }
+
+    [Fact]
+    public void MovingItemStackFromInventorySlotToAnotherInventorySlotMovesItThereAndMovesExistingStackToSourceSlot()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestItem1>(1));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestItem2>(1));
+
+        _sut.SetCommand(new MoveItemStackCommand { FromIndex = 0, ToIndex = 1 });
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestItem2>(1));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestItem1>(1));
+    }
+
+    [Fact]
+    public void MovingItemStackFromEmptyInventorySlotDoesNothing()
+    {
+        _sut.SetCommand(new MoveItemStackCommand { FromIndex = 0, ToIndex = 1 });
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().BeNull();
+        _sut.Inventory[1].Should().BeNull();
+    }
+
+    [Fact]
+    public void MovingItemStackFromInvalidInventorySlotDoesNothing()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestItem1>(1));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestItem2>(1));
+
+        _sut.SetCommand(new MoveItemStackCommand { FromIndex = -228, ToIndex = 1 });
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestItem1>(1));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestItem2>(1));
+    }
+
+    [Fact]
+    public void MovingItemStackToInvalidInventorySlotDoesNothing()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestItem1>(1));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestItem2>(1));
+
+        _sut.SetCommand(new MoveItemStackCommand { FromIndex = 0, ToIndex = int.MaxValue });
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestItem1>(1));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestItem2>(1));
     }
 
     private sealed class Sut : Unit
