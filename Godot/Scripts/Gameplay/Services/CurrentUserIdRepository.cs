@@ -10,8 +10,8 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
     public CurrentUserIdRepository(ServerDependency<ShardOptions> shardOptions)
     {
         if (shardOptions.Value != null)
-            Value = shardOptions.Value.ShardId;
+            Id = shardOptions.Value.ShardId;
     }
 
-    public Guid? Value { get; set; } // todo rename
+    public Guid? Id { get; set; }
 }

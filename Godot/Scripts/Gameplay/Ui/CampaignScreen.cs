@@ -88,8 +88,8 @@ public sealed class CampaignScreen
 
         _shardServerConnector.ConnectToShardServer(_selectedShardId.Value);
         _shardLoader.LoadShard(_selectedShardId.Value);
-        _currentCharIdRepo.Value = _selectedCharacterId;
-        _visibleShardIdRepo.Value = _selectedShardId;
+        _currentCharIdRepo.Id = _selectedCharacterId;
+        _visibleShardIdRepo.Id = _selectedShardId;
         _node.Visible = false;
     }
 
@@ -99,7 +99,7 @@ public sealed class CampaignScreen
 
         _shardServerConnector.ConnectToShardServer(_selectedShardId.Value);
         _shardLoader.LoadShard(_selectedShardId.Value);
-        _visibleShardIdRepo.Value = _selectedShardId;
+        _visibleShardIdRepo.Id = _selectedShardId;
         _node.Visible = false;
     }
 }

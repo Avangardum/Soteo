@@ -65,7 +65,7 @@ public sealed class InputHandler : Node2D
 
     private void HandleInteract()
     {
-        if (_currentCharIdRepo.Value == null) return;
+        if (_currentCharIdRepo.Id == null) return;
         _hud.TrySelectCurrentUnit();
         if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? user, out Guid? shardId))
             return;
@@ -106,7 +106,7 @@ public sealed class InputHandler : Node2D
 
     private void HandleStop()
     {
-        if (_currentCharIdRepo.Value == null) return;
+        if (_currentCharIdRepo.Id == null) return;
         _hud.TrySelectCurrentUnit();
         if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? user, out Guid? shardId))
             return;
@@ -119,7 +119,7 @@ public sealed class InputHandler : Node2D
 
     private void HandleUseAbility(AbilitySlot slot)
     {
-        if (_currentCharIdRepo.Value == null) return;
+        if (_currentCharIdRepo.Id == null) return;
         _hud.TrySelectCurrentUnit();
         if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? user, out Guid? shardId))
             return;

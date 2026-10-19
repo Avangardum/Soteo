@@ -68,7 +68,7 @@ public sealed class JsmqFromGameplayCommunicator :
 
     public void ConnectAsPlayer(string email, string password)
     {
-        _currentUserIdRepository.Value = Const.SingleplayerPlayerId;
+        _currentUserIdRepository.Id = Const.SingleplayerPlayerId;
         SendReliable
         (
             new CampaignServerHandshakePacket { Token = "player", Version = Const.Version },
@@ -89,8 +89,8 @@ public sealed class JsmqFromGameplayCommunicator :
     {
         while (true)
         {
-            if (_currentUserIdRepository.Value == null) return;
-            string? base64 = (string?)JavaScript.Eval($"""jsmq.receive("{_currentUserIdRepository.Value}")""");
+            if (_currentUserIdRepository.Id == null) return;
+            string? base64 = (string?)JavaScript.Eval($"""jsmq.receive("{_currentUserIdRepository.Id}")""");
             if (base64 == null) return;
             byte[] bytes = Convert.FromBase64String(base64);
             var senderId = new Guid(bytes.AsSpan()[..Const.BytesInGuid].ToArray());
@@ -114,8 +114,8 @@ public sealed class JsmqFromGameplayCommunicator :
 
     public void SendReliable(Packet packet, Guid receiverId)
     {
-        if (_currentUserIdRepository.Value == null) return;
-        byte[] bytes = [.._currentUserIdRepository.Value.Required.ToByteArray(), .._packetSerializer.Serialize(packet)];
+        if (_currentUserIdRepository.Id == null) return;
+        byte[] bytes = [.._currentUserIdRepository.Id.Required.ToByteArray(), .._packetSerializer.Serialize(packet)];
         string base64 = Convert.ToBase64String(bytes);
         JavaScript.Eval($"""jsmq.send("{base64}", "{receiverId}");""");
     }

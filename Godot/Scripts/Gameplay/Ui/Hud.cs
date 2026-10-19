@@ -47,8 +47,8 @@ public sealed class Hud : IHud
             field = value;
 
             bool isControllable = value != null &&
-                _currentUserIdRepo.Value != null &&
-                value.ControllingPlayerIds.Contains(_currentUserIdRepo.Value.Value);
+                _currentUserIdRepo.Id != null &&
+                value.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value);
             _isCancelingItemStackDrag = true;
             foreach (InventorySlot slot in _inventorySlots)
             {
@@ -141,13 +141,13 @@ public sealed class Hud : IHud
 
     private void OnAbilityButtonDown(int buttonIndex)
     {
-        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepo.Value)
+        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepo.Id)
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = true });
     }
 
     private void OnAbilityButtonUp(int buttonIndex)
     {
-        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepo.Value)
+        if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepo.Id)
             Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
     }
 
@@ -205,9 +205,9 @@ public sealed class Hud : IHud
 
         if (_isCancelingItemStackDrag) return;
         if (SelectedUnit == null) return;
-        if (_currentUserIdRepo.Value == null) return;
-        if (!SelectedUnit.ControllingPlayerIds.Contains(_currentUserIdRepo.Value.Value)) return;
-        if (_visibleShardIdRepo.Value == null) return;
+        if (_currentUserIdRepo.Id == null) return;
+        if (!SelectedUnit.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value)) return;
+        if (_visibleShardIdRepo.Id == null) return;
 
         for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
         {
@@ -217,7 +217,7 @@ public sealed class Hud : IHud
                 IsInsideRect(position, _inventorySlots[i].DropArea)
             )
             {
-                MoveItemStack(index, i, _visibleShardIdRepo.Value.Value, SelectedUnit);
+                MoveItemStack(index, i, _visibleShardIdRepo.Id.Value, SelectedUnit);
                 break;
             }
         }
@@ -239,7 +239,7 @@ public sealed class Hud : IHud
         (
             new MoveItemStackPacket
             {
-                UnitId = _currentCharIdRepo.Value.Required,
+                UnitId = _currentCharIdRepo.Id.Required,
                 Command = new MoveItemStackCommand
                 {
                     FromIndex = fromIndex,
@@ -280,7 +280,7 @@ public sealed class Hud : IHud
     [MemberNotNullWhen(true, nameof(SelectedUnit))]
     public bool TrySelectCurrentUnit()
     {
-        if (_currentCharIdRepo.Value == null) return false;
+        if (_currentCharIdRepo.Id == null) return false;
         if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? unit, out _))
             return false;
 

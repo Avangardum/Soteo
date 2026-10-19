@@ -93,7 +93,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     {
         _status = Status.Disconnected;
         if (_sideOptions.Side == Side.Client)
-            _currentUserIdRepository.Value = null;
+            _currentUserIdRepository.Id = null;
     }
 
     public void OnConnectionError()
@@ -152,7 +152,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
 
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
-        Guid id = _currentUserIdRepository.Value.Required;
+        Guid id = _currentUserIdRepository.Id.Required;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
             $"&intercomSecret={Uri.EscapeDataString(_intercomOptions.Value.Required.IntercomSecret)}";
         string url = $"{_toAuthServerConnectionOptions.AuthServerUrl}/token/service";
@@ -186,7 +186,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         else
         {
             _token = Encoding.UTF8.GetString(body);
-            _currentUserIdRepository.Value = GetPlayerIdFromTrustedToken(_token);
+            _currentUserIdRepository.Id = GetPlayerIdFromTrustedToken(_token);
             _wsClient.ConnectToUrl(_toCampaignServerConnectionOptions.CampaignServerUrl);
         }
     }

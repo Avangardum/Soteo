@@ -18,7 +18,7 @@ public sealed class GameplayRoutingPacketHandler
     public async Task HandleAsync(Packet packet, Guid senderId)
     {
         IServiceProvider? serviceProvider =
-            sideOptions.Side == Side.ShardServer ? shardServiceProviders[currentUserIdRepository.Value.Required] :
+            sideOptions.Side == Side.ShardServer ? shardServiceProviders[currentUserIdRepository.Id.Required] :
             senderId == Const.CampaignServerId ? rootServiceProvider :
             shardServiceProviders.GetOrDefault(senderId);
         if (serviceProvider == null) return;

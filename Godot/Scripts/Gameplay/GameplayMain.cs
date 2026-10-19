@@ -77,7 +77,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
 
     private async Task ServerInitAsync()
     {
-        LoadShard(_rootServiceProvider.Required.GetRequiredService<ICurrentUserIdRepository>().Value.Required);
+        LoadShard(_rootServiceProvider.Required.GetRequiredService<ICurrentUserIdRepository>().Id.Required);
         Guid shardId = _rootServiceProvider.GetRequiredService<ShardOptions>().ShardId;
         _rootServiceProvider = _shardServiceScopes[shardId].ServiceProvider;
         _rootServiceProvider.GetRequiredService<IShardPersistenceSnapshotManager>().SnapshotReplicated +=
