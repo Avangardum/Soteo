@@ -281,7 +281,7 @@ public sealed class Hud : IHud
     public bool TrySelectCurrentUnit()
     {
         if (_currentCharIdRepo.Id == null) return false;
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Required, out IUnitPuppet? unit, out _))
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required, out IUnitPuppet? unit, out _))
             return false;
 
         SelectedUnit = unit;
