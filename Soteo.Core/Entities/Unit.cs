@@ -488,6 +488,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     private void MoveItemStack(MoveItemStackCommand command)
     {
+        _commands.Dequeue();
+
         if (command.FromIndex < 0) return;
         if (command.FromIndex >= Inventory.Count) return;
         if (command.ToIndex < 0) return;

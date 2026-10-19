@@ -25,7 +25,9 @@ public sealed class PlayerCharacter : Unit
         SetAbility<RecallAbility>(AbilitySlot.Recall, 1);
         SetAbility<RangedAttackAbility>(AbilitySlot.Attack, 1);
 
-        Inventory.TryAdd(ItemStack.Of<RockItem>(1));
+        Inventory.PutAt(0, ItemStack.Of<LogItem>(1));
+        Inventory.PutAt(1, ItemStack.Of<LogItem>(1));
+        Inventory.PutAt(2, ItemStack.Of<RockItem>(1));
     }
 
     public static PlayerCharacter FromSnapshot
