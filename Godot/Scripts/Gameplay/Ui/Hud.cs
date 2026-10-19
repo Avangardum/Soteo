@@ -34,8 +34,22 @@ public sealed class Hud : IHud
     private readonly ISynchronizedCampaignStatePuppetRepository _syncCampaignStateRepo;
 
     private bool _isDragging;
+    private bool _isCancelingItemStackDrag;
 
-    public IUnitPuppet? SelectedUnit { get; set; }
+    public IUnitPuppet? SelectedUnit
+    {
+        get;
+        set
+        {
+            if (value == field) return;
+            field = value;
+
+            _isCancelingItemStackDrag = true;
+            foreach (InventorySlot slot in _inventorySlots)
+                slot.ItemStack.StopDrag();
+            _isCancelingItemStackDrag = false;
+        }
+    }
 
     public Hud
     (
@@ -177,6 +191,7 @@ public sealed class Hud : IHud
     {
         _isDragging = false;
 
+        if (_isCancelingItemStackDrag) return;
         if (_currentCharIdRepo.Value == null) return; // todo rename value
         if
         (

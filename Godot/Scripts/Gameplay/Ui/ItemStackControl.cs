@@ -44,7 +44,7 @@ public sealed class ItemStackControl : Control
         DragStarted();
     }
 
-    private void StopDrag()
+    public void StopDrag()
     {
         _isDragging = false;
         _isMouseHovering = false;
