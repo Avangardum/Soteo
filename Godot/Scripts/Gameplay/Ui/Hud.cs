@@ -23,7 +23,7 @@ public sealed class Hud : IHud
     private readonly ImmutableList<AbilityButton> _abilityButtons;
     private readonly ImmutableList<StatusIndicator> _statusIndicators;
     private readonly GridContainer _inventoryGrid;
-    private readonly ImmutableList<InventorySlot> _inventorySlots;
+    private readonly ImmutableList<InventorySlotControl> _inventorySlots;
 
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
@@ -50,7 +50,7 @@ public sealed class Hud : IHud
                 _currentUserIdRepo.Id != null &&
                 value.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value);
             _isCancelingItemStackDrag = true;
-            foreach (InventorySlot slot in _inventorySlots)
+            foreach (InventorySlotControl slot in _inventorySlots)
             {
                 slot.ItemStack.StopDrag();
                 slot.ItemStack.IsDraggable = isControllable;
@@ -97,7 +97,7 @@ public sealed class Hud : IHud
             .ToImmutableList();
         _inventoryGrid = node.GetNode<GridContainer>("Inventory/MarginContainer/Slots");
         _inventorySlots = _inventoryGrid.GetChildren()
-            .Cast<InventorySlot>()
+            .Cast<InventorySlotControl>()
             .ToImmutableList();
 
         SubscribeToAbilityButtonEvents();
