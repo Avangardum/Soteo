@@ -13,8 +13,12 @@ namespace Soteo.Core.Entities;
 public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 {
     private readonly ICamera _camera;
+    private double _visualInventoryLockTimeRemaining;
 
     public Inventory Inventory { get; } = new(0);
+
+    /// <inheritdoc/>
+    public Inventory VisualInventory { get; } = new(0);
 
     public UnitPuppet(Guid id, IUnitPuppetNode node, ICamera camera) : base(id, node)
     {
@@ -87,6 +91,8 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         AbilityUseProgress = s.AbilityUseProgress;
         StatusesInternal = s.Statuses.ToDictionary();
         Inventory.ReplicateSnapshot(s.Items);
+        if (_visualInventoryLockTimeRemaining == 0)
+            VisualInventory.ReplicateSnapshot(s.Items);
         UpdateAnimation();
     }
 
@@ -117,6 +123,8 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         }
         d.Statuses.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
         Inventory.ApplyDelta(d.Items);
+        if (_visualInventoryLockTimeRemaining == 0)
+            VisualInventory.ApplyDelta(d.Items);
         UpdateAnimation();
     }
 
@@ -172,4 +180,18 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
     }
 
     public bool IsAlliedTo(IUnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
+
+    /// <inheritdoc/>
+    public void LockVisualInventory()
+    {
+        _visualInventoryLockTimeRemaining = 0.5;
+    }
+
+    public void Process(double delta)
+    {
+        double prevVisualInventoryLockTimeRemaining = _visualInventoryLockTimeRemaining;
+        _visualInventoryLockTimeRemaining = Math.Max(_visualInventoryLockTimeRemaining - delta, 0);
+        if (prevVisualInventoryLockTimeRemaining > 0 && _visualInventoryLockTimeRemaining == 0)
+            VisualInventory.ReplicateSnapshot(Inventory.CreateSnapshot());
+    }
 }

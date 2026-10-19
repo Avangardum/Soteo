@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Immutable;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Deltas;
 
@@ -85,6 +86,8 @@ public sealed class Inventory : IReadOnlyList<ItemStack?>
         _stacks[slot] = null;
         return result;
     }
+
+    public IReadOnlyList<ItemStack?> CreateSnapshot() => this.ToImmutableList();
 
     public void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks) => _stacks = stacks.ToList();
 

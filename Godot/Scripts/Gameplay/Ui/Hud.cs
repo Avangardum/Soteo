@@ -31,6 +31,7 @@ public sealed class Hud : IHud
     private readonly ITooltip _tooltip;
     private readonly ILocalizer _localizer;
     private readonly IFromGameplayPacketSender _packetSender;
+    private readonly ISynchronizedCampaignStatePuppetRepository _syncCampaignStateRepo;
 
     private bool _isDragging;
 
@@ -44,7 +45,8 @@ public sealed class Hud : IHud
         IPalette palette,
         ITooltip tooltip,
         ILocalizer localizer,
-        IFromGameplayPacketSender packetSender
+        IFromGameplayPacketSender packetSender,
+        ISynchronizedCampaignStatePuppetRepository syncCampaignStateRepo
     )
     {
         _entityLocator = entityLocator;
@@ -53,6 +55,7 @@ public sealed class Hud : IHud
         _tooltip = tooltip;
         _localizer = localizer;
         _packetSender = packetSender;
+        _syncCampaignStateRepo = syncCampaignStateRepo;
 
         node.Hud = this;
         _node = node;
@@ -175,8 +178,18 @@ public sealed class Hud : IHud
         _isDragging = false;
 
         if (_currentCharIdRepo.Value == null) return; // todo rename value
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Value.Required, out IUnitPuppet? _, out Guid? shardId))
-            return; // todo maybe shardId should be empty instead of null on failure to avoid .Value?
+        if
+        (
+            !_entityLocator.TryFindEntity
+            (
+                _currentCharIdRepo.Value.Required,
+                out IUnitPuppet? unitPuppet,
+                out Guid? shardId
+            )
+        )
+        {
+            return;
+        } // todo maybe shardId should be empty instead of null on failure to avoid .Value?
 
         for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
         {
@@ -186,20 +199,7 @@ public sealed class Hud : IHud
                 IsInsideRect(position, _inventorySlots[i].DropArea)
             )
             {
-                _packetSender.SendReliable
-                (
-                    new MoveItemStackPacket
-                    {
-                        UnitId = _currentCharIdRepo.Value.Required,
-                        Command = new MoveItemStackCommand
-                        {
-                            FromIndex = index,
-                            ToIndex = i
-                        }
-                    },
-                    shardId.Value
-                );
-                // todo set temp puppet unit inventory override for lag compensation
+                MoveItemStack(index, i, shardId.Value, unitPuppet);
                 break;
             }
         }
@@ -211,6 +211,37 @@ public sealed class Hud : IHud
             position.x <= control.RectGlobalPosition.x + control.RectSize.x &&
             position.y >= control.RectGlobalPosition.y &&
             position.y <= control.RectGlobalPosition.y + control.RectSize.y;
+    }
+
+    private void MoveItemStack(int fromIndex, int toIndex, Guid shardId, IUnitPuppet unitPuppet)
+    {
+        if (_syncCampaignStateRepo.Value.IsPaused) return;
+
+        _packetSender.SendReliable
+        (
+            new MoveItemStackPacket
+            {
+                UnitId = _currentCharIdRepo.Value.Required,
+                Command = new MoveItemStackCommand
+                {
+                    FromIndex = fromIndex,
+                    ToIndex = toIndex
+                }
+            },
+            shardId
+        );
+
+        if (fromIndex < unitPuppet.VisualInventory.Count && toIndex < unitPuppet.VisualInventory.Count)
+        {
+            unitPuppet.LockVisualInventory();
+            ItemStack? stack = unitPuppet.VisualInventory.RemoveAt(fromIndex);
+            if (stack != null)
+            {
+                ItemStack? putResult = unitPuppet.VisualInventory.PutAt(toIndex, stack);
+                if (putResult != null)
+                    unitPuppet.VisualInventory.PutAt(fromIndex, putResult);
+            }
+        }
     }
 
     public void Process(double delta)
@@ -301,12 +332,12 @@ public sealed class Hud : IHud
 
     private void ProcessInventory(IUnitPuppet unit)
     {
-        _inventoryGrid.Columns = Maths.CeilToInt(unit.Inventory.Count / 2.0);
+        _inventoryGrid.Columns = Maths.CeilToInt(unit.VisualInventory.Count / 2.0);
 
-        for (int i = 0; i < unit.Inventory.Count; i++)
+        for (int i = 0; i < unit.VisualInventory.Count; i++)
         {
             _inventorySlots[i].Visible = true;
-            ItemStack? stack = unit.Inventory[i];
+            ItemStack? stack = unit.VisualInventory[i];
             _inventorySlots[i].TextureRect.Visible = stack != null;
             if (stack != null)
             {
@@ -316,7 +347,7 @@ public sealed class Hud : IHud
                     _inventorySlots[i].CountLabel.Text = stack.Count.ToString();
             }
         }
-        for (int i = unit.Inventory.Count; i < _inventorySlots.Count; i++)
+        for (int i = unit.VisualInventory.Count; i < _inventorySlots.Count; i++)
         {
             _inventorySlots[i].Visible = false;
         }

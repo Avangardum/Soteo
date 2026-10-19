@@ -75,6 +75,8 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
 
     public override void _Process(float delta)
     {
+        UnitPuppet?.Process(delta);
+
         _removalCountdown -= delta;
         if (_removalCountdown <= 0)
         {
