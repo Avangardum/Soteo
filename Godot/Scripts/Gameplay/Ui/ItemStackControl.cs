@@ -10,6 +10,8 @@ public sealed class ItemStackControl : Control
     private readonly LateInit<Node> _originalParent = new();
     private readonly LateInit<Node> _dragAndDropLayer = new();
 
+    public bool IsDraggable { get; set; }
+
     public event Action DragStarted = delegate { };
     public event Action<GdVector2> DragStopped = delegate { };
 
@@ -24,7 +26,7 @@ public sealed class ItemStackControl : Control
     public override void _Process(float delta)
     {
         // todo extract all action names to const
-        if (_isMouseHovering && Input.IsActionJustPressed("select"))
+        if (IsDraggable && _isMouseHovering && Input.IsActionJustPressed("select"))
             StartDrag();
         else if (_isDragging && Input.IsActionJustReleased("select"))
             StopDrag();

@@ -14,11 +14,14 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 {
     private readonly ICamera _camera;
     private double _visualInventoryLockTimeRemaining;
+    private List<Guid> _controllingPlayerIds = [];
 
     public Inventory Inventory { get; } = new(0);
 
     /// <inheritdoc/>
     public Inventory VisualInventory { get; } = new(0);
+
+    public IReadOnlyList<Guid> ControllingPlayerIds => _controllingPlayerIds;
 
     public UnitPuppet(Guid id, IUnitPuppetNode node, ICamera camera) : base(id, node)
     {
@@ -93,6 +96,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         Inventory.ReplicateSnapshot(s.Items);
         if (_visualInventoryLockTimeRemaining == 0)
             VisualInventory.ReplicateSnapshot(s.Items);
+        _controllingPlayerIds = s.ControllingPlayerIds.ToList();
         UpdateAnimation();
     }
 
@@ -125,6 +129,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         Inventory.ApplyDelta(d.Items);
         if (_visualInventoryLockTimeRemaining == 0)
             VisualInventory.ApplyDelta(d.Items);
+        d.ControllingPlayerIds.MutateList(_controllingPlayerIds);
         UpdateAnimation();
     }
 

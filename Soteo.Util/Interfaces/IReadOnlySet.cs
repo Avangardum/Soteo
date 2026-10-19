@@ -1,5 +1,6 @@
 namespace Soteo.Util.Interfaces;
 
+// todo remove this, use IReadOnlyList<T>
 public interface IReadOnlySet<T> : IReadOnlyCollection<T>
 {
     bool Contains(T item);

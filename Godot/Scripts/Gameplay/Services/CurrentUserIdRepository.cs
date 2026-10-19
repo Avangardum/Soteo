@@ -13,5 +13,5 @@ public sealed class CurrentUserIdRepository : ICurrentUserIdRepository
             Value = shardOptions.Value.ShardId;
     }
 
-    public Guid? Value { get; set; }
+    public Guid? Value { get; set; } // todo rename
 }

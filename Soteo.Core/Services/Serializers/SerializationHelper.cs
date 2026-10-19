@@ -486,6 +486,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeNullableClass(unitPuppet.AbilityUseProgress, SerializeAbilityUseProgress, stream);
         SerializeIndexedDictionary(unitPuppet.Statuses, SerializePuppetStatusContext, stream);
         SerializeList(unitPuppet.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
+        SerializeList(unitPuppet.ControllingPlayerIds, SerializeGuid, stream);
     }
 
     public UnitPuppetSnapshot DeserializeUnitPuppetSnapshot(Stream stream)
@@ -503,7 +504,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
                 DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializePuppetStatusContext, it => it.Id, stream),
-            Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream)
+            Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream),
+            ControllingPlayerIds = DeserializeList(DeserializeGuid, stream)
         };
     }
 

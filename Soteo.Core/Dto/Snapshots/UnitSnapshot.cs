@@ -29,7 +29,8 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
             AbilitySlotStates = AbilitySlotStates,
             AbilityUseProgress = AbilityUseProgress,
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToPuppet()),
-            Items = Items
+            Items = Items,
+            ControllingPlayerIds = ControllingPlayerId == null ? [] : [ControllingPlayerId.Value]
         };
     }
 

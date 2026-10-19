@@ -32,6 +32,8 @@ public sealed class Hud : IHud
     private readonly ILocalizer _localizer;
     private readonly IFromGameplayPacketSender _packetSender;
     private readonly ISynchronizedCampaignStatePuppetRepository _syncCampaignStateRepo;
+    private readonly IVisibleShardIdRepository _visibleShardIdRepo;
+    private readonly ICurrentUserIdRepository _currentUserIdRepo;
 
     private bool _isDragging;
     private bool _isCancelingItemStackDrag;
@@ -44,9 +46,15 @@ public sealed class Hud : IHud
             if (value == field) return;
             field = value;
 
+            bool isControllable = value != null &&
+                _currentUserIdRepo.Value != null &&
+                value.ControllingPlayerIds.Contains(_currentUserIdRepo.Value.Value);
             _isCancelingItemStackDrag = true;
             foreach (InventorySlot slot in _inventorySlots)
+            {
                 slot.ItemStack.StopDrag();
+                slot.ItemStack.IsDraggable = isControllable;
+            }
             _isCancelingItemStackDrag = false;
         }
     }
@@ -60,7 +68,9 @@ public sealed class Hud : IHud
         ITooltip tooltip,
         ILocalizer localizer,
         IFromGameplayPacketSender packetSender,
-        ISynchronizedCampaignStatePuppetRepository syncCampaignStateRepo
+        ISynchronizedCampaignStatePuppetRepository syncCampaignStateRepo,
+        IVisibleShardIdRepository visibleShardIdRepo,
+        ICurrentUserIdRepository currentUserIdRepo
     )
     {
         _entityLocator = entityLocator;
@@ -70,6 +80,8 @@ public sealed class Hud : IHud
         _localizer = localizer;
         _packetSender = packetSender;
         _syncCampaignStateRepo = syncCampaignStateRepo;
+        _visibleShardIdRepo = visibleShardIdRepo;
+        _currentUserIdRepo = currentUserIdRepo;
 
         node.Hud = this;
         _node = node;
@@ -192,19 +204,10 @@ public sealed class Hud : IHud
         _isDragging = false;
 
         if (_isCancelingItemStackDrag) return;
-        if (_currentCharIdRepo.Value == null) return; // todo rename value
-        if
-        (
-            !_entityLocator.TryFindEntity
-            (
-                _currentCharIdRepo.Value.Required,
-                out IUnitPuppet? unitPuppet,
-                out Guid? shardId
-            )
-        )
-        {
-            return;
-        } // todo maybe shardId should be empty instead of null on failure to avoid .Value?
+        if (SelectedUnit == null) return;
+        if (_currentUserIdRepo.Value == null) return;
+        if (!SelectedUnit.ControllingPlayerIds.Contains(_currentUserIdRepo.Value.Value)) return;
+        if (_visibleShardIdRepo.Value == null) return;
 
         for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
         {
@@ -214,7 +217,7 @@ public sealed class Hud : IHud
                 IsInsideRect(position, _inventorySlots[i].DropArea)
             )
             {
-                MoveItemStack(index, i, shardId.Value, unitPuppet);
+                MoveItemStack(index, i, _visibleShardIdRepo.Value.Value, SelectedUnit);
                 break;
             }
         }

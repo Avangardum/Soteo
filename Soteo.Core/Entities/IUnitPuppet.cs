@@ -1,4 +1,3 @@
-using System.Numerics;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Snapshots;
@@ -23,6 +22,7 @@ public interface IUnitPuppet : IEntity
     IReadOnlyDictionary<Stat, double> Stats { get; }
     IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; }
     AbilityUseProgress? AbilityUseProgress { get; }
+    IReadOnlyList<Guid> ControllingPlayerIds { get; }
     Faction Faction { get; }
 
     EntitySnapshot ToSnapshot();

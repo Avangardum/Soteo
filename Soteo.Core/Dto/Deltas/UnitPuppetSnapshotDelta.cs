@@ -11,6 +11,7 @@ public sealed record UnitPuppetSnapshotDelta : EntitySnapshotDelta
     public required Delta<AbilityUseProgress?> AbilityUseProgress { get; init; }
     public required DictionaryDelta<Guid, PuppetStatusContext> Statuses { get; init; }
     public required ListDelta<ItemStack?> Items { get; init; }
+    public required ListDelta<Guid> ControllingPlayerIds { get; init; }
 
     public override bool HasChanged
     {
@@ -18,7 +19,7 @@ public sealed record UnitPuppetSnapshotDelta : EntitySnapshotDelta
         {
             return base.HasChanged || IsDead.HasChanged || IsMoving.HasChanged || Stats.HasChanged ||
                 AbilitySlotStates.HasChanged || AbilityUseProgress.HasChanged || Statuses.HasChanged ||
-                Items.HasChanged;
+                Items.HasChanged || ControllingPlayerIds.HasChanged;
         }
     }
 }
