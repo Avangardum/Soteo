@@ -8,7 +8,6 @@ public sealed class InventorySlotControl : Control
     private readonly LateInit<Control> _countBackground = new();
     private readonly LateInit<Label> _countLabel = new();
     private readonly LateInit<ItemStackControl> _itemStack = new();
-    private readonly LateInit<Control> _dropArea = new();
 
     public event Action DragStarted
     {
@@ -16,7 +15,7 @@ public sealed class InventorySlotControl : Control
         remove => _itemStack.Value.DragStarted -= value;
     }
 
-    public event Action<GdVector2> DragStopped
+    public event Action DragStopped
     {
         add => _itemStack.Value.DragStopped += value;
         remove => _itemStack.Value.DragStopped -= value;
@@ -28,12 +27,10 @@ public sealed class InventorySlotControl : Control
         _countBackground.Value = GetNode<Control>("ItemStack/TextureRect/CountBackground");
         _countLabel.Value = GetNode<Label>("ItemStack/TextureRect/CountBackground/CountLabel");
         _itemStack.Value = GetNode<ItemStackControl>("ItemStack");
-        _dropArea.Value = GetNode<Control>("DropArea");
     }
 
     public TextureRect TextureRect => _textureRect.Value;
     public Control CountBackground => _countBackground.Value;
     public Label CountLabel => _countLabel.Value;
     public ItemStackControl ItemStack => _itemStack.Value;
-    public Control DropArea => _dropArea.Value;
 }

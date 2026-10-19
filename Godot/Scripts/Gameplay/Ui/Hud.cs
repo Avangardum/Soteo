@@ -135,7 +135,7 @@ public sealed class Hud : IHud
             _inventorySlots[i].Connect("mouse_entered", () => OnMouseEnteredInventorySlot(index));
             _inventorySlots[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
             _inventorySlots[i].DragStarted += () => OnInventoryItemStackDragStarted(index);
-            _inventorySlots[i].DragStopped += position => OnInventoryItemStackDragStopped(index, position);
+            _inventorySlots[i].DragStopped += () => OnInventoryItemStackDragStopped(index);
         }
     }
 
@@ -199,7 +199,7 @@ public sealed class Hud : IHud
         _tooltip.Hide();
     }
 
-    private void OnInventoryItemStackDragStopped(int index, GdVector2 position)
+    private void OnInventoryItemStackDragStopped(int index)
     {
         _isDragging = false;
 
@@ -211,11 +211,7 @@ public sealed class Hud : IHud
 
         for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
         {
-            if
-            (
-                IsInsideRect(_node.GetGlobalMousePosition(), _inventorySlots[i].DropArea) ||
-                IsInsideRect(position, _inventorySlots[i].DropArea)
-            )
+            if (IsInsideRect(_node.GetGlobalMousePosition(), _inventorySlots[i]))
             {
                 MoveItemStack(index, i, _visibleShardIdRepo.Id.Value, SelectedUnit);
                 break;
