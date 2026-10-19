@@ -39,16 +39,16 @@ public sealed class InputHandler : Node2D
 
     public override void _UnhandledInput(InputEvent e)
     {
-        if (e.IsActionPressed("select"))
+        if (e.IsActionPressed(InputActions.Select))
             HandleSelect();
-        if (e.IsActionPressed("interact"))
+        if (e.IsActionPressed(InputActions.Interact))
             HandleInteract();
-        if (e.IsActionPressed("stop"))
+        if (e.IsActionPressed(InputActions.Stop))
             HandleStop();
 
         foreach (var slot in Enum.GetValues<AbilitySlot>().Distinct())
         {
-            var action = "use_ability_" + slot.ToString().ToLower();
+            string action = InputActions.UseAbility(slot);
             if (InputMap.HasAction(action) && e.IsActionReleased(action))
             {
                 HandleUseAbility(slot);
@@ -125,7 +125,7 @@ public sealed class InputHandler : Node2D
             return;
         if (!user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
-        bool alt = Input.IsActionPressed("alt");
+        bool alt = Input.IsActionPressed(InputActions.Alt);
         Targeting targeting = alt ? state.Ability.AltTargeting : state.Ability.Targeting;
 
         IUnitPuppet? targetUnit = GetUnitsUnderMouse()

@@ -69,7 +69,7 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
     public override void _Process(float delta)
     {
         GdVector2 globalMousePos = GetGlobalMousePosition();
-        bool isDragging = Input.IsActionPressed("drag_camera");
+        bool isDragging = Input.IsActionPressed(InputActions.DragCamera);
 
         if (isDragging)
         {
@@ -144,9 +144,9 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
 
     public override void _Input(InputEvent e)
     {
-        if (e.IsActionPressed("zoom_in"))
+        if (e.IsActionPressed(InputActions.ZoomIn))
             TargetZoomLog2 += ZoomLog2Step;
-        else if (e.IsActionPressed("zoom_out"))
+        else if (e.IsActionPressed(InputActions.ZoomOut))
             TargetZoomLog2 -= ZoomLog2Step;
     }
 }

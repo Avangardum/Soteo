@@ -25,10 +25,9 @@ public sealed class ItemStackControl : Control
 
     public override void _Process(float delta)
     {
-        // todo extract all action names to const
-        if (IsDraggable && _isMouseHovering && Input.IsActionJustPressed("select"))
+        if (IsDraggable && _isMouseHovering && Input.IsActionJustPressed(InputActions.Select))
             StartDrag();
-        else if (_isDragging && Input.IsActionJustReleased("select"))
+        else if (_isDragging && Input.IsActionJustReleased(InputActions.Select))
             StopDrag();
 
         if (_isDragging)

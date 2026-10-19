@@ -112,7 +112,7 @@ public sealed class DebugScreen
 
     public void UnhandledInput(InputEvent e)
     {
-        if (e.IsActionPressed("debug_screen"))
+        if (e.IsActionPressed(InputActions.DebugScreen))
             _node.Visible = !_node.Visible;
     }
 }
