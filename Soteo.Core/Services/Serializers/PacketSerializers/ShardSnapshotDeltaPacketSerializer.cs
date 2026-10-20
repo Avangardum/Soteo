@@ -80,6 +80,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         SerializeDictionaryDelta(delta.Statuses, s.SerializeGuid, s.SerializePuppetStatusContext, stream);
         SerializeListDelta(delta.Items, (v, _) => s.SerializeNullableClass(v, s.SerializeItemStack, stream), stream);
         SerializeListDelta(delta.ControllingPlayerIds, s.SerializeGuid, stream);
+        SerializeDictionaryDelta(delta.EquipmentSlotStates, s.SerializeEnum, s.SerializeEquipmentSlotState, stream);
     }
 
     private UnitPuppetSnapshotDelta DeserializeUnitPuppetDelta(Stream stream)
@@ -97,7 +98,9 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
             AbilityUseProgress = DeserializeNullableClassDelta(s.DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeDictionaryDelta(s.DeserializeGuid, s.DeserializePuppetStatusContext, stream),
             Items = DeserializeListDelta(_ => s.DeserializeNullableClass(s.DeserializeItemStack, stream), stream),
-            ControllingPlayerIds = DeserializeListDelta(s.DeserializeGuid, stream)
+            ControllingPlayerIds = DeserializeListDelta(s.DeserializeGuid, stream),
+            EquipmentSlotStates =
+                DeserializeDictionaryDelta(s.DeserializeEnum<EquipmentSlot>, s.DeserializeEquipmentSlotState, stream)
         };
     }
 

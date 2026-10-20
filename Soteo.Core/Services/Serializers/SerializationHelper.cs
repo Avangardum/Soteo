@@ -453,6 +453,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeIndexedDictionary(unit.Statuses, SerializeStatusContextSnapshot, stream);
         SerializeNullableStruct(unit.ControllingPlayerId, SerializeGuid, stream);
         SerializeList(unit.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
+        SerializeDictionary(unit.EquipmentSlotStates, SerializeEnum, SerializeEquipmentSlotState, stream);
     }
 
     public UnitSnapshot DeserializeUnitSnapshot(Stream stream)
@@ -471,7 +472,9 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializeDeflatedStatusContext, it => it.Id, stream),
             ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream),
-            Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream)
+            Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream),
+            EquipmentSlotStates =
+                DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeEquipmentSlotState, stream)
         };
     }
 
@@ -487,6 +490,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeIndexedDictionary(unitPuppet.Statuses, SerializePuppetStatusContext, stream);
         SerializeList(unitPuppet.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
         SerializeList(unitPuppet.ControllingPlayerIds, SerializeGuid, stream);
+        SerializeDictionary(unitPuppet.EquipmentSlotStates, SerializeEnum, SerializeEquipmentSlotState, stream);
     }
 
     public UnitPuppetSnapshot DeserializeUnitPuppetSnapshot(Stream stream)
@@ -505,7 +509,9 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeIndexedDictionary(DeserializePuppetStatusContext, it => it.Id, stream),
             Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream),
-            ControllingPlayerIds = DeserializeList(DeserializeGuid, stream)
+            ControllingPlayerIds = DeserializeList(DeserializeGuid, stream),
+            EquipmentSlotStates =
+                DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeEquipmentSlotState, stream)
         };
     }
 
@@ -672,5 +678,18 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             item: DeserializeItem(stream),
             count: DeserializeLong(stream)
         );
+    }
+
+    public void SerializeEquipmentSlotState(EquipmentSlotState value, Stream stream)
+    {
+        SerializeNullableClass(value.ItemStack, SerializeItemStack, stream);
+    }
+
+    public EquipmentSlotState DeserializeEquipmentSlotState(Stream stream)
+    {
+        return new()
+        {
+            ItemStack = DeserializeNullableClass(DeserializeItemStack, stream)
+        };
     }
 }

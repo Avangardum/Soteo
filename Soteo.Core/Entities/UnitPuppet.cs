@@ -97,6 +97,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         if (_visualInventoryLockTimeRemaining == 0)
             VisualInventory.ReplicateSnapshot(s.Items);
         _controllingPlayerIds = s.ControllingPlayerIds.ToList();
+        EquipmentSlotStatesInternal = s.EquipmentSlotStates.ToDictionary();
         UpdateAnimation();
     }
 
@@ -130,6 +131,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         if (_visualInventoryLockTimeRemaining == 0)
             VisualInventory.ApplyDelta(d.Items);
         d.ControllingPlayerIds.MutateList(_controllingPlayerIds);
+        d.EquipmentSlotStates.MutateDictionary(EquipmentSlotStatesInternal);
         UpdateAnimation();
     }
 

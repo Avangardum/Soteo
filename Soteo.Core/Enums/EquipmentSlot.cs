@@ -6,6 +6,5 @@ public enum EquipmentSlot
     Offhand,
     Body,
     Head,
-    Feet,
-    Belt
+    Feet
 }

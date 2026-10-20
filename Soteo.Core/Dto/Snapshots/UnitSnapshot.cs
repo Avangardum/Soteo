@@ -14,6 +14,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required IReadOnlyDictionary<Guid, StatusContextSnapshot> Statuses { get; init; }
     public required Guid? ControllingPlayerId { get; init; }
     public required IReadOnlyList<ItemStack?> Items { get; init; }
+    public required IReadOnlyDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates { get; init; }
 
     public override EntitySnapshot ToPuppet()
     {
@@ -30,7 +31,8 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
             AbilityUseProgress = AbilityUseProgress,
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToPuppet()),
             Items = Items,
-            ControllingPlayerIds = ControllingPlayerId == null ? [] : [ControllingPlayerId.Value]
+            ControllingPlayerIds = ControllingPlayerId == null ? [] : [ControllingPlayerId.Value],
+            EquipmentSlotStates = EquipmentSlotStates
         };
     }
 

@@ -246,7 +246,8 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             Position = default,
             Azimuth = 0,
             ControllingPlayerId = null,
-            Items = []
+            Items = [],
+            EquipmentSlotStates = ImmutableDictionary<EquipmentSlot, EquipmentSlotState>.Empty
         };
     }
 

@@ -30,6 +30,9 @@ public sealed class PlayerCharacter : Unit
         Inventory.PutAt(2, ItemStack.Of<RockItem>(1));
     }
 
+    public override IReadOnlyList<EquipmentSlot> EquipmentSlots =>
+        [EquipmentSlot.MainHand, EquipmentSlot.Offhand, EquipmentSlot.Head, EquipmentSlot.Body, EquipmentSlot.Feet];
+
     public static PlayerCharacter FromSnapshot
     (
         UnitSnapshot snapshot,
