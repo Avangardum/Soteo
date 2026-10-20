@@ -11,7 +11,6 @@ public sealed class ProjectileBurstAbility : Ability
 {
     public override Targeting Targeting => Targeting.Nothing;
     public override Scalable<double> StaticRange => 100;
-    public override Scalable<double> StaticCooldown => 5;
 
     public override void TakeEffect(AbilityContext context)
     {
