@@ -116,6 +116,19 @@ finished and the rest after previous started.
 Start by reading the contents of the Docs folder to get a top level overview on the project. After that you can
 explore the classes mentioned in the docs or the ones you are interested in.
 
+## Troubleshooting
+
+### First step - delete snapshots
+
+During development snapshot format can change, causing crashed or undefined behavior when trying to replicate an
+old snapshot. So the first step if something breaks suddently should be clearing the snapshot folder
+(specified in environment variables).
+
+### Missing scene dependencies
+
+Godot editor sometimes show the missing scene dependencies window when trying to open a scene, even if all dependencies
+are fine. In this case close that window and open the scene again.
+
 ## Contributing
 
 If you'd like to contribute, join the Discord server and let me know.
