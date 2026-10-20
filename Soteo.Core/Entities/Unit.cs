@@ -24,16 +24,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     private Guid? _controllingPlayerId;
 
-    public IReadOnlySet<Guid> ControllingPlayerIds
-    {
-        get
-        {
-            if (_controllingPlayerId == null)
-                return ReadOnlySetWrapper<Guid>.Empty;
-            else
-                return new ReadOnlySetWrapper<Guid>(new HashSet<Guid> { _controllingPlayerId.Value } );
-        }
-    }
+    public IReadOnlyList<Guid> ControllingPlayerIds =>
+        _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
 
     private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;

@@ -26,7 +26,7 @@ public sealed class CommandPacketHandlerTests
         _unit = Substitute.For<ICommandableUnit>();
         _unit.Id.Returns(_unitId);
         _controllingPlayerId = Guid.NewGuid();
-        _unit.ControllingPlayerIds.Returns(new HashSet<Guid> { _controllingPlayerId }.AsReadOnly());
+        _unit.ControllingPlayerIds.Returns([_controllingPlayerId]);
         _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [_unitId] = _unit } );
         _command = new TestCommand();
     }

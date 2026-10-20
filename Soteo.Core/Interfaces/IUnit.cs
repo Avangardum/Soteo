@@ -11,7 +11,7 @@ public interface IUnit : IEntity
     bool IsDead { get; }
     void Die();
 
-    IReadOnlySet<Guid> ControllingPlayerIds { get; }
+    IReadOnlyList<Guid> ControllingPlayerIds { get; }
     Faction Faction { get; }
     bool IsAlliedTo(IUnit other);
 
