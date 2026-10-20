@@ -24,6 +24,8 @@ public sealed class Hud : IHud
     private readonly ImmutableList<StatusIndicator> _statusIndicators;
     private readonly GridContainer _inventoryGrid;
     private readonly ImmutableList<InventorySlotControl> _inventorySlots;
+    private readonly Control _equipmentPanel;
+    private readonly ImmutableDictionary<EquipmentSlot, InventorySlotControl> _equipmentSlotControls;
 
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
@@ -93,12 +95,19 @@ public sealed class Hud : IHud
             .Cast<AbilityButton>()
             .ToImmutableList();
         _statusIndicators = node.GetNode("VBoxContainer/Statuses").GetChildren()
-            .Cast<StatusIndicator>()
+            .OfType<StatusIndicator>()
             .ToImmutableList();
         _inventoryGrid = node.GetNode<GridContainer>("Inventory/MarginContainer/Slots");
         _inventorySlots = _inventoryGrid.GetChildren()
             .Cast<InventorySlotControl>()
             .ToImmutableList();
+        _equipmentPanel = node.GetNode<Control>("Equipment");
+        _equipmentSlotControls = Enum.GetValues<EquipmentSlot>()
+            .ToImmutableDictionary
+            (
+                it => it,
+                it => _equipmentPanel.GetNode<InventorySlotControl>($"MarginContainer/Slots/{it}")
+            );
 
         SubscribeToAbilityButtonEvents();
         SubscribeToStatusIndicatorEvents();
@@ -271,6 +280,7 @@ public sealed class Hud : IHud
         ProcessAbilities(SelectedUnit);
         ProcessStatuses(SelectedUnit);
         ProcessInventory(SelectedUnit);
+        ProcessEquipment(SelectedUnit);
     }
 
     [MemberNotNullWhen(true, nameof(SelectedUnit))]
@@ -364,6 +374,23 @@ public sealed class Hud : IHud
         for (int i = unit.VisualInventory.Count; i < _inventorySlots.Count; i++)
         {
             _inventorySlots[i].Visible = false;
+        }
+    }
+
+    private void ProcessEquipment(IUnitPuppet unit)
+    {
+        _equipmentPanel.Visible = unit.EquipmentSlotStates.Any();
+        foreach ((EquipmentSlot slot, InventorySlotControl control) in _equipmentSlotControls)
+        {
+            EquipmentSlotState state = unit.EquipmentSlotStates[slot];
+            control.ItemStack.Visible = state.ItemStack != null;
+            if (state.ItemStack != null)
+            {
+                control.TextureRect.Texture = state.ItemStack.Item.Icon;
+                control.CountBackground.Visible = state.ItemStack.Count > 1;
+                if (state.ItemStack.Count > 1)
+                    control.CountLabel.Text = state.ItemStack.Count.ToString();
+            }
         }
     }
 

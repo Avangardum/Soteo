@@ -21,6 +21,7 @@ public interface IUnitPuppet : IEntity
     Inventory Inventory { get; }
     IReadOnlyDictionary<Stat, double> Stats { get; }
     IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; }
+    IReadOnlyDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates { get; }
     AbilityUseProgress? AbilityUseProgress { get; }
     IReadOnlyList<Guid> ControllingPlayerIds { get; }
     Faction Faction { get; }

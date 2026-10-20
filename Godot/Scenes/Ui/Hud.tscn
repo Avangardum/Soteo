@@ -35,59 +35,62 @@ margin_right = 594.0
 margin_bottom = 38.0
 mouse_filter = 2
 
+[node name="Filler" type="Control" parent="VBoxContainer/Statuses"]
+margin_right = 5.0
+margin_bottom = 38.0
+rect_min_size = Vector2( 5, 0 )
+
 [node name="0" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
+margin_left = 9.0
+margin_right = 47.0
 
 [node name="1" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 42.0
-margin_right = 80.0
+margin_left = 51.0
+margin_right = 89.0
 
 [node name="2" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 84.0
-margin_right = 122.0
+margin_left = 93.0
+margin_right = 131.0
 
 [node name="3" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 126.0
-margin_right = 164.0
+margin_left = 135.0
+margin_right = 173.0
 
 [node name="4" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 168.0
-margin_right = 206.0
+margin_left = 177.0
+margin_right = 215.0
 
 [node name="5" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 210.0
-margin_right = 248.0
+margin_left = 219.0
+margin_right = 257.0
 
 [node name="6" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 252.0
-margin_right = 290.0
+margin_left = 261.0
+margin_right = 299.0
 
 [node name="7" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 294.0
-margin_right = 332.0
+margin_left = 303.0
+margin_right = 341.0
 
 [node name="8" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 336.0
-margin_right = 374.0
+margin_left = 345.0
+margin_right = 383.0
 
 [node name="9" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 378.0
-margin_right = 416.0
+margin_left = 387.0
+margin_right = 425.0
 
 [node name="10" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 420.0
-margin_right = 458.0
+margin_left = 429.0
+margin_right = 467.0
 
 [node name="11" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 462.0
-margin_right = 500.0
+margin_left = 471.0
+margin_right = 509.0
 
 [node name="12" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 504.0
-margin_right = 542.0
-
-[node name="13" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-margin_left = 546.0
-margin_right = 584.0
+margin_left = 513.0
+margin_right = 551.0
 
 [node name="UnitPanel" type="PanelContainer" parent="VBoxContainer"]
 margin_top = 42.0
@@ -231,4 +234,56 @@ margin_bottom = 164.0
 margin_left = 252.0
 margin_top = 84.0
 margin_right = 332.0
+margin_bottom = 164.0
+
+[node name="Equipment" type="PanelContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_right = -292.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Equipment"]
+margin_right = 258.0
+margin_bottom = 174.0
+custom_constants/margin_right = 5
+custom_constants/margin_top = 5
+custom_constants/margin_left = 5
+custom_constants/margin_bottom = 5
+
+[node name="Slots" type="GridContainer" parent="Equipment/MarginContainer"]
+margin_left = 5.0
+margin_top = 5.0
+margin_right = 253.0
+margin_bottom = 169.0
+columns = 3
+
+[node name="Filler" type="Control" parent="Equipment/MarginContainer/Slots"]
+margin_right = 80.0
+margin_bottom = 80.0
+
+[node name="MainHand" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
+margin_left = 84.0
+margin_right = 164.0
+
+[node name="Offhand" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
+margin_left = 168.0
+margin_right = 248.0
+
+[node name="Head" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
+margin_top = 84.0
+margin_bottom = 164.0
+
+[node name="Body" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
+margin_left = 84.0
+margin_top = 84.0
+margin_right = 164.0
+margin_bottom = 164.0
+
+[node name="Feet" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
+margin_left = 168.0
+margin_top = 84.0
+margin_right = 248.0
 margin_bottom = 164.0
