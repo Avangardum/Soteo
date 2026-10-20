@@ -2,7 +2,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class InventorySlotControl : Control
+public sealed class InventorySlotControl : Control // todo rename
 {
     private readonly LateInit<TextureRect> _textureRect = new();
     private readonly LateInit<Control> _countBackground = new();

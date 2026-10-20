@@ -52,7 +52,7 @@ public sealed class Hud : IHud
                 _currentUserIdRepo.Id != null &&
                 value.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value);
             _isCancelingItemStackDrag = true;
-            foreach (InventorySlotControl slot in _inventorySlots)
+            foreach (InventorySlotControl slot in _inventorySlots.Concat(_equipmentSlotControls.Values))
             {
                 slot.ItemStack.StopDrag();
                 slot.ItemStack.IsDraggable = isControllable;
@@ -112,6 +112,7 @@ public sealed class Hud : IHud
         SubscribeToAbilityButtonEvents();
         SubscribeToStatusIndicatorEvents();
         SubscribeToInventorySlotEvents();
+        SubscribeToEquipmentSlotEvents();
     }
 
     private void SubscribeToAbilityButtonEvents()
@@ -145,6 +146,17 @@ public sealed class Hud : IHud
             _inventorySlots[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
             _inventorySlots[i].DragStarted += () => OnInventoryItemStackDragStarted(index);
             _inventorySlots[i].DragStopped += () => OnInventoryItemStackDragStopped(index);
+        }
+    }
+
+    private void SubscribeToEquipmentSlotEvents()
+    {
+        foreach ((EquipmentSlot slot, InventorySlotControl control) in _equipmentSlotControls)
+        {
+            control.Connect("mouse_entered", () => OnMouseEnteredEquipmentSlot(slot));
+            control.Connect("mouse_exited", OnMouseExitedTooltipableControl);
+            control.DragStarted += () => OnEquipmentItemStackDragStarted(slot);
+            control.DragStopped += () => OnEquipmentItemStackDragStopped(slot);
         }
     }
 
@@ -197,6 +209,16 @@ public sealed class Hud : IHud
         _tooltip.Show(_inventorySlots[index].TopCenterGlobalPosition.ToSys(), item.Name, "");
     }
 
+    private void OnMouseEnteredEquipmentSlot(EquipmentSlot slot)
+    {
+        if (_isDragging) return;
+        if (SelectedUnit == null) return;
+        if (!SelectedUnit.EquipmentSlotStates.TryGetValue(slot, out EquipmentSlotState state)) return;
+        if (state.ItemStack == null) return;
+
+        _tooltip.Show(_equipmentSlotControls[slot].TopCenterGlobalPosition.ToSys(), state.ItemStack.Item.Name, "");
+    }
+
     public void OnMouseExitedTooltipableControl()
     {
         _tooltip.Hide();
@@ -226,6 +248,27 @@ public sealed class Hud : IHud
                 break;
             }
         }
+
+        // todo equip
+    }
+
+    private void OnEquipmentItemStackDragStarted(EquipmentSlot slot)
+    {
+        _isDragging = true;
+        _tooltip.Hide();
+    }
+
+    private void OnEquipmentItemStackDragStopped(EquipmentSlot slot)
+    {
+        _isDragging = false;
+
+        if (_isCancelingItemStackDrag) return;
+        if (SelectedUnit == null) return;
+        if (_currentUserIdRepo.Id == null) return;
+        if (!SelectedUnit.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value)) return;
+        if (_visibleShardIdRepo.Id == null) return;
+
+        // todo
     }
 
     private bool IsInsideRect(GdVector2 position, Control control)
