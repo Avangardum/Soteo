@@ -30,7 +30,12 @@ public sealed class UnitTests
         _sut = new Sut(Guid.NewGuid(), _node, _entityManager, _serviceProvider);
     }
 
-    // TODO UseAbilityCommandForEmptySlotDoesNothing
+    [Fact]
+    public void UseAbilityCommandForEmptySlotDoesntThrow()
+    {
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0, TargetUnitId = Guid.NewGuid() });
+        _sut.Tick(Const.TickInterval);
+    }
 
     [Fact]
     public void AbilityTargetingNonexistentUnitIsNotUsed()
