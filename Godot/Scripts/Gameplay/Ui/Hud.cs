@@ -55,7 +55,7 @@ public sealed class Hud : IHud
             foreach (ItemStackSlotControl slot in _inventorySlots.Concat(_equipmentSlotControls.Values))
             {
                 slot.ItemStack.StopDrag();
-                slot.ItemStack.IsDraggable = isControllable;
+                slot.ItemStack.IsInteractive = isControllable;
             }
             _isCancelingItemStackDrag = false;
         }

@@ -17,7 +17,7 @@ public sealed class ItemStackControl : Control
     private readonly LateInit<Control> _countBackground = new();
     private readonly LateInit<Label> _countLabel = new();
 
-    public bool IsDraggable { get; set; }
+    public bool IsInteractive { get; set; }
 
     public event Action SelectClicked = delegate { };
     public event Action DragStarted = delegate { };
@@ -41,7 +41,7 @@ public sealed class ItemStackControl : Control
 
     public override void _Process(float delta)
     {
-        if (IsDraggable && _isMouseHovering && Input.IsActionJustPressed(InputActions.Select))
+        if (IsInteractive && _isMouseHovering && Input.IsActionJustPressed(InputActions.Select))
         {
             _mouseDownPosition = GetGlobalMousePosition();
         }
