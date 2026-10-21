@@ -33,6 +33,7 @@ public sealed class PlayerCharacter : Unit
             new EquipmentSlotState { ItemStack = ItemStack.Of<BlinkBootsItem>(1) };
     }
 
+    /// <inheritdoc/>
     public override IReadOnlyList<EquipmentSlot> EquipmentSlots =>
         [EquipmentSlot.MainHand, EquipmentSlot.Offhand, EquipmentSlot.Head, EquipmentSlot.Body, EquipmentSlot.Feet];
 

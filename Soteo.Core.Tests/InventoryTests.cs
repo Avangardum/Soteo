@@ -10,8 +10,9 @@ public sealed class InventoryTests
     {
         var sut = new Inventory(10);
 
-        sut.TryAdd(ItemStack.Of<TestItem1>(1)).Should().BeTrue();
+        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(1));
 
+        remainder.Should().BeNull();
         sut[0].Should().Be(ItemStack.Of<TestItem1>(1));
     }
 
@@ -20,9 +21,11 @@ public sealed class InventoryTests
     {
         var sut = new Inventory(10);
 
-        sut.TryAdd(ItemStack.Of<TestItem1>(1)).Should().BeTrue();
-        sut.TryAdd(ItemStack.Of<TestItem2>(1)).Should().BeTrue();
+        ItemStack? remainder1 = sut.Add(ItemStack.Of<TestItem1>(1));
+        ItemStack? remainder2 = sut.Add(ItemStack.Of<TestItem2>(1));
 
+        remainder1.Should().BeNull();
+        remainder2.Should().BeNull();
         sut[0].Should().Be(ItemStack.Of<TestItem1>(1));
         sut[1].Should().Be(ItemStack.Of<TestItem2>(1));
     }
@@ -32,8 +35,9 @@ public sealed class InventoryTests
     {
         var sut = new Inventory([ItemStack.Of<TestItem1>(1)]);
 
-        sut.TryAdd(ItemStack.Of<TestItem2>(1)).Should().BeFalse();
+        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem2>(1));
 
+        remainder.Should().Be(ItemStack.Of<TestItem2>(1));
         sut[0].Should().Be(ItemStack.Of<TestItem1>(1));
     }
 
@@ -42,12 +46,13 @@ public sealed class InventoryTests
     {
         var sut = new Inventory([null, ItemStack.Of<TestItem1>(8), ItemStack.Of<TestItem1>(9), null]);
 
-        sut.TryAdd(ItemStack.Of<TestItem1>(3)).Should().BeTrue();
+        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(3));
 
-        sut[0].Should().Be(null);
+        remainder.Should().BeNull();
+        sut[0].Should().BeNull();
         sut[1].Should().Be(ItemStack.Of<TestItem1>(10));
         sut[2].Should().Be(ItemStack.Of<TestItem1>(10));
-        sut[3].Should().Be(null);
+        sut[3].Should().BeNull();
     }
 
     [Fact]
@@ -55,12 +60,24 @@ public sealed class InventoryTests
     {
         var sut = new Inventory([null, ItemStack.Of<TestItem1>(8), ItemStack.Of<TestItem1>(9), null]);
 
-        sut.TryAdd(ItemStack.Of<TestItem1>(5)).Should().BeTrue();
+        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(5));
 
+        remainder.Should().BeNull();
         sut[0].Should().Be(ItemStack.Of<TestItem1>(2));
         sut[1].Should().Be(ItemStack.Of<TestItem1>(10));
         sut[2].Should().Be(ItemStack.Of<TestItem1>(10));
-        sut[3].Should().Be(null);
+        sut[3].Should().BeNull();
+    }
+
+    [Fact]
+    public void AddingItemStackWhenSpaceIsInsufficientAddsWhatFitsAndReturnsRemainder()
+    {
+        var sut = new Inventory([ItemStack.Of<TestItem1>(8)]);
+
+        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(4));
+
+        remainder.Should().Be(ItemStack.Of<TestItem1>(2));
+        sut[0].Should().Be(ItemStack.Of<TestItem1>(10));
     }
 
     [Fact]

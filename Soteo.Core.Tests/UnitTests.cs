@@ -8,6 +8,7 @@ using Soteo.Core.Dto;
 using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
+using Soteo.Core.Items;
 using Soteo.Core.StaticHelpers;
 using Soteo.Core.Statuses;
 using Soteo.TestUtil;
@@ -226,6 +227,131 @@ public sealed class UnitTests
         _sut.Inventory[1].Should().Be(ItemStack.Of<TestItem2>(1));
     }
 
+    [Fact]
+    public void EquippingUnequippableItemDoesNothing()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestItem1>(1));
+
+        _sut.SetCommand(new EquipCommand(0));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestItem1>(1));
+        _sut.EquipmentSlotStates.All(it => it.Value.ItemStack == null).Should().BeTrue();
+    }
+
+    [Fact]
+    public void EquippingIntoOccupiedEquipmentSlotDoesNothing()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestBoots2Item>(1));
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet] =
+            new EquipmentSlotState { ItemStack = ItemStack.Of<TestBoots1Item>(1) };
+
+        _sut.SetCommand(new EquipCommand(0));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestBoots2Item>(1));
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet].ItemStack.Should().Be(ItemStack.Of<TestBoots1Item>(1));
+    }
+
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(int.MaxValue)]
+    public void EquippingFromEmptyOrNonexistentInventorySlotDoesNothing(int inventorySlot)
+    {
+        _sut.SetCommand(new EquipCommand(inventorySlot));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet].Should().BeNull();
+    }
+
+    [Fact]
+    public void EquippingToNonexistentEquipmentSlotDoesNothing()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestHatItem>(1));
+
+        _sut.SetCommand(new EquipCommand(0));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestHatItem>(1));
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet].Should().BeNull();
+    }
+
+    [Fact]
+    public void EquippingItemFromInventoryToEmptyEquipmentSlotSucceeds()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestBoots1Item>(1));
+
+        _sut.SetCommand(new EquipCommand(0));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().BeNull();
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet].ItemStack.Should().Be(ItemStack.Of<TestBoots1Item>(1));
+    }
+
+    [Theory]
+    [InlineData(EquipmentSlot.Head)]
+    [InlineData(EquipmentSlot.Feet)]
+    public void UnequippingItemFromNonexistentOrEmptyEquipmentSlotDoesNothing(EquipmentSlot slot)
+    {
+        _sut.SetCommand(new UnequipCommand(slot));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory.WhereNotNull().Should().BeEmpty();
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet].Should().BeNull();
+    }
+
+    [Fact]
+    public void UnequippingItemWhenInventoryHasNoSpaceDoesNothing()
+    {
+        for (int i = 0; i < _sut.Inventory.Count; i++)
+            _sut.Inventory.PutAt(i, ItemStack.Of<TestHatItem>(1));
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet] =
+            new EquipmentSlotState { ItemStack = ItemStack.Of<TestBoots1Item>(1) };
+
+        _sut.SetCommand(new UnequipCommand(EquipmentSlot.Feet));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory.All(it => it == ItemStack.Of<TestHatItem>(1)).Should().BeTrue();
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet].ItemStack.Should().Be(ItemStack.Of<TestBoots1Item>(1));
+    }
+
+    [Fact]
+    public void UnequippingItemFillsAvailableSpaceMergingStacksIfPossible()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestBoots1Item>(9));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestBoots1Item>(8));
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet] =
+            new EquipmentSlotState { ItemStack = ItemStack.Of<TestBoots1Item>(5) };
+
+        _sut.SetCommand(new UnequipCommand(EquipmentSlot.Feet));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestBoots1Item>(10));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestBoots1Item>(10));
+        _sut.Inventory[2].Should().Be(ItemStack.Of<TestBoots1Item>(2));
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet].ItemStack.Should().BeNull();
+    }
+
+    [Fact]
+    public void UnequippingItemWhenInventoryHasInsufficientSpaceFillsAvailableSpaceAndLeavesRemainderEquipped()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestBoots1Item>(9));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestBoots1Item>(8));
+        for (int i = 2; i < _sut.Inventory.Count; i++)
+            _sut.Inventory.PutAt(i, ItemStack.Of<TestHatItem>(1));
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet] =
+            new EquipmentSlotState { ItemStack = ItemStack.Of<TestBoots1Item>(5) };
+
+        _sut.SetCommand(new UnequipCommand(EquipmentSlot.Feet));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory.Take(2).All(it => it == ItemStack.Of<TestBoots1Item>(10)).Should().BeTrue();
+        _sut.Inventory.Skip(2).All(it => it == ItemStack.Of<TestHatItem>(1)).Should().BeTrue();
+        _sut.EquipmentSlotStates[EquipmentSlot.Feet].ItemStack.Should().Be(ItemStack.Of<TestBoots1Item>(2));
+    }
+
     private sealed class Sut : Unit
     {
         public Sut(Guid id, IUnitNode node, IEntityManager entityManager, IServiceProvider serviceProvider) :
@@ -233,6 +359,11 @@ public sealed class UnitTests
 
         public new void SetAbility<T>(AbilitySlot slot, int level) where T : Ability, new() =>
             base.SetAbility<T>(slot, level);
+
+        public new IDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates =>
+            EquipmentSlotStatesInternal;
+
+        public override IReadOnlyList<EquipmentSlot> EquipmentSlots => [EquipmentSlot.Feet];
     }
 
     public class SpyAbility : Ability
@@ -309,5 +440,22 @@ public sealed class UnitTests
     {
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
         public override void Tick(StatusContext context, double delta) => context.Unit.Die();
+    }
+
+    private sealed class TestBoots1Item : Item // todo change to potion
+    {
+        public override EquipmentSlot? EquipmentSlot => Enums.EquipmentSlot.Feet; // todo rename
+        public override long MaxStackCount => 10;
+    }
+
+    private sealed class TestBoots2Item : Item
+    {
+        public override EquipmentSlot? EquipmentSlot => Enums.EquipmentSlot.Feet;
+        public override long MaxStackCount => 10;
+    }
+
+    private sealed class TestHatItem : Item
+    {
+        public override EquipmentSlot? EquipmentSlot => Enums.EquipmentSlot.Head;
     }
 }

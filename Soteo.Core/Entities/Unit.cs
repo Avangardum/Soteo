@@ -9,7 +9,6 @@ using Soteo.Core.Interfaces;
 using Soteo.Core.StaticHelpers;
 using Soteo.Core.Statuses;
 using Soteo.Util;
-using Soteo.Util.Interfaces;
 
 namespace Soteo.Core.Entities;
 
@@ -50,6 +49,9 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             EquipmentSlotStatesInternal[slot] = new EquipmentSlotState { ItemStack = null };
     }
 
+    /// <summary>
+    /// List of equipment slots a unit has. Should be a constant value.
+    /// </summary>
     public virtual IReadOnlyList<EquipmentSlot> EquipmentSlots => [];
 
     public override Vector2 Position
@@ -276,6 +278,12 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
                 case MoveItemStackCommand command:
                     MoveItemStack(command);
                     break;
+                case EquipCommand command:
+                    Equip(command);
+                    break;
+                case UnequipCommand command:
+                    Unequip(command);
+                    break;
                 case ICommand command:
                     throw new Exception($"Unknown command type {command.GetType()}");
             }
@@ -499,6 +507,33 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         ItemStack? returnedStack = Inventory.PutAt(command.ToIndex, movedStack);
         if (returnedStack != null)
             Inventory.PutAt(command.FromIndex, returnedStack);
+    }
+
+    private void Equip(EquipCommand command)
+    {
+        _commands.Dequeue();
+
+        if (!Inventory.HasSlot(command.InventorySlot)) return;
+        ItemStack? stack = Inventory[command.InventorySlot];
+        if (stack?.Item.EquipmentSlot == null) return;
+        if (!EquipmentSlotStates.TryGetValue(stack.Item.EquipmentSlot.Value, out EquipmentSlotState? state)) return;
+        if (state.ItemStack != null) return;
+
+        Inventory.RemoveAt(command.InventorySlot);
+        EquipmentSlotStatesInternal[stack.Item.EquipmentSlot.Value] = new EquipmentSlotState { ItemStack = stack };
+        // todo support merging with existing equipment stack
+        // todo multi-slot equipment
+    }
+
+    private void Unequip(UnequipCommand command)
+    {
+        _commands.Dequeue();
+
+        if (!EquipmentSlotStates.TryGetValue(command.EquipmentSlot, out EquipmentSlotState? state)) return;
+        if (state.ItemStack == null) return;
+        ItemStack? remainder = Inventory.Add(state.ItemStack);
+        EquipmentSlotStatesInternal[command.EquipmentSlot] = new EquipmentSlotState { ItemStack = remainder };
+        // todo unequip into a specific inventory slot
     }
 
     public void SetCommand(ICommand command)

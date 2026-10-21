@@ -27,7 +27,12 @@ public sealed class Inventory : IReadOnlyList<ItemStack?>
 
     public ItemStack? this[int index] => _stacks[index];
 
-    public bool TryAdd(ItemStack stack)
+    public bool HasSlot(int slot) => slot >= 0 && slot < _stacks.Count;
+
+    /// <summary>
+    /// Add a stack to the inventory. If inventory space is insufficient, the remainder is returned.
+    /// </summary>
+    public ItemStack? Add(ItemStack stack)
     {
         long remainingCount = stack.Count;
         for (int i = 0; i < _stacks.Count && remainingCount > 0; i++)
@@ -42,17 +47,17 @@ public sealed class Inventory : IReadOnlyList<ItemStack?>
             }
         }
 
-        if (remainingCount == 0) return true;
+        if (remainingCount == 0) return null;
 
         for (int i = 0; i < _stacks.Count; i++)
         {
             if (_stacks[i] == null)
             {
                 _stacks[i] = new ItemStack(stack.Item, remainingCount);
-                return true;
+                return null;
             }
         }
-        return false;
+        return new ItemStack(stack.Item, remainingCount);
     }
 
     /// <summary>
