@@ -4,9 +4,12 @@ namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class ItemStackControl : Control
 {
+    private const double DragThresholdPx = 10;
+
     private bool _isMouseHovering;
     private bool _isDragging;
     private GdVector2 _offset;
+    private GdVector2? _mouseDownPosition;
 
     private readonly LateInit<Node> _originalParent = new();
     private readonly LateInit<Node> _dragAndDropLayer = new();
@@ -16,6 +19,7 @@ public sealed class ItemStackControl : Control
 
     public bool IsDraggable { get; set; }
 
+    public event Action SelectClicked = delegate { };
     public event Action DragStarted = delegate { };
     public event Action DragStopped = delegate { };
 
@@ -27,9 +31,9 @@ public sealed class ItemStackControl : Control
     {
         _originalParent.Value = GetParent().Required;
         _dragAndDropLayer.Value = GetNode("/root/GameplayMain/Ui/DragAndDropLayer").Required;
-        _textureRect.Value = GetNode<TextureRect>("TextureRect");
-        _countBackground.Value = GetNode<Control>("TextureRect/CountBackground");
-        _countLabel.Value = GetNode<Label>("TextureRect/CountBackground/CountLabel");
+        _textureRect.Value = GetNode<TextureRect>("TextureRect").Required;
+        _countBackground.Value = GetNode<Control>("TextureRect/CountBackground").Required;
+        _countLabel.Value = GetNode<Label>("TextureRect/CountBackground/CountLabel").Required;
 
         this.Connect("mouse_entered", () => _isMouseHovering = true);
         this.Connect("mouse_exited", () => _isMouseHovering = false);
@@ -38,9 +42,26 @@ public sealed class ItemStackControl : Control
     public override void _Process(float delta)
     {
         if (IsDraggable && _isMouseHovering && Input.IsActionJustPressed(InputActions.Select))
+        {
+            _mouseDownPosition = GetGlobalMousePosition();
+        }
+        if (_mouseDownPosition != null && Input.IsActionJustReleased(InputActions.Select))
+        {
+            _mouseDownPosition = null;
+            if (_isDragging)
+                StopDrag();
+            else
+                SelectClicked();
+        }
+
+        if
+        (
+            !_isDragging &&
+            _mouseDownPosition != null &&
+            (_mouseDownPosition.Value - GetGlobalMousePosition()).LengthSquared() >= DragThresholdPx)
+        {
             StartDrag();
-        else if (_isDragging && Input.IsActionJustReleased(InputActions.Select))
-            StopDrag();
+        }
 
         if (_isDragging)
             RectGlobalPosition = GetGlobalMousePosition() + _offset;
