@@ -144,8 +144,8 @@ public sealed class Hud : IHud
             int index = i;
             _inventorySlots[i].Connect("mouse_entered", () => OnMouseEnteredInventorySlot(index));
             _inventorySlots[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
-            _inventorySlots[i].DragStarted += () => OnInventoryItemStackDragStarted(index);
-            _inventorySlots[i].DragStopped += () => OnInventoryItemStackDragStopped(index);
+            _inventorySlots[i].ItemStack.DragStarted += () => OnInventoryItemStackDragStarted(index);
+            _inventorySlots[i].ItemStack.DragStopped += () => OnInventoryItemStackDragStopped(index);
         }
     }
 
@@ -155,8 +155,8 @@ public sealed class Hud : IHud
         {
             control.Connect("mouse_entered", () => OnMouseEnteredEquipmentSlot(slot));
             control.Connect("mouse_exited", OnMouseExitedTooltipableControl);
-            control.DragStarted += () => OnEquipmentItemStackDragStarted(slot);
-            control.DragStopped += () => OnEquipmentItemStackDragStopped(slot);
+            control.ItemStack.DragStarted += () => OnEquipmentItemStackDragStarted(slot);
+            control.ItemStack.DragStopped += () => OnEquipmentItemStackDragStopped(slot);
         }
     }
 
@@ -405,13 +405,13 @@ public sealed class Hud : IHud
         {
             _inventorySlots[i].Visible = true;
             ItemStack? stack = unit.VisualInventory[i];
-            _inventorySlots[i].TextureRect.Visible = stack != null;
+            _inventorySlots[i].ItemStack.TextureRect.Visible = stack != null;
             if (stack != null)
             {
-                _inventorySlots[i].TextureRect.Texture = stack.Item.Icon;
-                _inventorySlots[i].CountBackground.Visible = stack.Count > 1;
+                _inventorySlots[i].ItemStack.TextureRect.Texture = stack.Item.Icon;
+                _inventorySlots[i].ItemStack.CountBackground.Visible = stack.Count > 1;
                 if (stack.Count > 1)
-                    _inventorySlots[i].CountLabel.Text = stack.Count.ToString();
+                    _inventorySlots[i].ItemStack.CountLabel.Text = stack.Count.ToString();
             }
         }
         for (int i = unit.VisualInventory.Count; i < _inventorySlots.Count; i++)
@@ -429,10 +429,10 @@ public sealed class Hud : IHud
             control.ItemStack.Visible = state.ItemStack != null;
             if (state.ItemStack != null)
             {
-                control.TextureRect.Texture = state.ItemStack.Item.Icon;
-                control.CountBackground.Visible = state.ItemStack.Count > 1;
+                control.ItemStack.TextureRect.Texture = state.ItemStack.Item.Icon;
+                control.ItemStack.CountBackground.Visible = state.ItemStack.Count > 1;
                 if (state.ItemStack.Count > 1)
-                    control.CountLabel.Text = state.ItemStack.Count.ToString();
+                    control.ItemStack.CountLabel.Text = state.ItemStack.Count.ToString();
             }
         }
     }

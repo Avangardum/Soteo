@@ -7,18 +7,30 @@ public sealed class ItemStackControl : Control
     private bool _isMouseHovering;
     private bool _isDragging;
     private GdVector2 _offset;
+
     private readonly LateInit<Node> _originalParent = new();
     private readonly LateInit<Node> _dragAndDropLayer = new();
+    private readonly LateInit<TextureRect> _textureRect = new();
+    private readonly LateInit<Control> _countBackground = new();
+    private readonly LateInit<Label> _countLabel = new();
 
     public bool IsDraggable { get; set; }
 
     public event Action DragStarted = delegate { };
     public event Action DragStopped = delegate { };
 
+    public TextureRect TextureRect => _textureRect.Value;
+    public Control CountBackground => _countBackground.Value;
+    public Label CountLabel => _countLabel.Value;
+
     public override void _Ready()
     {
         _originalParent.Value = GetParent().Required;
         _dragAndDropLayer.Value = GetNode("/root/GameplayMain/Ui/DragAndDropLayer").Required;
+        _textureRect.Value = GetNode<TextureRect>("TextureRect");
+        _countBackground.Value = GetNode<Control>("TextureRect/CountBackground");
+        _countLabel.Value = GetNode<Label>("TextureRect/CountBackground/CountLabel");
+
         this.Connect("mouse_entered", () => _isMouseHovering = true);
         this.Connect("mouse_exited", () => _isMouseHovering = false);
     }
