@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Textures/Icons/Placeholder.png" type="Texture" id=1]
-[ext_resource path="res://Scripts/Gameplay/Ui/InventorySlotControl.cs" type="Script" id=2]
+[ext_resource path="res://Scripts/Gameplay/Ui/ItemStackSlotControl.cs" type="Script" id=2]
 [ext_resource path="res://Scripts/Gameplay/Ui/ItemStackControl.cs" type="Script" id=3]
 
 [node name="InventorySlot" type="Control"]

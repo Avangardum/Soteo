@@ -23,9 +23,9 @@ public sealed class Hud : IHud
     private readonly ImmutableList<AbilityButton> _abilityButtons;
     private readonly ImmutableList<StatusIndicator> _statusIndicators;
     private readonly GridContainer _inventoryGrid;
-    private readonly ImmutableList<InventorySlotControl> _inventorySlots;
+    private readonly ImmutableList<ItemStackSlotControl> _inventorySlots;
     private readonly Control _equipmentPanel;
-    private readonly ImmutableDictionary<EquipmentSlot, InventorySlotControl> _equipmentSlotControls;
+    private readonly ImmutableDictionary<EquipmentSlot, ItemStackSlotControl> _equipmentSlotControls;
 
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
@@ -52,7 +52,7 @@ public sealed class Hud : IHud
                 _currentUserIdRepo.Id != null &&
                 value.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value);
             _isCancelingItemStackDrag = true;
-            foreach (InventorySlotControl slot in _inventorySlots.Concat(_equipmentSlotControls.Values))
+            foreach (ItemStackSlotControl slot in _inventorySlots.Concat(_equipmentSlotControls.Values))
             {
                 slot.ItemStack.StopDrag();
                 slot.ItemStack.IsDraggable = isControllable;
@@ -99,14 +99,14 @@ public sealed class Hud : IHud
             .ToImmutableList();
         _inventoryGrid = node.GetNode<GridContainer>("Inventory/MarginContainer/Slots");
         _inventorySlots = _inventoryGrid.GetChildren()
-            .Cast<InventorySlotControl>()
+            .Cast<ItemStackSlotControl>()
             .ToImmutableList();
         _equipmentPanel = node.GetNode<Control>("Equipment");
         _equipmentSlotControls = Enum.GetValues<EquipmentSlot>()
             .ToImmutableDictionary
             (
                 it => it,
-                it => _equipmentPanel.GetNode<InventorySlotControl>($"MarginContainer/Slots/{it}")
+                it => _equipmentPanel.GetNode<ItemStackSlotControl>($"MarginContainer/Slots/{it}")
             );
 
         SubscribeToAbilityButtonEvents();
@@ -151,7 +151,7 @@ public sealed class Hud : IHud
 
     private void SubscribeToEquipmentSlotEvents()
     {
-        foreach ((EquipmentSlot slot, InventorySlotControl control) in _equipmentSlotControls)
+        foreach ((EquipmentSlot slot, ItemStackSlotControl control) in _equipmentSlotControls)
         {
             control.Connect("mouse_entered", () => OnMouseEnteredEquipmentSlot(slot));
             control.Connect("mouse_exited", OnMouseExitedTooltipableControl);
@@ -423,7 +423,7 @@ public sealed class Hud : IHud
     private void ProcessEquipment(IUnitPuppet unit)
     {
         _equipmentPanel.Visible = unit.EquipmentSlotStates.Any();
-        foreach ((EquipmentSlot slot, InventorySlotControl control) in _equipmentSlotControls)
+        foreach ((EquipmentSlot slot, ItemStackSlotControl control) in _equipmentSlotControls)
         {
             EquipmentSlotState state = unit.EquipmentSlotStates[slot];
             control.ItemStack.Visible = state.ItemStack != null;

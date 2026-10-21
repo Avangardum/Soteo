@@ -2,7 +2,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class InventorySlotControl : Control // todo rename
+public sealed class ItemStackSlotControl : Control
 {
     private readonly LateInit<ItemStackControl> _itemStack = new();
 
