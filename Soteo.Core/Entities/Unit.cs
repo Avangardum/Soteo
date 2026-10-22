@@ -515,12 +515,12 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
         if (!Inventory.HasSlot(command.InventorySlot)) return;
         ItemStack? stack = Inventory[command.InventorySlot];
-        if (stack?.Item.EquipmentSlot == null) return;
-        if (!EquipmentSlotStates.TryGetValue(stack.Item.EquipmentSlot.Value, out EquipmentSlotState? state)) return;
+        if (stack?.Item.EquippableTo == null) return;
+        if (!EquipmentSlotStates.TryGetValue(stack.Item.EquippableTo.Value, out EquipmentSlotState? state)) return;
         if (state.ItemStack != null) return;
 
         Inventory.RemoveAt(command.InventorySlot);
-        EquipmentSlotStatesInternal[stack.Item.EquipmentSlot.Value] = new EquipmentSlotState { ItemStack = stack };
+        EquipmentSlotStatesInternal[stack.Item.EquippableTo.Value] = new EquipmentSlotState { ItemStack = stack };
         // todo support merging with existing equipment stack
         // todo multi-slot equipment
     }

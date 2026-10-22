@@ -260,9 +260,7 @@ margin_right = 253.0
 margin_bottom = 169.0
 columns = 3
 
-[node name="Filler" type="Control" parent="Equipment/MarginContainer/Slots"]
-margin_right = 80.0
-margin_bottom = 80.0
+[node name="Potion" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
 
 [node name="MainHand" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
 margin_left = 84.0

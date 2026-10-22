@@ -35,7 +35,14 @@ public sealed class PlayerCharacter : Unit
 
     /// <inheritdoc/>
     public override IReadOnlyList<EquipmentSlot> EquipmentSlots =>
-        [EquipmentSlot.MainHand, EquipmentSlot.Offhand, EquipmentSlot.Head, EquipmentSlot.Body, EquipmentSlot.Feet];
+    [
+        EquipmentSlot.MainHand,
+        EquipmentSlot.Offhand,
+        EquipmentSlot.Head,
+        EquipmentSlot.Body,
+        EquipmentSlot.Feet,
+        EquipmentSlot.Potion
+    ];
 
     public static PlayerCharacter FromSnapshot
     (

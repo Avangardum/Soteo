@@ -4,5 +4,5 @@ namespace Soteo.Core.Items;
 
 public sealed class BlinkBootsItem : Item
 {
-    public override EquipmentSlot? EquipmentSlot => Enums.EquipmentSlot.Feet;
+    public override EquipmentSlot? EquippableTo => Enums.EquipmentSlot.Feet;
 }

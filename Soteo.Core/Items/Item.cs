@@ -8,7 +8,7 @@ public abstract class Item : SingletonHierarchyBase<Item>
 {
     public virtual long MaxStackCount => 1;
 
-    public virtual EquipmentSlot? EquipmentSlot => null;
+    public virtual EquipmentSlot? EquippableTo => null;
 
     /// <summary>
     /// Extra equipment slots that the item occupies in addition to its main slot,

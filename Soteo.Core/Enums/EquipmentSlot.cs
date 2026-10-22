@@ -6,5 +6,6 @@ public enum EquipmentSlot
     Offhand,
     Body,
     Head,
-    Feet
+    Feet,
+    Potion
 }
