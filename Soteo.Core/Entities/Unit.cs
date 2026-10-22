@@ -105,6 +105,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     {
         if (IsRemoved) return;
         IsMoving = false;
+        // todo check IsRemoved between ticking statuses
         ProcessStatuses(delta);
         if (IsRemoved) return;
         UpdateStats();
@@ -113,6 +114,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         if (IsRemoved) return;
         ApplyRegen(delta);
         if (IsRemoved) return;
+        // todo check IsRemoved between executing commands
         ExecuteCommands(Node.Required, delta);
     }
 
@@ -135,12 +137,14 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     private void ProcessStatuses(double delta)
     {
+        // todo if a status tick removes another status, that status will still be ticked
         ImmutableList<StatusContext> contexts = Statuses.Values.ToImmutableList();
         for (int i = 0; i < contexts.Count; i++)
         {
             StatusContext context = contexts[i];
             double limitedDelta = Math.Min(delta, context.RemainingTime);
             StatusTickContext? newTick = ProcessStatusTickCountdown(context, limitedDelta);
+            // todo check if self-removing status behaves correctly
             context = context with
             {
                 Tick = newTick,
@@ -217,6 +221,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             .FirstOrDefault(StatConst[stat].Max);
         if (maxFloor > minCeiling)
             return ResolveNonOverlappingStatLimits(floorModifiers, ceilingModifiers);
+        // todo will crash if a floor is above max or ceiling is below min
 
         double addTotal = modifiers[StatModifierKind.Add].Sum(it => it.Value);
         double multiplyTotal = modifiers[StatModifierKind.Multiply].Product(it => it.Value);
@@ -252,12 +257,14 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     private void UpdateResourceStat(Stat stat, Stat maxStat, double oldMax)
     {
-        double normalized = Stats[stat] / oldMax;
+        double normalized = Stats[stat] / oldMax; // todo division by 0
         SetResourceStat(stat, Stats[maxStat] * normalized);
     }
 
     private void ExecuteCommands(IUnitNode node, double deltaTime)
     {
+        // todo Bad stuff will happen if the command stack changes during execution.
+        // While this shouldn't happen, some guard against this should probably be added.
         double remainingDeltaTime = deltaTime;
         int iterations = 0;
         const int maxIterations = 5;
@@ -411,7 +418,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         IUnit? targetUnit = null;
         if (command.TargetUnitId != null)
         {
-            targetUnit = _entityManager.GetEntity(command.TargetUnitId.Value) as Unit;
+            targetUnit = _entityManager.GetEntity(command.TargetUnitId.Value) as IUnit;
             if (targetUnit == null) return null;
         }
         return new AbilityContext
@@ -477,9 +484,11 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
                 case AbilityValidationResult.Ok:
                     return abilityValidationResult;
                 case AbilityValidationResult.OutOfRange:
+                    // todo handle targetPosition == null
                     MoveToPosition(targetPosition!.Value, ref remainingDeltaTime, node);
                     break;
                 case AbilityValidationResult.OutOfAngularRange:
+                    // todo handle targetPosition == null
                     LookAtPosition(targetPosition!.Value, ref remainingDeltaTime);
                     break;
                 default:
@@ -570,6 +579,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             _commands.Enqueue(command);
         if (command is not UseAbilityCommand useAbilityCommand || useAbilityCommand.Slot != AbilityUseProgress?.Slot)
             AbilityUseProgress = null;
+        // todo reset progress on retargeting
     }
 
     public void SpendHealth(double amount, Ability? sourceAbility)
