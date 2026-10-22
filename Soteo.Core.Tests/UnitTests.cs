@@ -263,7 +263,7 @@ public sealed class UnitTests
         _sut.SetCommand(new EquipCommand(inventorySlot));
         _sut.Tick(Const.TickInterval);
 
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].Should().BeNull();
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().BeNull();
     }
 
     [Fact]
@@ -275,11 +275,11 @@ public sealed class UnitTests
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory[0].Should().Be(ItemStack.Of<TestHatItem>(1));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].Should().BeNull();
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().BeNull();
     }
 
     [Fact]
-    public void EquippingItemFromInventoryToEmptyEquipmentSlotSucceeds()
+    public void EquippingItemStackToEmptyEquipmentSlotMovesItToThatSlot()
     {
         _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(1));
 
@@ -288,6 +288,20 @@ public sealed class UnitTests
 
         _sut.Inventory[0].Should().BeNull();
         _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(1));
+    }
+
+    [Fact]
+    public void EquippingItemStackToEquipmentSlotOccupiedBySameItemEquipsWhatIsPossibleAndLeavesRestInInventory()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(5));
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
+            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(8) };
+
+        _sut.SetCommand(new EquipCommand(0));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(3));
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(10));
     }
 
     [Theory]
@@ -299,7 +313,7 @@ public sealed class UnitTests
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory.WhereNotNull().Should().BeEmpty();
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].Should().BeNull();
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().BeNull();
     }
 
     [Fact]

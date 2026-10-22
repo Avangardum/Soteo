@@ -15,5 +15,9 @@ public sealed record ItemStack
         Count = count;
     }
 
-    public static ItemStack Of<T>(int count) where T : Item, new() => new(Item.Instance<T>(), count);
+    public static ItemStack Of<T>(long count) where T : Item, new() => new(Item.Instance<T>(), count);
+
+    public ItemStack WithCount(long count) => new (Item, count);
+
+    public long FreeSpace => Item.MaxStackCount - Count;
 }

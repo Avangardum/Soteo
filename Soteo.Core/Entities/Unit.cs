@@ -514,14 +514,28 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         _commands.Dequeue();
 
         if (!Inventory.HasSlot(command.InventorySlot)) return;
-        ItemStack? stack = Inventory[command.InventorySlot];
-        if (stack?.Item.EquippableTo == null) return;
-        if (!EquipmentSlotStates.TryGetValue(stack.Item.EquippableTo.Value, out EquipmentSlotState? state)) return;
-        if (state.ItemStack != null) return;
+        ItemStack? inventoryStack = Inventory[command.InventorySlot];
+        if (inventoryStack?.Item.EquippableTo == null) return;
+        if (!EquipmentSlotStates.TryGetValue(inventoryStack.Item.EquippableTo.Value, out EquipmentSlotState? equipmentSlotState)) return;
+        if (equipmentSlotState.ItemStack != null && (equipmentSlotState.ItemStack.Item != inventoryStack.Item || equipmentSlotState.ItemStack.FreeSpace == 0)) return;
 
         Inventory.RemoveAt(command.InventorySlot);
-        EquipmentSlotStatesInternal[stack.Item.EquippableTo.Value] = new EquipmentSlotState { ItemStack = stack };
-        // todo support merging with existing equipment stack
+        if (equipmentSlotState.ItemStack == null)
+        {
+
+            EquipmentSlotStatesInternal[inventoryStack.Item.EquippableTo.Value] = new EquipmentSlotState { ItemStack = inventoryStack };
+        }
+        else
+        {
+            long equippedCount = Math.Min(equipmentSlotState.ItemStack.FreeSpace, inventoryStack.Count);
+            long newEquipmentStackCount = equipmentSlotState.ItemStack.Count + equippedCount;
+            long newInventoryStackCount = inventoryStack.Count - equippedCount;
+            EquipmentSlotStatesInternal[inventoryStack.Item.EquippableTo.Value] =
+                equipmentSlotState with { ItemStack = equipmentSlotState.ItemStack.WithCount(newEquipmentStackCount) };
+            if (newInventoryStackCount > 0)
+                Inventory.PutAt(command.InventorySlot, inventoryStack.WithCount(newInventoryStackCount));
+        }
+
         // todo multi-slot equipment
     }
 
