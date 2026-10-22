@@ -516,21 +516,21 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         if (!Inventory.HasSlot(command.InventorySlot)) return;
         ItemStack? inventoryStack = Inventory[command.InventorySlot];
         if (inventoryStack?.Item.EquippableTo == null) return;
-        if (!EquipmentSlotStates.TryGetValue(inventoryStack.Item.EquippableTo.Value, out EquipmentSlotState? equipmentSlotState)) return;
-        if (equipmentSlotState.ItemStack != null && (equipmentSlotState.ItemStack.Item != inventoryStack.Item || equipmentSlotState.ItemStack.FreeSpace == 0)) return;
+        EquipmentSlot equipmentSlot = inventoryStack.Item.EquippableTo.Value;
+        if (!EquipmentSlotStates.TryGetValue(equipmentSlot, out EquipmentSlotState? equipmentSlotState)) return;
+        if (equipmentSlotState.ItemStack != null && equipmentSlotState.ItemStack.Item != inventoryStack.Item) return;
 
         Inventory.RemoveAt(command.InventorySlot);
         if (equipmentSlotState.ItemStack == null)
         {
-
-            EquipmentSlotStatesInternal[inventoryStack.Item.EquippableTo.Value] = new EquipmentSlotState { ItemStack = inventoryStack };
+            EquipmentSlotStatesInternal[equipmentSlot] = new EquipmentSlotState { ItemStack = inventoryStack };
         }
         else
         {
             long equippedCount = Math.Min(equipmentSlotState.ItemStack.FreeSpace, inventoryStack.Count);
             long newEquipmentStackCount = equipmentSlotState.ItemStack.Count + equippedCount;
             long newInventoryStackCount = inventoryStack.Count - equippedCount;
-            EquipmentSlotStatesInternal[inventoryStack.Item.EquippableTo.Value] =
+            EquipmentSlotStatesInternal[equipmentSlot] =
                 equipmentSlotState with { ItemStack = equipmentSlotState.ItemStack.WithCount(newEquipmentStackCount) };
             if (newInventoryStackCount > 0)
                 Inventory.PutAt(command.InventorySlot, inventoryStack.WithCount(newInventoryStackCount));
@@ -545,9 +545,22 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
         if (!EquipmentSlotStates.TryGetValue(command.EquipmentSlot, out EquipmentSlotState? state)) return;
         if (state.ItemStack == null) return;
-        ItemStack? remainder = Inventory.Add(state.ItemStack);
+        if (command.ToInventorySlot != null)
+        {
+            if (!Inventory.HasSlot(command.ToInventorySlot.Value)) return;
+            ItemStack? inventoryStack = Inventory[command.ToInventorySlot.Value];
+            if (inventoryStack != null)
+            {
+                if (inventoryStack.Item != state.ItemStack.Item) return;
+                if (inventoryStack.FreeSpace == 0) return;
+            }
+        }
+
+        ItemStack? remainder = command.ToInventorySlot == null ?
+            Inventory.Add(state.ItemStack) :
+            Inventory.PutAt(command.ToInventorySlot.Value, state.ItemStack);
+
         EquipmentSlotStatesInternal[command.EquipmentSlot] = new EquipmentSlotState { ItemStack = remainder };
-        // todo unequip into a specific inventory slot
     }
 
     public void SetCommand(ICommand command)

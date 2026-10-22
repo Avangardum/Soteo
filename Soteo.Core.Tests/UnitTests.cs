@@ -349,7 +349,7 @@ public sealed class UnitTests
     }
 
     [Fact]
-    public void UnequippingItemWhenInventoryHasInsufficientSpaceFillsAvailableSpaceAndLeavesRemainderEquipped()
+    public void UnequippingItemStackWhenInventoryHasInsufficientSpaceFillsAvailableSpaceAndLeavesRemainderEquipped()
     {
         _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(9));
         _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(8));
@@ -364,6 +364,60 @@ public sealed class UnitTests
         _sut.Inventory.Take(2).All(it => it == ItemStack.Of<TestPotion1Item>(10)).Should().BeTrue();
         _sut.Inventory.Skip(2).All(it => it == ItemStack.Of<TestHatItem>(1)).Should().BeTrue();
         _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(2));
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(-1)]
+    [InlineData(int.MaxValue)]
+    public void UnequippingItemStackToOccupiedOrNonexistentInventorySlotDoesNothing(int inventorySlot)
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(10));
+        _sut.Inventory.PutAt(2, ItemStack.Of<TestPotion2Item>(1));
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
+            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(1) };
+
+        _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, inventorySlot));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(10));
+        _sut.Inventory[2].Should().Be(ItemStack.Of<TestPotion2Item>(1));
+        _sut.Inventory[3].Should().BeNull();
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(1));
+    }
+
+    [Fact]
+    public void UnequippingItemStackToEmptyInventorySlotMovesItThere()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(1));
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
+            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(1) };
+
+        _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, 1));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().BeNull();
+    }
+
+    [Fact]
+    public void UnequippingItemStackToInventorySlotWithInsufficientSpaceMovesWhatPossibleAndKeepsRestEquipped()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(4));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(7));
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
+            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(8) };
+
+        _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, 1));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(4));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(10));
+        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(5));
     }
 
     private sealed class Sut : Unit
