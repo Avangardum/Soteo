@@ -12,14 +12,14 @@ namespace Soteo.Core.Entities;
 
 public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 {
+    private const double InventoryDesyncDuration = 0.5;
+
     private readonly ICamera _camera;
-    private double _visualInventoryLockTimeRemaining;
+    private double _inventoryDesyncTimeRemaining;
     private List<Guid> _controllingPlayerIds = [];
+    private readonly Inventory _alwaysSynchronizedInventory = new(0);
 
     public Inventory Inventory { get; } = new(0);
-
-    /// <inheritdoc/>
-    public Inventory VisualInventory { get; } = new(0);
 
     public IReadOnlyList<Guid> ControllingPlayerIds => _controllingPlayerIds;
 
@@ -93,9 +93,9 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
         StatusesInternal = s.Statuses.ToDictionary();
-        Inventory.ReplicateSnapshot(s.Items);
-        if (_visualInventoryLockTimeRemaining == 0)
-            VisualInventory.ReplicateSnapshot(s.Items);
+        _alwaysSynchronizedInventory.ReplicateSnapshot(s.Items);
+        if (_inventoryDesyncTimeRemaining == 0)
+            Inventory.ReplicateSnapshot(s.Items);
         _controllingPlayerIds = s.ControllingPlayerIds.ToList();
         EquipmentSlotStatesInternal = s.EquipmentSlotStates.ToDictionary();
         UpdateAnimation();
@@ -127,9 +127,9 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             );
         }
         d.Statuses.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
-        Inventory.ApplyDelta(d.Items);
-        if (_visualInventoryLockTimeRemaining == 0)
-            VisualInventory.ApplyDelta(d.Items);
+        _alwaysSynchronizedInventory.ApplyDelta(d.Items);
+        if (_inventoryDesyncTimeRemaining == 0)
+            Inventory.ApplyDelta(d.Items);
         d.ControllingPlayerIds.MutateList(_controllingPlayerIds);
         d.EquipmentSlotStates.MutateDictionary(EquipmentSlotStatesInternal);
         UpdateAnimation();
@@ -188,17 +188,13 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 
     public bool IsAlliedTo(IUnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
 
-    /// <inheritdoc/>
-    public void DesyncVisualInventory()
-    {
-        _visualInventoryLockTimeRemaining = 0.5;
-    }
+    public void DesyncInventory() => _inventoryDesyncTimeRemaining = InventoryDesyncDuration;
 
     public void Process(double delta)
     {
-        double prevVisualInventoryLockTimeRemaining = _visualInventoryLockTimeRemaining;
-        _visualInventoryLockTimeRemaining = Math.Max(_visualInventoryLockTimeRemaining - delta, 0);
-        if (prevVisualInventoryLockTimeRemaining > 0 && _visualInventoryLockTimeRemaining == 0)
-            VisualInventory.ReplicateSnapshot(Inventory.CreateSnapshot());
+        double prevInventoryDesyncTimeRemaining = _inventoryDesyncTimeRemaining;
+        _inventoryDesyncTimeRemaining = Math.Max(_inventoryDesyncTimeRemaining - delta, 0);
+        if (prevInventoryDesyncTimeRemaining > 0 && _inventoryDesyncTimeRemaining == 0)
+            Inventory.ReplicateSnapshot(_alwaysSynchronizedInventory.CreateSnapshot());
     }
 }

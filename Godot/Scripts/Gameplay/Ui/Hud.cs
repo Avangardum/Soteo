@@ -201,7 +201,7 @@ public sealed class Hud : IHud
     {
         if (_isDragging) return;
         if (SelectedUnit == null) return;
-        if (index >= SelectedUnit.Inventory.Count) return;
+        if (!SelectedUnit.Inventory.HasSlot(index)) return;
 
         Item? item = SelectedUnit.Inventory[index]?.Item;
         if (item == null) return;
@@ -313,8 +313,8 @@ public sealed class Hud : IHud
 
     private void MoveInventoryItemStack(int fromIndex, int toIndex, Guid shardId, IUnitPuppet unit)
     {
-        if (!unit.VisualInventory.HasSlot(fromIndex)) return;
-        if (!unit.VisualInventory.HasSlot(toIndex)) return;
+        if (!unit.Inventory.HasSlot(fromIndex)) return;
+        if (!unit.Inventory.HasSlot(toIndex)) return;
 
         _packetSender.SendReliable
         (
@@ -330,20 +330,20 @@ public sealed class Hud : IHud
             shardId
         );
 
-        unit.DesyncVisualInventory();
-        ItemStack? stack = unit.VisualInventory.RemoveAt(fromIndex);
+        unit.DesyncInventory();
+        ItemStack? stack = unit.Inventory.RemoveAt(fromIndex);
         if (stack != null)
         {
-            ItemStack? remainder = unit.VisualInventory.PutAt(toIndex, stack);
+            ItemStack? remainder = unit.Inventory.PutAt(toIndex, stack);
             if (remainder != null)
-                unit.VisualInventory.PutAt(fromIndex, remainder);
+                unit.Inventory.PutAt(fromIndex, remainder);
         }
     }
 
     private void Equip(int fromInventorySlot, EquipmentSlot? toEquipmentSlot, Guid shardId, IUnitPuppet unit)
     {
-        if (!unit.VisualInventory.HasSlot(fromInventorySlot)) return;
-        ItemStack? stack = unit.VisualInventory[fromInventorySlot];
+        if (!unit.Inventory.HasSlot(fromInventorySlot)) return;
+        ItemStack? stack = unit.Inventory[fromInventorySlot];
         if (stack == null) return;
         if (toEquipmentSlot != null && toEquipmentSlot != stack.Item.EquippableTo) return;
 
@@ -452,12 +452,12 @@ public sealed class Hud : IHud
 
     private void ProcessInventory(IUnitPuppet unit)
     {
-        _inventoryGrid.Columns = Maths.CeilToInt(unit.VisualInventory.Count / 2.0);
+        _inventoryGrid.Columns = Maths.CeilToInt(unit.Inventory.Count / 2.0);
 
-        for (int i = 0; i < unit.VisualInventory.Count; i++)
+        for (int i = 0; i < unit.Inventory.Count; i++)
         {
             _inventorySlotControls[i].Visible = true;
-            ItemStack? stack = unit.VisualInventory[i];
+            ItemStack? stack = unit.Inventory[i];
             _inventorySlotControls[i].ItemStack.TextureRect.Visible = stack != null;
             if (stack != null)
             {
@@ -467,7 +467,7 @@ public sealed class Hud : IHud
                     _inventorySlotControls[i].ItemStack.CountLabel.Text = stack.Count.ToString();
             }
         }
-        for (int i = unit.VisualInventory.Count; i < _inventorySlotControls.Count; i++)
+        for (int i = unit.Inventory.Count; i < _inventorySlotControls.Count; i++)
         {
             _inventorySlotControls[i].Visible = false;
         }

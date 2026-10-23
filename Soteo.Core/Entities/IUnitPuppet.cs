@@ -10,15 +10,7 @@ public interface IUnitPuppet : IEntity
 {
     bool IsDead { get; }
     IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses { get; }
-
-    /// <summary>
-    /// Inventory displayed in the HUD. Usually it's automatically synced with a shard server, just like the normal
-    /// inventory. For lag compensation, it can be temporarily locked, shortly stopping server sync, then manual
-    /// changes can be applied.
-    /// </summary>
-    Inventory VisualInventory { get; } // todo rename
-
-    Inventory Inventory { get; } // todo remove
+    Inventory Inventory { get; }
     IReadOnlyDictionary<Stat, double> Stats { get; }
     IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; }
     IReadOnlyDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates { get; }
@@ -33,7 +25,7 @@ public interface IUnitPuppet : IEntity
     void Respawn(IUnitPuppetNode node);
 
     /// <summary>
-    /// Temporarily desynchronize the visual inventory, preventing it from receiving server updates
+    /// Temporarily desynchronize the inventory, preventing it from receiving server updates
     /// </summary>
-    void DesyncVisualInventory();
+    void DesyncInventory();
 }
