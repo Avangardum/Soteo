@@ -23,7 +23,7 @@ public sealed class Hud : IHud
     private readonly ImmutableList<AbilityButton> _abilityButtons;
     private readonly ImmutableList<StatusIndicator> _statusIndicators;
     private readonly GridContainer _inventoryGrid;
-    private readonly ImmutableList<ItemStackSlotControl> _inventorySlots; // todo rename
+    private readonly ImmutableList<ItemStackSlotControl> _inventorySlotControls;
     private readonly Control _equipmentPanel;
     private readonly ImmutableDictionary<EquipmentSlot, ItemStackSlotControl> _equipmentSlotControls;
 
@@ -52,7 +52,7 @@ public sealed class Hud : IHud
                 _currentUserIdRepo.Id != null &&
                 value.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value);
             _isCancelingItemStackDrag = true;
-            foreach (ItemStackSlotControl slot in _inventorySlots.Concat(_equipmentSlotControls.Values))
+            foreach (ItemStackSlotControl slot in _inventorySlotControls.Concat(_equipmentSlotControls.Values))
             {
                 slot.ItemStack.StopDrag();
                 slot.ItemStack.IsInteractive = isControllable;
@@ -98,7 +98,7 @@ public sealed class Hud : IHud
             .OfType<StatusIndicator>()
             .ToImmutableList();
         _inventoryGrid = node.GetNode<GridContainer>("Inventory/MarginContainer/Slots");
-        _inventorySlots = _inventoryGrid.GetChildren()
+        _inventorySlotControls = _inventoryGrid.GetChildren()
             .Cast<ItemStackSlotControl>()
             .ToImmutableList();
         _equipmentPanel = node.GetNode<Control>("Equipment");
@@ -139,13 +139,13 @@ public sealed class Hud : IHud
 
     private void SubscribeToInventorySlotEvents()
     {
-        for (int i = 0; i < _inventorySlots.Count; i++)
+        for (int i = 0; i < _inventorySlotControls.Count; i++)
         {
             int index = i;
-            _inventorySlots[i].Connect("mouse_entered", () => OnMouseEnteredInventorySlot(index));
-            _inventorySlots[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
-            _inventorySlots[i].ItemStack.DragStarted += () => OnInventoryItemStackDragStarted(index);
-            _inventorySlots[i].ItemStack.DragStopped += () => OnInventoryItemStackDragStopped(index);
+            _inventorySlotControls[i].Connect("mouse_entered", () => OnMouseEnteredInventorySlot(index));
+            _inventorySlotControls[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
+            _inventorySlotControls[i].ItemStack.DragStarted += () => OnInventoryItemStackDragStarted(index);
+            _inventorySlotControls[i].ItemStack.DragStopped += () => OnInventoryItemStackDragStopped(index);
         }
     }
 
@@ -206,7 +206,7 @@ public sealed class Hud : IHud
         Item? item = SelectedUnit.Inventory[index]?.Item;
         if (item == null) return;
 
-        _tooltip.Show(_inventorySlots[index].TopCenterGlobalPosition.ToSys(), item.Name, "");
+        _tooltip.Show(_inventorySlotControls[index].TopCenterGlobalPosition.ToSys(), item.Name, "");
     }
 
     private void OnMouseEnteredEquipmentSlot(EquipmentSlot slot)
@@ -238,9 +238,9 @@ public sealed class Hud : IHud
 
         GdVector2 mousePos = _node.GetGlobalMousePosition();
 
-        for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
+        for (int i = 0; i < _inventorySlotControls.Count && _inventorySlotControls[i].Visible; i++)
         {
-            if (IsInsideRect(mousePos, _inventorySlots[i]))
+            if (IsInsideRect(mousePos, _inventorySlotControls[i]))
             {
                 MoveInventoryItemStack(index, i, shardId.Value, SelectedUnit);
                 return;
@@ -293,9 +293,9 @@ public sealed class Hud : IHud
 
         GdVector2 mousePos = _node.GetGlobalMousePosition();
 
-        for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
+        for (int i = 0; i < _inventorySlotControls.Count && _inventorySlotControls[i].Visible; i++)
         {
-            if (IsInsideRect(mousePos, _inventorySlots[i]))
+            if (IsInsideRect(mousePos, _inventorySlotControls[i]))
             {
                 Unequip(slot, i, shardId.Value, SelectedUnit);
                 return;
@@ -311,16 +311,16 @@ public sealed class Hud : IHud
             position.y <= control.RectGlobalPosition.y + control.RectSize.y;
     }
 
-    private void MoveInventoryItemStack(int fromIndex, int toIndex, Guid shardId, IUnitPuppet unitPuppet)
+    private void MoveInventoryItemStack(int fromIndex, int toIndex, Guid shardId, IUnitPuppet unit)
     {
-        if (!unitPuppet.VisualInventory.HasSlot(fromIndex)) return;
-        if (!unitPuppet.VisualInventory.HasSlot(toIndex)) return;
+        if (!unit.VisualInventory.HasSlot(fromIndex)) return;
+        if (!unit.VisualInventory.HasSlot(toIndex)) return;
 
         _packetSender.SendReliable
         (
             new MoveItemStackPacket
             {
-                UnitId = unitPuppet.Id,
+                UnitId = unit.Id,
                 Command = new MoveItemStackCommand
                 {
                     FromIndex = fromIndex,
@@ -330,13 +330,13 @@ public sealed class Hud : IHud
             shardId
         );
 
-        unitPuppet.LockVisualInventory();
-        ItemStack? stack = unitPuppet.VisualInventory.RemoveAt(fromIndex);
+        unit.DesyncVisualInventory();
+        ItemStack? stack = unit.VisualInventory.RemoveAt(fromIndex);
         if (stack != null)
         {
-            ItemStack? remainder = unitPuppet.VisualInventory.PutAt(toIndex, stack);
+            ItemStack? remainder = unit.VisualInventory.PutAt(toIndex, stack);
             if (remainder != null)
-                unitPuppet.VisualInventory.PutAt(fromIndex, remainder);
+                unit.VisualInventory.PutAt(fromIndex, remainder);
         }
     }
 
@@ -354,11 +354,11 @@ public sealed class Hud : IHud
         }, shardId);
     }
 
-    private void Unequip(EquipmentSlot fromEquipmentSlot, int? toInventorySlot, Guid shardId, IUnitPuppet unitPuppet)
+    private void Unequip(EquipmentSlot fromEquipmentSlot, int? toInventorySlot, Guid shardId, IUnitPuppet unit)
     {
         _packetSender.SendReliable(new UnequipPacket
         {
-            UnitId = unitPuppet.Id,
+            UnitId = unit.Id,
             Command = new UnequipCommand(fromEquipmentSlot, toInventorySlot)
         }, shardId);
     }
@@ -456,20 +456,20 @@ public sealed class Hud : IHud
 
         for (int i = 0; i < unit.VisualInventory.Count; i++)
         {
-            _inventorySlots[i].Visible = true;
+            _inventorySlotControls[i].Visible = true;
             ItemStack? stack = unit.VisualInventory[i];
-            _inventorySlots[i].ItemStack.TextureRect.Visible = stack != null;
+            _inventorySlotControls[i].ItemStack.TextureRect.Visible = stack != null;
             if (stack != null)
             {
-                _inventorySlots[i].ItemStack.TextureRect.Texture = stack.Item.Icon;
-                _inventorySlots[i].ItemStack.CountBackground.Visible = stack.Count > 1;
+                _inventorySlotControls[i].ItemStack.TextureRect.Texture = stack.Item.Icon;
+                _inventorySlotControls[i].ItemStack.CountBackground.Visible = stack.Count > 1;
                 if (stack.Count > 1)
-                    _inventorySlots[i].ItemStack.CountLabel.Text = stack.Count.ToString();
+                    _inventorySlotControls[i].ItemStack.CountLabel.Text = stack.Count.ToString();
             }
         }
-        for (int i = unit.VisualInventory.Count; i < _inventorySlots.Count; i++)
+        for (int i = unit.VisualInventory.Count; i < _inventorySlotControls.Count; i++)
         {
-            _inventorySlots[i].Visible = false;
+            _inventorySlotControls[i].Visible = false;
         }
     }
 

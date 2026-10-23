@@ -16,9 +16,9 @@ public interface IUnitPuppet : IEntity
     /// inventory. For lag compensation, it can be temporarily locked, shortly stopping server sync, then manual
     /// changes can be applied.
     /// </summary>
-    Inventory VisualInventory { get; }
+    Inventory VisualInventory { get; } // todo rename
 
-    Inventory Inventory { get; }
+    Inventory Inventory { get; } // todo remove
     IReadOnlyDictionary<Stat, double> Stats { get; }
     IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; }
     IReadOnlyDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates { get; }
@@ -33,7 +33,7 @@ public interface IUnitPuppet : IEntity
     void Respawn(IUnitPuppetNode node);
 
     /// <summary>
-    /// Temporarily lock the visual inventory, preventing it from receiving server updates
+    /// Temporarily desynchronize the visual inventory, preventing it from receiving server updates
     /// </summary>
-    void LockVisualInventory();
+    void DesyncVisualInventory();
 }

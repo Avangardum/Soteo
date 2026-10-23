@@ -189,7 +189,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
     public bool IsAlliedTo(IUnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
 
     /// <inheritdoc/>
-    public void LockVisualInventory()
+    public void DesyncVisualInventory()
     {
         _visualInventoryLockTimeRemaining = 0.5;
     }
