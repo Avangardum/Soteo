@@ -128,6 +128,10 @@ public interface ISerializationHelper
     ShardSnapshot DeserializeShardSnapshot(Stream stream);
     void SerializeItemStack(ItemStack value, Stream stream);
     ItemStack DeserializeItemStack(Stream stream);
+    void SerializeNullableItemStack(ItemStack? value, Stream stream);
+    ItemStack? DeserializeNullableItemStack(Stream stream);
     void SerializeEquipmentSlotState(EquipmentSlotState value, Stream stream);
     EquipmentSlotState DeserializeEquipmentSlotState(Stream stream);
+    void SerializeEquipmentInventorySnapshot(EquipmentInventorySnapshot value, Stream stream);
+    EquipmentInventorySnapshot DeserializeEquipmentInventorySnapshot(Stream stream);
 }

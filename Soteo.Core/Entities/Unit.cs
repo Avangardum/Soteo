@@ -30,6 +30,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
 
     public Inventory Inventory { get; } = new(8);
+    public EquipmentInventory EquipmentInventory { get; }
 
     protected Unit
     (
@@ -47,6 +48,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
         foreach (EquipmentSlot slot in EquipmentSlots)
             EquipmentSlotStatesInternal[slot] = new EquipmentSlotState { ItemStack = null };
+
+        EquipmentInventory = new EquipmentInventory(EquipmentSlots);
     }
 
     /// <summary>
@@ -80,7 +83,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot()),
             ControllingPlayerId = _controllingPlayerId,
             Items = Inventory.ToImmutableList(),
-            EquipmentSlotStates = EquipmentSlotStates.ToImmutableDictionary()
+            EquipmentSlotStates = EquipmentSlotStates.ToImmutableDictionary(),
+            EquipmentInventory = EquipmentInventory.ToSnapshot()
         };
     }
 
@@ -99,6 +103,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.Items);
         EquipmentSlotStatesInternal = s.EquipmentSlotStates.ToDictionary();
+        EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
     }
 
     public void Tick(double delta)

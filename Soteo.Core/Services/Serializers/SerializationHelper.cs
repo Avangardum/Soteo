@@ -454,6 +454,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeNullableStruct(unit.ControllingPlayerId, SerializeGuid, stream);
         SerializeList(unit.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
         SerializeDictionary(unit.EquipmentSlotStates, SerializeEnum, SerializeEquipmentSlotState, stream);
+        SerializeEquipmentInventorySnapshot(unit.EquipmentInventory, stream);
     }
 
     public UnitSnapshot DeserializeUnitSnapshot(Stream stream)
@@ -474,7 +475,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream),
             Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream),
             EquipmentSlotStates =
-                DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeEquipmentSlotState, stream)
+                DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeEquipmentSlotState, stream),
+            EquipmentInventory = DeserializeEquipmentInventorySnapshot(stream)
         };
     }
 
@@ -680,6 +682,12 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         );
     }
 
+    public void SerializeNullableItemStack(ItemStack? value, Stream stream) =>
+        SerializeNullableClass(value, SerializeItemStack, stream);
+
+    public ItemStack? DeserializeNullableItemStack(Stream stream) =>
+        DeserializeNullableClass(DeserializeItemStack, stream);
+
     public void SerializeEquipmentSlotState(EquipmentSlotState value, Stream stream)
     {
         SerializeNullableClass(value.ItemStack, SerializeItemStack, stream);
@@ -691,5 +699,17 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         {
             ItemStack = DeserializeNullableClass(DeserializeItemStack, stream)
         };
+    }
+
+    public void SerializeEquipmentInventorySnapshot(EquipmentInventorySnapshot value, Stream stream)
+    {
+        SerializeDictionary(value.Stacks, SerializeEnum, SerializeNullableItemStack, stream);
+    }
+
+    public EquipmentInventorySnapshot DeserializeEquipmentInventorySnapshot(Stream stream)
+    {
+        ImmutableDictionary<EquipmentSlot, ItemStack?> stacks =
+            DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeNullableItemStack, stream);
+        return new EquipmentInventorySnapshot(stacks);
     }
 }

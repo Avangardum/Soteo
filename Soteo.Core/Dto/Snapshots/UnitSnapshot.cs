@@ -15,6 +15,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required Guid? ControllingPlayerId { get; init; }
     public required IReadOnlyList<ItemStack?> Items { get; init; }
     public required IReadOnlyDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates { get; init; }
+    public required EquipmentInventorySnapshot EquipmentInventory { get; init; }
 
     public override EntitySnapshot ToPuppet()
     {
