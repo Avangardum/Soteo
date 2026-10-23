@@ -70,12 +70,11 @@ public sealed class Inventory : IReadOnlyList<ItemStack?>
         ItemStack? existingStack = _stacks[slot];
         bool canMerge = existingStack != null &&
             stack.Item == existingStack.Item &&
-            existingStack.Count < existingStack.Item.MaxStackCount;
+            existingStack.FreeSpace > 0;
 
         if (canMerge)
         {
-            long freeSpace = existingStack.Required.Item.MaxStackCount - existingStack.Count;
-            long movedCount = Math.Min(stack.Count, freeSpace);
+            long movedCount = Math.Min(stack.Count, existingStack.Required.FreeSpace);
             _stacks[slot] = new ItemStack(existingStack.Item, existingStack.Count + movedCount);
             long remainder = stack.Count - movedCount;
             return remainder == 0 ? null : new ItemStack(stack.Item, remainder);
