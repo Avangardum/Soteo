@@ -23,7 +23,7 @@ public sealed class Hud : IHud
     private readonly ImmutableList<AbilityButton> _abilityButtons;
     private readonly ImmutableList<StatusIndicator> _statusIndicators;
     private readonly GridContainer _inventoryGrid;
-    private readonly ImmutableList<ItemStackSlotControl> _inventorySlots;
+    private readonly ImmutableList<ItemStackSlotControl> _inventorySlots; // todo rename
     private readonly Control _equipmentPanel;
     private readonly ImmutableDictionary<EquipmentSlot, ItemStackSlotControl> _equipmentSlotControls;
 
@@ -234,22 +234,49 @@ public sealed class Hud : IHud
     {
         _isDragging = false;
 
-        if (_isCancelingItemStackDrag) return;
-        if (SelectedUnit == null) return;
-        if (_currentUserIdRepo.Id == null) return;
-        if (!SelectedUnit.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value)) return;
-        if (_visibleShardIdRepo.Id == null) return;
+        if (!CanControlSelectedUnit(out Guid? shardId)) return;
+
+        GdVector2 mousePos = _node.GetGlobalMousePosition();
 
         for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
         {
-            if (IsInsideRect(_node.GetGlobalMousePosition(), _inventorySlots[i]))
+            if (IsInsideRect(mousePos, _inventorySlots[i]))
             {
-                MoveItemStack(index, i, _visibleShardIdRepo.Id.Value, SelectedUnit);
-                break;
+                MoveInventoryItemStack(index, i, shardId.Value, SelectedUnit);
+                return;
             }
         }
 
-        // todo equip
+        foreach ((EquipmentSlot slot, ItemStackSlotControl control) in _equipmentSlotControls)
+        {
+            if (IsInsideRect(mousePos, control))
+            {
+                if (control.Visible)
+                    Equip(index, slot, shardId.Value, SelectedUnit);
+                return;
+            }
+        }
+    }
+
+    [MemberNotNullWhen(true, nameof(SelectedUnit))]
+    private bool CanControlSelectedUnit([NotNullWhen(true)] out Guid? shardId)
+    {
+        if
+        (
+            _syncCampaignStateRepo.Value.IsPaused ||
+            _isCancelingItemStackDrag ||
+            SelectedUnit == null ||
+            _currentUserIdRepo.Id == null ||
+            !SelectedUnit.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value) ||
+            _visibleShardIdRepo.Id == null
+        )
+        {
+            shardId = null;
+            return false;
+        }
+
+        shardId = _visibleShardIdRepo.Id;
+        return true;
     }
 
     private void OnEquipmentItemStackDragStarted(EquipmentSlot slot)
@@ -262,13 +289,18 @@ public sealed class Hud : IHud
     {
         _isDragging = false;
 
-        if (_isCancelingItemStackDrag) return;
-        if (SelectedUnit == null) return;
-        if (_currentUserIdRepo.Id == null) return;
-        if (!SelectedUnit.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value)) return;
-        if (_visibleShardIdRepo.Id == null) return;
+        if (!CanControlSelectedUnit(out Guid? shardId)) return;
 
-        // todo
+        GdVector2 mousePos = _node.GetGlobalMousePosition();
+
+        for (int i = 0; i < _inventorySlots.Count && _inventorySlots[i].Visible; i++)
+        {
+            if (IsInsideRect(mousePos, _inventorySlots[i]))
+            {
+                Unequip(slot, i, shardId.Value, SelectedUnit);
+                return;
+            }
+        }
     }
 
     private bool IsInsideRect(GdVector2 position, Control control)
@@ -279,15 +311,16 @@ public sealed class Hud : IHud
             position.y <= control.RectGlobalPosition.y + control.RectSize.y;
     }
 
-    private void MoveItemStack(int fromIndex, int toIndex, Guid shardId, IUnitPuppet unitPuppet)
+    private void MoveInventoryItemStack(int fromIndex, int toIndex, Guid shardId, IUnitPuppet unitPuppet)
     {
-        if (_syncCampaignStateRepo.Value.IsPaused) return;
+        if (!unitPuppet.VisualInventory.HasSlot(fromIndex)) return;
+        if (!unitPuppet.VisualInventory.HasSlot(toIndex)) return;
 
         _packetSender.SendReliable
         (
             new MoveItemStackPacket
             {
-                UnitId = _currentCharIdRepo.Id.Required,
+                UnitId = unitPuppet.Id,
                 Command = new MoveItemStackCommand
                 {
                     FromIndex = fromIndex,
@@ -297,17 +330,37 @@ public sealed class Hud : IHud
             shardId
         );
 
-        if (fromIndex < unitPuppet.VisualInventory.Count && toIndex < unitPuppet.VisualInventory.Count)
+        unitPuppet.LockVisualInventory();
+        ItemStack? stack = unitPuppet.VisualInventory.RemoveAt(fromIndex);
+        if (stack != null)
         {
-            unitPuppet.LockVisualInventory();
-            ItemStack? stack = unitPuppet.VisualInventory.RemoveAt(fromIndex);
-            if (stack != null)
-            {
-                ItemStack? putResult = unitPuppet.VisualInventory.PutAt(toIndex, stack);
-                if (putResult != null)
-                    unitPuppet.VisualInventory.PutAt(fromIndex, putResult);
-            }
+            ItemStack? remainder = unitPuppet.VisualInventory.PutAt(toIndex, stack);
+            if (remainder != null)
+                unitPuppet.VisualInventory.PutAt(fromIndex, remainder);
         }
+    }
+
+    private void Equip(int fromInventorySlot, EquipmentSlot? toEquipmentSlot, Guid shardId, IUnitPuppet unit)
+    {
+        if (!unit.VisualInventory.HasSlot(fromInventorySlot)) return;
+        ItemStack? stack = unit.VisualInventory[fromInventorySlot];
+        if (stack == null) return;
+        if (toEquipmentSlot != null && toEquipmentSlot != stack.Item.EquippableTo) return;
+
+        _packetSender.SendReliable(new EquipPacket
+        {
+            UnitId = unit.Id,
+            Command = new EquipCommand(fromInventorySlot)
+        }, shardId);
+    }
+
+    private void Unequip(EquipmentSlot fromEquipmentSlot, int? toInventorySlot, Guid shardId, IUnitPuppet unitPuppet)
+    {
+        _packetSender.SendReliable(new UnequipPacket
+        {
+            UnitId = unitPuppet.Id,
+            Command = new UnequipCommand(fromEquipmentSlot, toInventorySlot)
+        }, shardId);
     }
 
     public void Process(double delta)

@@ -28,9 +28,7 @@ public sealed class PlayerCharacter : Unit
         Inventory.PutAt(0, ItemStack.Of<LogItem>(1));
         Inventory.PutAt(1, ItemStack.Of<LogItem>(1));
         Inventory.PutAt(2, ItemStack.Of<RockItem>(1));
-
-        EquipmentSlotStatesInternal[EquipmentSlot.Feet] =
-            new EquipmentSlotState { ItemStack = ItemStack.Of<BlinkBootsItem>(1) };
+        Inventory.PutAt(3, ItemStack.Of<BlinkBootsItem>(1));
     }
 
     /// <inheritdoc/>
