@@ -12,12 +12,11 @@ namespace Soteo.Core.Entities;
 
 public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 {
-    private const double InventoryDesyncDuration = 0.5;
-
     private readonly ICamera _camera;
     private double _inventoryDesyncTimeRemaining;
     private List<Guid> _controllingPlayerIds = [];
     private readonly Inventory _alwaysSynchronizedInventory = new(0);
+    private readonly EquipmentInventory _alwaysSynchronizedEquipmentInventory = new();
 
     public Inventory Inventory { get; } = new(0);
     public EquipmentInventory EquipmentInventory { get; } = new();
@@ -94,11 +93,16 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
         StatusesInternal = s.Statuses.ToDictionary();
-        _alwaysSynchronizedInventory.ReplicateSnapshot(s.Items);
-        if (_inventoryDesyncTimeRemaining == 0)
-            Inventory.ReplicateSnapshot(s.Items);
         _controllingPlayerIds = s.ControllingPlayerIds.ToList();
-        EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
+
+        _alwaysSynchronizedInventory.ReplicateSnapshot(s.Items);
+        _alwaysSynchronizedEquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
+        if (_inventoryDesyncTimeRemaining == 0)
+        {
+            Inventory.ReplicateSnapshot(s.Items);
+            EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
+        }
+
         UpdateAnimation();
     }
 
@@ -128,11 +132,16 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             );
         }
         d.Statuses.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
-        _alwaysSynchronizedInventory.ApplyDelta(d.Items);
-        if (_inventoryDesyncTimeRemaining == 0)
-            Inventory.ApplyDelta(d.Items);
         d.ControllingPlayerIds.MutateList(_controllingPlayerIds);
-        EquipmentInventory.ApplyDelta(d.EquipmentInventory);
+
+        _alwaysSynchronizedInventory.ApplyDelta(d.Items);
+        _alwaysSynchronizedEquipmentInventory.ApplyDelta(d.EquipmentInventory);
+        if (_inventoryDesyncTimeRemaining == 0)
+        {
+            Inventory.ApplyDelta(d.Items);
+            EquipmentInventory.ApplyDelta(d.EquipmentInventory);
+        }
+
         UpdateAnimation();
     }
 
@@ -189,13 +198,16 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 
     public bool IsAlliedTo(IUnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
 
-    public void DesyncInventory() => _inventoryDesyncTimeRemaining = InventoryDesyncDuration;
+    public void DesyncInventory() => _inventoryDesyncTimeRemaining = 0.5;
 
     public void Process(double delta)
     {
         double prevInventoryDesyncTimeRemaining = _inventoryDesyncTimeRemaining;
         _inventoryDesyncTimeRemaining = Math.Max(_inventoryDesyncTimeRemaining - delta, 0);
         if (prevInventoryDesyncTimeRemaining > 0 && _inventoryDesyncTimeRemaining == 0)
+        {
             Inventory.ReplicateSnapshot(_alwaysSynchronizedInventory.CreateSnapshot());
+            EquipmentInventory.ReplicateSnapshot(_alwaysSynchronizedEquipmentInventory.ToSnapshot());
+        }
     }
 }
