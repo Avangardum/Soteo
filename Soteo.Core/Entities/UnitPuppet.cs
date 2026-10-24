@@ -20,6 +20,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
     private readonly Inventory _alwaysSynchronizedInventory = new(0);
 
     public Inventory Inventory { get; } = new(0);
+    public EquipmentInventory EquipmentInventory { get; } = new();
 
     public IReadOnlyList<Guid> ControllingPlayerIds => _controllingPlayerIds;
 
@@ -98,6 +99,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             Inventory.ReplicateSnapshot(s.Items);
         _controllingPlayerIds = s.ControllingPlayerIds.ToList();
         EquipmentSlotStatesInternal = s.EquipmentSlotStates.ToDictionary();
+        EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
         UpdateAnimation();
     }
 
@@ -132,6 +134,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
             Inventory.ApplyDelta(d.Items);
         d.ControllingPlayerIds.MutateList(_controllingPlayerIds);
         d.EquipmentSlotStates.MutateDictionary(EquipmentSlotStatesInternal);
+        EquipmentInventory.ApplyDelta(d.EquipmentInventory);
         UpdateAnimation();
     }
 

@@ -1,4 +1,5 @@
 using Soteo.Core.Delegates;
+using Soteo.Core.Dto;
 using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Snapshots;
@@ -81,6 +82,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         SerializeListDelta(delta.Items, (v, _) => s.SerializeNullableClass(v, s.SerializeItemStack, stream), stream);
         SerializeListDelta(delta.ControllingPlayerIds, s.SerializeGuid, stream);
         SerializeDictionaryDelta(delta.EquipmentSlotStates, s.SerializeEnum, s.SerializeEquipmentSlotState, stream);
+        SerializeEquipmentInventoryDelta(delta.EquipmentInventory, stream);
     }
 
     private UnitPuppetSnapshotDelta DeserializeUnitPuppetDelta(Stream stream)
@@ -100,7 +102,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
             Items = DeserializeListDelta(_ => s.DeserializeNullableClass(s.DeserializeItemStack, stream), stream),
             ControllingPlayerIds = DeserializeListDelta(s.DeserializeGuid, stream),
             EquipmentSlotStates =
-                DeserializeDictionaryDelta(s.DeserializeEnum<EquipmentSlot>, s.DeserializeEquipmentSlotState, stream)
+                DeserializeDictionaryDelta(s.DeserializeEnum<EquipmentSlot>, s.DeserializeEquipmentSlotState, stream),
+            EquipmentInventory = DeserializeEquipmentInventoryDelta(stream),
         };
     }
 
@@ -210,5 +213,17 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
             Changes = s.DeserializeDictionary(s.DeserializeInt, deserializeValue, stream),
             HasChanged = s.DeserializeBool(stream)
         };
+    }
+
+    private void SerializeEquipmentInventoryDelta(EquipmentInventoryDelta delta, Stream stream)
+    {
+        SerializeDictionaryDelta(delta.Stacks, s.SerializeEnum, s.SerializeNullableItemStack, stream);
+    }
+
+    private EquipmentInventoryDelta DeserializeEquipmentInventoryDelta(Stream stream)
+    {
+        DictionaryDelta<EquipmentSlot, ItemStack?> stacks =
+            DeserializeDictionaryDelta(s.DeserializeEnum<EquipmentSlot>, s.DeserializeNullableItemStack, stream);
+        return new EquipmentInventoryDelta(stacks);
     }
 }

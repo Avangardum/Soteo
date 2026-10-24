@@ -9,7 +9,7 @@ using Soteo.Core.Statuses;
 
 namespace Soteo.Core.Interfaces;
 
-public interface ISerializationHelper
+public interface ISerializationHelper // todo remove maybe?
 {
     void SerializeByte(byte value, Stream stream);
     byte DeserializeByte(Stream stream);

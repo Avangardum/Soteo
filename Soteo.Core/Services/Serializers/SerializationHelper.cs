@@ -493,6 +493,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeList(unitPuppet.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
         SerializeList(unitPuppet.ControllingPlayerIds, SerializeGuid, stream);
         SerializeDictionary(unitPuppet.EquipmentSlotStates, SerializeEnum, SerializeEquipmentSlotState, stream);
+        SerializeEquipmentInventorySnapshot(unitPuppet.EquipmentInventory, stream);
     }
 
     public UnitPuppetSnapshot DeserializeUnitPuppetSnapshot(Stream stream)
@@ -513,7 +514,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream),
             ControllingPlayerIds = DeserializeList(DeserializeGuid, stream),
             EquipmentSlotStates =
-                DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeEquipmentSlotState, stream)
+                DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeEquipmentSlotState, stream),
+            EquipmentInventory = DeserializeEquipmentInventorySnapshot(stream)
         };
     }
 

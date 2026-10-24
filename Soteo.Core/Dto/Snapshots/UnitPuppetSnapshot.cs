@@ -14,6 +14,7 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
     public required IReadOnlyList<ItemStack?> Items { get; init; }
     public required IReadOnlyList<Guid> ControllingPlayerIds { get; init; }
     public required IReadOnlyDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates { get; init; }
+    public required EquipmentInventorySnapshot EquipmentInventory { get; init; }
 
     public override EntitySnapshotDelta DeltaFrom(UnitPuppetSnapshot? from)
     {
@@ -32,7 +33,8 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
                 Statuses = DictionaryDelta.FromNewDictionary(Statuses),
                 Items = ListDelta.FromNewList(Items),
                 ControllingPlayerIds = ListDelta.FromNewList(ControllingPlayerIds),
-                EquipmentSlotStates = DictionaryDelta.FromNewDictionary(EquipmentSlotStates)
+                EquipmentSlotStates = DictionaryDelta.FromNewDictionary(EquipmentSlotStates),
+                EquipmentInventory = EquipmentInventoryDelta.FromNew(EquipmentInventory)
             };
         }
 
@@ -51,7 +53,8 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
             Statuses = DictionaryDelta.Between(from.Statuses, Statuses),
             Items = ListDelta.Between(from.Items, Items),
             ControllingPlayerIds = ListDelta.Between(from.ControllingPlayerIds, ControllingPlayerIds),
-            EquipmentSlotStates = DictionaryDelta.Between(from.EquipmentSlotStates, EquipmentSlotStates)
+            EquipmentSlotStates = DictionaryDelta.Between(from.EquipmentSlotStates, EquipmentSlotStates),
+            EquipmentInventory = EquipmentInventoryDelta.Between(from.EquipmentInventory, EquipmentInventory)
         };
     }
 

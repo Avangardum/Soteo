@@ -33,7 +33,8 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToPuppet()),
             Items = Items,
             ControllingPlayerIds = ControllingPlayerId == null ? [] : [ControllingPlayerId.Value],
-            EquipmentSlotStates = EquipmentSlotStates
+            EquipmentSlotStates = EquipmentSlotStates,
+            EquipmentInventory = EquipmentInventory
         };
     }
 
