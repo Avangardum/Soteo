@@ -6,7 +6,7 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Core;
 
-public sealed class EquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemStack?>
+public sealed class EquipmentInventory : IEquipmentInventory
 {
     private Dictionary<EquipmentSlot, ItemStack?> _stacks;
 

@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Immutable;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Deltas;
+using Soteo.Core.Interfaces;
 
 namespace Soteo.Core;
 
-public sealed class Inventory : IReadOnlyList<ItemStack?>
+public sealed class Inventory : IInventory
 {
     private List<ItemStack?> _stacks;
 

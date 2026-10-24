@@ -16,6 +16,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
+    private readonly ICrossInventoryHelper _crossInventoryHelper = new CrossInventoryHelper(); // todo inject
 
     private long _nextStatusOrdinal;
 
@@ -29,8 +30,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
 
-    public Inventory Inventory { get; } = new(8);
-    public EquipmentInventory EquipmentInventory { get; }
+    public Inventory Inventory { get; } = new(8); // todo inject
+    public EquipmentInventory EquipmentInventory { get; } // todo inject
 
     protected Unit
     (
@@ -521,52 +522,13 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private void Equip(EquipCommand command)
     {
         _commands.Dequeue();
-
-        if (!Inventory.HasSlot(command.InventorySlot)) return;
-        ItemStack? inventoryStack = Inventory[command.InventorySlot];
-        if (inventoryStack?.Item.EquippableTo == null) return;
-        EquipmentSlot equipmentSlot = inventoryStack.Item.EquippableTo.Value;
-        if (!EquipmentInventory.TryGetValue(equipmentSlot, out ItemStack? equipmentStack)) return;
-        if (equipmentStack != null && equipmentStack.Item != inventoryStack.Item) return;
-
-        Inventory.RemoveAt(command.InventorySlot);
-        if (equipmentStack == null)
-        {
-            EquipmentInventory.PutAt(equipmentSlot, inventoryStack);
-        }
-        else
-        {
-            ItemStack? remainder = EquipmentInventory.PutAt(equipmentSlot, inventoryStack);
-            if (remainder != null)
-                Inventory.PutAt(command.InventorySlot, remainder);
-        }
-
-        // todo multi-slot equipment
+        _crossInventoryHelper.Equip(Inventory, EquipmentInventory, command.InventorySlot, toEquipmentSlot: null);
     }
 
     private void Unequip(UnequipCommand command)
     {
         _commands.Dequeue();
-
-        if (!EquipmentInventory.TryGetValue(command.EquipmentSlot, out ItemStack? equipmentStack)) return;
-        if (equipmentStack == null) return;
-        if (command.ToInventorySlot != null)
-        {
-            if (!Inventory.HasSlot(command.ToInventorySlot.Value)) return;
-            ItemStack? inventoryStack = Inventory[command.ToInventorySlot.Value];
-            if (inventoryStack != null)
-            {
-                if (inventoryStack.Item != equipmentStack.Item) return;
-                if (inventoryStack.FreeSpace == 0) return;
-            }
-        }
-
-        EquipmentInventory.RemoveAt(command.EquipmentSlot);
-        ItemStack? remainder = command.ToInventorySlot == null ?
-            Inventory.Add(equipmentStack) :
-            Inventory.PutAt(command.ToInventorySlot.Value, equipmentStack);
-        if (remainder != null)
-            EquipmentInventory.PutAt(command.EquipmentSlot, remainder);
+        _crossInventoryHelper.Unequip(Inventory, EquipmentInventory, command.EquipmentSlot, command.ToInventorySlot);
     }
 
     public void SetCommand(ICommand command)

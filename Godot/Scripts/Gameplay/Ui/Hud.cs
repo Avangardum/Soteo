@@ -36,6 +36,7 @@ public sealed class Hud : IHud
     private readonly ISynchronizedCampaignStatePuppetRepository _syncCampaignStateRepo;
     private readonly IVisibleShardIdRepository _visibleShardIdRepo;
     private readonly ICurrentUserIdRepository _currentUserIdRepo;
+    private readonly ICrossInventoryHelper _crossInventoryHelper;
 
     private bool _isDragging;
     private bool _isCancelingItemStackDrag;
@@ -72,7 +73,8 @@ public sealed class Hud : IHud
         IFromGameplayPacketSender packetSender,
         ISynchronizedCampaignStatePuppetRepository syncCampaignStateRepo,
         IVisibleShardIdRepository visibleShardIdRepo,
-        ICurrentUserIdRepository currentUserIdRepo
+        ICurrentUserIdRepository currentUserIdRepo,
+        ICrossInventoryHelper crossInventoryHelper
     )
     {
         _entityLocator = entityLocator;
@@ -84,6 +86,7 @@ public sealed class Hud : IHud
         _syncCampaignStateRepo = syncCampaignStateRepo;
         _visibleShardIdRepo = visibleShardIdRepo;
         _currentUserIdRepo = currentUserIdRepo;
+        _crossInventoryHelper = crossInventoryHelper;
 
         node.Hud = this;
         _node = node;
@@ -342,54 +345,26 @@ public sealed class Hud : IHud
 
     private void Equip(int fromInventorySlot, EquipmentSlot? toEquipmentSlot, Guid shardId, IUnitPuppet unit)
     {
-        if (!unit.Inventory.HasSlot(fromInventorySlot)) return;
-        ItemStack? stack = unit.Inventory[fromInventorySlot];
-        if (stack == null) return;
-        if (toEquipmentSlot != null && toEquipmentSlot != stack.Item.EquippableTo) return;
-        if (stack.Item.EquippableTo == null) return;
-        if (!unit.EquipmentInventory.HasSlot(stack.Item.EquippableTo.Value)) return;
-
+        if (!_crossInventoryHelper.Equip(unit.Inventory, unit.EquipmentInventory, fromInventorySlot, toEquipmentSlot))
+            return;
+        unit.DesyncInventory();
         _packetSender.SendReliable(new EquipPacket
         {
             UnitId = unit.Id,
             Command = new EquipCommand(fromInventorySlot)
         }, shardId);
-
-        unit.DesyncInventory();
-        unit.Inventory.RemoveAt(fromInventorySlot);
-        ItemStack? remainder = unit.EquipmentInventory.PutAt(stack.Item.EquippableTo.Value, stack);
-        if (remainder != null)
-            unit.Inventory.PutAt(fromInventorySlot, remainder);
     }
 
     private void Unequip(EquipmentSlot fromEquipmentSlot, int? toInventorySlot, Guid shardId, IUnitPuppet unit)
     {
-        if (!unit.EquipmentInventory.TryGetValue(fromEquipmentSlot, out ItemStack? stack)) return;
-        if (stack == null) return;
-        if (toInventorySlot != null)
-        {
-            if (!unit.Inventory.HasSlot(toInventorySlot.Value)) return;
-            ItemStack? inventoryStack = unit.Inventory[toInventorySlot.Value];
-            if (inventoryStack != null)
-            {
-                if (inventoryStack.Item != stack.Item) return;
-                if (inventoryStack.FreeSpace == 0) return;
-            }
-        }
-
+        if (!_crossInventoryHelper.Unequip(unit.Inventory, unit.EquipmentInventory, fromEquipmentSlot, toInventorySlot))
+            return;
+        unit.DesyncInventory();
         _packetSender.SendReliable(new UnequipPacket
         {
             UnitId = unit.Id,
             Command = new UnequipCommand(fromEquipmentSlot, toInventorySlot)
         }, shardId);
-
-        unit.DesyncInventory();
-        unit.EquipmentInventory.RemoveAt(fromEquipmentSlot);
-        ItemStack? remainder = toInventorySlot != null ?
-            unit.Inventory.PutAt(toInventorySlot.Value, stack) :
-            unit.Inventory.Add(stack);
-        if (remainder != null)
-            unit.EquipmentInventory.PutAt(fromEquipmentSlot, stack);
     }
 
     public void Process(double delta)

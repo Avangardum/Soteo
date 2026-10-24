@@ -150,6 +150,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddAlias<ISynchronizedCampaignStatePacketReceiver, SynchronizedCampaignStatePuppetRepository>();
         services.AddAlias<IPauseRepository, SynchronizedCampaignStatePuppetRepository>();
         services.AddSingleton<SceneTreePauser>();
+        services.AddSingleton<ICrossInventoryHelper, CrossInventoryHelper>();
 
         foreach (Type type in PacketSerializer.AllTypes(typeLocator))
             services.AddSingleton(type);
