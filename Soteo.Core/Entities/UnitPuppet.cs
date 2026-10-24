@@ -98,7 +98,6 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         if (_inventoryDesyncTimeRemaining == 0)
             Inventory.ReplicateSnapshot(s.Items);
         _controllingPlayerIds = s.ControllingPlayerIds.ToList();
-        EquipmentSlotStatesInternal = s.EquipmentSlotStates.ToDictionary();
         EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
         UpdateAnimation();
     }
@@ -133,7 +132,6 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         if (_inventoryDesyncTimeRemaining == 0)
             Inventory.ApplyDelta(d.Items);
         d.ControllingPlayerIds.MutateList(_controllingPlayerIds);
-        d.EquipmentSlotStates.MutateDictionary(EquipmentSlotStatesInternal);
         EquipmentInventory.ApplyDelta(d.EquipmentInventory);
         UpdateAnimation();
     }

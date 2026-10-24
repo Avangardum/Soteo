@@ -46,9 +46,6 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
         _controllingPlayerId = controllingPlayerId;
 
-        foreach (EquipmentSlot slot in EquipmentSlots)
-            EquipmentSlotStatesInternal[slot] = new EquipmentSlotState { ItemStack = null };
-
         EquipmentInventory = new EquipmentInventory(EquipmentSlots);
     }
 
@@ -83,7 +80,6 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot()),
             ControllingPlayerId = _controllingPlayerId,
             Items = Inventory.ToImmutableList(),
-            EquipmentSlotStates = EquipmentSlotStates.ToImmutableDictionary(),
             EquipmentInventory = EquipmentInventory.ToSnapshot()
         };
     }
@@ -102,7 +98,6 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.Items);
-        EquipmentSlotStatesInternal = s.EquipmentSlotStates.ToDictionary();
         EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
     }
 

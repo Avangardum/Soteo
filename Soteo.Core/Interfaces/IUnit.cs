@@ -18,7 +18,6 @@ public interface IUnit : IEntity
     IReadOnlyDictionary<Stat, double> Stats { get; }
     AbilityUseProgress? AbilityUseProgress { get; }
     IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; }
-    IReadOnlyDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates { get; }
     IReadOnlyDictionary<Guid, StatusContext> Statuses { get; }
 
     void AddStatus

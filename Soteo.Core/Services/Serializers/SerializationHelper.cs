@@ -453,7 +453,6 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeIndexedDictionary(unit.Statuses, SerializeStatusContextSnapshot, stream);
         SerializeNullableStruct(unit.ControllingPlayerId, SerializeGuid, stream);
         SerializeList(unit.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
-        SerializeDictionary(unit.EquipmentSlotStates, SerializeEnum, SerializeEquipmentSlotState, stream);
         SerializeEquipmentInventorySnapshot(unit.EquipmentInventory, stream);
     }
 
@@ -474,8 +473,6 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Statuses = DeserializeIndexedDictionary(DeserializeDeflatedStatusContext, it => it.Id, stream),
             ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream),
             Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream),
-            EquipmentSlotStates =
-                DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeEquipmentSlotState, stream),
             EquipmentInventory = DeserializeEquipmentInventorySnapshot(stream)
         };
     }
@@ -492,7 +489,6 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeIndexedDictionary(unitPuppet.Statuses, SerializePuppetStatusContext, stream);
         SerializeList(unitPuppet.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
         SerializeList(unitPuppet.ControllingPlayerIds, SerializeGuid, stream);
-        SerializeDictionary(unitPuppet.EquipmentSlotStates, SerializeEnum, SerializeEquipmentSlotState, stream);
         SerializeEquipmentInventorySnapshot(unitPuppet.EquipmentInventory, stream);
     }
 
@@ -513,8 +509,6 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Statuses = DeserializeIndexedDictionary(DeserializePuppetStatusContext, it => it.Id, stream),
             Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream),
             ControllingPlayerIds = DeserializeList(DeserializeGuid, stream),
-            EquipmentSlotStates =
-                DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeEquipmentSlotState, stream),
             EquipmentInventory = DeserializeEquipmentInventorySnapshot(stream)
         };
     }

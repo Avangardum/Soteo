@@ -45,9 +45,6 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEnti
     protected Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = [];
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
 
-    protected Dictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStatesInternal { get; set; } = [];
-    public IReadOnlyDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates => EquipmentSlotStatesInternal;
-
     public AbilityUseProgress? AbilityUseProgress { get; protected set; }
     public Faction Faction { get; }
 }
