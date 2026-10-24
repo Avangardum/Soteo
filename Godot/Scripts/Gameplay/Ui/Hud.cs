@@ -213,10 +213,10 @@ public sealed class Hud : IHud
     {
         if (_isDragging) return;
         if (SelectedUnit == null) return;
-        if (!SelectedUnit.EquipmentSlotStates.TryGetValue(slot, out EquipmentSlotState state)) return;
-        if (state.ItemStack == null) return;
+        if (!SelectedUnit.EquipmentInventory.TryGetValue(slot, out ItemStack? stack)) return;
+        if (stack == null) return;
 
-        _tooltip.Show(_equipmentSlotControls[slot].TopCenterGlobalPosition.ToSys(), state.ItemStack.Item.Name, "");
+        _tooltip.Show(_equipmentSlotControls[slot].TopCenterGlobalPosition.ToSys(), stack.Item.Name, "");
     }
 
     public void OnMouseExitedTooltipableControl()
@@ -475,18 +475,39 @@ public sealed class Hud : IHud
 
     private void ProcessEquipment(IUnitPuppet unit)
     {
-        _equipmentPanel.Visible = unit.EquipmentSlotStates.Any();
+        if (!unit.EquipmentInventory.Any())
+        {
+            _equipmentPanel.Visible = false;
+            return;
+        }
+
+        _equipmentPanel.Visible = true;
         foreach ((EquipmentSlot slot, ItemStackSlotControl control) in _equipmentSlotControls)
         {
-            EquipmentSlotState state = unit.EquipmentSlotStates[slot];
-            control.ItemStack.Visible = state.ItemStack != null;
-            if (state.ItemStack != null)
+            if (!unit.EquipmentInventory.TryGetValue(slot, out ItemStack? stack))
             {
-                control.ItemStack.TextureRect.Texture = state.ItemStack.Item.Icon;
-                control.ItemStack.CountBackground.Visible = state.ItemStack.Count > 1;
-                if (state.ItemStack.Count > 1)
-                    control.ItemStack.CountLabel.Text = state.ItemStack.Count.ToString();
+                control.Visible = false;
+                continue;
             }
+
+            control.Visible = true;
+
+            if (stack == null)
+            {
+                control.ItemStack.Visible = false;
+                continue;
+            }
+
+            control.ItemStack.Visible = true;
+            control.ItemStack.TextureRect.Texture = stack.Item.Icon;
+
+            if (stack.Count == 1)
+            {
+                control.ItemStack.CountBackground.Visible = false;
+                continue;
+            }
+
+            control.ItemStack.CountLabel.Text = stack.Count.ToString();
         }
     }
 

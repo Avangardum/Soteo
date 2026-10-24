@@ -531,21 +531,21 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         ItemStack? inventoryStack = Inventory[command.InventorySlot];
         if (inventoryStack?.Item.EquippableTo == null) return;
         EquipmentSlot equipmentSlot = inventoryStack.Item.EquippableTo.Value;
-        if (!EquipmentSlotStates.TryGetValue(equipmentSlot, out EquipmentSlotState? equipmentSlotState)) return;
-        if (equipmentSlotState.ItemStack != null && equipmentSlotState.ItemStack.Item != inventoryStack.Item) return;
+        if (!EquipmentInventory.TryGetValue(equipmentSlot, out ItemStack? equipmentStack)) return;
+        if (equipmentStack != null && equipmentStack.Item != inventoryStack.Item) return;
 
         Inventory.RemoveAt(command.InventorySlot);
-        if (equipmentSlotState.ItemStack == null)
+        if (equipmentStack == null)
         {
-            EquipmentSlotStatesInternal[equipmentSlot] = new EquipmentSlotState { ItemStack = inventoryStack };
+            EquipmentInventory.PutAt(equipmentSlot, inventoryStack);
         }
         else
         {
-            long equippedCount = Math.Min(equipmentSlotState.ItemStack.FreeSpace, inventoryStack.Count);
-            long newEquipmentStackCount = equipmentSlotState.ItemStack.Count + equippedCount;
+            long equippedCount = Math.Min(equipmentStack.FreeSpace, inventoryStack.Count);
+            long newEquipmentStackCount = equipmentStack.Count + equippedCount;
             long newInventoryStackCount = inventoryStack.Count - equippedCount;
-            EquipmentSlotStatesInternal[equipmentSlot] =
-                equipmentSlotState with { ItemStack = equipmentSlotState.ItemStack.WithCount(newEquipmentStackCount) };
+            EquipmentInventory.RemoveAt(equipmentSlot);
+            EquipmentInventory.PutAt(equipmentSlot, equipmentStack.WithCount(newEquipmentStackCount));
             if (newInventoryStackCount > 0)
                 Inventory.PutAt(command.InventorySlot, inventoryStack.WithCount(newInventoryStackCount));
         }
@@ -557,24 +557,25 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     {
         _commands.Dequeue();
 
-        if (!EquipmentSlotStates.TryGetValue(command.EquipmentSlot, out EquipmentSlotState? state)) return;
-        if (state.ItemStack == null) return;
+        if (!EquipmentInventory.TryGetValue(command.EquipmentSlot, out ItemStack? equipmentStack)) return;
+        if (equipmentStack == null) return;
         if (command.ToInventorySlot != null)
         {
             if (!Inventory.HasSlot(command.ToInventorySlot.Value)) return;
             ItemStack? inventoryStack = Inventory[command.ToInventorySlot.Value];
             if (inventoryStack != null)
             {
-                if (inventoryStack.Item != state.ItemStack.Item) return;
+                if (inventoryStack.Item != equipmentStack.Item) return;
                 if (inventoryStack.FreeSpace == 0) return;
             }
         }
 
+        EquipmentInventory.RemoveAt(command.EquipmentSlot);
         ItemStack? remainder = command.ToInventorySlot == null ?
-            Inventory.Add(state.ItemStack) :
-            Inventory.PutAt(command.ToInventorySlot.Value, state.ItemStack);
-
-        EquipmentSlotStatesInternal[command.EquipmentSlot] = new EquipmentSlotState { ItemStack = remainder };
+            Inventory.Add(equipmentStack) :
+            Inventory.PutAt(command.ToInventorySlot.Value, equipmentStack);
+        if (remainder != null)
+            EquipmentInventory.PutAt(command.EquipmentSlot, remainder);
     }
 
     public void SetCommand(ICommand command)

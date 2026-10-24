@@ -11,9 +11,9 @@ public interface IUnitPuppet : IEntity
     bool IsDead { get; }
     IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses { get; }
     Inventory Inventory { get; }
+    EquipmentInventory EquipmentInventory { get; }
     IReadOnlyDictionary<Stat, double> Stats { get; }
     IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; }
-    IReadOnlyDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates { get; }
     AbilityUseProgress? AbilityUseProgress { get; }
     IReadOnlyList<Guid> ControllingPlayerIds { get; }
     Faction Faction { get; }

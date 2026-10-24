@@ -236,23 +236,21 @@ public sealed class UnitTests
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory[0].Should().Be(ItemStack.Of<TestItem1>(1));
-        _sut.EquipmentSlotStates.All(it => it.Value.ItemStack == null).Should().BeTrue();
+        _sut.EquipmentInventory.Values.WhereNotNull().Should().BeEmpty();
     }
 
     [Fact]
     public void EquippingIntoOccupiedEquipmentSlotDoesNothing()
     {
         _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion2Item>(1));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
-            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(1) };
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion2Item>(1));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(1));
     }
-
 
     [Theory]
     [InlineData(0)]
@@ -263,7 +261,7 @@ public sealed class UnitTests
         _sut.SetCommand(new EquipCommand(inventorySlot));
         _sut.Tick(Const.TickInterval);
 
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().BeNull();
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
     [Fact]
@@ -275,7 +273,7 @@ public sealed class UnitTests
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory[0].Should().Be(ItemStack.Of<TestHatItem>(1));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().BeNull();
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
     [Fact]
@@ -287,21 +285,20 @@ public sealed class UnitTests
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory[0].Should().BeNull();
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(1));
     }
 
     [Fact]
     public void EquippingItemStackToEquipmentSlotOccupiedBySameItemEquipsWhatIsPossibleAndLeavesRestInInventory()
     {
         _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(5));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
-            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(8) };
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(8));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(3));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(10));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(10));
     }
 
     [Theory]
@@ -313,7 +310,7 @@ public sealed class UnitTests
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory.WhereNotNull().Should().BeEmpty();
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().BeNull();
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
     [Fact]
@@ -321,14 +318,13 @@ public sealed class UnitTests
     {
         for (int i = 0; i < _sut.Inventory.Count; i++)
             _sut.Inventory.PutAt(i, ItemStack.Of<TestHatItem>(1));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
-            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(1) };
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(1));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion));
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory.All(it => it == ItemStack.Of<TestHatItem>(1)).Should().BeTrue();
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(1));
     }
 
     [Fact]
@@ -336,8 +332,7 @@ public sealed class UnitTests
     {
         _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(9));
         _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(8));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
-            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(5) };
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(5));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion));
         _sut.Tick(Const.TickInterval);
@@ -345,7 +340,7 @@ public sealed class UnitTests
         _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(10));
         _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(10));
         _sut.Inventory[2].Should().Be(ItemStack.Of<TestPotion1Item>(2));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().BeNull();
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
     [Fact]
@@ -355,15 +350,14 @@ public sealed class UnitTests
         _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(8));
         for (int i = 2; i < _sut.Inventory.Count; i++)
             _sut.Inventory.PutAt(i, ItemStack.Of<TestHatItem>(1));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
-            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(5) };
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(5));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion));
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory.Take(2).All(it => it == ItemStack.Of<TestPotion1Item>(10)).Should().BeTrue();
         _sut.Inventory.Skip(2).All(it => it == ItemStack.Of<TestHatItem>(1)).Should().BeTrue();
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(2));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(2));
     }
 
     [Theory]
@@ -376,8 +370,7 @@ public sealed class UnitTests
         _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(1));
         _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(10));
         _sut.Inventory.PutAt(2, ItemStack.Of<TestPotion2Item>(1));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
-            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(1) };
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(1));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, inventorySlot));
         _sut.Tick(Const.TickInterval);
@@ -386,22 +379,21 @@ public sealed class UnitTests
         _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(10));
         _sut.Inventory[2].Should().Be(ItemStack.Of<TestPotion2Item>(1));
         _sut.Inventory[3].Should().BeNull();
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(1));
     }
 
     [Fact]
     public void UnequippingItemStackToEmptyInventorySlotMovesItThere()
     {
         _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(1));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
-            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(1) };
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(1));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, 1));
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(1));
         _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(1));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().BeNull();
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
     [Fact]
@@ -409,15 +401,14 @@ public sealed class UnitTests
     {
         _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(4));
         _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(7));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion] =
-            new EquipmentSlotState { ItemStack = ItemStack.Of<TestPotion1Item>(8) };
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(8));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, 1));
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(4));
         _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(10));
-        _sut.EquipmentSlotStates[EquipmentSlot.Potion].ItemStack.Should().Be(ItemStack.Of<TestPotion1Item>(5));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(5));
     }
 
     private sealed class Sut : Unit
@@ -427,9 +418,6 @@ public sealed class UnitTests
 
         public new void SetAbility<T>(AbilitySlot slot, int level) where T : Ability, new() =>
             base.SetAbility<T>(slot, level);
-
-        public new IDictionary<EquipmentSlot, EquipmentSlotState> EquipmentSlotStates =>
-            EquipmentSlotStatesInternal;
 
         public override IReadOnlyList<EquipmentSlot> EquipmentSlots => [EquipmentSlot.Potion];
     }

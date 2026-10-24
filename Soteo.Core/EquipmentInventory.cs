@@ -1,3 +1,4 @@
+using System.Collections;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Snapshots;
@@ -5,7 +6,7 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Core;
 
-public sealed class EquipmentInventory
+public sealed class EquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemStack?>
 {
     private Dictionary<EquipmentSlot, ItemStack?> _stacks;
 
@@ -49,6 +50,13 @@ public sealed class EquipmentInventory
         return stack.WithCount(stack.Count - movedCount);
     }
 
+    public ItemStack? RemoveAt(EquipmentSlot slot)
+    {
+        ItemStack? result = _stacks[slot];
+        _stacks[slot] = null;
+        return result;
+    }
+
     public EquipmentInventorySnapshot ToSnapshot() => new(_stacks.ToDictionary());
 
     public void ReplicateSnapshot(EquipmentInventorySnapshot snapshot)
@@ -60,4 +68,18 @@ public sealed class EquipmentInventory
     {
         delta.Stacks.MutateDictionary(_stacks);
     }
+
+    public IEnumerator<KeyValuePair<EquipmentSlot, ItemStack?>> GetEnumerator() => _stacks.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public int Count => _stacks.Count;
+
+    public bool ContainsKey(EquipmentSlot key) => _stacks.ContainsKey(key);
+
+    public bool TryGetValue(EquipmentSlot key, out ItemStack? value) => _stacks.TryGetValue(key, out value);
+
+    public IEnumerable<EquipmentSlot> Keys => _stacks.Keys;
+
+    public IEnumerable<ItemStack?> Values => _stacks.Values;
 }
