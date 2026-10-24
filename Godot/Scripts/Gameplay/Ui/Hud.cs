@@ -366,7 +366,16 @@ public sealed class Hud : IHud
     {
         if (!unit.EquipmentInventory.TryGetValue(fromEquipmentSlot, out ItemStack? stack)) return;
         if (stack == null) return;
-        if (toInventorySlot != null && !unit.Inventory.HasSlot(toInventorySlot.Value)) return;
+        if (toInventorySlot != null)
+        {
+            if (!unit.Inventory.HasSlot(toInventorySlot.Value)) return;
+            ItemStack? inventoryStack = unit.Inventory[toInventorySlot.Value];
+            if (inventoryStack != null)
+            {
+                if (inventoryStack.Item != stack.Item) return;
+                if (inventoryStack.FreeSpace == 0) return;
+            }
+        }
 
         _packetSender.SendReliable(new UnequipPacket
         {

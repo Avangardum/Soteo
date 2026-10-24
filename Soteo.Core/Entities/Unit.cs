@@ -536,13 +536,9 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         }
         else
         {
-            long equippedCount = Math.Min(equipmentStack.FreeSpace, inventoryStack.Count);
-            long newEquipmentStackCount = equipmentStack.Count + equippedCount;
-            long newInventoryStackCount = inventoryStack.Count - equippedCount;
-            EquipmentInventory.RemoveAt(equipmentSlot);
-            EquipmentInventory.PutAt(equipmentSlot, equipmentStack.WithCount(newEquipmentStackCount));
-            if (newInventoryStackCount > 0)
-                Inventory.PutAt(command.InventorySlot, inventoryStack.WithCount(newInventoryStackCount));
+            ItemStack? remainder = EquipmentInventory.PutAt(equipmentSlot, inventoryStack);
+            if (remainder != null)
+                Inventory.PutAt(command.InventorySlot, remainder);
         }
 
         // todo multi-slot equipment
