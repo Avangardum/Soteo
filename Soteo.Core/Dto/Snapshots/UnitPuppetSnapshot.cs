@@ -26,12 +26,12 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
                 Azimuth = Azimuth,
                 IsDead = IsDead,
                 IsMoving = IsMoving,
-                Stats = DictionaryDelta.FromNewDictionary(Stats),
-                AbilitySlotStates = DictionaryDelta.FromNewDictionary(AbilitySlotStates),
+                Stats = DictionaryDelta.FromNew(Stats),
+                AbilitySlotStates = DictionaryDelta.FromNew(AbilitySlotStates),
                 AbilityUseProgress = AbilityUseProgress,
-                Statuses = DictionaryDelta.FromNewDictionary(Statuses),
-                Items = ListDelta.FromNewList(Items),
-                ControllingPlayerIds = ListDelta.FromNewList(ControllingPlayerIds),
+                Statuses = DictionaryDelta.FromNew(Statuses),
+                Items = ListDelta.FromNew(Items),
+                ControllingPlayerIds = ListDelta.FromNew(ControllingPlayerIds),
                 EquipmentInventory = EquipmentInventoryDelta.FromNew(EquipmentInventory)
             };
         }

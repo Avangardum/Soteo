@@ -7,7 +7,7 @@ public sealed record EquipmentInventoryDelta(DictionaryDelta<EquipmentSlot, Item
 {
     public static EquipmentInventoryDelta FromNew(EquipmentInventorySnapshot snapshot)
     {
-        return new(DictionaryDelta.FromNewDictionary(snapshot.Stacks));
+        return new(DictionaryDelta.FromNew(snapshot.Stacks));
     }
 
     public static EquipmentInventoryDelta Between(EquipmentInventorySnapshot from, EquipmentInventorySnapshot to)

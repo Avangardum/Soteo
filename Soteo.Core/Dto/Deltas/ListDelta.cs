@@ -14,7 +14,7 @@ public static class ListDelta
         return new ListDelta<T> { Count = to.Count, Changes = changes, HasChanged = hasChanged };
     }
 
-    public static ListDelta<T> FromNewList<T>(IReadOnlyList<T> list) // todo rename
+    public static ListDelta<T> FromNew<T>(IReadOnlyList<T> list)
     {
         return new ListDelta<T>
         {

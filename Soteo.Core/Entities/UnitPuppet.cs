@@ -206,7 +206,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         _inventoryDesyncTimeRemaining = Math.Max(_inventoryDesyncTimeRemaining - delta, 0);
         if (prevInventoryDesyncTimeRemaining > 0 && _inventoryDesyncTimeRemaining == 0)
         {
-            Inventory.ReplicateSnapshot(_alwaysSynchronizedInventory.CreateSnapshot());
+            Inventory.ReplicateSnapshot(_alwaysSynchronizedInventory.ToSnapshot());
             EquipmentInventory.ReplicateSnapshot(_alwaysSynchronizedEquipmentInventory.ToSnapshot());
         }
     }

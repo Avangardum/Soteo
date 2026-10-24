@@ -91,7 +91,7 @@ public sealed class Inventory : IReadOnlyList<ItemStack?>
         return result;
     }
 
-    public IReadOnlyList<ItemStack?> CreateSnapshot() => this.ToImmutableList(); // todo rename
+    public IReadOnlyList<ItemStack?> ToSnapshot() => this.ToImmutableList();
 
     public void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks) => _stacks = stacks.ToList();
 

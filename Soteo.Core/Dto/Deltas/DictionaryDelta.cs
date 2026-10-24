@@ -17,7 +17,7 @@ public static class DictionaryDelta
         return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
     }
 
-    public static DictionaryDelta<TKey, TValue> FromNewDictionary<TKey, TValue> // todo rename
+    public static DictionaryDelta<TKey, TValue> FromNew<TKey, TValue>
     (
         IReadOnlyDictionary<TKey, TValue> dictionary
     ) where TKey : notnull
