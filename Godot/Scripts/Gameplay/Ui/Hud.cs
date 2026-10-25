@@ -312,12 +312,14 @@ public sealed class Hud : IHud
     {
         if (!CanControlSelectedUnit(out Guid? shardId)) return;
         Equip(slot, toEquipmentSlot: null, shardId.Value, SelectedUnit);
+        _tooltip.Hide();
     }
 
     private void OnEquipmentItemStackSelectClicked(EquipmentSlot slot)
     {
         if (!CanControlSelectedUnit(out Guid? shardId)) return;
         Unequip(slot, toInventorySlot: null, shardId.Value, SelectedUnit);
+        _tooltip.Hide();
     }
 
     private bool IsInsideRect(GdVector2 position, Control control)
