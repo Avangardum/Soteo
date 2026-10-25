@@ -1,8 +1,8 @@
 using Soteo.Core.Attributes;
-using Soteo.Core.Dto.Packets;
+using Soteo.Core.Dto.Packets.Command;
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.PacketHandlers.Gameplay;
+namespace Soteo.Core.Services.PacketHandlers.Gameplay.Command;
 
 [GameplayPacketHandler]
 [AllowClientPackets]

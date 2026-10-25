@@ -1,9 +1,8 @@
-using Soteo.Core.Attributes;
-using Soteo.Core.Commands;
-using Soteo.Core.Dto.Packets;
+using Soteo.Core.Dto.Commands;
+using Soteo.Core.Dto.Packets.Command;
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.PacketHandlers.Gameplay;
+namespace Soteo.Core.Services.PacketHandlers.Gameplay.Command;
 
 public sealed class MovePacketHandler
 (

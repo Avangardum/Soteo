@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
 using System.Numerics;
 using Soteo.Core.Abilities;
-using Soteo.Core.Commands;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Commands;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;

@@ -2,7 +2,7 @@ using System.Numerics;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Commands;
+namespace Soteo.Core.Dto.Commands;
 
 public sealed record UseAbilityCommand : ICommand
 {

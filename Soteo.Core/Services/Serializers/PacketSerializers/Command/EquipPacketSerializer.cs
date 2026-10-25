@@ -1,10 +1,9 @@
-using Soteo.Core.Commands;
-using Soteo.Core.Dto.Packets;
+using Soteo.Core.Dto.Commands;
+using Soteo.Core.Dto.Packets.Command;
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.Serializers.PacketSerializers;
+namespace Soteo.Core.Services.Serializers.PacketSerializers.Command;
 
-// todo move command packet serializers to subfolder
 public sealed class EquipPacketSerializer(ISerializationHelper s) : PacketSerializer<EquipPacket>(s)
 {
     protected override void SerializeInternal(EquipPacket packet, Stream stream)

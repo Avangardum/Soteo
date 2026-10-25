@@ -1,8 +1,9 @@
 using System.Collections.Immutable;
 using Godot.Collections;
-using Soteo.Core.Commands;
 using Soteo.Core.Dto;
+using Soteo.Core.Dto.Commands;
 using Soteo.Core.Dto.Packets;
+using Soteo.Core.Dto.Packets.Command;
 using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;

@@ -1,8 +1,8 @@
-using Soteo.Core.Commands;
-using Soteo.Core.Dto.Packets;
+using Soteo.Core.Dto.Commands;
+using Soteo.Core.Dto.Packets.Command;
 using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.Serializers.PacketSerializers;
+namespace Soteo.Core.Services.Serializers.PacketSerializers.Command;
 
 public sealed class StopPacketSerializer(ISerializationHelper s) : PacketSerializer<StopPacket>(s)
 {
