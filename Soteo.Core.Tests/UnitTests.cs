@@ -29,7 +29,7 @@ public sealed class UnitTests
         _node = Substitute.For<IUnitNode>();
         _serviceProvider = new ServiceCollection().AddSingleton(_entityManager).BuildServiceProvider();
         var inventory = new Inventory(8);
-        var equipmentInventory = new EquipmentInventory(EquipmentSlot.Potion);
+        var equipmentInventory = new EquipmentInventory(EquipmentSlot.Head, EquipmentSlot.Potion);
         _sut = new Sut
         (
             Guid.NewGuid(),
@@ -239,7 +239,7 @@ public sealed class UnitTests
     }
 
     [Fact]
-    public void EquippingUnequippableItemDoesNothing()
+    public void EquippingUnequippableItemStackDoesNothing()
     {
         _sut.Inventory.PutAt(0, ItemStack.Of<TestItem1>(1));
 
@@ -251,16 +251,29 @@ public sealed class UnitTests
     }
 
     [Fact]
-    public void EquippingIntoOccupiedEquipmentSlotDoesNothing()
+    public void EquippingItemStackIntoOccupiedSlotDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion2Item>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion2>(1));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
 
-        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion2Item>(1));
-        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion2>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1>(1));
+    }
+
+    [Fact]
+    public void EquippingItemStackIntoBlockedSlotDoesNothing()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion2>(1));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Head, ItemStack.Of<HatThatMakesYouHatePotions>(1));
+
+        _sut.SetCommand(new EquipCommand(0));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion2>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
     [Theory]
@@ -278,38 +291,39 @@ public sealed class UnitTests
     [Fact]
     public void EquippingToNonexistentEquipmentSlotDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestHatItem>(1));
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestBoots>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
 
-        _sut.Inventory[0].Should().Be(ItemStack.Of<TestHatItem>(1));
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestBoots>(1));
         _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
+        _sut.EquipmentInventory.Should().NotContainKey(EquipmentSlot.Feet);
     }
 
     [Fact]
     public void EquippingItemStackToEmptyEquipmentSlotMovesItToThatSlot()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
 
         _sut.Inventory[0].Should().BeNull();
-        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1>(1));
     }
 
     [Fact]
     public void EquippingItemStackToEquipmentSlotOccupiedBySameItemEquipsWhatIsPossibleAndLeavesRestInInventory()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(5));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(8));
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(5));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(8));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
 
-        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(3));
-        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(10));
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1>(3));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1>(10));
     }
 
     [Theory]
@@ -328,47 +342,47 @@ public sealed class UnitTests
     public void UnequippingItemWhenInventoryHasNoSpaceDoesNothing()
     {
         for (int i = 0; i < _sut.Inventory.Count; i++)
-            _sut.Inventory.PutAt(i, ItemStack.Of<TestHatItem>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(1));
+            _sut.Inventory.PutAt(i, ItemStack.Of<TestBoots>(1));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion));
         _sut.Tick(Const.TickInterval);
 
-        _sut.Inventory.All(it => it == ItemStack.Of<TestHatItem>(1)).Should().BeTrue();
-        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory.All(it => it == ItemStack.Of<TestBoots>(1)).Should().BeTrue();
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1>(1));
     }
 
     [Fact]
     public void UnequippingItemFillsAvailableSpaceMergingStacksIfPossible()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(9));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(8));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(5));
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(9));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1>(8));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(5));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion));
         _sut.Tick(Const.TickInterval);
 
-        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(10));
-        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(10));
-        _sut.Inventory[2].Should().Be(ItemStack.Of<TestPotion1Item>(2));
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1>(10));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1>(10));
+        _sut.Inventory[2].Should().Be(ItemStack.Of<TestPotion1>(2));
         _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
     [Fact]
     public void UnequippingItemStackWhenInventoryHasInsufficientSpaceFillsAvailableSpaceAndLeavesRemainderEquipped()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(9));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(8));
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(9));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1>(8));
         for (int i = 2; i < _sut.Inventory.Count; i++)
-            _sut.Inventory.PutAt(i, ItemStack.Of<TestHatItem>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(5));
+            _sut.Inventory.PutAt(i, ItemStack.Of<TestBoots>(1));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(5));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion));
         _sut.Tick(Const.TickInterval);
 
-        _sut.Inventory.Take(2).All(it => it == ItemStack.Of<TestPotion1Item>(10)).Should().BeTrue();
-        _sut.Inventory.Skip(2).All(it => it == ItemStack.Of<TestHatItem>(1)).Should().BeTrue();
-        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(2));
+        _sut.Inventory.Take(2).All(it => it == ItemStack.Of<TestPotion1>(10)).Should().BeTrue();
+        _sut.Inventory.Skip(2).All(it => it == ItemStack.Of<TestBoots>(1)).Should().BeTrue();
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1>(2));
     }
 
     [Theory]
@@ -378,48 +392,48 @@ public sealed class UnitTests
     [InlineData(int.MaxValue)]
     public void UnequippingItemStackToOccupiedOrNonexistentInventorySlotDoesNothing(int inventorySlot)
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(1));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(10));
-        _sut.Inventory.PutAt(2, ItemStack.Of<TestPotion2Item>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(1));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1>(10));
+        _sut.Inventory.PutAt(2, ItemStack.Of<TestPotion2>(1));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, inventorySlot));
         _sut.Tick(Const.TickInterval);
 
-        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(1));
-        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(10));
-        _sut.Inventory[2].Should().Be(ItemStack.Of<TestPotion2Item>(1));
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1>(1));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1>(10));
+        _sut.Inventory[2].Should().Be(ItemStack.Of<TestPotion2>(1));
         _sut.Inventory[3].Should().BeNull();
-        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1>(1));
     }
 
     [Fact]
     public void UnequippingItemStackToEmptyInventorySlotMovesItThere()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(1));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, 1));
         _sut.Tick(Const.TickInterval);
 
-        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(1));
-        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(1));
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1>(1));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1>(1));
         _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
     [Fact]
     public void UnequippingItemStackToInventorySlotWithInsufficientSpaceMovesWhatPossibleAndKeepsRestEquipped()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1Item>(4));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1Item>(7));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1Item>(8));
+        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(4));
+        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1>(7));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(8));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, 1));
         _sut.Tick(Const.TickInterval);
 
-        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1Item>(4));
-        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1Item>(10));
-        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1Item>(5));
+        _sut.Inventory[0].Should().Be(ItemStack.Of<TestPotion1>(4));
+        _sut.Inventory[1].Should().Be(ItemStack.Of<TestPotion1>(10));
+        _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1>(5));
     }
 
     private sealed class Sut : Unit
@@ -525,20 +539,26 @@ public sealed class UnitTests
         public override void Tick(StatusContext context, double delta) => context.Unit.Die();
     }
 
-    private sealed class TestPotion1Item : Item
+    private sealed class TestPotion1 : Item
     {
         public override EquipmentSlot? EquippableTo => EquipmentSlot.Potion;
         public override long MaxStackCount => 10;
     }
 
-    private sealed class TestPotion2Item : Item
+    private sealed class TestPotion2 : Item
     {
         public override EquipmentSlot? EquippableTo => EquipmentSlot.Potion;
         public override long MaxStackCount => 10;
     }
 
-    private sealed class TestHatItem : Item
+    private sealed class TestBoots : Item
     {
-        public override EquipmentSlot? EquippableTo => Enums.EquipmentSlot.Head;
+        public override EquipmentSlot? EquippableTo => EquipmentSlot.Feet;
+    }
+
+    private sealed class HatThatMakesYouHatePotions : Item
+    {
+        public override EquipmentSlot? EquippableTo => EquipmentSlot.Head;
+        public override IReadOnlyList<EquipmentSlot> BlocksEquipmentSlots => [EquipmentSlot.Potion];
     }
 }

@@ -15,7 +15,15 @@ public interface IEquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemSt
     ItemStack? PutAt(EquipmentSlot slot, ItemStack stack);
 
     ItemStack? RemoveAt(EquipmentSlot slot);
+
+    /// <summary>
+    /// Slots that are not occupied, but blocked by items in other slots
+    /// </summary>
+    IReadOnlyList<EquipmentSlot> BlockedSlots { get; }
+
     EquipmentInventorySnapshot ToSnapshot();
+
     void ReplicateSnapshot(EquipmentInventorySnapshot snapshot);
+
     void ApplyDelta(EquipmentInventoryDelta delta);
 }

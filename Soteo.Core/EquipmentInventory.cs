@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Immutable;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Snapshots;
@@ -31,8 +32,8 @@ public sealed class EquipmentInventory : IEquipmentInventory
     /// </summary>
     public ItemStack? PutAt(EquipmentSlot slot, ItemStack stack)
     {
-        if (stack.Item.EquippableTo != slot)
-            return stack;
+        if (stack.Item.EquippableTo != slot) return stack;
+        if (BlockedSlots.Contains(slot)) return stack;
 
         ItemStack? existingStack = _stacks[slot];
 
@@ -56,6 +57,9 @@ public sealed class EquipmentInventory : IEquipmentInventory
         _stacks[slot] = null;
         return result;
     }
+
+    public IReadOnlyList<EquipmentSlot> BlockedSlots =>
+        _stacks.Values.WhereNotNull().SelectMany(it => it.Item.BlocksEquipmentSlots).Distinct().ToImmutableList();
 
     public EquipmentInventorySnapshot ToSnapshot() => new(_stacks.ToDictionary());
 

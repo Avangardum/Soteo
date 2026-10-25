@@ -14,7 +14,7 @@ public abstract class Item : SingletonHierarchyBase<Item>
     /// Extra equipment slots that the item occupies in addition to its main slot,
     /// preventing other items from being equipped to them
     /// </summary>
-    public virtual IReadOnlyList<EquipmentSlot> SecondaryEquipmentSlots => [];
+    public virtual IReadOnlyList<EquipmentSlot> BlocksEquipmentSlots => [];
 
     public virtual IReadOnlyDictionary<AbilitySlot, Ability> Abilities =>
         ImmutableDictionary<AbilitySlot, Ability>.Empty;
