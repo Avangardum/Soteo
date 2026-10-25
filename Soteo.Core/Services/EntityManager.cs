@@ -4,6 +4,7 @@ using Soteo.Core.Dto;
 using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Entities;
+using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.SidedDependencies;
 
@@ -14,6 +15,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     private readonly IServiceProvider _serviceProvider;
     private readonly ClientDependency<ICamera> _camera;
     private readonly IEntityNodeManager _entityNodeManager;
+    private readonly ICrossInventoryHelper _crossInventoryHelper;
 
     private readonly Dictionary<Guid, ISnapshottableEntity> _entities = [];
 
@@ -36,12 +38,14 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     (
         IServiceProvider serviceProvider,
         ClientDependency<ICamera> camera,
-        IEntityNodeManager entityNodeManager
+        IEntityNodeManager entityNodeManager,
+        ICrossInventoryHelper crossInventoryHelper
     )
     {
         _serviceProvider = serviceProvider;
         _camera = camera;
         _entityNodeManager = entityNodeManager;
+        _crossInventoryHelper = crossInventoryHelper;
     }
 
     public IReadOnlyDictionary<Guid, IEntity> Entities =>
@@ -116,7 +120,19 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     {
         return snapshot switch
         {
-            UnitSnapshot s => Add(PlayerCharacter.FromSnapshot(s, AddNode<IUnitNode>(s.Id), this, _serviceProvider)),
+            UnitSnapshot s => Add
+            (
+                PlayerCharacter.FromSnapshot
+                (
+                    s,
+                    AddNode<IUnitNode>(s.Id),
+                    this,
+                    MakePlayerCharacterInventory(),
+                    MakePlayerCharacterEquipmentInventory(),
+                    _crossInventoryHelper,
+                    _serviceProvider
+                )
+            ),
             ProjectileSnapshot s => Add(Projectile.FromSnapshot(s, AddNode<IProjectileNode>(s.Id), _serviceProvider)),
             UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, AddNode<IUnitPuppetNode>(s.Id), _camera.Required)),
             ProjectilePuppetSnapshot s =>
@@ -164,7 +180,20 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         }
         else
         {
-            return Add(new PlayerCharacter(id, controllingPlayerId, AddNode<IUnitNode>(id), this, _serviceProvider));
+            return Add
+            (
+                new PlayerCharacter
+                (
+                    id,
+                    controllingPlayerId,
+                    AddNode<IUnitNode>(id),
+                    this,
+                    MakePlayerCharacterInventory(),
+                    MakePlayerCharacterEquipmentInventory(),
+                    _crossInventoryHelper,
+                    _serviceProvider
+                )
+            );
         }
     }
 
@@ -212,4 +241,10 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 
         _removalsUntilRemovedEntitiesCleanup = CleanupRemovedEntitiesEveryXRemovals;
     }
+
+    private IInventory MakePlayerCharacterInventory() =>
+        new Inventory(8);
+
+    private IEquipmentInventory MakePlayerCharacterEquipmentInventory() =>
+        new EquipmentInventory(Enum.GetValues<EquipmentSlot>());
 }

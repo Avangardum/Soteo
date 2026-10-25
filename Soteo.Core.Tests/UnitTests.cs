@@ -28,7 +28,18 @@ public sealed class UnitTests
         _entityManager = Substitute.For<IEntityManager>();
         _node = Substitute.For<IUnitNode>();
         _serviceProvider = new ServiceCollection().AddSingleton(_entityManager).BuildServiceProvider();
-        _sut = new Sut(Guid.NewGuid(), _node, _entityManager, _serviceProvider);
+        var inventory = new Inventory(8);
+        var equipmentInventory = new EquipmentInventory(EquipmentSlot.Potion);
+        _sut = new Sut
+        (
+            Guid.NewGuid(),
+            _node,
+            _entityManager,
+            inventory,
+            equipmentInventory,
+            new CrossInventoryHelper(),
+            _serviceProvider
+        );
     }
 
     [Fact]
@@ -413,13 +424,29 @@ public sealed class UnitTests
 
     private sealed class Sut : Unit
     {
-        public Sut(Guid id, IUnitNode node, IEntityManager entityManager, IServiceProvider serviceProvider) :
-            base(id, controllingPlayerId: id, node, entityManager, serviceProvider) { }
+        public Sut
+        (
+            Guid id,
+            IUnitNode node,
+            IEntityManager entityManager,
+            IInventory inventory,
+            IEquipmentInventory equipmentInventory,
+            ICrossInventoryHelper crossInventoryHelper,
+            IServiceProvider serviceProvider
+        ) : base
+        (
+            id,
+            controllingPlayerId: id,
+            node,
+            entityManager,
+            inventory,
+            equipmentInventory,
+            crossInventoryHelper,
+            serviceProvider
+        ) { }
 
         public new void SetAbility<T>(AbilitySlot slot, int level) where T : Ability, new() =>
             base.SetAbility<T>(slot, level);
-
-        public override IReadOnlyList<EquipmentSlot> EquipmentSlots => [EquipmentSlot.Potion];
     }
 
     public class SpyAbility : Ability

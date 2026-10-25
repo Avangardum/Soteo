@@ -15,8 +15,21 @@ public sealed class PlayerCharacter : Unit
         Guid controllingPlayerId,
         IUnitNode node,
         IEntityManager entityManager,
+        IInventory inventory,
+        IEquipmentInventory equipmentInventory,
+        ICrossInventoryHelper crossInventoryHelper,
         IServiceProvider serviceProvider
-    ) : base(id, controllingPlayerId, node, entityManager, serviceProvider)
+    ) : base
+    (
+        id,
+        controllingPlayerId,
+        node,
+        entityManager,
+        inventory,
+        equipmentInventory,
+        crossInventoryHelper,
+        serviceProvider
+    )
     {
         SetAbility<BloodSacrificeAbility>(AbilitySlot.Class0, 1);
         SetAbility<HealAbility>(AbilitySlot.Class1, 1);
@@ -31,25 +44,27 @@ public sealed class PlayerCharacter : Unit
         Inventory.PutAt(3, ItemStack.Of<BlinkBootsItem>(1));
     }
 
-    /// <inheritdoc/>
-    public override IReadOnlyList<EquipmentSlot> EquipmentSlots =>
-    [
-        EquipmentSlot.MainHand,
-        EquipmentSlot.Offhand,
-        EquipmentSlot.Head,
-        EquipmentSlot.Body,
-        EquipmentSlot.Feet,
-        EquipmentSlot.Potion
-    ];
-
     public static PlayerCharacter FromSnapshot
     (
         UnitSnapshot snapshot,
         IUnitNode node,
         IEntityManager entityManager,
+        IInventory inventory,
+        IEquipmentInventory equipmentInventory,
+        ICrossInventoryHelper crossInventoryHelper,
         IServiceProvider serviceProvider
     )
     {
-        return new(snapshot.Id, snapshot.ControllingPlayerId.Required, node, entityManager, serviceProvider);
+        return new
+        (
+            snapshot.Id,
+            snapshot.ControllingPlayerId.Required,
+            node,
+            entityManager,
+            inventory,
+            equipmentInventory,
+            crossInventoryHelper,
+            serviceProvider
+        );
     }
 }

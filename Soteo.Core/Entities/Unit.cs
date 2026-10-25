@@ -16,7 +16,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
-    private readonly ICrossInventoryHelper _crossInventoryHelper = new CrossInventoryHelper(); // todo inject
+    private readonly ICrossInventoryHelper _crossInventoryHelper;
 
     private long _nextStatusOrdinal;
 
@@ -30,8 +30,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
 
-    public Inventory Inventory { get; } = new(8); // todo inject
-    public EquipmentInventory EquipmentInventory { get; } // todo inject
+    public IInventory Inventory { get; }
+    public IEquipmentInventory EquipmentInventory { get; }
 
     protected Unit
     (
@@ -39,21 +39,19 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         Guid controllingPlayerId,
         IUnitNode node,
         IEntityManager entityManager,
+        IInventory inventory,
+        IEquipmentInventory equipmentInventory,
+        ICrossInventoryHelper crossInventoryHelper,
         IServiceProvider serviceProvider
     ) : base(id, node)
     {
         _serviceProvider = serviceProvider;
         _entityManager = entityManager;
-
         _controllingPlayerId = controllingPlayerId;
-
-        EquipmentInventory = new EquipmentInventory(EquipmentSlots);
+        Inventory = inventory;
+        EquipmentInventory = equipmentInventory;
+        _crossInventoryHelper = crossInventoryHelper;
     }
-
-    /// <summary>
-    /// List of equipment slots a unit has. Should be a constant value.
-    /// </summary>
-    public virtual IReadOnlyList<EquipmentSlot> EquipmentSlots => [];
 
     public override Vector2 Position
     {
