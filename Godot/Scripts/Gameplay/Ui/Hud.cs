@@ -503,6 +503,8 @@ public sealed class Hud : IHud
         }
 
         _equipmentPanel.Visible = true;
+        IReadOnlyList<EquipmentSlot> blockedSlots = unit.EquipmentInventory.BlockedSlots;
+
         foreach ((EquipmentSlot slot, ItemStackSlotControl control) in _equipmentSlotControls)
         {
             if (!unit.EquipmentInventory.TryGetValue(slot, out ItemStack? stack))
@@ -512,6 +514,14 @@ public sealed class Hud : IHud
             }
 
             control.Visible = true;
+
+            if (blockedSlots.Contains(slot))
+            {
+                control.Shade.Visible = true;
+                continue;
+            }
+
+            control.Shade.Visible = false;
 
             if (stack == null)
             {
