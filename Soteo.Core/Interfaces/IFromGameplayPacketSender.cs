@@ -9,7 +9,7 @@ namespace Soteo.Core.Interfaces;
 /// </summary>
 public interface IFromGameplayPacketSender
 {
-    void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds); // todo signature allows accidentally sending a packed to nobody
+    void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds);
     void SendUnreliable(Packet packet, params IEnumerable<Guid> receiverIds);
     void BroadcastReliable(Packet packet);
     void BroadcastUnreliable(Packet packet);
