@@ -149,6 +149,7 @@ public sealed class Hud : IHud
             _inventorySlotControls[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
             _inventorySlotControls[i].ItemStack.DragStarted += () => OnInventoryItemStackDragStarted(index);
             _inventorySlotControls[i].ItemStack.DragStopped += () => OnInventoryItemStackDragStopped(index);
+            _inventorySlotControls[i].ItemStack.SelectClicked += () => OnInventoryItemStackSelectClicked(index);
         }
     }
 
@@ -160,6 +161,7 @@ public sealed class Hud : IHud
             control.Connect("mouse_exited", OnMouseExitedTooltipableControl);
             control.ItemStack.DragStarted += () => OnEquipmentItemStackDragStarted(slot);
             control.ItemStack.DragStopped += () => OnEquipmentItemStackDragStopped(slot);
+            control.ItemStack.SelectClicked += () => OnEquipmentItemStackSelectClicked(slot);
         }
     }
 
@@ -304,6 +306,18 @@ public sealed class Hud : IHud
                 return;
             }
         }
+    }
+
+    private void OnInventoryItemStackSelectClicked(int slot)
+    {
+        if (!CanControlSelectedUnit(out Guid? shardId)) return;
+        Equip(slot, toEquipmentSlot: null, shardId.Value, SelectedUnit);
+    }
+
+    private void OnEquipmentItemStackSelectClicked(EquipmentSlot slot)
+    {
+        if (!CanControlSelectedUnit(out Guid? shardId)) return;
+        Unequip(slot, toInventorySlot: null, shardId.Value, SelectedUnit);
     }
 
     private bool IsInsideRect(GdVector2 position, Control control)

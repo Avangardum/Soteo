@@ -41,6 +41,14 @@ public sealed class ItemStackControl : Control
 
     public override void _Process(float delta)
     {
+        if (!Visible)
+        {
+            _mouseDownPosition = null;
+            _isMouseHovering = false;
+            if (_isDragging) StopDrag();
+            return;
+        }
+
         if (IsInteractive && _isMouseHovering && Input.IsActionJustPressed(InputActions.Select))
         {
             _mouseDownPosition = GetGlobalMousePosition();
@@ -58,7 +66,8 @@ public sealed class ItemStackControl : Control
         (
             !_isDragging &&
             _mouseDownPosition != null &&
-            (_mouseDownPosition.Value - GetGlobalMousePosition()).LengthSquared() >= DragThresholdPx)
+            (_mouseDownPosition.Value - GetGlobalMousePosition()).LengthSquared() >= DragThresholdPx
+        )
         {
             StartDrag();
         }
