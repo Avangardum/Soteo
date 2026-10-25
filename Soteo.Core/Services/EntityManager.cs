@@ -134,7 +134,17 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
                 )
             ),
             ProjectileSnapshot s => Add(Projectile.FromSnapshot(s, AddNode<IProjectileNode>(s.Id), _serviceProvider)),
-            UnitPuppetSnapshot s => Add(new UnitPuppet(s.Id, AddNode<IUnitPuppetNode>(s.Id), _camera.Required)),
+            UnitPuppetSnapshot s => Add
+            (
+                new UnitPuppet
+                (
+                    s.Id,
+                    AddNode<IUnitPuppetNode>(s.Id),
+                    _camera.Required,
+                    MakePlayerCharacterInventory,
+                    MakePlayerCharacterEquipmentInventory
+                )
+            ),
             ProjectilePuppetSnapshot s =>
                 Add(new ProjectilePuppet(s.Id, AddNode<IProjectilePuppetNode>(s.Id), _camera.Required)),
             _ => throw new ArgumentOutOfRangeException()
@@ -145,7 +155,17 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     {
         return delta switch
         {
-            UnitPuppetSnapshotDelta d => Add(new UnitPuppet(d.Id, AddNode<IUnitPuppetNode>(d.Id), _camera.Required)),
+            UnitPuppetSnapshotDelta d => Add
+            (
+                new UnitPuppet
+                (
+                    d.Id,
+                    AddNode<IUnitPuppetNode>(d.Id),
+                    _camera.Required,
+                    MakePlayerCharacterInventory,
+                    MakePlayerCharacterEquipmentInventory
+                )
+            ),
             ProjectilePuppetSnapshotDelta d =>
                 Add(new ProjectilePuppet(d.Id, AddNode<IProjectilePuppetNode>(d.Id), _camera.Required)),
             _ => throw new ArgumentOutOfRangeException()

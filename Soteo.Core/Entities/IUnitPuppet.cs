@@ -10,8 +10,8 @@ public interface IUnitPuppet : IEntity
 {
     bool IsDead { get; }
     IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses { get; }
-    Inventory Inventory { get; }
-    EquipmentInventory EquipmentInventory { get; }
+    IInventory Inventory { get; }
+    IEquipmentInventory EquipmentInventory { get; }
     IReadOnlyDictionary<Stat, double> Stats { get; }
     IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; }
     AbilityUseProgress? AbilityUseProgress { get; }

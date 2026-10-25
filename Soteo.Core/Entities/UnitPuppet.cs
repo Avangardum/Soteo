@@ -15,18 +15,30 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
     private readonly ICamera _camera;
     private double _inventoryDesyncTimeRemaining;
     private List<Guid> _controllingPlayerIds = [];
-    private readonly Inventory _alwaysSynchronizedInventory = new(0);
-    private readonly EquipmentInventory _alwaysSynchronizedEquipmentInventory = new();
+    private readonly IInventory _alwaysSynchronizedInventory;
+    private readonly IEquipmentInventory _alwaysSynchronizedEquipmentInventory;
 
-    public Inventory Inventory { get; } = new(0);
-    public EquipmentInventory EquipmentInventory { get; } = new();
+    public IInventory Inventory { get; }
+    public IEquipmentInventory EquipmentInventory { get; }
 
     public IReadOnlyList<Guid> ControllingPlayerIds => _controllingPlayerIds;
 
-    public UnitPuppet(Guid id, IUnitPuppetNode node, ICamera camera) : base(id, node)
+    public UnitPuppet
+    (
+        Guid id,
+        IUnitPuppetNode node,
+        ICamera camera,
+        Func<IInventory> makeInventory,
+        Func<IEquipmentInventory> makeEquipmentInventory
+    ) : base(id, node)
     {
         _camera = camera;
         camera.ZoomChanged += OnZoomChanged;
+
+        Inventory = makeInventory();
+        EquipmentInventory = makeEquipmentInventory();
+        _alwaysSynchronizedInventory = makeInventory();
+        _alwaysSynchronizedEquipmentInventory = makeEquipmentInventory();
     }
 
     public override void Remove()
