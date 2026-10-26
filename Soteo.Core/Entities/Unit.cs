@@ -531,12 +531,19 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     public void SetCommand(ICommand command)
     {
+        ICommand? prevCommand = _commands.PeekOrDefault();
         _commands.Clear();
+
+        if (command is UseAbilityCommand a && prevCommand is UseAbilityCommand b && a.Slot == b.Slot)
+        {
+            _commands.Enqueue(prevCommand);
+            return;
+        }
+
         if (command is not StopCommand)
             _commands.Enqueue(command);
-        if (command is not UseAbilityCommand useAbilityCommand || useAbilityCommand.Slot != AbilityUseProgress?.Slot)
-            AbilityUseProgress = null;
-        // todo reset progress on retargeting
+
+        AbilityUseProgress = null;
     }
 
     public void SpendHealth(double amount, Ability? sourceAbility)

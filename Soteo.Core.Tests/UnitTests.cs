@@ -490,7 +490,7 @@ public sealed class UnitTests
             base.SetAbility<T>(slot, level);
     }
 
-    public class SpyAbility : Ability
+    private class SpyAbility : Ability
     {
         public event Action Used = delegate { };
         public event Action ValidatedStrictly = delegate { };
@@ -512,18 +512,18 @@ public sealed class UnitTests
         }
     }
 
-    public class SpyAbilityWithUseTime : SpyAbility
+    private class SpyAbilityWithUseTime : SpyAbility
     {
         public override Scalable<double> StaticUseTime => 1;
     }
 
-    public class AbilityWithUseTime : Ability
+    private class AbilityWithUseTime : Ability
     {
         public override Targeting Targeting => Targeting.Anything;
         public override Scalable<double> StaticUseTime => 1;
     }
 
-    public sealed class StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff : Status
+    private sealed class StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff : Status
     {
         public const double BuffValue = 5;
 
@@ -536,7 +536,7 @@ public sealed class UnitTests
         }
     }
 
-    public sealed class SpyStatus : Status
+    private sealed class SpyStatus : Status
     {
         public static event Action Ticked = delegate { };
 
@@ -549,7 +549,7 @@ public sealed class UnitTests
         }
     }
 
-    public sealed class StatusRemovedOnDealAttackDamage : Status
+    private sealed class StatusRemovedOnDealAttackDamage : Status
     {
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
 
@@ -560,7 +560,7 @@ public sealed class UnitTests
         }
     }
 
-    public sealed class DieOnTickStatus : Status
+    private sealed class DieOnTickStatus : Status
     {
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
         public override void Tick(StatusContext context, double delta) => context.Unit.Die();
