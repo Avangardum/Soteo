@@ -29,7 +29,8 @@ public sealed class UnitTests
         _node = Substitute.For<IUnitNode>();
         _serviceProvider = new ServiceCollection().AddSingleton(_entityManager).BuildServiceProvider();
         var inventory = new Inventory(8);
-        var equipmentInventory = new EquipmentInventory(EquipmentSlot.Head, EquipmentSlot.Potion);
+        var equipmentInventory =
+            new EquipmentInventory(EquipmentSlot.MainHand ,EquipmentSlot.Head, EquipmentSlot.Potion);
         _sut = new Sut
         (
             Guid.NewGuid(),
@@ -276,9 +277,31 @@ public sealed class UnitTests
         _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
-    // todo EquippingItemStackWhenSlotItBlocksIsOccupiedDoesNothing()
+    [Fact]
+    public void EquippingItemStackWhenSlotItBlocksIsOccupiedDoesNothing()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<HatThatMakesYouHatePotions>(1));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
-    // todo EquippingItemStackWhenSlotItBlocksIsBlockedDoesNothing()
+        _sut.SetCommand(new EquipCommand(0));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<HatThatMakesYouHatePotions>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Head].Should().BeNull();
+    }
+
+    [Fact]
+    public void EquippingItemStackWhenSlotItBlocksIsBlockedDoesNothing()
+    {
+        _sut.Inventory.PutAt(0, ItemStack.Of<HatThatMakesYouHatePotions>(1));
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordThatMakesYouHatePotions>(1));
+
+        _sut.SetCommand(new EquipCommand(0));
+        _sut.Tick(Const.TickInterval);
+
+        _sut.Inventory[0].Should().Be(ItemStack.Of<HatThatMakesYouHatePotions>(1));
+        _sut.EquipmentInventory[EquipmentSlot.Head].Should().BeNull();
+    }
 
     [Theory]
     [InlineData(0)]
@@ -563,6 +586,12 @@ public sealed class UnitTests
     private sealed class HatThatMakesYouHatePotions : Item
     {
         public override EquipmentSlot? EquippableTo => EquipmentSlot.Head;
+        public override IReadOnlyList<EquipmentSlot> BlocksEquipmentSlots => [EquipmentSlot.Potion];
+    }
+
+    private sealed class SwordThatMakesYouHatePotions : Item
+    {
+        public override EquipmentSlot? EquippableTo => EquipmentSlot.MainHand;
         public override IReadOnlyList<EquipmentSlot> BlocksEquipmentSlots => [EquipmentSlot.Potion];
     }
 }

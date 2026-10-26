@@ -31,7 +31,14 @@ public sealed class EquipmentInventory : IEquipmentInventory
     public ItemStack? PutAt(EquipmentSlot slot, ItemStack stack)
     {
         if (stack.Item.EquippableTo != slot) return stack;
-        if (BlockedAndBlockingSlots.Keys.Contains(slot)) return stack;
+        IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> blockedAndBlockingSlots = BlockedAndBlockingSlots;
+        if (blockedAndBlockingSlots.ContainsKey(slot)) return stack;
+
+        foreach (EquipmentSlot blockingSlot in stack.Item.BlocksEquipmentSlots)
+        {
+            if (_stacks[blockingSlot] != null) return stack;
+            if (blockedAndBlockingSlots.ContainsKey(blockingSlot)) return stack;
+        }
 
         ItemStack? existingStack = _stacks[slot];
 
