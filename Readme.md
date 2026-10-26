@@ -129,6 +129,10 @@ old snapshot. So the first step if something breaks suddently should be clearing
 Godot editor sometimes show the missing scene dependencies window when trying to open a scene, even if all dependencies
 are fine. In this case close that window and open the scene again.
 
+### ERROR: Missing scripts metadata file
+
+Press the Build button in Godot
+
 ## Contributing
 
 If you'd like to contribute, join the Discord server and let me know.
