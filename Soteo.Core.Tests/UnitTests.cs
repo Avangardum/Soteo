@@ -276,6 +276,10 @@ public sealed class UnitTests
         _sut.EquipmentInventory[EquipmentSlot.Potion].Should().BeNull();
     }
 
+    // todo EquippingItemStackWhenSlotItBlocksIsOccupiedDoesNothing()
+
+    // todo EquippingItemStackWhenSlotItBlocksIsBlockedDoesNothing()
+
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]

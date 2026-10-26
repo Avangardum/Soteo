@@ -17,9 +17,9 @@ public interface IEquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemSt
     ItemStack? RemoveAt(EquipmentSlot slot);
 
     /// <summary>
-    /// Slots that are not occupied, but blocked by items in other slots
+    /// Slots that are empty, but blocked by items in other slots as keys and slots that block them as values
     /// </summary>
-    IReadOnlyList<EquipmentSlot> BlockedSlots { get; }
+    IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> BlockedAndBlockingSlots { get; }
 
     EquipmentInventorySnapshot ToSnapshot();
 

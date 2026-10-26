@@ -18,7 +18,16 @@ public sealed class CrossInventoryHelper : ICrossInventoryHelper
         ItemStack? inventoryStack = inventory[fromInventorySlot];
         if (inventoryStack?.Item.EquippableTo == null) return false;
         if (!equipmentInventory.ContainsKey(inventoryStack.Item.EquippableTo.Value)) return false;
-        if (toEquipmentSlot != null && toEquipmentSlot != inventoryStack.Item.EquippableTo) return false;
+
+        if
+        (
+            toEquipmentSlot != null &&
+            toEquipmentSlot != inventoryStack.Item.EquippableTo &&
+            !inventoryStack.Item.BlocksEquipmentSlots.Contains(toEquipmentSlot.Value)
+        )
+        {
+            return false;
+        }
 
         inventory.RemoveAt(fromInventorySlot);
         ItemStack? remainder = equipmentInventory.PutAt(inventoryStack.Item.EquippableTo.Value, inventoryStack);

@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Commands;
-using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Packets.Command;
 using Soteo.Core.Entities;
 using Soteo.Core.Enums;
@@ -16,6 +15,8 @@ namespace Soteo.Main.Gameplay.Ui;
 
 public sealed class Hud : IHud
 {
+    private static readonly Color BlockedSlotItemStackColor = Color.Color8(255, 255, 255, 100);
+
     private readonly HudNode _node;
     private readonly TextureProgress _healthBar;
     private readonly TextureProgress _manaBar;
@@ -50,15 +51,9 @@ public sealed class Hud : IHud
             if (value == field) return;
             field = value;
 
-            bool isControllable = value != null &&
-                _currentUserIdRepo.Id != null &&
-                value.ControllingPlayerIds.Contains(_currentUserIdRepo.Id.Value);
             _isCancelingItemStackDrag = true;
             foreach (ItemStackSlotControl slot in _inventorySlotControls.Concat(_equipmentSlotControls.Values))
-            {
                 slot.ItemStack.StopDrag();
-                slot.ItemStack.IsInteractive = isControllable;
-            }
             _isCancelingItemStackDrag = false;
         }
     }
@@ -474,16 +469,18 @@ public sealed class Hud : IHud
     private void ProcessInventory(IUnitPuppet unit)
     {
         _inventoryGrid.Columns = Maths.CeilToInt(unit.Inventory.Count / 2.0);
+        bool canControlSelectedUnit = CanControlSelectedUnit(out _);
 
         for (int i = 0; i < unit.Inventory.Count; i++)
         {
             _inventorySlotControls[i].Visible = true;
             ItemStack? stack = unit.Inventory[i];
-            _inventorySlotControls[i].ItemStack.TextureRect.Visible = stack != null;
+            _inventorySlotControls[i].ItemStack.Visible = stack != null;
             if (stack != null)
             {
                 _inventorySlotControls[i].ItemStack.TextureRect.Texture = stack.Item.Icon;
                 _inventorySlotControls[i].ItemStack.CountBackground.Visible = stack.Count > 1;
+                _inventorySlotControls[i].ItemStack.IsInteractive = canControlSelectedUnit;
                 if (stack.Count > 1)
                     _inventorySlotControls[i].ItemStack.CountLabel.Text = stack.Count.ToString();
             }
@@ -503,7 +500,9 @@ public sealed class Hud : IHud
         }
 
         _equipmentPanel.Visible = true;
-        IReadOnlyList<EquipmentSlot> blockedSlots = unit.EquipmentInventory.BlockedSlots;
+        IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> blockedAndBlockingSlots =
+            unit.EquipmentInventory.BlockedAndBlockingSlots;
+        bool canControlSelectedUnit = CanControlSelectedUnit(out _);
 
         foreach ((EquipmentSlot slot, ItemStackSlotControl control) in _equipmentSlotControls)
         {
@@ -515,13 +514,18 @@ public sealed class Hud : IHud
 
             control.Visible = true;
 
-            if (blockedSlots.Contains(slot))
+            if (blockedAndBlockingSlots.TryGetValue(slot, out EquipmentSlot blockingSlot))
             {
-                control.Shade.Visible = true;
+                control.ItemStack.Visible = true;
+                control.ItemStack.Modulate = BlockedSlotItemStackColor;
+                control.ItemStack.TextureRect.Texture = unit.EquipmentInventory[blockingSlot].Required.Item.Icon;
+                control.ItemStack.CountBackground.Visible = false;
+                control.ItemStack.IsInteractive = false;
                 continue;
             }
 
-            control.Shade.Visible = false;
+            control.ItemStack.Modulate = Colors.White;
+            control.ItemStack.IsInteractive = canControlSelectedUnit;
 
             if (stack == null)
             {

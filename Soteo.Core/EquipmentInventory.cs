@@ -23,8 +23,6 @@ public sealed class EquipmentInventory : IEquipmentInventory
 
     public ItemStack? this[EquipmentSlot slot] => _stacks[slot];
 
-    public bool HasSlot(EquipmentSlot slot) => _stacks.ContainsKey(slot);
-
     /// <summary>
     /// Put an item stack into a target slot. If the slot contains a stack that can be fully or partially merged with
     /// the put stack, it's merged and a remainder is returned. If the slot contains a stack that can't be merged,
@@ -33,7 +31,7 @@ public sealed class EquipmentInventory : IEquipmentInventory
     public ItemStack? PutAt(EquipmentSlot slot, ItemStack stack)
     {
         if (stack.Item.EquippableTo != slot) return stack;
-        if (BlockedSlots.Contains(slot)) return stack;
+        if (BlockedAndBlockingSlots.Keys.Contains(slot)) return stack;
 
         ItemStack? existingStack = _stacks[slot];
 
@@ -58,8 +56,20 @@ public sealed class EquipmentInventory : IEquipmentInventory
         return result;
     }
 
-    public IReadOnlyList<EquipmentSlot> BlockedSlots =>
-        _stacks.Values.WhereNotNull().SelectMany(it => it.Item.BlocksEquipmentSlots).Distinct().ToImmutableList();
+    public IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> BlockedAndBlockingSlots
+    {
+        get
+        {
+            Dictionary<EquipmentSlot, EquipmentSlot> result = [];
+            foreach ((EquipmentSlot blockingSlot, ItemStack? stack) in _stacks)
+            {
+                if (stack == null) continue;
+                foreach (EquipmentSlot blockedSlot in stack.Item.BlocksEquipmentSlots)
+                    result[blockedSlot] = blockingSlot;
+            }
+            return result;
+        }
+    }
 
     public EquipmentInventorySnapshot ToSnapshot() => new(_stacks.ToDictionary());
 

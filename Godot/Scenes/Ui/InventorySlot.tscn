@@ -45,9 +45,3 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 text = "64"
-
-[node name="Shade" type="ColorRect" parent="."]
-visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color( 0, 0, 0, 0.27451 )
