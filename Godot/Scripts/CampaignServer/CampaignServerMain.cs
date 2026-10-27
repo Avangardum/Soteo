@@ -53,7 +53,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         CreateSingletonNodes();
-        _serviceProvider.Value = serviceCollection.BuildAutofacServiceProvider();
+        _serviceProvider.Value = serviceCollection.BuildServiceProvider();
         CreateSingletonServices();
 
         IReadOnlyList<Guid> shardIds = ServiceProvider.GetRequiredService<CampaignOptions>().ShardIds;

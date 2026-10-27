@@ -64,7 +64,7 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         GlobalInit.Init();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
-        _rootServiceProvider = serviceCollection.BuildAutofacServiceProvider();
+        _rootServiceProvider = serviceCollection.BuildServiceProvider();
         GetNodes();
         CreateSingletonNodes();
         CreateSingletonServices();

@@ -56,13 +56,9 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
 
     public event Action Connected = delegate {};
 
-    // Disabling certificate validation doesn't work in browser, so it's always enabled.
-    // If the development certificate is trusted, it should be verified without problems.
-    private bool VerifyCertificate => _certificateVerificationOptions.VerifyCertificate || OS.HasFeature("web");
-
     public override void _Ready()
     {
-        _wsClient.VerifySsl = VerifyCertificate;
+        _wsClient.VerifySsl = _certificateVerificationOptions.VerifyCertificate;
         _wsClient.Connect("connection_closed", this, nameof(OnConnectionClosed));
         _wsClient.Connect("connection_error", this, nameof(OnConnectionError));
         _wsClient.Connect("connection_established", this, nameof(OnConnectionEstablished));
@@ -141,7 +137,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
             method: HTTPClient.Method.Post,
             customHeaders: headers,
             requestData: body,
-            sslValidateDomain: VerifyCertificate
+            sslValidateDomain: _certificateVerificationOptions.VerifyCertificate
         );
     }
 
@@ -162,7 +158,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
             method: HTTPClient.Method.Post,
             customHeaders: headers,
             requestData: body,
-            sslValidateDomain: VerifyCertificate
+            sslValidateDomain: _certificateVerificationOptions.VerifyCertificate
         );
     }
 

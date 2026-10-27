@@ -8,7 +8,6 @@ public static class Logging
 {
     public static void AddToServiceCollection(IServiceCollection services)
     {
-        services.AddLogging();
-        services.AddSingleton<ILoggerProvider, SimpleConsoleLogger.Provider>();
+        services.AddLogging(builder => builder.AddConsole());
     }
 }
