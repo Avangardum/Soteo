@@ -33,7 +33,6 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     // Server simulates a single shard, so it creates a scope on startup and uses it for everything.
     // Client can connect to multiple shards, so it uses a separate scope for each loaded shard.
 
-    private readonly bool _useJsmq = OS.HasFeature("web") && Config.IsSingleplayer;
     private readonly TaskCompletionSource _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs = new();
     private readonly TaskCompletionSource _synchronizedCampaignStateInitializedTcs = new();
     private readonly TaskCompletionSource _campaignInitializedTcs = new();
@@ -45,7 +44,6 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     private Node2D? _shardRoot;
     private WebSocketFromGameplayToCampaignServerCommunicator? _webSocketCampaignServerCommunicator;
     private WebRtcFromGameplayToGameplayCommunicator? _webRtcGameplayCommunicator;
-    private JsmqFromGameplayCommunicator? _jsmqCommunicator;
     private ProcessPublisher? _processPublisher;
     private SoteoCamera? _camera;
     private ILogger<GameplayMain>? _logger;
@@ -111,11 +109,6 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
             RegisterServerServices(services);
         else
             RegisterClientServices(services);
-
-        if (_useJsmq)
-            RegisterJsmqServices(services);
-        else
-            RegisterWebServices(services);
     }
 
     private void RegisterSharedServices(IServiceCollection services)
@@ -151,6 +144,21 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddAlias<IPauseRepository, SynchronizedCampaignStatePuppetRepository>();
         services.AddSingleton<SceneTreePauser>();
         services.AddSingleton<ICrossInventoryHelper, CrossInventoryHelper>();
+        services.AddSingleton<ICampaignServerConnector>(_ => _webSocketCampaignServerCommunicator.Required);
+        services.AddSingleton<IFromGameplayToCampaignServerPacketSender>(_ => _webSocketCampaignServerCommunicator.Required);
+        services.AddSingleton<IFromGameplayPacketSender>
+        (
+            _ => new RoutingPacketSender
+            (
+                _webSocketCampaignServerCommunicator.Required,
+                _webRtcGameplayCommunicator.Required
+            )
+        );
+        services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
+        services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
+        services.AddSingleton<IConnectionNotifier>(_ => _webRtcGameplayCommunicator.Required);
+        services.AddSingleton<IShardServerConnector>(_ => _webRtcGameplayCommunicator.Required);
+        services.AddSingleton<IChunkCollector, ChunkCollector>();
 
         foreach (Type type in PacketSerializer.AllTypes(typeLocator))
             services.AddSingleton(type);
@@ -193,35 +201,6 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         services.AddSingleton<ClientInitializer>();
     }
 
-    private void RegisterJsmqServices(IServiceCollection services)
-    {
-        services.AddSingleton<ICampaignServerConnector>(_ => _jsmqCommunicator.Required);
-        services.AddSingleton<IFromGameplayToCampaignServerPacketSender>(_ => _jsmqCommunicator.Required);
-        services.AddSingleton<IFromGameplayPacketSender>(_ => _jsmqCommunicator.Required);
-        services.AddSingleton<INetworkDebugger>(_ => _jsmqCommunicator.Required);
-        services.AddSingleton<IConnectionNotifier>(_ => _jsmqCommunicator.Required);
-        services.AddSingleton<IShardServerConnector>(_ => _jsmqCommunicator.Required);
-    }
-
-    private void RegisterWebServices(IServiceCollection services)
-    {
-        services.AddSingleton<ICampaignServerConnector>(_ => _webSocketCampaignServerCommunicator.Required);
-        services.AddSingleton<IFromGameplayToCampaignServerPacketSender>(_ => _webSocketCampaignServerCommunicator.Required);
-        services.AddSingleton<IFromGameplayPacketSender>
-        (
-            _ => new RoutingPacketSender
-            (
-                _webSocketCampaignServerCommunicator.Required,
-                _webRtcGameplayCommunicator.Required
-            )
-        );
-        services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
-        services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
-        services.AddSingleton<IConnectionNotifier>(_ => _webRtcGameplayCommunicator.Required);
-        services.AddSingleton<IShardServerConnector>(_ => _webRtcGameplayCommunicator.Required);
-        services.AddSingleton<IChunkCollector, ChunkCollector>();
-    }
-
     private void GetNodes()
     {
         _shardRoot = GetNode<Node2D>("Shards");
@@ -231,21 +210,12 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
     {
         _processPublisher = new ProcessPublisher().Also(it => AddChild(it));
 
-        if (_useJsmq)
-        {
-            _jsmqCommunicator = ActivatorUtilities
-                .CreateInstance<JsmqFromGameplayCommunicator>(_rootServiceProvider.Required)
-                .Also(it => AddChild(it));
-        }
-        else
-        {
-            _webSocketCampaignServerCommunicator = ActivatorUtilities
-                .CreateInstance<WebSocketFromGameplayToCampaignServerCommunicator>(_rootServiceProvider.Required)
-                .Also(it => AddChild(it));
-            _webRtcGameplayCommunicator = ActivatorUtilities
-                .CreateInstance<WebRtcFromGameplayToGameplayCommunicator>(_rootServiceProvider)
-                .Also(it => AddChild(it));
-        }
+        _webSocketCampaignServerCommunicator = ActivatorUtilities
+            .CreateInstance<WebSocketFromGameplayToCampaignServerCommunicator>(_rootServiceProvider.Required)
+            .Also(it => AddChild(it));
+        _webRtcGameplayCommunicator = ActivatorUtilities
+            .CreateInstance<WebRtcFromGameplayToGameplayCommunicator>(_rootServiceProvider)
+            .Also(it => AddChild(it));
 
         if (Config.Side == Side.Client)
         {

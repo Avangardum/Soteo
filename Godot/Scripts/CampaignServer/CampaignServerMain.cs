@@ -27,8 +27,6 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
 {
     private readonly Dictionary<Guid, TaskCompletionSource> _shardServerLocalInitDoneTcs = new();
 
-    private readonly bool _useJsmq = OS.HasFeature("web") && Config.IsSingleplayer;
-
     private readonly LateInit<IFromCampaignServerCommunicator> _communicator = new();
     private readonly LateInit<IServiceProvider> _serviceProvider = new();
     private readonly LateInit<CampaignSnapshotManager> _snapshotManager = new();
@@ -186,11 +184,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
             ShardServerAllowlist.Enabled(sp.GetRequiredService<CampaignOptions>().ShardIds));
         services.AddSingleton<ISynchronizedCampaignStateRepository, SynchronizedCampaignStateRepository>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
-
-        if (_useJsmq)
-            services.AddSingleton<IFromCampaignServerCommunicator, JsmqFromCampaignServerCommunicator>();
-        else
-            services.AddSingleton<IFromCampaignServerCommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
+        services.AddSingleton<IFromCampaignServerCommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
 
         foreach (Type type in PacketSerializer.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
             services.AddSingleton(type);
