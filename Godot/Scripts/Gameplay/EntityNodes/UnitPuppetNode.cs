@@ -11,10 +11,10 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
     private double? _removalCountdown;
     private TaskCompletionSource _waitUntilCanRemoveSource = new();
 
-    private readonly LateInit<AnimatedSprite> _sprite = new();
+    private readonly LateInit<AnimatedSprite2D> _sprite = new();
     private readonly LateInit<AzimuthIndicator> _azimuthIndicator = new();
 
-    private AnimatedSprite Sprite => _sprite;
+    private AnimatedSprite2D Sprite2D => _sprite;
     private AzimuthIndicator AzimuthIndicator => _azimuthIndicator;
 
     // If a sprite has pixel position with .5 as the fractional part in any dimension
@@ -67,10 +67,10 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
 
     public override void _Ready()
     {
-        _sprite.Value = GetNode<AnimatedSprite>("AnimatedSprite");
+        _sprite.Value = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         _azimuthIndicator.Value = GetNode<AzimuthIndicator>("AzimuthIndicator");
 
-        Sprite.Playing = true;
+        Sprite2D.Playing = true;
     }
 
     public override void _Process(float delta)
@@ -95,29 +95,29 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
 
     public bool FlipSpriteH
     {
-        get => Sprite.FlipH;
-        set => Sprite.FlipH = value;
+        get => Sprite2D.FlipH;
+        set => Sprite2D.FlipH = value;
     }
 
     public string Animation
     {
-        get => Sprite.Animation;
-        set => Sprite.Animation = value;
+        get => Sprite2D.Animation;
+        set => Sprite2D.Animation = value;
     }
 
     public double AnimationSpeedScale
     {
-        get => Sprite.SpeedScale;
-        set => Sprite.SpeedScale = (float)value;
+        get => Sprite2D.SpeedScale;
+        set => Sprite2D.SpeedScale = (float)value;
     }
 
     public int AnimationFrame
     {
-        get => Sprite.Frame;
-        set => Sprite.Frame = value;
+        get => Sprite2D.Frame;
+        set => Sprite2D.Frame = value;
     }
 
-    public int AnimationFrameCount => Sprite.Frames.GetFrameCount(Animation);
+    public int AnimationFrameCount => Sprite2D.Frames.GetFrameCount(Animation);
 
     public void CalculateAzimuthIndicatorPoints(double azimuth, double zoom) =>
         AzimuthIndicator.CalculatePoints(azimuth, zoom);

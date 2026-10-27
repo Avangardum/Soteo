@@ -16,21 +16,21 @@ public sealed class SignalConnector : Node
     public IDisposable ConnectSignal(GdObject obj, string signal, Action handler)
     {
         var connection = new Connection(handler);
-        obj.Connect(signal, connection, nameof(Connection.Handle));
+        obj.Connect(signal, new Callable(connection, nameof(Connection.Handle)));
         return new DelegateDisposable(connection.Free);
     }
 
     public IDisposable ConnectSignal<T>(GdObject obj, string signal, Action<T> handler)
     {
         var connection = new Connection<T>(handler);
-        obj.Connect(signal, connection, nameof(Connection.Handle));
+        obj.Connect(signal, new Callable(connection, nameof(Connection.Handle)));
         return new DelegateDisposable(connection.Free);
     }
 
     public IDisposable ConnectSignal<T1, T2>(GdObject obj, string signal, Action<T1, T2> handler)
     {
         var connection = new Connection<T1, T2>(handler);
-        obj.Connect(signal, connection, nameof(Connection.Handle));
+        obj.Connect(signal, new Callable(connection, nameof(Connection.Handle)));
         return new DelegateDisposable(connection.Free);
     }
 

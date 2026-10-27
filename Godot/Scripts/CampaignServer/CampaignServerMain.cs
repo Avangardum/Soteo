@@ -19,7 +19,7 @@ using Soteo.Main.Shared;
 using Soteo.Main.Shared.Nodes;
 using Soteo.Util;
 using File = System.IO.File;
-using Path = System.IO.Path;
+using Path3D = System.IO.Path3D;
 
 namespace Soteo.Main.CampaignServer;
 
@@ -146,7 +146,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     {
         get
         {
-            return Path.Combine
+            return Path3D.Combine
             (
                 ServiceProvider.GetRequiredService<CampaignPersistenceOptions>().SnapshotFolder,
                 "Snapshot"

@@ -3,29 +3,29 @@
 [ext_resource path="res://Scripts/Gameplay/Ui/LogInScreenNode.cs" type="Script" id=1]
 
 [node name="LogIn" type="Control"]
-pause_mode = 2
+process_mode = 3
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
 
 [node name="Email" type="LineEdit" parent="."]
-margin_left = 360.0
-margin_top = 220.0
-margin_right = 630.0
-margin_bottom = 255.0
+offset_left = 360.0
+offset_top = 220.0
+offset_right = 630.0
+offset_bottom = 255.0
 text = "player1@soteo.net"
 
 [node name="Password" type="LineEdit" parent="."]
-margin_left = 360.0
-margin_top = 280.0
-margin_right = 630.0
-margin_bottom = 315.0
+offset_left = 360.0
+offset_top = 280.0
+offset_right = 630.0
+offset_bottom = 315.0
 text = "Pa55_word"
 secret = true
 
 [node name="LogIn" type="Button" parent="."]
-margin_left = 380.0
-margin_top = 345.0
-margin_right = 600.0
-margin_bottom = 390.0
+offset_left = 380.0
+offset_top = 345.0
+offset_right = 600.0
+offset_bottom = 390.0
 text = "Log in"

@@ -7,31 +7,31 @@ namespace Soteo.Main.Shared.Extensions;
 
 public static class IconExtensions
 {
-    private static readonly Texture Placeholder = ResourceLoader.Load<Texture>("res://Textures/Icons/Placeholder.png");
+    private static readonly Texture2D Placeholder = ResourceLoader.Load<Texture2D>("res://Textures/Icons/Placeholder.png");
 
     extension (Status self)
     {
-        public Texture ResolveIcon(PuppetStatusContext context) =>
+        public Texture2D ResolveIcon(PuppetStatusContext context) =>
             self.Icon ?? context.Ability?.Icon ?? Placeholder;
 
-        public Texture? Icon
+        public Texture2D? Icon
         {
             get
             {
                 return self.IconPath == null ?
                     null :
-                    ResourceLoader.Load<Texture>($"res://Textures/Icons/{self.IconPath}.png") ?? Placeholder;
+                    ResourceLoader.Load<Texture2D>($"res://Textures/Icons/{self.IconPath}.png") ?? Placeholder;
             }
         }
     }
 
     extension (Ability self)
     {
-        public Texture Icon => ResourceLoader.Load<Texture>($"res://Textures/Icons/{self.IconPath}.png") ?? Placeholder;
+        public Texture2D Icon => ResourceLoader.Load<Texture2D>($"res://Textures/Icons/{self.IconPath}.png") ?? Placeholder;
     }
 
     extension (Item self)
     {
-        public Texture Icon => ResourceLoader.Load<Texture>($"res://Textures/Icons/{self.IconPath}.png") ?? Placeholder;
+        public Texture2D Icon => ResourceLoader.Load<Texture2D>($"res://Textures/Icons/{self.IconPath}.png") ?? Placeholder;
     }
 }

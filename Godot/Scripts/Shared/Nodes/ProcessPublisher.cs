@@ -71,7 +71,7 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
         {
             Name = nameof(ProcessListener) + " " + priority;
             ProcessPriority = (int)priority;
-            PauseMode = PauseModeEnum.Process;
+            ProcessMode = PauseModeEnum.Process;
         }
 
         public override void _Process(float delta)

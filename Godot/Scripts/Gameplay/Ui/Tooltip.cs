@@ -20,15 +20,15 @@ public sealed class Tooltip : Control, ITooltip
         _separator.Value = GetNode<HSeparator>("PanelContainer/MarginContainer/VBoxContainer/HSeparator");
         _bodyLabel.Value = GetNode<RichTextLabel>("PanelContainer/MarginContainer/VBoxContainer/Body");
 
-        _bodyDefaultMinWidth.Value = BodyLabel.RectMinSize.x;
+        _bodyDefaultMinWidth.Value = BodyLabel.CustomMinimumSize.x;
     }
 
     public void Show(Vector2 position, string header, string body)
     {
         Visible = true;
-        RectGlobalPosition = position.ToGd();
+        GlobalPosition = position.ToGd();
         HeaderLabel.Text = header;
-        BodyLabel.BbcodeText = body;
+        BodyLabel.Text = body;
         HeaderLabel.Visible = header != "";
         BodyLabel.Visible = body != "";
         Separator.Visible = header != "" && body != "";
@@ -37,21 +37,21 @@ public sealed class Tooltip : Control, ITooltip
 
     private void UpdateBodyMinWidth()
     {
-        BodyLabel.RectMinSize = new GdVector2(_bodyDefaultMinWidth, 0);
-        BodyLabel.RectSize = BodyLabel.RectSize with { x = _bodyDefaultMinWidth };
+        BodyLabel.CustomMinimumSize = new GdVector2(_bodyDefaultMinWidth, 0);
+        BodyLabel.Size = BodyLabel.Size with { x = _bodyDefaultMinWidth };
 
-        string text = BodyLabel.BbcodeText;
-        BodyLabel.BbcodeText = "Lorem ipsum";
+        string text = BodyLabel.Text;
+        BodyLabel.Text = "Lorem ipsum";
         int lineHeight = BodyLabel.GetContentHeight();
-        BodyLabel.BbcodeText = text;
+        BodyLabel.Text = text;
 
         const int step = 10;
-        while (BodyLabel.GetContentHeight() == lineHeight && BodyLabel.RectMinSize.x > step)
+        while (BodyLabel.GetContentHeight() == lineHeight && BodyLabel.CustomMinimumSize.x > step)
         {
-            BodyLabel.RectMinSize -= new GdVector2(step, 0);
-            BodyLabel.RectSize = BodyLabel.RectSize with { x = BodyLabel.RectMinSize.x };
+            BodyLabel.CustomMinimumSize -= new GdVector2(step, 0);
+            BodyLabel.Size = BodyLabel.Size with { x = BodyLabel.CustomMinimumSize.x };
         }
-        BodyLabel.RectMinSize += new GdVector2(step, 0);
+        BodyLabel.CustomMinimumSize += new GdVector2(step, 0);
     }
 
     public new void Hide() => Visible = false;

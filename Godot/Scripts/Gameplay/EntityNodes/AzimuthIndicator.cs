@@ -17,7 +17,7 @@ public sealed class AzimuthIndicator : Line2D
     public void CalculatePoints(double azimuth, double zoom)
     {
         const double sectorAngle = 2 * Math.PI / SectorCount;
-        double forwardAngle = Maths.Deg2Rad(azimuth) - Math.PI / 2;
+        double forwardAngle = Maths.DegToRad(azimuth) - Math.PI / 2;
         var arrowTip = GdVector2.New
         (
             EllipseWidth * Math.Cos(forwardAngle),

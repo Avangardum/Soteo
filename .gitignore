@@ -435,6 +435,7 @@ FodyWeavers.xsd
 .import/
 *.translation
 .mono/
+.godot/
 
 # Rider
 data_source_mapping.xml

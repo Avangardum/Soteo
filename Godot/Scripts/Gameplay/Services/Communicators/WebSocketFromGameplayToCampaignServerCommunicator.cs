@@ -51,7 +51,7 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
 
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        PauseMode = PauseModeEnum.Process;
+        ProcessMode = PauseModeEnum.Process;
     }
 
     public event Action Connected = delegate {};
@@ -59,13 +59,13 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     public override void _Ready()
     {
         _wsClient.VerifySsl = _certificateVerificationOptions.VerifyCertificate;
-        _wsClient.Connect("connection_closed", this, nameof(OnConnectionClosed));
-        _wsClient.Connect("connection_error", this, nameof(OnConnectionError));
-        _wsClient.Connect("connection_established", this, nameof(OnConnectionEstablished));
-        _wsClient.Connect("data_received", this, nameof(OnDataReceived));
+        _wsClient.Connect("connection_closed", new Callable(this, nameof(OnConnectionClosed)));
+        _wsClient.Connect("connection_error", new Callable(this, nameof(OnConnectionError)));
+        _wsClient.Connect("connection_established", new Callable(this, nameof(OnConnectionEstablished)));
+        _wsClient.Connect("data_received", new Callable(this, nameof(OnDataReceived)));
 
         AddChild(_httpRequest);
-        _httpRequest.Connect("request_completed", this, nameof(OnAuthRequestCompleted));
+        _httpRequest.Connect("request_completed", new Callable(this, nameof(OnAuthRequestCompleted)));
     }
 
     public override void _PhysicsProcess(float delta)

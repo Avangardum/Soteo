@@ -3,7 +3,7 @@
 [ext_resource path="res://Scenes/Ui/Tooltip.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Scripts/Gameplay/GameplayMain.cs" type="Script" id=2]
 [ext_resource path="res://Scenes/Ui/PauseScreen.tscn" type="PackedScene" id=4]
-[ext_resource path="res://Textures/Stars.png" type="Texture" id=7]
+[ext_resource path="res://Textures/Stars.png" type="Texture2D" id=7]
 
 [node name="GameplayMain" type="Node2D"]
 script = ExtResource( 2 )
@@ -20,7 +20,7 @@ layer = 3
 visible = false
 
 [node name="DragAndDropLayer" type="CanvasLayer" parent="Ui"]
-pause_mode = 2
+process_mode = 3
 layer = 4
 
 [node name="PauseScreen" parent="Ui" instance=ExtResource( 4 )]
@@ -35,11 +35,11 @@ motion_scale = Vector2( 0.01, 0.01 )
 motion_mirroring = Vector2( 32000, 32000 )
 
 [node name="TextureRect" type="TextureRect" parent="ParallaxBackground/ParallaxLayer"]
-margin_left = -4270.0
-margin_top = -3969.0
-margin_right = 3730.0
-margin_bottom = 4031.0
-rect_scale = Vector2( 4, 4 )
+offset_left = -4270.0
+offset_top = -3969.0
+offset_right = 3730.0
+offset_bottom = 4031.0
+scale = Vector2( 4, 4 )
 mouse_filter = 2
 texture = ExtResource( 7 )
 expand = true

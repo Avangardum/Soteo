@@ -73,17 +73,17 @@ public sealed class ItemStackControl : Control
         }
 
         if (_isDragging)
-            RectGlobalPosition = GetGlobalMousePosition() + _offset;
+            GlobalPosition = GetGlobalMousePosition() + _offset;
     }
 
     private void StartDrag()
     {
         _isDragging = true;
         _offset = -GetLocalMousePosition();
-        GdVector2 position = RectGlobalPosition;
+        GdVector2 position = GlobalPosition;
         GetParent().RemoveChild(this);
         _dragAndDropLayer.Value.AddChild(this);
-        RectGlobalPosition = position;
+        GlobalPosition = position;
         DragStarted();
     }
 
@@ -91,7 +91,7 @@ public sealed class ItemStackControl : Control
     {
         _isDragging = false;
         _isMouseHovering = false;
-        RectPosition = GdVector2.Zero;
+        Position = GdVector2.Zero;
         GetParent().RemoveChild(this);
         _originalParent.Value.AddChild(this);
         DragStopped();

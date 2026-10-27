@@ -29,18 +29,18 @@ public sealed class Graph : Control
 
         _frame.Value =
         [
-            new GdVector2(DataRect.RectPosition.x, RectSize.y),
-            new GdVector2(DataRect.RectPosition.x, 0),
-            new GdVector2(DataRect.RectPosition.x + DataRect.RectSize.x, 0),
-            new GdVector2(DataRect.RectPosition.x + DataRect.RectSize.x, RectSize.y),
-            new GdVector2(DataRect.RectPosition.x, RectSize.y),
-            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y + DataRect.RectSize.y),
-            new GdVector2(DataRect.RectPosition.x - DataRect.RectPosition.y,
-                DataRect.RectPosition.y + DataRect.RectSize.y),
-            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y + DataRect.RectSize.y),
-            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y),
-            new GdVector2(DataRect.RectPosition.x - DataRect.RectPosition.y, DataRect.RectPosition.y),
-            new GdVector2(DataRect.RectPosition.x, DataRect.RectPosition.y)
+            new GdVector2(DataRect.Position.x, Size.y),
+            new GdVector2(DataRect.Position.x, 0),
+            new GdVector2(DataRect.Position.x + DataRect.Size.x, 0),
+            new GdVector2(DataRect.Position.x + DataRect.Size.x, Size.y),
+            new GdVector2(DataRect.Position.x, Size.y),
+            new GdVector2(DataRect.Position.x, DataRect.Position.y + DataRect.Size.y),
+            new GdVector2(DataRect.Position.x - DataRect.Position.y,
+                DataRect.Position.y + DataRect.Size.y),
+            new GdVector2(DataRect.Position.x, DataRect.Position.y + DataRect.Size.y),
+            new GdVector2(DataRect.Position.x, DataRect.Position.y),
+            new GdVector2(DataRect.Position.x - DataRect.Position.y, DataRect.Position.y),
+            new GdVector2(DataRect.Position.x, DataRect.Position.y)
         ];
 
         SetData([0, 0], "N0", 0, 1);
@@ -60,13 +60,13 @@ public sealed class Graph : Control
         {
             double x = i / (data.Count - 1.0);
             double y = Maths.InverseLerp(max.Value, min.Value, data[i]);
-            GdVector2 point = GdVector2.New(x, y) * DataRect.RectSize + DataRect.RectPosition;
-            point.y = Mathf.Clamp(point.y, 0, RectSize.y);
+            GdVector2 point = GdVector2.New(x, y) * DataRect.Size + DataRect.Position;
+            point.y = Mathf.Clamp(point.y, 0, Size.y);
             dataPoints[i] = point;
         }
 
-        Line.Points = [..Frame, ..dataPoints, dataPoints[^1] + new GdVector2(DataRect.RectPosition.y, 0)];
+        Line.Points = [..Frame, ..dataPoints, dataPoints[^1] + new GdVector2(DataRect.Position.y, 0)];
         LastLabel.Text = data[^1].ToString(format);
-        LastLabel.RectPosition = LastLabel.RectPosition with { y = dataPoints[^1].y - LastLabel.RectSize.y / 2 };
+        LastLabel.Position = LastLabel.Position with { y = dataPoints[^1].y - LastLabel.Size.y / 2 };
     }
 }

@@ -4,7 +4,7 @@ using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Main.Gameplay.EntityNodes;
 
-public sealed class UnitNode : KinematicBody2D, IUnitNode
+public sealed class UnitNode : CharacterBody2D, IUnitNode
 {
     public Unit? Unit { get; set; }
 

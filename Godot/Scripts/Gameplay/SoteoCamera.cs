@@ -61,7 +61,7 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
 
     public override void _Ready()
     {
-        PauseMode = PauseModeEnum.Process;
+        ProcessMode = PauseModeEnum.Process;
         Current = true;
         TargetZoomLog2 = DefaultZoomLog2;
     }

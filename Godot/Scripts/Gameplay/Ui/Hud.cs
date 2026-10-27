@@ -18,8 +18,8 @@ public sealed class Hud : IHud
     private static readonly Color BlockedSlotItemStackColor = Color.Color8(255, 255, 255, 100);
 
     private readonly HudNode _node;
-    private readonly TextureProgress _healthBar;
-    private readonly TextureProgress _manaBar;
+    private readonly TextureProgressBar _healthBar;
+    private readonly TextureProgressBar _manaBar;
     private readonly Label _healthLabel;
     private readonly Label _manaLabel;
     private readonly ImmutableList<AbilityButton> _abilityButtons;
@@ -86,8 +86,8 @@ public sealed class Hud : IHud
 
         node.Hud = this;
         _node = node;
-        _healthBar = node.GetNode<TextureProgress>("VBoxContainer/UnitPanel/VBoxContainer/Health");
-        _manaBar = node.GetNode<TextureProgress>("VBoxContainer/UnitPanel/VBoxContainer/Mana");
+        _healthBar = node.GetNode<TextureProgressBar>("VBoxContainer/UnitPanel/VBoxContainer/Health");
+        _manaBar = node.GetNode<TextureProgressBar>("VBoxContainer/UnitPanel/VBoxContainer/Mana");
         _healthLabel = _healthBar.GetNode<Label>("Label");
         _manaLabel = _manaBar.GetNode<Label>("Label");
         _abilityButtons = node.GetNode("VBoxContainer/UnitPanel/VBoxContainer/Abilities").GetChildren()
@@ -320,10 +320,10 @@ public sealed class Hud : IHud
 
     private bool IsInsideRect(GdVector2 position, Control control)
     {
-        return position.x >= control.RectGlobalPosition.x &&
-            position.x <= control.RectGlobalPosition.x + control.RectSize.x &&
-            position.y >= control.RectGlobalPosition.y &&
-            position.y <= control.RectGlobalPosition.y + control.RectSize.y;
+        return position.x >= control.GlobalPosition.x &&
+            position.x <= control.GlobalPosition.x + control.Size.x &&
+            position.y >= control.GlobalPosition.y &&
+            position.y <= control.GlobalPosition.y + control.Size.y;
     }
 
     private void MoveInventoryItemStack(int fromIndex, int toIndex, Guid shardId, IUnitPuppet unit)
@@ -432,7 +432,7 @@ public sealed class Hud : IHud
             }
 
             button.Visible = true;
-            button.IconRect.Texture = state.Ability.Icon;
+            button.IconRect.Texture2D = state.Ability.Icon;
 
             button.CooldownIndicator.Value = state.Cooldown;
             button.CooldownIndicator.MaxValue = state.MaxCooldown == 0 ? 1 : state.MaxCooldown;
@@ -457,7 +457,7 @@ public sealed class Hud : IHud
         for (int i = 0; i < contexts.Count; i++)
         {
             _statusIndicators[i].Visible = true;
-            _statusIndicators[i].IconRect.Texture = contexts[i].Status.ResolveIcon(contexts[i]);
+            _statusIndicators[i].IconRect.Texture2D = contexts[i].Status.ResolveIcon(contexts[i]);
             _statusIndicators[i].Value = contexts[i].DisplayNormalizedRemainingTime;
         }
         for (int i = contexts.Count; i < _statusIndicators.Count; i++)
@@ -478,7 +478,7 @@ public sealed class Hud : IHud
             _inventorySlotControls[i].ItemStack.Visible = stack != null;
             if (stack != null)
             {
-                _inventorySlotControls[i].ItemStack.TextureRect.Texture = stack.Item.Icon;
+                _inventorySlotControls[i].ItemStack.TextureRect.Texture2D = stack.Item.Icon;
                 _inventorySlotControls[i].ItemStack.CountBackground.Visible = stack.Count > 1;
                 _inventorySlotControls[i].ItemStack.IsInteractive = canControlSelectedUnit;
                 if (stack.Count > 1)
@@ -518,7 +518,7 @@ public sealed class Hud : IHud
             {
                 control.ItemStack.Visible = true;
                 control.ItemStack.Modulate = BlockedSlotItemStackColor;
-                control.ItemStack.TextureRect.Texture = unit.EquipmentInventory[blockingSlot].Required.Item.Icon;
+                control.ItemStack.TextureRect.Texture2D = unit.EquipmentInventory[blockingSlot].Required.Item.Icon;
                 control.ItemStack.CountBackground.Visible = false;
                 control.ItemStack.IsInteractive = false;
                 continue;
@@ -534,7 +534,7 @@ public sealed class Hud : IHud
             }
 
             control.ItemStack.Visible = true;
-            control.ItemStack.TextureRect.Texture = stack.Item.Icon;
+            control.ItemStack.TextureRect.Texture2D = stack.Item.Icon;
 
             if (stack.Count == 1)
             {

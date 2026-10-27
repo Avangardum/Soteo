@@ -2,7 +2,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class StatusIndicator : TextureProgress
+public sealed class StatusIndicator : TextureProgressBar
 {
     private readonly LateInit<TextureRect> _iconRect = new();
 

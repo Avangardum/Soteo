@@ -2,15 +2,18 @@
 
 importer="csv_translation"
 type="Translation"
+uid="uid://b4ea1u2ctdtmf"
 
 [deps]
 
-files=[ "res://Localization/English.en.translation" ]
+files=["res://Localization/English.en.translation"]
 
 source_file="res://Localization/English.csv"
-dest_files=[ "res://Localization/English.en.translation" ]
+dest_files=["res://Localization/English.en.translation"]
 
 [params]
 
 compress=true
 delimiter=1
+unescape_keys=false
+unescape_translations=true

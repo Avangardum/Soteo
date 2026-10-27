@@ -16,10 +16,10 @@ public sealed class OverheadUi
     private readonly Control _playerCharacterPanel;
     private readonly Label _playerCharacterNameLabel;
     private readonly Label _playerCharacterLevelLabel;
-    private readonly TextureProgress _playerCharacterHealthBar;
-    private readonly TextureProgress _playerCharacterManaBar;
+    private readonly TextureProgressBar _playerCharacterHealthBar;
+    private readonly TextureProgressBar _playerCharacterManaBar;
     private readonly Control _tinyHealthPanel;
-    private readonly TextureProgress _tinyHealthBar;
+    private readonly TextureProgressBar _tinyHealthBar;
 
     private Vector2 _offsetPx;
 
@@ -36,10 +36,10 @@ public sealed class OverheadUi
         _playerCharacterPanel = node.GetNode<Control>("PlayerCharacter");
         _playerCharacterNameLabel = node.GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Name");
         _playerCharacterLevelLabel = node.GetNode<Label>("PlayerCharacter/MarginContainer/VBoxContainer/HBoxContainer/Level");
-        _playerCharacterHealthBar = node.GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Health");
-        _playerCharacterManaBar = node.GetNode<TextureProgress>("PlayerCharacter/MarginContainer/VBoxContainer/Mana");
+        _playerCharacterHealthBar = node.GetNode<TextureProgressBar>("PlayerCharacter/MarginContainer/VBoxContainer/Health");
+        _playerCharacterManaBar = node.GetNode<TextureProgressBar>("PlayerCharacter/MarginContainer/VBoxContainer/Mana");
         _tinyHealthPanel = node.GetNode<Control>("TinyHealth");
-        _tinyHealthBar = node.GetNode<TextureProgress>("TinyHealth/MarginContainer/Health");
+        _tinyHealthBar = node.GetNode<TextureProgressBar>("TinyHealth/MarginContainer/Health");
 
         unit.Removed += OnUnitRemoved;
 
@@ -77,7 +77,7 @@ public sealed class OverheadUi
 
     public void Process(double delta)
     {
-        _node.RectPosition =
+        _node.Position =
             (((_unit.Position - _camera.PositionM) * Const.PixelsInMeter + _offsetPx) * _camera.Zoom).ToGd();
         SelectVariant();
         SetFaction(_unit.Faction);

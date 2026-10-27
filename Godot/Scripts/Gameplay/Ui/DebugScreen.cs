@@ -39,7 +39,7 @@ public sealed class DebugScreen
 
         node.DebugScreen = this;
         node.Visible = false;
-        node.PauseMode = Node.PauseModeEnum.Process;
+        node.ProcessMode = Node.PauseModeEnum.Process;
         _node = node;
         _label = node.GetNode<Label>("Label");
         _fpsGraph = node.GetNode<Graph>("FpsGraph");

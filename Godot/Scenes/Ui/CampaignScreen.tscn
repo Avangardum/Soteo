@@ -3,97 +3,97 @@
 [ext_resource path="res://Scripts/Gameplay/Ui/CampaignScreenNode.cs" type="Script" id=1]
 
 [node name="CampaignScreen" type="Control"]
-pause_mode = 2
+process_mode = 3
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
 
 [node name="Label" type="Label" parent="."]
-margin_right = 350.0
-margin_bottom = 19.0
+offset_right = 350.0
+offset_bottom = 19.0
 text = "Select character"
 
 [node name="CharacterButtons" type="VBoxContainer" parent="."]
-margin_top = 25.0
-margin_right = 350.0
-margin_bottom = 225.0
+offset_top = 25.0
+offset_right = 350.0
+offset_bottom = 225.0
 
 [node name="Button" type="Button" parent="CharacterButtons"]
-margin_right = 350.0
-margin_bottom = 25.0
+offset_right = 350.0
+offset_bottom = 25.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000000c1"
 
 [node name="Button2" type="Button" parent="CharacterButtons"]
-margin_top = 29.0
-margin_right = 350.0
-margin_bottom = 54.0
+offset_top = 29.0
+offset_right = 350.0
+offset_bottom = 54.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000000c2"
 
 [node name="Button3" type="Button" parent="CharacterButtons"]
-margin_top = 58.0
-margin_right = 350.0
-margin_bottom = 83.0
+offset_top = 58.0
+offset_right = 350.0
+offset_bottom = 83.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000000c3"
 
 [node name="Button4" type="Button" parent="CharacterButtons"]
-margin_top = 87.0
-margin_right = 350.0
-margin_bottom = 112.0
+offset_top = 87.0
+offset_right = 350.0
+offset_bottom = 112.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000000c4"
 
 [node name="Button5" type="Button" parent="CharacterButtons"]
-margin_top = 116.0
-margin_right = 350.0
-margin_bottom = 141.0
+offset_top = 116.0
+offset_right = 350.0
+offset_bottom = 141.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000000c5"
 
 [node name="Button6" type="Button" parent="CharacterButtons"]
-margin_top = 145.0
-margin_right = 350.0
-margin_bottom = 170.0
+offset_top = 145.0
+offset_right = 350.0
+offset_bottom = 170.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000000c6"
 
 [node name="Label2" type="Label" parent="."]
-margin_left = 400.0
-margin_right = 750.0
-margin_bottom = 19.0
+offset_left = 400.0
+offset_right = 750.0
+offset_bottom = 19.0
 text = "Select shard"
 
 [node name="ShardButtons" type="VBoxContainer" parent="."]
-margin_left = 400.0
-margin_top = 25.0
-margin_right = 750.0
-margin_bottom = 225.0
+offset_left = 400.0
+offset_top = 25.0
+offset_right = 750.0
+offset_bottom = 225.0
 
 [node name="Button" type="Button" parent="ShardButtons"]
-margin_right = 350.0
-margin_bottom = 25.0
+offset_right = 350.0
+offset_bottom = 25.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000005d1"
 
 [node name="Button2" type="Button" parent="ShardButtons"]
-margin_top = 29.0
-margin_right = 350.0
-margin_bottom = 54.0
+offset_top = 29.0
+offset_right = 350.0
+offset_bottom = 54.0
 toggle_mode = true
 text = "00000000-0000-0000-0000-0000000005d2"
 
 [node name="SpectateButton" type="Button" parent="."]
-margin_left = 501.0
-margin_top = 361.0
-margin_right = 636.0
-margin_bottom = 438.0
+offset_left = 501.0
+offset_top = 361.0
+offset_right = 636.0
+offset_bottom = 438.0
 text = "Spectate"
 
 [node name="DeployButton" type="Button" parent="."]
-margin_left = 283.0
-margin_top = 361.0
-margin_right = 418.0
-margin_bottom = 438.0
+offset_left = 283.0
+offset_top = 361.0
+offset_right = 418.0
+offset_bottom = 438.0
 text = "Deploy"

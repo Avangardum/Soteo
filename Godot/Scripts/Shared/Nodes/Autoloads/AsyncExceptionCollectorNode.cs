@@ -6,7 +6,7 @@ public sealed class AsyncExceptionCollectorNode : Node
 {
     public override void _Ready()
     {
-        PauseMode = PauseModeEnum.Process;
+        ProcessMode = PauseModeEnum.Process;
     }
 
     public override void _Process(float delta)

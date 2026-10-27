@@ -59,7 +59,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
         Name = nameof(WebRtcFromGameplayToGameplayCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        PauseMode = PauseModeEnum.Process;
+        ProcessMode = PauseModeEnum.Process;
     }
 
     public override void _PhysicsProcess(float delta)
@@ -245,8 +245,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
         var connection = new WebRTCPeerConnection();
         byte[] peerIdBytes = peerId.ToByteArray();
-        connection.Connect("session_description_created", this, nameof(OnSessionDescriptionCreated), [peerIdBytes]);
-        connection.Connect("ice_candidate_created", this, nameof(OnIceCandidateCreated), [peerIdBytes]);
+        connection.Connect("session_description_created", new Callable(this, nameof(OnSessionDescriptionCreated)), [peerIdBytes]);
+        connection.Connect("ice_candidate_created", new Callable(this, nameof(OnIceCandidateCreated)), [peerIdBytes]);
 
         WebRTCDataChannel reliableChannel = connection.CreateDataChannel("reliable", new GdDictionary
         {
