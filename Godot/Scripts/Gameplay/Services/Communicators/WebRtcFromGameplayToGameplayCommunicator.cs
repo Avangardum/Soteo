@@ -16,10 +16,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 {
     private const double PingInterval = 1;
 
-    // Web export has a bug that seemingly corrupts memory when receiving a large packet.
-    // Chunking is used as a workaround.
-    // TODO remove chunking as web is not supported anymore
-    private const int MaxChunkSize = 32000;
+    // Godot breaks on very big packets, so they are chunked
+    private const int MaxChunkSize = 250000;
 
     private double _timeSinceLastPing;
     private Guid? _lastPingId;
