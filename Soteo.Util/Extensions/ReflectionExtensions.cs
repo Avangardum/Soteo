@@ -8,9 +8,6 @@ public static class ReflectionExtensions
     {
         public bool HasAttribute<T>() where T : Attribute => self.GetCustomAttribute<T>() != null;
 
-        public T? GetCustomAttribute<T>() where T : Attribute =>
-            (T)self.GetCustomAttribute(typeof(T));
-
         public T GetRequiredAttribute<T>() where T : Attribute =>
             self.GetCustomAttribute<T>() ?? throw new ArgumentException($"{typeof(T)} not found on {self}.");
     }
@@ -34,7 +31,5 @@ public static class ReflectionExtensions
                 }
             }
         }
-
-        public bool IsAssignableTo(Type other) => other.IsAssignableFrom(self);
     }
 }

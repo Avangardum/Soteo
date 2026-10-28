@@ -20,7 +20,7 @@ public readonly record struct Delta<T>
 
     public static implicit operator Delta<T>(T newValue) => new(newValue);
 
-    public override string ToString()
+    public override string? ToString()
     {
         return HasChanged ?
             NewValue == null ? "null" : NewValue.ToString() :

@@ -133,7 +133,7 @@ public sealed class CampaignSnapshotManager
 
     public void ReceiveShardSnapshotReplicatedPacket(Guid senderId)
     {
-        if (!_shardSnapshotReplicatedTcs.TryGetValue(senderId, out TaskCompletionSource tcs))
+        if (!_shardSnapshotReplicatedTcs.TryGetValue(senderId, out TaskCompletionSource? tcs))
             throw new InvalidOperationException($"No packet was requested from {senderId}");
         if (!tcs.TrySetResult())
             throw new InvalidOperationException($"Duplicate packet from {senderId}");

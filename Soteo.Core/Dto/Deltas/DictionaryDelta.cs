@@ -11,7 +11,7 @@ public static class DictionaryDelta
     ) where TKey : notnull
     {
         ImmutableDictionary<TKey, TValue> changes = to
-            .Where(it => !from.TryGetValue(it.Key, out TValue value) || !Equals(value, it.Value))
+            .Where(it => !from.TryGetValue(it.Key, out TValue? value) || !Equals(value, it.Value))
             .ToImmutableDictionary();
         ImmutableList<TKey> removedKeys = from.Keys.Except(to.Keys).ToImmutableList();
         return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
@@ -41,7 +41,7 @@ public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
     )
     {
         foreach ((TKey key, TValue newValue) in Changes)
-            if (dictionary.TryGetValue(key, out TValue oldValue))
+            if (dictionary.TryGetValue(key, out TValue? oldValue))
                 dictionary[key] = interpolateValue(oldValue, newValue, interpolationWeight);
             else
                 dictionary[key] = newValue;

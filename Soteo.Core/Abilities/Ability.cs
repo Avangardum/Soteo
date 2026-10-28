@@ -190,7 +190,7 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
                     null => "ERROR",
                     Scalable s => s.ToBbcode(level, format),
                     IFormattable f => f.ToString(format, CultureInfo.CurrentCulture),
-                    _ => propertyValue.ToString()
+                    _ => propertyValue.ToString() ?? ""
                 };
             }
         );

@@ -69,7 +69,7 @@ public class UserRepository
     retry:
         foreach (Guid id in ids)
         {
-            if (!TryGetValue(id, out User user) || !user.IsConnected)
+            if (!TryGetValue(id, out User? user) || !user.IsConnected)
             {
                 Task completedTask = await Task.WhenAny(_userConnectedTcs.Task, timeoutTask);
                 if (completedTask == timeoutTask)

@@ -179,8 +179,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 
         if
         (
-            _removedEntities.TryGetValue(id, out WeakReference<ISnapshottableEntity> removedEntityRef) &&
-            removedEntityRef.TryGetTarget(out ISnapshottableEntity removedEntity)
+            _removedEntities.TryGetValue(id, out WeakReference<ISnapshottableEntity>? removedEntityRef) &&
+            removedEntityRef.TryGetTarget(out ISnapshottableEntity? removedEntity)
         )
         {
             if (removedEntity is not PlayerCharacter playerCharacter)
@@ -255,7 +255,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 
     private void CleanupRemovedEntities()
     {
-        foreach ((Guid id, WeakReference<ISnapshottableEntity> reference) in _removedEntities.ToDictionaryPolyfill())
+        foreach ((Guid id, WeakReference<ISnapshottableEntity> reference) in _removedEntities.ToDictionary())
             if (!reference.TryGetTarget(out _))
                 _removedEntities.Remove(id);
 

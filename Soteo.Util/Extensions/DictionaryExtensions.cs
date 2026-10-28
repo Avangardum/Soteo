@@ -26,7 +26,7 @@ public static class DictionaryExtensions
         }
     }
 
-    extension<TKey, TValue> (IReadOnlyDictionary<TKey, TValue> self)
+    extension<TKey, TValue> (IReadOnlyDictionary<TKey, TValue> self) where TKey : notnull
     {
         public TValue GetOrDefault(TKey key, TValue defaultValue) =>
             self.TryGetValue(key, out TValue? value) ? value : defaultValue;
@@ -39,7 +39,7 @@ public static class DictionaryExtensions
         /// </summary>
         public IReadOnlyDictionary<TKey, TValue> With(IReadOnlyDictionary<TKey, TValue> values)
         {
-            Dictionary<TKey, TValue> dict = self.ToDictionaryPolyfill();
+            Dictionary<TKey, TValue> dict = self.ToDictionary();
             foreach ((TKey key, TValue value) in values)
                 dict[key] = value;
             return dict;
@@ -50,7 +50,7 @@ public static class DictionaryExtensions
         /// </summary>
         public IReadOnlyDictionary<TKey, TValue> Without(params IEnumerable<TKey> keys)
         {
-            Dictionary<TKey, TValue> dict = self.ToDictionaryPolyfill();
+            Dictionary<TKey, TValue> dict = self.ToDictionary();
             foreach (TKey key in keys)
                 dict.Remove(key);
             return dict;
@@ -77,11 +77,5 @@ public static class DictionaryExtensions
             self[key] = value;
             return value;
         }
-    }
-
-    extension<TKey, TValue> (IEnumerable<KeyValuePair<TKey, TValue>> self)
-    {
-        public Dictionary<TKey, TValue> ToDictionaryPolyfill() => // todo remove
-            self.ToDictionary(it => it.Key, it => it.Value);
     }
 }

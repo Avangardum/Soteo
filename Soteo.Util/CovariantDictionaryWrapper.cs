@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Soteo.Util;
 
@@ -19,9 +20,9 @@ internal sealed class CovariantDictionaryWrapper<TKey, TValue, TInnerValue>
 
     public bool ContainsKey(TKey key) => inner.ContainsKey(key);
 
-    public bool TryGetValue(TKey key, out TValue value)
+    public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
     {
-        bool found = inner.TryGetValue(key, out TInnerValue innerValue);
+        bool found = inner.TryGetValue(key, out TInnerValue? innerValue);
         value = innerValue;
         return found;
     }

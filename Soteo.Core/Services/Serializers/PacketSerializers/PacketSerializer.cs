@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Reflection;
 using Soteo.Core.Attributes;
 using Soteo.Core.Dto.Packets;
 using Soteo.Core.Enums;

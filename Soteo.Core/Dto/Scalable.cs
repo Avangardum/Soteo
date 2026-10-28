@@ -46,8 +46,12 @@ public sealed class Scalable<T> : Scalable, IEnumerable<T> where T : notnull
             this.Select((v, i) => i + 1 == highlightLevel ? $"[b]{Format(v, format)}[/b]" : Format(v, format)));
     }
 
-    private string Format(T value, string? format) =>
-        value is IFormattable f && format != null ? f.ToString(format, CultureInfo.CurrentCulture) : value.ToString();
+    private string Format(T value, string? format)
+    {
+        return value is IFormattable f && format != null ?
+            f.ToString(format, CultureInfo.CurrentCulture) :
+            value.ToString() ?? "";
+    }
 
     public override double? ToDoubleOrNull()
     {

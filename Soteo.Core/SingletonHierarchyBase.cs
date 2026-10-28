@@ -27,7 +27,7 @@ public abstract class SingletonHierarchyBase<TBase> where TBase : class
             return existingInstance;
 
         _currentlyConstructedType = type;
-        var newInstance = (TBase)Activator.CreateInstance(type);
+        var newInstance = (TBase)Activator.CreateInstance(type).Required;
         _currentlyConstructedType = null;
         Instances[type] = newInstance;
         return newInstance;

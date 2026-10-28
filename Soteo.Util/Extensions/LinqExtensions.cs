@@ -14,12 +14,6 @@ public static class LinqExtensions
 
     extension<T> (IEnumerable<T> self)
     {
-        public IOrderedEnumerable<T> Order() => self.OrderBy(it => it);
-
-        public IOrderedEnumerable<T> OrderDescending() => self.OrderByDescending(it => it);
-
-        public T FirstOrDefault(T defaultValue) => self.Any() ? self.First() : defaultValue;
-
         public float Product(Func<T, float> selector) => self.Select(selector).Product();
 
         public double Product(Func<T, double> selector) => self.Select(selector).Product();

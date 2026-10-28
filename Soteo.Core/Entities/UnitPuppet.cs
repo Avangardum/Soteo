@@ -101,10 +101,10 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         var s = (UnitPuppetSnapshot)snapshot;
         IsDead = s.IsDead;
         IsMoving = s.IsMoving;
-        StatsInternal = s.Stats.ToDictionaryPolyfill();
-        AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionaryPolyfill();
+        StatsInternal = s.Stats.ToDictionary();
+        AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
-        StatusesInternal = s.Statuses.ToDictionaryPolyfill();
+        StatusesInternal = s.Statuses.ToDictionary();
         _controllingPlayerIds = s.ControllingPlayerIds.ToList();
 
         _alwaysSynchronizedInventory.ReplicateSnapshot(s.Items);
