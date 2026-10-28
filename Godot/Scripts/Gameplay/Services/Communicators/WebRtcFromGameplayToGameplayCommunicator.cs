@@ -244,8 +244,7 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         }
 
         var connection = new WebRtcPeerConnection();
-        connection.SessionDescriptionCreated +=
-            (string type, string sdp) => OnSessionDescriptionCreated(type, sdp, peerId);
+        connection.SessionDescriptionCreated += (type, sdp) => OnSessionDescriptionCreated(type, sdp, peerId);
         connection.IceCandidateCreated += (media, index, name) => OnIceCandidateCreated(media, index, name, peerId);
 
         WebRtcDataChannel reliableChannel = connection.CreateDataChannel("reliable", new GdDictionary
