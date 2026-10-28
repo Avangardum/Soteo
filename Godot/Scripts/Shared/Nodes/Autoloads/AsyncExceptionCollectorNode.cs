@@ -2,14 +2,14 @@ using Soteo.Util;
 
 namespace Soteo.Main.Shared.Nodes.Autoloads;
 
-public sealed class AsyncExceptionCollectorNode : Node
+public sealed partial class AsyncExceptionCollectorNode : Node
 {
     public override void _Ready()
     {
-        ProcessMode = PauseModeEnum.Process;
+        ProcessMode = ProcessModeEnum.Always;
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         AsyncExceptionCollector.Process();
     }

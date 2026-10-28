@@ -1,8 +1,8 @@
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class PauseScreen : Control
+public sealed partial class PauseScreen : Control
 {
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         Visible = GetTree().Paused;
     }

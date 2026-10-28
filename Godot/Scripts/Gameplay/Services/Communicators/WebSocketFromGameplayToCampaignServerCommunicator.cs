@@ -9,11 +9,11 @@ using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Main.Gameplay.Services.Communicators;
 
-public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
+public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
     Node, IFromGameplayToCampaignServerPacketSender, ICampaignServerConnector
 {
-    private readonly WebSocketClient _wsClient = new();
-    private readonly HTTPRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 15 };
+    private readonly WebSocketPeer _socket = new();
+    private readonly HttpRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 15 };
 
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
@@ -51,75 +51,70 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
 
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        ProcessMode = PauseModeEnum.Process;
+        ProcessMode = ProcessModeEnum.Always;
+
+        if (!certificateVerificationOptions.VerifyCertificate)
+            _httpRequest.SetTlsOptions(TlsOptions.ClientUnsafe());
     }
 
     public event Action Connected = delegate {};
 
     public override void _Ready()
     {
-        _wsClient.VerifySsl = _certificateVerificationOptions.VerifyCertificate;
-        _wsClient.Connect("connection_closed", new Callable(this, nameof(OnConnectionClosed)));
-        _wsClient.Connect("connection_error", new Callable(this, nameof(OnConnectionError)));
-        _wsClient.Connect("connection_established", new Callable(this, nameof(OnConnectionEstablished)));
-        _wsClient.Connect("data_received", new Callable(this, nameof(OnDataReceived)));
-
         AddChild(_httpRequest);
-        _httpRequest.Connect("request_completed", new Callable(this, nameof(OnAuthRequestCompleted)));
+        _httpRequest.RequestCompleted += OnAuthRequestCompleted;
     }
 
-    public override void _PhysicsProcess(float delta)
+    public override void _PhysicsProcess(double delta)
     {
-        // Server polls in _PhysicsProcess so that simulation code only runs on physics ticks
+        // Server polls in _PhysicsProcess, so that simulation code only runs on physics ticks
         if (_sideOptions.Side == Side.ShardServer)
-            _wsClient.Poll();
+            Poll();
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (_sideOptions.Side == Side.ShardServer && _status == Status.Disconnected)
             ConnectAsShardServer();
 
         // Client polls in _Process to minimize latency
         if (_sideOptions.Side == Side.Client)
-            _wsClient.Poll();
+            Poll();
     }
 
-    public void OnConnectionClosed(bool wasCleanClose)
+    private void Poll()
     {
-        _status = Status.Disconnected;
-        if (_sideOptions.Side == Side.Client)
-            _currentUserIdRepository.Id = null;
-    }
-
-    public void OnConnectionError()
-    {
-// Unreachable code detected
-#pragma warning disable CS0162
-
-        throw new Exception("WebSocket connection error");
-        _status = Status.Disconnected;
-    }
-
-    public void OnConnectionEstablished(string protocol)
-    {
-        SendPacket(new CampaignServerHandshakePacket { Token = _token.Required, Version = Const.Version });
-        _token = null;
-    }
-
-    public void OnDataReceived()
-    {
-        byte[] bytes = _wsClient.GetPeer(1).GetPacket();
-        Packet packet = _packetSerializer.Deserialize(bytes);
-
-        if (packet is CampaignServerHandshakeAckPacket)
+        _socket.Poll();
+        switch (_socket.GetReadyState())
         {
-            _status = Status.Connected;
-            Connected();
-        }
-        else
-        {
-            _packetHandler.HandleAsync(packet, Const.CampaignServerId).CollectException();
+            case WebSocketPeer.State.Open:
+                if (_status == Status.Connecting)
+                {
+                    _status = Status.Handshake;
+                    _token = null;
+                    SendPacket(new CampaignServerHandshakePacket { Token = _token.Required, Version = Const.Version });
+                }
+                else
+                {
+                    byte[] bytes = _socket.GetPacket();
+                    Packet packet = _packetSerializer.Deserialize(bytes);
+
+                    if (packet is CampaignServerHandshakeAckPacket)
+                    {
+                        _status = Status.Connected;
+                        Connected();
+                    }
+                    else
+                    {
+                        _packetHandler.HandleAsync(packet, Const.CampaignServerId).CollectException();
+                    }
+                }
+                break;
+            case WebSocketPeer.State.Closed:
+                _status = Status.Disconnected;
+                if (_sideOptions.Side == Side.Client)
+                    _currentUserIdRepository.Id = null;
+                break;
         }
     }
 
@@ -134,10 +129,9 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         _httpRequest.Request
         (
             url,
-            method: HTTPClient.Method.Post,
+            method: Godot.HttpClient.Method.Post,
             customHeaders: headers,
-            requestData: body,
-            sslValidateDomain: _certificateVerificationOptions.VerifyCertificate
+            requestData: body
         );
     }
 
@@ -155,35 +149,37 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
         _httpRequest.Request
         (
             url,
-            method: HTTPClient.Method.Post,
+            method: Godot.HttpClient.Method.Post,
             customHeaders: headers,
-            requestData: body,
-            sslValidateDomain: _certificateVerificationOptions.VerifyCertificate
+            requestData: body
         );
     }
 
-    public void OnAuthRequestCompleted(int result, int responseCode, string[] headers, byte[] body)
+    private void OnAuthRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
     {
-        if (result != (int)HTTPRequest.Result.Success)
+        if (result != (int)HttpRequest.Result.Success)
         {
-            throw new Exception($"Authentication error: {(HTTPRequest.Result)result}");
             _status = Status.Disconnected;
+            throw new Exception($"Authentication error: {(HttpRequest.Result)result}");
         }
         else if (responseCode == 401)
         {
-            throw new Exception("Incorrect credentials");
             _status = Status.Disconnected;
+            throw new Exception("Incorrect credentials");
         }
         else if (responseCode is not (>= 200 and < 300))
         {
-            throw new Exception($"Auth server responded with code {responseCode}");
             _status = Status.Disconnected;
+            throw new Exception($"Auth server responded with code {responseCode}");
         }
         else
         {
             _token = Encoding.UTF8.GetString(body);
             _currentUserIdRepository.Id = GetPlayerIdFromTrustedToken(_token);
-            _wsClient.ConnectToUrl(_toCampaignServerConnectionOptions.CampaignServerUrl);
+            TlsOptions tlsOptions = _certificateVerificationOptions.VerifyCertificate ?
+                TlsOptions.Client() :
+                TlsOptions.ClientUnsafe();
+            _socket.ConnectToUrl(_toCampaignServerConnectionOptions.CampaignServerUrl, tlsOptions);
         }
     }
 
@@ -196,8 +192,8 @@ public sealed class WebSocketFromGameplayToCampaignServerCommunicator :
     public void SendPacket(Packet packet)
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
-        _wsClient.GetPeer(1).PutPacket(bytes).ThrowIfError();
+        _socket.PutPacket(bytes).ThrowIfError();
     }
 
-    private enum Status { Disconnected, Connecting, Connected }
+    private enum Status { Disconnected, Connecting, Handshake, Connected }
 }

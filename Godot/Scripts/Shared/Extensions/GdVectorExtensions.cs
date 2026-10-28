@@ -6,10 +6,10 @@ public static class GdVectorExtensions
 {
     extension (GdVector2 self)
     {
-        public Vector2 ToSys() => new(self.x, self.y);
+        public Vector2 ToSys() => new(self.X, self.Y);
 
         public GdVector2 Lerp(GdVector2 to, float weight) =>
-            new(Maths.Lerp(self.x, to.x, weight), Maths.Lerp(self.y, to.y, weight));
+            new(Maths.Lerp(self.X, to.X, weight), Maths.Lerp(self.Y, to.Y, weight));
 
         public GdVector2 Lerp(GdVector2 to, double weight) => self.Lerp(to, (float)weight);
 

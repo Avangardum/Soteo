@@ -89,8 +89,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         var s = (UnitSnapshot)snapshot;
         IsDead = s.IsDead;
         IsMoving = s.IsMoving;
-        StatsInternal = s.Stats.ToDictionary();
-        AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
+        StatsInternal = s.Stats.ToDictionaryPolyfill();
+        AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionaryPolyfill();
         AbilityUseProgress = s.AbilityUseProgress;
         StatusesInternal =
             s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _serviceProvider));

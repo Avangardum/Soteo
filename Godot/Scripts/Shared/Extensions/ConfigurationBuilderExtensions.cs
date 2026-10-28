@@ -1,5 +1,6 @@
 using System.Text;
 using Microsoft.Extensions.Configuration;
+using FileAccess = Godot.FileAccess;
 
 namespace Soteo.Main.Shared.Extensions;
 
@@ -9,13 +10,12 @@ public static class ConfigurationBuilderExtensions
     {
         public ConfigurationBuilder AddGodotJsonFile(string path, bool optional)
         {
-            var file = new GdFile();
-            if (!file.FileExists(path))
+            if (!FileAccess.FileExists(path))
             {
                 if (optional) return self;
                 throw new FileNotFoundException($"File {path} not found");
             }
-            file.Open(path, GdFile.ModeFlags.Read);
+            using FileAccess file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
             string text = file.GetAsText();
             byte[] bytes = Encoding.UTF8.GetBytes(text);
             var stream = new MemoryStream(bytes);

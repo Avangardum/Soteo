@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core.Interfaces;
 
@@ -18,7 +19,8 @@ public sealed class ShardServiceProviders(IReadOnlyDictionary<Guid, IServiceScop
 
     public bool ContainsKey(Guid key) => Providers.ContainsKey(key);
 
-    public bool TryGetValue(Guid key, out IServiceProvider value) => Providers.TryGetValue(key, out value);
+    public bool TryGetValue(Guid key, [MaybeNullWhen(false)] out IServiceProvider value) =>
+        Providers.TryGetValue(key, out value);
 
     public IServiceProvider this[Guid key] => Providers[key];
 

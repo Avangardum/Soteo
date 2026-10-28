@@ -2,7 +2,7 @@ using Soteo.Core.Enums;
 
 namespace Soteo.Main.Shared.Nodes;
 
-public sealed class Main : Node
+public sealed partial class Main : Node
 {
     public override void _Ready()
     {

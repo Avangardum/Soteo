@@ -255,7 +255,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 
     private void CleanupRemovedEntities()
     {
-        foreach ((Guid id, WeakReference<ISnapshottableEntity> reference) in _removedEntities.ToDictionary())
+        foreach ((Guid id, WeakReference<ISnapshottableEntity> reference) in _removedEntities.ToDictionaryPolyfill())
             if (!reference.TryGetTarget(out _))
                 _removedEntities.Remove(id);
 

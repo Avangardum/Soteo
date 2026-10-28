@@ -25,7 +25,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay;
 
-public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketReceiver
+public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketReceiver
 {
     // Client and shard server entry point.
     // Handles scene loading and dependency injection.
@@ -262,13 +262,13 @@ public sealed class GameplayMain : Node2D, IShardLoader, IGameplayInitPacketRece
         string mapPath = $"res://Scenes/Maps/Test{id.ToString()[^1]}.tscn";
         Vector2 position = new Vector2(0, 0);
 
-        var shard = _shardScene.Required.Instance<ShardNode>();
+        var shard = _shardScene.Required.Instantiate<ShardNode>();
         shard.Id = id;
         shard.Name = id.ToString();
         shard.Position = position.ToGd();
         _shardRoot.Required.AddChild(shard);
 
-        var map = ResourceLoader.Load<PackedScene>(mapPath).Instance<Node2D>();
+        var map = ResourceLoader.Load<PackedScene>(mapPath).Instantiate<Node2D>();
         shard.GetNode<Node2D>("Map").AddChild(map);
 
         var scope = _rootServiceProvider.Required.CreateScope();

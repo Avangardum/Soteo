@@ -4,7 +4,7 @@ using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Main.Gameplay.EntityNodes;
 
-public sealed class ProjectilePuppetNode : Node2D, IProjectilePuppetNode
+public sealed partial class ProjectilePuppetNode : Node2D, IProjectilePuppetNode
 {
     // If the sprite has pixel position with .5 as fractional part in any dimension
     // (used to center sprites with odd sizes), the following fields help compensate

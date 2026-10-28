@@ -59,7 +59,7 @@ public sealed class CampaignScreen
     private void SelectCharacter(Guid id)
     {
         foreach (Button button in _characterButtons)
-            button.Pressed = button.Text == id.ToString();
+            button.ButtonPressed = button.Text == id.ToString();
 
         _selectedCharacterId = id;
     }
@@ -67,7 +67,7 @@ public sealed class CampaignScreen
     private void SelectShard(Guid id)
     {
         foreach (Button button in _shardButtons)
-            button.Pressed = button.Text == id.ToString();
+            button.ButtonPressed = button.Text == id.ToString();
 
         _selectedShardId = id;
     }

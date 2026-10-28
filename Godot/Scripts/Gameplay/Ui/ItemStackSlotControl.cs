@@ -2,7 +2,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class ItemStackSlotControl : Control
+public sealed partial class ItemStackSlotControl : Control
 {
     private readonly LateInit<ItemStackControl> _itemStack = new();
 

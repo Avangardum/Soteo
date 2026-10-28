@@ -3,7 +3,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay;
 
-public sealed class ShardNode : Node2D, IShard
+public sealed partial class ShardNode : Node2D, IShard
 {
     private readonly LateInit<Node2D> _entityRootLateInit = new();
     public Node2D EntityRoot => _entityRootLateInit;

@@ -3,7 +3,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class Graph : Control
+public sealed partial class Graph : Control
 {
     private readonly LateInit<Control> _dataRect = new();
     private readonly LateInit<Line2D> _line = new();
@@ -29,18 +29,18 @@ public sealed class Graph : Control
 
         _frame.Value =
         [
-            new GdVector2(DataRect.Position.x, Size.y),
-            new GdVector2(DataRect.Position.x, 0),
-            new GdVector2(DataRect.Position.x + DataRect.Size.x, 0),
-            new GdVector2(DataRect.Position.x + DataRect.Size.x, Size.y),
-            new GdVector2(DataRect.Position.x, Size.y),
-            new GdVector2(DataRect.Position.x, DataRect.Position.y + DataRect.Size.y),
-            new GdVector2(DataRect.Position.x - DataRect.Position.y,
-                DataRect.Position.y + DataRect.Size.y),
-            new GdVector2(DataRect.Position.x, DataRect.Position.y + DataRect.Size.y),
-            new GdVector2(DataRect.Position.x, DataRect.Position.y),
-            new GdVector2(DataRect.Position.x - DataRect.Position.y, DataRect.Position.y),
-            new GdVector2(DataRect.Position.x, DataRect.Position.y)
+            new GdVector2(DataRect.Position.X, Size.Y),
+            new GdVector2(DataRect.Position.X, 0),
+            new GdVector2(DataRect.Position.X + DataRect.Size.X, 0),
+            new GdVector2(DataRect.Position.X + DataRect.Size.X, Size.Y),
+            new GdVector2(DataRect.Position.X, Size.Y),
+            new GdVector2(DataRect.Position.X, DataRect.Position.Y + DataRect.Size.Y),
+            new GdVector2(DataRect.Position.X - DataRect.Position.Y,
+                DataRect.Position.Y + DataRect.Size.Y),
+            new GdVector2(DataRect.Position.X, DataRect.Position.Y + DataRect.Size.Y),
+            new GdVector2(DataRect.Position.X, DataRect.Position.Y),
+            new GdVector2(DataRect.Position.X - DataRect.Position.Y, DataRect.Position.Y),
+            new GdVector2(DataRect.Position.X, DataRect.Position.Y)
         ];
 
         SetData([0, 0], "N0", 0, 1);
@@ -61,12 +61,12 @@ public sealed class Graph : Control
             double x = i / (data.Count - 1.0);
             double y = Maths.InverseLerp(max.Value, min.Value, data[i]);
             GdVector2 point = GdVector2.New(x, y) * DataRect.Size + DataRect.Position;
-            point.y = Mathf.Clamp(point.y, 0, Size.y);
+            point.Y = Mathf.Clamp(point.Y, 0, Size.Y);
             dataPoints[i] = point;
         }
 
-        Line.Points = [..Frame, ..dataPoints, dataPoints[^1] + new GdVector2(DataRect.Position.y, 0)];
+        Line.Points = [..Frame, ..dataPoints, dataPoints[^1] + new GdVector2(DataRect.Position.Y, 0)];
         LastLabel.Text = data[^1].ToString(format);
-        LastLabel.Position = LastLabel.Position with { y = dataPoints[^1].y - LastLabel.Size.y / 2 };
+        LastLabel.Position = LastLabel.Position with { Y = dataPoints[^1].Y - LastLabel.Size.Y / 2 };
     }
 }

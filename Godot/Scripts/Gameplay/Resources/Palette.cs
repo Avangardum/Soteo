@@ -3,7 +3,7 @@ using Soteo.Main.Gameplay.Interfaces;
 
 namespace Soteo.Main.Gameplay.Resources;
 
-public sealed class Palette : Resource, IPalette
+public sealed partial class Palette : Resource, IPalette
 {
     [field: Export] public Color Neutral { get; }
     [field: Export] public Color Empire { get; }

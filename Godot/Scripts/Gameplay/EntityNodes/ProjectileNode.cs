@@ -4,7 +4,7 @@ using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Main.Gameplay.EntityNodes;
 
-public sealed class ProjectileNode : Area2D, IProjectileNode
+public sealed partial class ProjectileNode : Area2D, IProjectileNode
 {
     public Projectile? Projectile { get; set; }
 
@@ -20,7 +20,7 @@ public sealed class ProjectileNode : Area2D, IProjectileNode
         set => Position = value.ToGd() * Const.PixelsInMeter;
     }
 
-    public override void _PhysicsProcess(float delta)
+    public override void _PhysicsProcess(double delta)
     {
         Projectile?.Tick(delta);
     }

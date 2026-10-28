@@ -14,7 +14,7 @@ using Soteo.Main.Gameplay.Interfaces;
 
 namespace Soteo.Main.Gameplay.Services;
 
-public sealed class InputHandler : Node2D
+public sealed partial class InputHandler : Node2D
 {
     private readonly IFromGameplayPacketSender _packetSender;
     private readonly IHud _hud;
@@ -35,7 +35,7 @@ public sealed class InputHandler : Node2D
         _currentCharIdRepo = currentCharIdRepo;
 
         Name = nameof(InputHandler);
-        ProcessMode = PauseModeEnum.Process;
+        ProcessMode = ProcessModeEnum.Always;
     }
 
     public override void _UnhandledInput(InputEvent e)
@@ -191,16 +191,18 @@ public sealed class InputHandler : Node2D
 
     private IReadOnlyList<IUnitPuppet> GetUnitsUnderMouse()
     {
-        GdArray intersections = GetWorld2d().DirectSpaceState.IntersectPoint
+        Array<Dictionary> intersections = GetWorld2D().DirectSpaceState.IntersectPoint
         (
-            GetGlobalMousePosition(),
-            maxResults: 32,
-            collisionLayer: (uint)CollisionLayer.ClickArea,
-            collideWithBodies: false,
-            collideWithAreas: true
+            new PhysicsPointQueryParameters2D
+            {
+                Position = GetGlobalMousePosition(),
+                CollisionMask = (uint)CollisionLayer.ClickArea,
+                CollideWithBodies = false,
+                CollideWithAreas = true
+            },
+            maxResults: 32
         );
         return intersections
-            .Cast<Dictionary>()
             .Select(it => (Area2D)it["collider"])
             .Select(it => it.GetParent() as UnitPuppetNode)
             .WhereNotNull()

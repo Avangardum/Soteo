@@ -22,7 +22,7 @@ public sealed class EntityNodePool : IEntityNodePool
         Stack<IEntityNode> stack = _stacks[typeof(T)];
         if (stack.Count > 0)
             return (T)stack.Pop();
-        return Scenes[typeof(T)].Instance<T>();
+        return Scenes[typeof(T)].Instantiate<T>();
     }
 
     public void ReturnNode(IEntityNode node)

@@ -4,7 +4,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Shared.Nodes;
 
-public sealed class ProcessPublisher : Node, IProcessPublisher
+public sealed partial class ProcessPublisher : Node, IProcessPublisher
 {
     private readonly Dictionary<ProcessPriorityEnum, Subscriptions> _subscriptionsByPriority = [];
 
@@ -65,22 +65,22 @@ public sealed class ProcessPublisher : Node, IProcessPublisher
 
     private sealed record Subscriptions(List<Action<double>> Process, List<Action<double>> PhysicsProcess);
 
-    private sealed class ProcessListener(Subscriptions subscriptions, ProcessPriorityEnum priority) : Node
+    private sealed partial class ProcessListener(Subscriptions subscriptions, ProcessPriorityEnum priority) : Node
     {
         public override void _Ready()
         {
             Name = nameof(ProcessListener) + " " + priority;
             ProcessPriority = (int)priority;
-            ProcessMode = PauseModeEnum.Process;
+            ProcessMode = ProcessModeEnum.Always;
         }
 
-        public override void _Process(float delta)
+        public override void _Process(double delta)
         {
             foreach (Action<double> sub in subscriptions.Process.ToList())
                 sub(delta);
         }
 
-        public override void _PhysicsProcess(float delta)
+        public override void _PhysicsProcess(double delta)
         {
             foreach (Action<double> sub in subscriptions.PhysicsProcess.ToList())
                 sub(delta);

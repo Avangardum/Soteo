@@ -6,7 +6,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.EntityNodes;
 
-public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPuppetNode
+public sealed partial class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPuppetNode
 {
     private double? _removalCountdown;
     private TaskCompletionSource _waitUntilCanRemoveSource = new();
@@ -70,10 +70,10 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
         _sprite.Value = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
         _azimuthIndicator.Value = GetNode<AzimuthIndicator>("AzimuthIndicator");
 
-        Sprite2D.Playing = true;
+        Sprite2D.Play();
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         UnitPuppet?.Process(delta);
 
@@ -117,7 +117,7 @@ public sealed class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode, IUnitPu
         set => Sprite2D.Frame = value;
     }
 
-    public int AnimationFrameCount => Sprite2D.Frames.GetFrameCount(Animation);
+    public int AnimationFrameCount => Sprite2D.SpriteFrames.GetFrameCount(Animation);
 
     public void CalculateAzimuthIndicatorPoints(double azimuth, double zoom) =>
         AzimuthIndicator.CalculatePoints(azimuth, zoom);

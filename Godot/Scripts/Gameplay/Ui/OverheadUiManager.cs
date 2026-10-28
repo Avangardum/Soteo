@@ -4,7 +4,7 @@ using Soteo.Main.Gameplay.Interfaces;
 
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class OverheadUiManager : Control
+public sealed partial class OverheadUiManager : Control
 {
     private readonly ICamera _camera;
     private readonly IPalette _palette;

@@ -7,7 +7,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay;
 
-public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
+public sealed partial class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
 {
     private const int MinZoomLog2 = 0;
     private const int MaxZoomLog2 = 5;
@@ -28,15 +28,14 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
         private set => Position = value.ToGd() * Const.PixelsInMeter;
     }
 
-    /// <inheritdoc/>
     public new double Zoom
     {
-        get => 1 / base.Zoom.x;
+        get => base.Zoom.X;
         private set
         {
             if (value == Zoom) return;
             GdVector2 mousePosBefore = GetGlobalMousePosition();
-            base.Zoom = GdVector2.One / value;
+            base.Zoom = GdVector2.One * value;
             Position += mousePosBefore - GetGlobalMousePosition();
             ZoomChanged();
         }
@@ -61,12 +60,12 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
 
     public override void _Ready()
     {
-        ProcessMode = PauseModeEnum.Process;
-        Current = true;
+        ProcessMode = ProcessModeEnum.Always;
+        MakeCurrent();
         TargetZoomLog2 = DefaultZoomLog2;
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         GdVector2 globalMousePos = GetGlobalMousePosition();
         bool isDragging = Input.IsActionPressed(InputActions.DragCamera);
@@ -104,10 +103,10 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
         if (cameraOptions.NoScroll) return;
         GdVector2 viewportMousePos = GetViewport().GetMousePosition();
         GdVector2 viewportSize = GetViewport().GetVisibleRect().Size;
-        int xDirection = viewportMousePos.x < ScrollZoneThickness ? -1 :
-            viewportMousePos.x > viewportSize.x - ScrollZoneThickness ? 1 : 0;
-        int yDirection = viewportMousePos.y < ScrollZoneThickness ? -1 :
-            viewportMousePos.y > viewportSize.y - ScrollZoneThickness ? 1 : 0;
+        int xDirection = viewportMousePos.X < ScrollZoneThickness ? -1 :
+            viewportMousePos.X > viewportSize.X - ScrollZoneThickness ? 1 : 0;
+        int yDirection = viewportMousePos.Y < ScrollZoneThickness ? -1 :
+            viewportMousePos.Y > viewportSize.Y - ScrollZoneThickness ? 1 : 0;
         base.Position += new GdVector2(xDirection, yDirection) * delta * ScrollSpeed / Zoom;
     }
 
@@ -120,15 +119,15 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
         GdVector2 viewportHalfSizeInWorldSpace = GetViewport().GetVisibleRect().Size / Zoom / 2;
         GdVector2 position = base.Position;
 
-        double minX = -Limit + viewportHalfSizeInWorldSpace.x;
-        double maxX = Limit - viewportHalfSizeInWorldSpace.x;
+        double minX = -Limit + viewportHalfSizeInWorldSpace.X;
+        double maxX = Limit - viewportHalfSizeInWorldSpace.X;
         if (minX > maxX) minX = maxX = 0;
-        position.x = (float)Maths.Clamp(position.x, minX, maxX);
+        position.X = (float)Maths.Clamp(position.X, minX, maxX);
 
-        double minY = -Limit + viewportHalfSizeInWorldSpace.y;
-        double maxY = Limit - viewportHalfSizeInWorldSpace.y;
+        double minY = -Limit + viewportHalfSizeInWorldSpace.Y;
+        double maxY = Limit - viewportHalfSizeInWorldSpace.Y;
         if (minY > maxY) minY = maxY = 0;
-        position.y = (float)Maths.Clamp(position.y, minY, maxY);
+        position.Y = (float)Maths.Clamp(position.Y, minY, maxY);
 
         base.Position = position;
     }
@@ -136,8 +135,8 @@ public sealed class SoteoCamera(CameraOptions cameraOptions) : Camera2D, ICamera
     private void RoundPositionToPixelPerfect()
     {
         GdVector2 viewportSize = GetViewport().GetVisibleRect().Size;
-        bool halfPixelXOffset = viewportSize.x % 2 == 1;
-        bool halfPixelYOffset = viewportSize.y % 2 == 1;
+        bool halfPixelXOffset = viewportSize.X % 2 == 1;
+        bool halfPixelYOffset = viewportSize.Y % 2 == 1;
         PositionM = NodeHelper.RoundPositionToPixelPerfect(
             PositionM, Zoom, isCamera: true, halfPixelXOffset, halfPixelYOffset);
     }

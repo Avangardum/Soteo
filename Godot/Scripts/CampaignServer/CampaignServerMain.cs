@@ -19,11 +19,11 @@ using Soteo.Main.Shared;
 using Soteo.Main.Shared.Nodes;
 using Soteo.Util;
 using File = System.IO.File;
-using Path3D = System.IO.Path3D;
+using Path = System.IO.Path;
 
 namespace Soteo.Main.CampaignServer;
 
-public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
+public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
 {
     private readonly Dictionary<Guid, TaskCompletionSource> _shardServerLocalInitDoneTcs = new();
 
@@ -146,7 +146,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
     {
         get
         {
-            return Path3D.Combine
+            return Path.Combine
             (
                 ServiceProvider.GetRequiredService<CampaignPersistenceOptions>().SnapshotFolder,
                 "Snapshot"
@@ -154,7 +154,7 @@ public sealed class CampaignServerMain : Node, ICampaignServerInitPacketReceiver
         }
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         _communicator.Value.Poll();
     }

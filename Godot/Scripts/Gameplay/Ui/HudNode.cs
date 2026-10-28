@@ -1,6 +1,6 @@
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class HudNode : Control
+public sealed partial class HudNode : Control
 {
     private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/Hud.tscn");
 
@@ -8,7 +8,7 @@ public sealed class HudNode : Control
 
     private HudNode() { }
 
-    public static HudNode Instance() => Scene.Instance<HudNode>();
+    public static HudNode Instance() => Scene.Instantiate<HudNode>(); // todo rename
 
-    public override void _Process(float delta) => Hud?.Process(delta);
+    public override void _Process(double delta) => Hud?.Process(delta);
 }

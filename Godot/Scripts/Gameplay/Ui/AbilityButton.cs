@@ -2,7 +2,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class AbilityButton : TextureButton
+public sealed partial class AbilityButton : TextureButton
 {
     private readonly LateInit<TextureRect> _iconRect = new();
     private readonly LateInit<TextureProgressBar> _cooldownIndicator = new();

@@ -1,14 +1,14 @@
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class OverheadUiNode : Control
+public sealed partial class OverheadUiNode : Control
 {
     private static readonly PackedScene Scene = ResourceLoader.Load<PackedScene>("res://Scenes/Ui/OverheadUi.tscn");
 
     private OverheadUiNode() { }
 
-    public static OverheadUiNode Instance() => Scene.Instance<OverheadUiNode>();
+    public static OverheadUiNode Instance() => Scene.Instantiate<OverheadUiNode>(); // todo rename
 
     public OverheadUi? OverheadUi { get; set; }
 
-    public override void _Process(float delta) => OverheadUi?.Process(delta);
+    public override void _Process(double delta) => OverheadUi?.Process(delta);
 }

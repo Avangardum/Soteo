@@ -11,7 +11,7 @@ namespace Soteo.Main.Gameplay.Services.Communicators;
 /// <summary>
 /// Communicates between clients and shard servers
 /// </summary>
-public sealed class WebRtcFromGameplayToGameplayCommunicator :
+public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
     Node, IShardServerConnector, IFromGameplayPacketSender, IWebrtcPacketReceiver, INetworkDebugger, IConnectionNotifier
 {
     private const double PingInterval = 1;
@@ -59,10 +59,10 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
         Name = nameof(WebRtcFromGameplayToGameplayCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        ProcessMode = PauseModeEnum.Process;
+        ProcessMode = ProcessModeEnum.Always;
     }
 
-    public override void _PhysicsProcess(float delta)
+    public override void _PhysicsProcess(double delta)
     {
         _isPhysicsProcess = true;
 
@@ -82,7 +82,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         _isPhysicsProcess = false;
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         Poll(delta);
         ProcessPing(delta);
@@ -103,13 +103,13 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         {
             peerConnectionAndChannels.Connection.Poll();
 
-            WebRTCPeerConnection.ConnectionState state = peerConnectionAndChannels.Connection.GetConnectionState();
-            if (state == WebRTCPeerConnection.ConnectionState.Closed)
+            WebRtcPeerConnection.ConnectionState state = peerConnectionAndChannels.Connection.GetConnectionState();
+            if (state == WebRtcPeerConnection.ConnectionState.Closed)
             {
                 OnPeerDisconnected(peerId);
                 continue;
             }
-            if (state == WebRTCPeerConnection.ConnectionState.Connected && _connectedPeerIds.Add(peerId))
+            if (state == WebRtcPeerConnection.ConnectionState.Connected && _connectedPeerIds.Add(peerId))
             {
                 PeerConnected(peerId);
             }
@@ -142,7 +142,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         }
     }
 
-    private void DeserializeAndHandlePackets(WebRTCDataChannel channel, Guid senderId)
+    private void DeserializeAndHandlePackets(WebRtcDataChannel channel, Guid senderId)
     {
         while (channel.GetAvailablePacketCount() > 0)
         {
@@ -231,29 +231,29 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     {
         if (_sideOptions.Side == Side.ShardServer) throw new InvalidOperationException();
 
-        WebRTCPeerConnection connection = CreateConnection(id);
+        WebRtcPeerConnection connection = CreateConnection(id);
         connection.CreateOffer();
     }
 
-    private WebRTCPeerConnection CreateConnection(Guid peerId)
+    private WebRtcPeerConnection CreateConnection(Guid peerId)
     {
-        if (_peerConnectionsAndChannels.TryGetValue(peerId, out PeerConnectionAndChannels existing))
+        if (_peerConnectionsAndChannels.TryGetValue(peerId, out PeerConnectionAndChannels? existing))
         {
             existing.Connection.Close();
             OnPeerDisconnected(peerId);
         }
 
-        var connection = new WebRTCPeerConnection();
-        byte[] peerIdBytes = peerId.ToByteArray();
-        connection.Connect("session_description_created", new Callable(this, nameof(OnSessionDescriptionCreated)), [peerIdBytes]);
-        connection.Connect("ice_candidate_created", new Callable(this, nameof(OnIceCandidateCreated)), [peerIdBytes]);
+        var connection = new WebRtcPeerConnection();
+        connection.SessionDescriptionCreated +=
+            (string type, string sdp) => OnSessionDescriptionCreated(type, sdp, peerId);
+        connection.IceCandidateCreated += (media, index, name) => OnIceCandidateCreated(media, index, name, peerId);
 
-        WebRTCDataChannel reliableChannel = connection.CreateDataChannel("reliable", new GdDictionary
+        WebRtcDataChannel reliableChannel = connection.CreateDataChannel("reliable", new GdDictionary
         {
             ["negotiated"] = true,
             ["id"] = 0,
         });
-        WebRTCDataChannel unreliableChannel = connection.CreateDataChannel("unreliable", new GdDictionary
+        WebRtcDataChannel unreliableChannel = connection.CreateDataChannel("unreliable", new GdDictionary
         {
             ["negotiated"] = true,
             ["id"] = 1,
@@ -266,20 +266,18 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
         return connection;
     }
 
-    private void OnSessionDescriptionCreated(string type, string sdp, byte[] peerIdBytes)
+    private void OnSessionDescriptionCreated(string type, string sdp, Guid peerId)
     {
-        var peerId = new Guid(peerIdBytes);
         _peerConnectionsAndChannels[peerId].Connection.SetLocalDescription(type, sdp);
         _campaignServerPacketSender.SendPacket(new WebrtcSdpPacket { Sdp = sdp, PeerId = peerId } );
     }
 
-    private void OnIceCandidateCreated(string media, int index, String name, byte[] peerIdBytes)
+    private void OnIceCandidateCreated(string media, long index, String name, Guid peerId)
     {
-        var peerId = new Guid(peerIdBytes);
         _campaignServerPacketSender.SendPacket(new WebrtcIceCandidatePacket
         {
             Media = media,
-            Index = index,
+            Index = (int)index,
             Name = name,
             PeerId = peerId
         });
@@ -301,7 +299,7 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     (
         Packet packet,
         IEnumerable<Guid> receiverIds,
-        Func<PeerConnectionAndChannels, WebRTCDataChannel> channelSelector
+        Func<PeerConnectionAndChannels, WebRtcDataChannel> channelSelector
     )
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
@@ -323,12 +321,12 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     (
         byte[] bytes,
         Guid receiverId,
-        Func<PeerConnectionAndChannels, WebRTCDataChannel> channelSelector
+        Func<PeerConnectionAndChannels, WebRtcDataChannel> channelSelector
     )
     {
         if (!_peerConnectionsAndChannels.TryGetValue(receiverId, out var connectionAndChannels)) return;
-        WebRTCDataChannel channel = channelSelector(connectionAndChannels);
-        if (channel.GetReadyState() != WebRTCDataChannel.ChannelState.Open) return;
+        WebRtcDataChannel channel = channelSelector(connectionAndChannels);
+        if (channel.GetReadyState() != WebRtcDataChannel.ChannelState.Open) return;
         channel.PutPacket(bytes).ThrowIfError();
         BytesSent += bytes.Length;
     }
@@ -357,15 +355,15 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
     public void ReceiveWebrtcSdpPacket(WebrtcSdpPacket packet)
     {
         string type = _sideOptions.Side == Side.ShardServer ? "offer" : "answer";
-        WebRTCPeerConnection? connection = _sideOptions.Side == Side.ShardServer ? CreateConnection(packet.PeerId) :
+        WebRtcPeerConnection? connection = _sideOptions.Side == Side.ShardServer ? CreateConnection(packet.PeerId) :
             _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
-        connection?.SetRemoteDescription(type, packet.Sdp);
+        connection?.SetRemoteDescription(type, packet.Sdp).ThrowIfError();
     }
 
     public void ReceiveWebrtcIceCandidatePacket(WebrtcIceCandidatePacket packet)
     {
-        WebRTCPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
-        connection?.AddIceCandidate(packet.Media, packet.Index, packet.Name);
+        WebRtcPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
+        connection?.AddIceCandidate(packet.Media, packet.Index, packet.Name).ThrowIfError();
     }
 
     public double? Ping(Guid peerId) =>
@@ -373,8 +371,8 @@ public sealed class WebRtcFromGameplayToGameplayCommunicator :
 
     private record PeerConnectionAndChannels
     (
-        WebRTCPeerConnection Connection,
-        WebRTCDataChannel ReliableChannel,
-        WebRTCDataChannel UnreliableChannel
+        WebRtcPeerConnection Connection,
+        WebRtcDataChannel ReliableChannel,
+        WebRtcDataChannel UnreliableChannel
     );
 }

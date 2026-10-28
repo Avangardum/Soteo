@@ -2,7 +2,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class ItemStackControl : Control
+public sealed partial class ItemStackControl : Control
 {
     private const double DragThresholdPx = 10;
 
@@ -39,7 +39,7 @@ public sealed class ItemStackControl : Control
         this.Connect("mouse_exited", () => _isMouseHovering = false);
     }
 
-    public override void _Process(float delta)
+    public override void _Process(double delta)
     {
         if (!Visible)
         {

@@ -18,7 +18,7 @@ public sealed class EquipmentInventory : IEquipmentInventory
 
     public EquipmentInventory(IReadOnlyDictionary<EquipmentSlot, ItemStack?> stacks)
     {
-        _stacks = stacks.ToDictionary();
+        _stacks = stacks.ToDictionaryPolyfill();
     }
 
     public ItemStack? this[EquipmentSlot slot] => _stacks[slot];
@@ -78,11 +78,11 @@ public sealed class EquipmentInventory : IEquipmentInventory
         }
     }
 
-    public EquipmentInventorySnapshot ToSnapshot() => new(_stacks.ToDictionary());
+    public EquipmentInventorySnapshot ToSnapshot() => new(_stacks.ToDictionaryPolyfill());
 
     public void ReplicateSnapshot(EquipmentInventorySnapshot snapshot)
     {
-        _stacks = snapshot.Stacks.ToDictionary();
+        _stacks = snapshot.Stacks.ToDictionaryPolyfill();
     }
 
     public void ApplyDelta(EquipmentInventoryDelta delta)

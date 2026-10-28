@@ -4,7 +4,7 @@ using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Main.Gameplay.EntityNodes;
 
-public sealed class UnitNode : CharacterBody2D, IUnitNode
+public sealed partial class UnitNode : CharacterBody2D, IUnitNode
 {
     public Unit? Unit { get; set; }
 
@@ -22,7 +22,7 @@ public sealed class UnitNode : CharacterBody2D, IUnitNode
 
     public void MoveAndCollide(Vector2 movement) => base.MoveAndCollide(movement.ToGd() * Const.PixelsInMeter);
 
-    public override void _PhysicsProcess(float delta)
+    public override void _PhysicsProcess(double delta)
     {
         Unit?.Tick(delta);
     }

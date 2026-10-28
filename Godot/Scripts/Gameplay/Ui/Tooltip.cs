@@ -3,7 +3,7 @@ using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
 
-public sealed class Tooltip : Control, ITooltip
+public sealed partial class Tooltip : Control, ITooltip
 {
     private readonly LateInit<Label> _headerLabel = new();
     private readonly LateInit<HSeparator> _separator = new();
@@ -20,7 +20,7 @@ public sealed class Tooltip : Control, ITooltip
         _separator.Value = GetNode<HSeparator>("PanelContainer/MarginContainer/VBoxContainer/HSeparator");
         _bodyLabel.Value = GetNode<RichTextLabel>("PanelContainer/MarginContainer/VBoxContainer/Body");
 
-        _bodyDefaultMinWidth.Value = BodyLabel.CustomMinimumSize.x;
+        _bodyDefaultMinWidth.Value = BodyLabel.CustomMinimumSize.X;
     }
 
     public void Show(Vector2 position, string header, string body)
@@ -38,7 +38,7 @@ public sealed class Tooltip : Control, ITooltip
     private void UpdateBodyMinWidth()
     {
         BodyLabel.CustomMinimumSize = new GdVector2(_bodyDefaultMinWidth, 0);
-        BodyLabel.Size = BodyLabel.Size with { x = _bodyDefaultMinWidth };
+        BodyLabel.Size = BodyLabel.Size with { X = _bodyDefaultMinWidth };
 
         string text = BodyLabel.Text;
         BodyLabel.Text = "Lorem ipsum";
@@ -46,10 +46,10 @@ public sealed class Tooltip : Control, ITooltip
         BodyLabel.Text = text;
 
         const int step = 10;
-        while (BodyLabel.GetContentHeight() == lineHeight && BodyLabel.CustomMinimumSize.x > step)
+        while (BodyLabel.GetContentHeight() == lineHeight && BodyLabel.CustomMinimumSize.X > step)
         {
             BodyLabel.CustomMinimumSize -= new GdVector2(step, 0);
-            BodyLabel.Size = BodyLabel.Size with { x = BodyLabel.CustomMinimumSize.x };
+            BodyLabel.Size = BodyLabel.Size with { X = BodyLabel.CustomMinimumSize.X };
         }
         BodyLabel.CustomMinimumSize += new GdVector2(step, 0);
     }
