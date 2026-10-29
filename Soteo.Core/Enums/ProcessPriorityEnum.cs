@@ -8,5 +8,5 @@ public enum ProcessPriorityEnum
     Default = 0,
     OverheadUi,
     SynchronizationServer,
-    CurrentTickRepository,
+    CurrentTickRepository
 }
