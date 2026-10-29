@@ -5,9 +5,9 @@ namespace Soteo.Main.Gameplay.Resources;
 
 public sealed partial class Palette : Resource, IPalette
 {
-    [field: Export] public Color Neutral { get; }
-    [field: Export] public Color Empire { get; }
-    [field: Export] public Color Syndicate { get; }
+    [Export] public Color Neutral { get; private set; }
+    [Export] public Color Empire { get; private set; }
+    [Export] public Color Syndicate { get; private set; }
 
     public Color FactionColor(Faction faction)
     {

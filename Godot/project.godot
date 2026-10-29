@@ -159,6 +159,7 @@ common/physics_ticks_per_second=20
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 environment/defaults/default_clear_color=Color(0.0313726, 0.0431373, 0.0784314, 1)
 environment/defaults/default_environment="res://default_env.tres"
 quality/driver/driver_name="GLES2"
