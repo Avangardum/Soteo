@@ -1,5 +1,3 @@
-using Soteo.Core.Enums;
-
 namespace Soteo.Main.Shared.Nodes;
 
 public sealed partial class Main : Node

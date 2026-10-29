@@ -87,14 +87,13 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
         _socket.Poll();
         switch (_socket.GetReadyState())
         {
-            case WebSocketPeer.State.Open:
-                if (_status == Status.Connecting)
-                {
-                    _status = Status.Handshake;
-                    _token = null;
-                    SendPacket(new CampaignServerHandshakePacket { Token = _token.Required, Version = Const.Version });
-                }
-                else
+            case WebSocketPeer.State.Open when _status is Status.Connecting:
+                _status = Status.Handshake;
+                SendPacket(new CampaignServerHandshakePacket { Token = _token.Required, Version = Const.Version });
+                _token = null;
+                break;
+            case WebSocketPeer.State.Open when _status is Status.Handshake or Status.Connected:
+                while (_socket.GetAvailablePacketCount() > 0)
                 {
                     byte[] bytes = _socket.GetPacket();
                     Packet packet = _packetSerializer.Deserialize(bytes);
@@ -110,7 +109,7 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
                     }
                 }
                 break;
-            case WebSocketPeer.State.Closed:
+            case WebSocketPeer.State.Closed when _status is Status.Handshake or Status.Connected:
                 _status = Status.Disconnected;
                 if (_sideOptions.Side == Side.Client)
                     _currentUserIdRepository.Id = null;
@@ -153,6 +152,7 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
             customHeaders: headers,
             requestData: body
         );
+        // todo don't use the word intercom
     }
 
     private void OnAuthRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
