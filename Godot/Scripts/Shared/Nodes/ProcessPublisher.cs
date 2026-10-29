@@ -71,6 +71,7 @@ public sealed partial class ProcessPublisher : Node, IProcessPublisher
         {
             Name = nameof(ProcessListener) + " " + priority;
             ProcessPriority = (int)priority;
+            ProcessPhysicsPriority = (int)priority;
             ProcessMode = ProcessModeEnum.Always;
         }
 

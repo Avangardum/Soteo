@@ -182,13 +182,11 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
     {
         if (State == StateEnum.Desynchronized) return;
 
-        if (_syncData.ReceivedDeltaCount > 0 && packet.SnapshotDelta.Tick != _syncData.LastDeltaTick + 1)
-        {
-            throw new Exception
-            (
-                $"Expected delta for tick {_syncData.LastDeltaTick + 1}, received for {packet.SnapshotDelta.Tick}"
-            );
-        }
+        long expectedTick = _syncData.ReceivedDeltaCount > 0 ?
+            _syncData.LastDeltaTick.Required + 1 :
+            _syncData.LastSnapshotPacket.Required.Snapshot.Tick + 1;
+        if (packet.SnapshotDelta.Tick != expectedTick)
+            throw new Exception($"Expected delta for tick {expectedTick}, received for {packet.SnapshotDelta.Tick}");
 
         _syncData.DeltaRing.RingSet(packet.SnapshotDelta.Tick, packet.SnapshotDelta);
         _syncData.ServerLoad = packet.ServerLoad;
