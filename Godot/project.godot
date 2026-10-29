@@ -153,14 +153,6 @@ translations=PackedStringArray("res://Localization/English.en.translation", "res
 
 project/assembly_name="Soteo"
 
-[network]
-
-limits/webrtc/max_channel_in_buffer_kb=100000
-limits/websocket_client/max_in_buffer_kb=100000
-limits/websocket_client/max_out_buffer_kb=100000
-limits/websocket_server/max_in_buffer_kb=100000
-limits/websocket_server/max_out_buffer_kb=100000
-
 [physics]
 
 common/physics_ticks_per_second=20

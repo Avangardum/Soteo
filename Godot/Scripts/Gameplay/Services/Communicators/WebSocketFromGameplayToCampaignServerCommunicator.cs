@@ -12,14 +12,15 @@ namespace Soteo.Main.Gameplay.Services.Communicators;
 public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
     Node, IFromGameplayToCampaignServerPacketSender, ICampaignServerConnector
 {
-    private readonly WebSocketPeer _socket = new();
+    private readonly WebSocketPeer _socket =
+        new() { InboundBufferSize = 100_000_000, OutboundBufferSize = 100_000_000 };
     private readonly HttpRequest _httpRequest = new() { Name = "AuthHttpRequest", Timeout = 15 };
 
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
     private readonly ICurrentUserIdRepository _currentUserIdRepository;
-    private readonly SideOptions _sideOptions;
 
+    private readonly SideOptions _sideOptions;
     private readonly ToAuthServerConnectionOptions _toAuthServerConnectionOptions;
     private readonly ToCampaignServerConnectionOptions _toCampaignServerConnectionOptions;
     private readonly CertificateVerificationOptions _certificateVerificationOptions;
@@ -42,8 +43,9 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
     {
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
-        _sideOptions = sideOptions;
         _currentUserIdRepository = currentUserIdRepository;
+
+        _sideOptions = sideOptions;
         _toAuthServerConnectionOptions = toAuthServerConnectionOptions;
         _toCampaignServerConnectionOptions = toCampaignServerConnectionOptions;
         _certificateVerificationOptions = certificateVerificationOptions;

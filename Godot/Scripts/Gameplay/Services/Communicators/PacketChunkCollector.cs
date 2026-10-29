@@ -3,7 +3,7 @@ using Soteo.Main.Gameplay.Interfaces;
 
 namespace Soteo.Main.Gameplay.Services.Communicators;
 
-public sealed class ChunkCollector : IChunkCollector
+public sealed class PacketChunkCollector : IPacketChunkCollector
 {
     private readonly Dictionary<Guid, Group> _groups = [];
     private DateTime _nextCleanupTime = DateTime.UtcNow;

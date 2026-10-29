@@ -107,7 +107,7 @@ public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
             key.Load(_certificateOptions.PrivateKeyPath);
             var tlsOptions = TlsOptions.Server(key, certificate);
             tlsTcpStream.AcceptStream(rawTcpStream, tlsOptions).ThrowIfError();
-            var wsPeer = new WebSocketPeer();
+            var wsPeer = new WebSocketPeer { InboundBufferSize = 100_000_000, OutboundBufferSize = 100_000_000 };
             wsPeer.AcceptStream(tlsTcpStream);
             _wsPeers[_nextWsPeerId++] = wsPeer;
         }

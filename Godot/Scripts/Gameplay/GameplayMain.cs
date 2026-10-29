@@ -158,7 +158,8 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
         services.AddSingleton<IConnectionNotifier>(_ => _webRtcGameplayCommunicator.Required);
         services.AddSingleton<IShardServerConnector>(_ => _webRtcGameplayCommunicator.Required);
-        services.AddSingleton<IChunkCollector, ChunkCollector>();
+        services.AddSingleton<IPacketChunkCollector, PacketChunkCollector>();
+        services.AddSingleton<IPacketChunker, PacketChunker>();
 
         foreach (Type type in PacketSerializer.AllTypes(typeLocator))
             services.AddSingleton(type);

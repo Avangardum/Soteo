@@ -16,9 +16,6 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
 {
     private const double PingInterval = 1;
 
-    // Godot breaks on very big packets, so they are chunked
-    private const int MaxChunkSize = 250000;
-
     private double _timeSinceLastPing;
     private Guid? _lastPingId;
     private bool _didPollThisFrame;
@@ -36,7 +33,8 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
     private readonly IFromGameplayToCampaignServerPacketSender _campaignServerPacketSender;
     private readonly IPacketSerializer _packetSerializer;
     private readonly IPacketHandler _packetHandler;
-    private readonly IChunkCollector _chunkCollector;
+    private readonly IPacketChunkCollector _packetChunkCollector;
+    private readonly IPacketChunker _packetChunker;
     private readonly SideOptions _sideOptions;
 
     public long BytesSent { get; private set; }
@@ -47,14 +45,16 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         IFromGameplayToCampaignServerPacketSender campaignServerPacketSender,
         IPacketHandler packetHandler,
         IPacketSerializer packetSerializer,
-        IChunkCollector chunkCollector,
+        IPacketChunkCollector packetChunkCollector,
+        IPacketChunker packetChunker,
         SideOptions sideOptions
     )
     {
         _campaignServerPacketSender = campaignServerPacketSender;
         _packetHandler = packetHandler;
         _packetSerializer = packetSerializer;
-        _chunkCollector = chunkCollector;
+        _packetChunkCollector = packetChunkCollector;
+        _packetChunker = packetChunker;
         _sideOptions = sideOptions;
 
         Name = nameof(WebRtcFromGameplayToGameplayCommunicator);
@@ -188,7 +188,7 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
             }
             if (packet is ChunkPacket chunkPacket)
             {
-                byte[]? restoredPacketBytes = _chunkCollector.AddChunk(chunkPacket, senderId);
+                byte[]? restoredPacketBytes = _packetChunkCollector.AddChunk(chunkPacket, senderId);
                 if (restoredPacketBytes != null)
                     DeserializeAndHandlePacket(restoredPacketBytes, senderId);
                 return;
@@ -302,54 +302,20 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         Func<PeerConnectionAndChannels, WebRtcDataChannel> channelSelector
     )
     {
-        byte[] bytes = _packetSerializer.Serialize(packet);
-        if (bytes.Length <= MaxChunkSize)
+        // There is an undocumented packet size limit, so large packets are chunked
+        byte[][] chunks = _packetChunker.SplitIntoChunks(packet, maxChunkSize: 250000);
+        foreach (Guid receiverId in receiverIds)
         {
-            foreach (Guid receiverId in receiverIds)
-                SendWithoutChunking(bytes, receiverId, channelSelector);
-        }
-        else
-        {
-            byte[][] chunks = SplitIntoChunks(bytes);
-            foreach (Guid receiverId in receiverIds)
+            PeerConnectionAndChannels? connectionAndChannels;
+            if (!_peerConnectionsAndChannels.TryGetValue(receiverId, out connectionAndChannels)) continue;
+            WebRtcDataChannel channel = channelSelector(connectionAndChannels);
+            if (channel.GetReadyState() != WebRtcDataChannel.ChannelState.Open) continue;
             foreach (byte[] chunk in chunks)
-                SendWithoutChunking(chunk, receiverId, channelSelector);
-        }
-    }
-
-    private void SendWithoutChunking
-    (
-        byte[] bytes,
-        Guid receiverId,
-        Func<PeerConnectionAndChannels, WebRtcDataChannel> channelSelector
-    )
-    {
-        if (!_peerConnectionsAndChannels.TryGetValue(receiverId, out var connectionAndChannels)) return;
-        WebRtcDataChannel channel = channelSelector(connectionAndChannels);
-        if (channel.GetReadyState() != WebRtcDataChannel.ChannelState.Open) return;
-        channel.PutPacket(bytes).ThrowIfError();
-        BytesSent += bytes.Length;
-    }
-
-    private byte[][] SplitIntoChunks(Span<byte> bytes)
-    {
-        var groupId = Guid.NewGuid();
-        var chunks = new byte[Maths.CeilToInt((double)bytes.Length / MaxChunkSize)][];
-        for (int i = 0; i < chunks.Length; i++)
-        {
-            bool isLast = i == chunks.Length - 1;
-            int start = i * MaxChunkSize;
-            int end = isLast ? bytes.Length : start + MaxChunkSize;
-            var chunkPacket = new ChunkPacket
             {
-                GroupId = groupId,
-                Index = i,
-                IsLast = isLast,
-                Bytes = bytes[start..end].ToArray()
-            };
-            chunks[i] = _packetSerializer.Serialize(chunkPacket);
+                channel.PutPacket(chunk).ThrowIfError();
+                BytesSent += chunk.Length;
+            }
         }
-        return chunks;
     }
 
     public void ReceiveWebrtcSdpPacket(WebrtcSdpPacket packet)
