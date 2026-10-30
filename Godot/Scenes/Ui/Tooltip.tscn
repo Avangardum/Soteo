@@ -4,6 +4,9 @@
 [ext_resource type="Script" uid="uid://cjjpcidbog477" path="res://Scripts/Gameplay/Ui/Tooltip.cs" id="2"]
 [ext_resource type="FontFile" uid="uid://b5t1c7de1uixv" path="res://Fonts/Roboto/static/Roboto-Bold.ttf" id="3"]
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qiwed"]
+bg_color = Color(0.14509805, 0.14509805, 0.16470589, 1)
+
 [sub_resource type="FontFile" id="2"]
 fallbacks = Array[Font]([ExtResource("1")])
 cache/0/variation_coordinates = {}
@@ -130,7 +133,8 @@ layout_mode = 0
 offset_top = -10.0
 offset_right = 15.0
 offset_bottom = 5.0
-rotation = -135.0
+rotation = -2.3561945
+theme_override_styles/panel = SubResource("StyleBoxFlat_qiwed")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=281161889]
 layout_mode = 0
