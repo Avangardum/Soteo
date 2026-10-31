@@ -6,8 +6,9 @@ namespace Soteo.Main.Shared;
 
 public static class Logging
 {
-    public static void AddToServiceCollection(IServiceCollection services)
+    public static void AddToServiceCollection(IServiceCollection services, string? processName)
     {
-        services.AddLogging(builder => builder.AddConsole());
+        services.AddLogging();
+        services.AddSingleton<ILoggerProvider>(new GodotLogger.Provider(processName));
     }
 }

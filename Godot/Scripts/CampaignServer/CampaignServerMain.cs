@@ -193,7 +193,7 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
             services.AddSingleton(type);
 
         Config.AddToServiceCollection(services);
-        Logging.AddToServiceCollection(services);
+        Logging.AddToServiceCollection(services, Config.ProcessName);
     }
 
     private void CreateSingletonNodes()

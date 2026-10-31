@@ -7,7 +7,7 @@ using Soteo.Main.Gameplay;
 
 namespace Soteo.Main.Shared;
 
-public static class Config
+internal static class Config
 {
     // The game uses .NET configuration and option APIs for configuring the app. Configuration can be specified in the
     // following ways:
@@ -23,8 +23,9 @@ public static class Config
     private static readonly IConfiguration Configuration = BuildConfiguration(Environment);
 
     // Static fields are only for accessing the configuration in main classes before a service provider is built
-    internal static readonly Side Side = Side.Parse(Configuration["Side"].Required);
-    internal static readonly bool IsSingleplayer = bool.Parse(Configuration["IsSingleplayer"].Required);
+    public static readonly Side Side = Side.Parse(Configuration["Side"].Required);
+    public static readonly bool IsSingleplayer = bool.Parse(Configuration["IsSingleplayer"].Required);
+    public static readonly string? ProcessName = Configuration["ProcessName"];
 
     private static IConfiguration BuildConfiguration(string? environment)
     {
@@ -39,6 +40,7 @@ public static class Config
 
     public static void AddToServiceCollection(IServiceCollection services)
     {
+        // todo refactor
         // Register all options regardless of side, because omitting a registration would implicitly register a
         // default (possibly invalid) value which would be silently injected into IOptions<T> constructor parameters
         // instead of throwing an exception

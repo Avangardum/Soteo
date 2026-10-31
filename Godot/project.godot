@@ -13,12 +13,12 @@ config_version=5
 config/name="Soteo"
 run/main_scene="res://Scenes/Main.tscn"
 config/features=PackedStringArray("4.7", "C#")
+run/flush_stdout_on_print=true
 config/icon="res://Textures/icon.png"
 
 [autoload]
 
 AsyncExceptionCollectorNode="*res://Scripts/Shared/Nodes/Autoloads/AsyncExceptionCollectorNode.cs"
-SignalConnector="*res://Scripts/Shared/Nodes/Autoloads/SignalConnector.cs"
 
 [dotnet]
 
