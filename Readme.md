@@ -26,7 +26,7 @@ singleplayer challenge showcasing core mechanics.
 
 ### Building and running from source
 
-#### Environment setup
+[Install Rider](https://www.jetbrains.com/rider/)
 
 [Install .NET 10 SDK](https://dotnet.microsoft.com/en-us/download)
 
@@ -39,13 +39,13 @@ Export the .NET development certificate into any directory outside of the reposi
 with `<PATH>` replaced by a path where the certificate file will be created, including the .crt extension. This will
 produce a pair of .crt and .key files.
 
-```bash
+```
 dotnet dev-certs https --export-path <PATH> --no-password --format PEM
 ```
 
 Trust the certificate.
 
-```bash
+```
 dotnet dev-certs https --trust
 ```
 
@@ -64,29 +64,36 @@ Set the following environment variables:
 
 Restart your IDE / Godot editor / terminal for the environment variable changes to be applied.
 
-In the Godot editor go to `Debug -> Customize run instances`, enable 5 instances and set the following
-launch arguments for each one (`NoScroll=true` disables camera scrolling by holding the mouse at the edge of the
-screen, because this can be annoying when switching between several clients, you can drag the camera by holding the
-mouse wheel or you can remove this if you wish):
+In Rider click the 3 dots in the top right and click `Edit...`. In the top left of the opened window click `+` and
+add a `.NET Project` configuration named `AuthServer`. Set the project to `Soteo.AuthServer` and environment variables
+to `ASPNETCORE_ENVIRONMENT=Development`.
+
+Add a `.NET Executable` configuration named `CampaignServer`, set the exe path to the Godot executable, and the working
+directory to the `Godot` folder inside the repository.
+
+Copy `CampaignServer` 4 times using the copy button and name new configurations `ShardServer1`, `ShardServer2`,
+`Client1`, `Client2`. Set the following program arguments for each configuration:
 
 ```
---no-header --headless ProcessName=CampaignServer Side=CampaignServer ShardIds:0=00000000-0000-0000-0000-0000000005d1 ShardIds:1=00000000-0000-0000-0000-0000000005d2
---no-header --headless ProcessName=ShardServer1 Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d1
---no-header --headless ProcessName=ShardServer2 Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d2
---no-header --position 10,50 --resolution 1400x700 ProcessName=Client1 NoScroll=true
---no-header --position 10,800 --resolution 1400x700 ProcessName=Client2 NoScroll=true Email=player2@soteo.net
+--no-header --headless Side=CampaignServer ShardIds:0=00000000-0000-0000-0000-0000000005d1 ShardIds:1=00000000-0000-0000-0000-0000000005d2
+--no-header --headless Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d1
+--no-header --headless Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d2
+--no-header --position 10,50 --resolution 1400x700 NoScroll=true
+--no-header --position 10,800 --resolution 1400x700 NoScroll=true Email=player2@soteo.net
 ```
 
-Start the auth server either by running `dotnet run` from the `Soteo.AuthServer` folder or from your IDE.
+`NoScroll=true` disables camera scrolling by holding the mouse at the edge of the
+screen, because this can be annoying when switching between several clients. You can drag the camera by holding the
+mouse wheel or you can remove this if you wish.
+
+Create a `Multi-Launch` configuration named `All` and add all the previous configurations to it. Run it.
 
 Go to https://localhost:3705 in a browser, register a new account with email `player1@soteo.net` and password
 `Pa55_word`, then click the link to confirm the email. Repeat for `player2@soteo.net`.
 
-Press the play button in the Godot editor, this will start a campaign server, 2 shard servers and 2 clients.
+Log in with a Godot client with default credentials, choose a shard and a character and click `Deploy`.
 
-Log in with a Godot client with the default credentials, choose a shard and a character and click `Deploy`.
-
-For more info on configuration, such as changing ports, see the `Config` class.
+For more info on configuration, see the `Config` class.
 
 ### Exploring the codebase
 

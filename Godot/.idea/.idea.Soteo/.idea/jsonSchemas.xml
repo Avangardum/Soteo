@@ -20,6 +20,9 @@
                   <Item>
                     <option name="path" value="file://$PROJECT_DIR$/../Soteo.AuthServer/appsettings.Development.json" />
                   </Item>
+                  <Item>
+                    <option name="path" value="file://$PROJECT_DIR$/../Soteo.AuthServer/appsettings.json" />
+                  </Item>
                 </list>
               </option>
             </SchemaInfo>

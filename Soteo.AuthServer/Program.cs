@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Soteo.AuthServer.Data;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.Sources.Clear();
 builder.Configuration.AddJsonFile("appsettings.json", optional: false);
@@ -10,7 +10,7 @@ builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.Environment
 builder.Configuration.AddEnvironmentVariables("Soteo__");
 builder.Configuration.AddCommandLine(args);
 
-var connectionString = builder.Configuration["AuthServerConnectionString"] ??
+string connectionString = builder.Configuration["AuthServerConnectionString"] ??
     throw new InvalidOperationException("AuthServerConnectionString configuration value is not set");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -20,13 +20,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 builder.Services.AddRazorPages();
 builder.Services.AddControllers();
 
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services
-        .AddCors(options => options.AddDefaultPolicy(policy => policy.SetIsOriginAllowed(o => new Uri(o).IsLoopback)));
-}
-
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -42,7 +36,6 @@ else
 
 app.UseHttpsRedirection();
 app.UseRouting();
-app.UseCors();
 app.UseAuthorization();
 
 app.MapStaticAssets();
