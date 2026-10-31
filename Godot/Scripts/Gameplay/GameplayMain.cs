@@ -137,7 +137,7 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         services.AddAlias<IEntityManager, EntityManager>();
         services.AddAlias<IEntitySnapshotManager, EntityManager>();
         services.AddScoped<IEntityNodeManager, EntityNodeManager>();
-        services.AddSingleton<TimeProvider>(new GodotTimeProvider(GetTree()));
+        services.AddSingleton(TimeProvider.System);
         services.AddSingleton<SynchronizedCampaignStatePuppetRepository>();
         services.AddAlias<ISynchronizedCampaignStatePuppetRepository, SynchronizedCampaignStatePuppetRepository>();
         services.AddAlias<ISynchronizedCampaignStatePacketReceiver, SynchronizedCampaignStatePuppetRepository>();

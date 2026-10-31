@@ -178,7 +178,7 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
             ICampaignSnapshotCrossServerConsistencyValidator,
             CampaignSnapshotCrossServerConsistencyValidator
         >();
-        services.AddSingleton<TimeProvider>(new GodotTimeProvider(GetTree()));
+        services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ICampaignSnapshotSerializer, CampaignSnapshotSerializer>();
         services.AddSingleton<IShardServerAllowlist>(sp =>
             ShardServerAllowlist.Enabled(sp.GetRequiredService<CampaignOptions>().ShardIds));

@@ -23,7 +23,7 @@ public sealed class LogInScreen
         _node = node;
         _emailLineEdit = node.GetNode<LineEdit>("Email");
         _passwordLineEdit = node.GetNode<LineEdit>("Password");
-        node.GetNode<Button>("LogIn").Connect("pressed", OnLogInPressed);
+        node.GetNode<Button>("LogIn").Pressed += OnLogInPressed;
 
         if (logInOptions.Email != null)
             _emailLineEdit.Text = logInOptions.Email;

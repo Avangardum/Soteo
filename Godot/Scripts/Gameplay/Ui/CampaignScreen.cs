@@ -44,14 +44,14 @@ public sealed class CampaignScreen
         _characterButtons = node.GetNode("CharacterButtons").GetChildren().Cast<Button>().ToImmutableList();
         _shardButtons = node.GetNode("ShardButtons").GetChildren().Cast<Button>().ToImmutableList();
 
-        node.GetNode<Button>("DeployButton").Connect("pressed", Deploy);
-        node.GetNode<Button>("SpectateButton").Connect("pressed", Spectate);
+        node.GetNode<Button>("DeployButton").Pressed += Deploy;
+        node.GetNode<Button>("SpectateButton").Pressed += Spectate;
 
         foreach (Button button in _characterButtons)
-            button.Connect("pressed", () => SelectCharacter(Guid.Parse(button.Text)));
+            button.Pressed += () => SelectCharacter(Guid.Parse(button.Text));
 
         foreach (Button button in _shardButtons)
-            button.Connect("pressed", () => SelectShard(Guid.Parse(button.Text)));
+            button.Pressed += () => SelectShard(Guid.Parse(button.Text));
 
         initRepo.WaitForInitAsync().ContinueWithinContext(() => node.Visible = true).CollectException();
     }

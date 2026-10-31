@@ -119,10 +119,10 @@ public sealed class Hud : IHud
         for (int i = 0; i < _abilityButtons.Count; i++)
         {
             int index = i;
-            _abilityButtons[i].Connect("button_down", () => OnAbilityButtonDown(index));
-            _abilityButtons[i].Connect("button_up", () => OnAbilityButtonUp(index));
-            _abilityButtons[i].Connect("mouse_entered", () => OnMouseEnteredAbilityButton(index));
-            _abilityButtons[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
+            _abilityButtons[i].ButtonDown += () => OnAbilityButtonDown(index);
+            _abilityButtons[i].ButtonUp += () => OnAbilityButtonUp(index);
+            _abilityButtons[i].MouseEntered += () => OnMouseEnteredAbilityButton(index);
+            _abilityButtons[i].MouseExited += OnMouseExitedTooltipableControl;
         }
     }
 
@@ -131,8 +131,8 @@ public sealed class Hud : IHud
         for (int i = 0; i < _statusIndicators.Count; i++)
         {
             int index = i;
-            _statusIndicators[i].Connect("mouse_entered", () => OnMouseEnteredStatusIndicator(index));
-            _statusIndicators[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
+            _statusIndicators[i].MouseEntered += () => OnMouseEnteredStatusIndicator(index);
+            _statusIndicators[i].MouseExited += OnMouseExitedTooltipableControl;
         }
     }
 
@@ -141,8 +141,8 @@ public sealed class Hud : IHud
         for (int i = 0; i < _inventorySlotControls.Count; i++)
         {
             int index = i;
-            _inventorySlotControls[i].Connect("mouse_entered", () => OnMouseEnteredInventorySlot(index));
-            _inventorySlotControls[i].Connect("mouse_exited", OnMouseExitedTooltipableControl);
+            _inventorySlotControls[i].MouseEntered += () => OnMouseEnteredInventorySlot(index);
+            _inventorySlotControls[i].MouseExited += OnMouseExitedTooltipableControl;
             _inventorySlotControls[i].ItemStack.DragStarted += () => OnInventoryItemStackDragStarted(index);
             _inventorySlotControls[i].ItemStack.DragStopped += () => OnInventoryItemStackDragStopped(index);
             _inventorySlotControls[i].ItemStack.SelectClicked += () => OnInventoryItemStackSelectClicked(index);
@@ -153,8 +153,8 @@ public sealed class Hud : IHud
     {
         foreach ((EquipmentSlot slot, ItemStackSlotControl control) in _equipmentSlotControls)
         {
-            control.Connect("mouse_entered", () => OnMouseEnteredEquipmentSlot(slot));
-            control.Connect("mouse_exited", OnMouseExitedTooltipableControl);
+            control.MouseEntered += () => OnMouseEnteredEquipmentSlot(slot);
+            control.MouseExited += OnMouseExitedTooltipableControl;
             control.ItemStack.DragStarted += () => OnEquipmentItemStackDragStarted(slot);
             control.ItemStack.DragStopped += () => OnEquipmentItemStackDragStopped(slot);
             control.ItemStack.SelectClicked += () => OnEquipmentItemStackSelectClicked(slot);
@@ -220,7 +220,7 @@ public sealed class Hud : IHud
         _tooltip.Show(_equipmentSlotControls[slot].TopCenterGlobalPosition.ToSys(), stack.Item.Name, "");
     }
 
-    public void OnMouseExitedTooltipableControl()
+    private void OnMouseExitedTooltipableControl()
     {
         _tooltip.Hide();
     }

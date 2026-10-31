@@ -35,8 +35,8 @@ public sealed partial class ItemStackControl : Control
         _countBackground.Value = GetNode<Control>("TextureRect/CountBackground").Required;
         _countLabel.Value = GetNode<Label>("TextureRect/CountBackground/CountLabel").Required;
 
-        this.Connect("mouse_entered", () => _isMouseHovering = true);
-        this.Connect("mouse_exited", () => _isMouseHovering = false);
+        MouseEntered += () => _isMouseHovering = true;
+        MouseExited += () => _isMouseHovering = false;
     }
 
     public override void _Process(double delta)
