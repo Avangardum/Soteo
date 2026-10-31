@@ -185,7 +185,8 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         long expectedTick = _syncData.ReceivedDeltaCount > 0 ?
             _syncData.LastDeltaTick.Required + 1 :
             _syncData.LastSnapshotPacket.Required.Snapshot.Tick + 1;
-        if (packet.SnapshotDelta.Tick != expectedTick)
+        if (packet.SnapshotDelta.Tick < expectedTick) return;
+        if (packet.SnapshotDelta.Tick > expectedTick)
             throw new Exception($"Expected delta for tick {expectedTick}, received for {packet.SnapshotDelta.Tick}");
 
         _syncData.DeltaRing.RingSet(packet.SnapshotDelta.Tick, packet.SnapshotDelta);
