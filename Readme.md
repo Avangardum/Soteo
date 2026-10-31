@@ -1,7 +1,7 @@
 # Shards of the Empire Online
 
 Shard of the Empire Online (Soteo) is a game that fits between classical MMOs and match-based games.
-A campaign that lasts for hours is played over many short sessions so that any dedicated player can play from the
+A campaign that lasts for hours is played over many short sessions, so that any dedicated player can play from the
 beginning to the end.
 
 The project aims to provide an MMO level scale while keeping gameplay engaging and concentrated. It aims to avoid
@@ -26,28 +26,17 @@ singleplayer challenge showcasing core mechanics.
 
 ### Building and running from source
 
-#### Browser singleplayer
+#### Environment setup
 
-The simplest way to run the Soteo from source is browser singleplayer.
-Install .NET and Godot using links from the next section. Open the Godot project,
-go to `Editor / Manage Export Templates...` and download export templates, then press the HTML5
-icon in the top right, in the opened browser window click singleplayer and log in with default credentials.
+[Install .NET 10 SDK](https://dotnet.microsoft.com/en-us/download)
 
-#### Multiplayer
+[Install Godot 4.7.2](https://godotengine.org/download/archive/4.7.2-stable/)
+(pick the .NET version, not the standard one)
 
-##### Environment setup
-
-[Install .NET 10 SDK](https://dotnet.microsoft.com/en-us/download).
-
-[Install Godot 3.6.2](https://godotengine.org/download/archive/3.6.2-stable/) (pick the .NET version, not the standard
-one). Create a link to the Godot executable called `soteo` (`soteo.exe` on Windows) and update the PATH environment
-variable to include the directory containing the link. Open a new terminal and type `soteo`. If everything is
-correct, the Godot project selection menu will open.
-
-[Install latest PostgreSQL](https://www.postgresql.org/download/).
+[Install latest PostgreSQL](https://www.postgresql.org/download/)
 
 Export the .NET development certificate into any directory outside of the repository by running the following command
-with <PATH> replaced by a path where the certificate file will be created, including the .crt extension. This will
+with `<PATH>` replaced by a path where the certificate file will be created, including the .crt extension. This will
 produce a pair of .crt and .key files.
 
 ```bash
@@ -73,43 +62,31 @@ Set the following environment variables:
 
 `Soteo__Environment` - `Development`
 
-Restart your IDE or terminal for the environment variable changes to apply.
+Restart your IDE / Godot editor / terminal for the environment variable changes to be applied.
 
-##### Running from a terminal
+In the Godot editor go to `Debug -> Customize run instances`, enable 5 instances and set the following
+launch arguments for each one (`NoScroll=true` disables camera scrolling by holding the mouse at the edge of the
+screen, because this can be annoying when switching between several clients, you can drag the camera by holding the
+mouse wheel or you can remove this if you wish):
 
-Open a terminal and navigate to `/Godot`, all commands should run from here.
-
-Before running, build the solution with `dotnet build` or with a build button in Godot or Rider.
-
-Start the auth server, the campaign server, 2 shard servers and 2 clients by running the following commands,
-each in a separate terminal:
-
-```bash
-dotnet run --project ../Soteo.AuthServer
-soteo --quiet --no-window Side=CampaignServer ShardIds:0=00000000-0000-0000-0000-0000000005d1 ShardIds:1=00000000-0000-0000-0000-0000000005d2
-soteo --quiet --no-window Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d1
-soteo --quiet --no-window Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d2
-soteo --quiet --position 10,10 --resolution 1000x500 NoScroll=true
-soteo --quiet --position 10,550 --resolution 1000x500 NoScroll=true Email=player2@soteo.net
+```
+--no-header --headless ProcessName=CampaignServer Side=CampaignServer ShardIds:0=00000000-0000-0000-0000-0000000005d1 ShardIds:1=00000000-0000-0000-0000-0000000005d2
+--no-header --headless ProcessName=ShardServer1 Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d1
+--no-header --headless ProcessName=ShardServer2 Side=ShardServer ShardId=00000000-0000-0000-0000-0000000005d2
+--no-header --position 10,50 --resolution 1400x700 ProcessName=Client1 NoScroll=true
+--no-header --position 10,800 --resolution 1400x700 ProcessName=Client2 NoScroll=true Email=player2@soteo.net
 ```
 
-Note that `--quiet` suppresses all `GD.Print` logs. For temporary debug logs use `Console.WriteLine`, it still works
-even in the quiet mode. Also, you can remove this option if you wish.
+Start the auth server either by running `dotnet run` from the `Soteo.AuthServer` folder or from your IDE.
 
 Go to https://localhost:3705 in a browser, register a new account with email `player1@soteo.net` and password
 `Pa55_word`, then click the link to confirm the email. Repeat for `player2@soteo.net`.
 
-Log in with the Godot client with the default credentials, choose a shard and a character and click "Deploy".
+Press the play button in the Godot editor, this will start a campaign server, 2 shard servers and 2 clients.
+
+Log in with a Godot client with the default credentials, choose a shard and a character and click `Deploy`.
 
 For more info on configuration, such as changing ports, see the `Config` class.
-
-##### Running from Rider
-
-If using Rider, you can use Run/Debug configurations to run the game instead of terminal. For the auth server add
-".NET Launch Settings Profile", for other processes add "Godot 3 Start and Debug" (set working directory to `/Godot`,
-copy arguments from above and use "Redirect standard streams" terminal mode). To launch all processes in one click add
-"Multi-Launch" with first step building the solution immediately, second step launching auth server after previous
-finished and the rest after previous started.
 
 ### Exploring the codebase
 
@@ -120,18 +97,15 @@ explore the classes mentioned in the docs or the ones you are interested in.
 
 ### First step - delete snapshots
 
-During development snapshot format can change, causing crashed or undefined behavior when trying to replicate an
+During development snapshot format can change, causing crashes or undefined behavior when trying to replicate an
 old snapshot. So the first step if something breaks suddently should be clearing the snapshot folder
 (specified in environment variables).
 
-### Missing scene dependencies
+### Problems with running the game from a terminal
 
-Godot editor sometimes show the missing scene dependencies window when trying to open a scene, even if all dependencies
-are fine. In this case close that window and open the scene again.
-
-### ERROR: Missing scripts metadata file
-
-Press the Build button in Godot
+Windows releases of Godot include 2 executables, one with the _console suffix and one without. Make sure you use
+the console one. Also Godot doesn't work well with terminal IO redirection, so don't use tools that do that,
+such as Git Bash, instead use a native terminal app (cmd or PowerShell on Windows).
 
 ## Contributing
 
