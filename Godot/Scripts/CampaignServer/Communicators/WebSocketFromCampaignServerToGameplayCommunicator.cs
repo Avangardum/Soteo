@@ -36,7 +36,7 @@ public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
         IPacketHandler packetHandler,
         IUserRepository userRepo,
         IInitializationRepository initRepo,
-        IntercomOptions intercomOptions,
+        ServerOptions serverOptions,
         CertificateOptions certificateOptions,
         PortOptions portOptions
     )
@@ -49,7 +49,7 @@ public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
 
         _jwtBuilder = JwtBuilder.Create()
             .WithAlgorithm(new HMACSHA256Algorithm())
-            .WithSecret(Convert.FromBase64String(intercomOptions.IntercomSecret));
+            .WithSecret(Convert.FromBase64String(serverOptions.ServerSecret));
 
         _tcpServer.Listen((ushort)portOptions.Port).ThrowIfError();
     }

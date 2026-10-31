@@ -24,7 +24,7 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
     private readonly ToAuthServerConnectionOptions _toAuthServerConnectionOptions;
     private readonly ToCampaignServerConnectionOptions _toCampaignServerConnectionOptions;
     private readonly CertificateVerificationOptions _certificateVerificationOptions;
-    private readonly ServerDependency<IntercomOptions> _intercomOptions;
+    private readonly ServerDependency<ServerOptions> _serverOptions;
 
     private string? _token;
     private Status _status;
@@ -38,7 +38,7 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
         ToAuthServerConnectionOptions toAuthServerConnectionOptions,
         ToCampaignServerConnectionOptions toCampaignServerConnectionOptions,
         CertificateVerificationOptions certificateVerificationOptions,
-        ServerDependency<IntercomOptions> intercomOptions
+        ServerDependency<ServerOptions> serverOptions
     )
     {
         _packetHandler = packetHandler;
@@ -49,7 +49,7 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
         _toAuthServerConnectionOptions = toAuthServerConnectionOptions;
         _toCampaignServerConnectionOptions = toCampaignServerConnectionOptions;
         _certificateVerificationOptions = certificateVerificationOptions;
-        _intercomOptions = intercomOptions;
+        _serverOptions = serverOptions;
 
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
         ProcessPriority = (int)ProcessPriorityEnum.Communicator;
@@ -146,8 +146,8 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
         Guid id = _currentUserIdRepository.Id.Required;
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
-            $"&intercomSecret={Uri.EscapeDataString(_intercomOptions.Value.Required.IntercomSecret)}";
-        string url = $"{_toAuthServerConnectionOptions.AuthServerUrl}/token/service";
+            $"&serverSecret={Uri.EscapeDataString(_serverOptions.Value.Required.ServerSecret)}";
+        string url = $"{_toAuthServerConnectionOptions.AuthServerUrl}/token/server";
         _httpRequest.Request
         (
             url,
@@ -155,7 +155,6 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
             customHeaders: headers,
             requestData: body
         );
-        // todo don't use the word intercom
     }
 
     private void OnAuthRequestCompleted(long result, long responseCode, string[] headers, byte[] body)

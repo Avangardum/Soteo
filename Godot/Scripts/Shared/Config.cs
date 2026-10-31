@@ -59,7 +59,7 @@ internal static class Config
         Add<ToCampaignServerConnectionOptions>(Side.Client, Side.ShardServer);
         Add<CertificateVerificationOptions>(Side.Client, Side.ShardServer);
         Add<CertificateOptions>(Side.CampaignServer);
-        Add<IntercomOptions>(Side.Client, Side.ShardServer, Side.CampaignServer);
+        Add<ServerOptions>(Side.Client, Side.ShardServer, Side.CampaignServer);
         Add<SideOptions>(Side.Client, Side.ShardServer, Side.CampaignServer);
         Add<ShardOptions>(Side.ShardServer);
         Add<CameraOptions>(Side.Client);

@@ -9,7 +9,7 @@ namespace Soteo.AuthServer.Controllers;
 
 public sealed class AuthController : Controller
 {
-    private readonly string _intercomSecret;
+    private readonly string _serverSecret;
     private readonly string _domain = "localhost";
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SigningCredentials _signingCredentials;
@@ -17,8 +17,8 @@ public sealed class AuthController : Controller
     public AuthController(UserManager<IdentityUser> userManager, IConfiguration configuration)
     {
         _userManager = userManager;
-        _intercomSecret = configuration["IntercomSecret"] ?? throw new Exception("IntercomSecret is not set.");
-        var securityKey = new SymmetricSecurityKey(Convert.FromBase64String(_intercomSecret));
+        _serverSecret = configuration["ServerSecret"] ?? throw new Exception("ServerSecret is not set.");
+        var securityKey = new SymmetricSecurityKey(Convert.FromBase64String(_serverSecret));
         _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
     }
 
@@ -46,11 +46,11 @@ public sealed class AuthController : Controller
         return Ok(accessToken);
     }
 
-    [HttpPost("/token/service")]
-    public async Task<IActionResult> GetServiceToken(string id, string role, string intercomSecret)
+    [HttpPost("/token/server")]
+    public async Task<IActionResult> GetServerToken(string id, string role, string serverSecret)
     {
         if (!ModelState.IsValid) return BadRequest();
-        if (intercomSecret != _intercomSecret) return Unauthorized();
+        if (serverSecret != _serverSecret) return Unauthorized();
         List<Claim> claims =
         [
             new(JwtRegisteredClaimNames.Sub, id),

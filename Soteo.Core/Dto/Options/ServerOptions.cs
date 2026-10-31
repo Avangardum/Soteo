@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Soteo.Core.Dto.Options;
 
-public sealed record IntercomOptions
+public sealed record ServerOptions
 {
     [Required]
-    public required string IntercomSecret { get; init; }
+    public required string ServerSecret { get; init; }
 }
