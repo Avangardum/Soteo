@@ -8,7 +8,7 @@ public sealed partial class DebugScreenNode : Control
 
     private DebugScreenNode() { }
 
-    public static DebugScreenNode Instance() => Scene.Instantiate<DebugScreenNode>(); // todo rename
+    public static DebugScreenNode Instantiate() => Scene.Instantiate<DebugScreenNode>();
 
     public override void _PhysicsProcess(double delta) => DebugScreen?.PhysicsProcess(delta);
     public override void _Process(double delta) => DebugScreen?.Process(delta);

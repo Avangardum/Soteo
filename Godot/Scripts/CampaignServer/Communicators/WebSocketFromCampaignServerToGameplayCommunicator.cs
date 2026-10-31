@@ -12,7 +12,7 @@ using Soteo.Util;
 namespace Soteo.Main.CampaignServer.Communicators;
 
 public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
-    GdObject, IFromCampaignServerCommunicator
+    GodotObject, IFromCampaignServerCommunicator
 {
     private readonly TcpServer _tcpServer = new();
     private readonly IPacketSerializer _packetSerializer;

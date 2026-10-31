@@ -6,5 +6,5 @@ public sealed partial class LogInScreenNode : Control
 
     private LogInScreenNode() { }
 
-    public static LogInScreenNode Instance() => Scene.Instantiate<LogInScreenNode>(); // todo rename
+    public static LogInScreenNode Instantiate() => Scene.Instantiate<LogInScreenNode>();
 }

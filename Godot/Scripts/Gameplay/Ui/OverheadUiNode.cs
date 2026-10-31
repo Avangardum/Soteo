@@ -6,7 +6,7 @@ public sealed partial class OverheadUiNode : Control
 
     private OverheadUiNode() { }
 
-    public static OverheadUiNode Instance() => Scene.Instantiate<OverheadUiNode>(); // todo rename
+    public static OverheadUiNode Instantiate() => Scene.Instantiate<OverheadUiNode>();
 
     public OverheadUi? OverheadUi { get; set; }
 

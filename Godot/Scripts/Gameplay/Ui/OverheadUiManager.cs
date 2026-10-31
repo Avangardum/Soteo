@@ -25,7 +25,7 @@ public sealed partial class OverheadUiManager : Control
     {
         if (entity is not IUnitPuppet unit) return;
 
-        var node = OverheadUiNode.Instance();
+        var node = OverheadUiNode.Instantiate();
         AddChild(node);
         new OverheadUi(node, unit, _camera, _palette);
     }

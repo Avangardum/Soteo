@@ -8,7 +8,7 @@ public sealed partial class HudNode : Control
 
     private HudNode() { }
 
-    public static HudNode Instance() => Scene.Instantiate<HudNode>(); // todo rename
+    public static HudNode Instantiate() => Scene.Instantiate<HudNode>();
 
     public override void _Process(double delta) => Hud?.Process(delta);
 }

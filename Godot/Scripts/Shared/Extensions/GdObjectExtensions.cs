@@ -4,7 +4,7 @@ namespace Soteo.Main.Shared.Extensions;
 
 public static class GdObjectExtensions
 {
-    extension (GdObject self)
+    extension (GodotObject self)
     {
         public IDisposable Connect(string signal, Action handler) =>
             SignalConnector.Instance.ConnectSignal(self, signal, handler);

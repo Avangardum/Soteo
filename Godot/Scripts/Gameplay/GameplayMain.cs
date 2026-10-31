@@ -222,11 +222,11 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         {
             _camera = ActivatorUtilities.CreateInstance<SoteoCamera>(_rootServiceProvider).Also(it => AddChild(it));
             var ui = GetNode<CanvasLayer>("Ui").Required;
-            _hudNode = HudNode.Instance().Also(it => ui.AddChild(it));
+            _hudNode = HudNode.Instantiate().Also(it => ui.AddChild(it));
             AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));
-            _logIScreenNode = LogInScreenNode.Instance().Also(it => ui.AddChild(it));
-            _debugScreenNode = DebugScreenNode.Instance().Also(it => ui.AddChild(it));
-            _campaignScreenNode = CampaignScreenNode.Instance().Also(it => ui.AddChild(it));
+            _logIScreenNode = LogInScreenNode.Instantiate().Also(it => ui.AddChild(it));
+            _debugScreenNode = DebugScreenNode.Instantiate().Also(it => ui.AddChild(it));
+            _campaignScreenNode = CampaignScreenNode.Instantiate().Also(it => ui.AddChild(it));
         }
     }
 

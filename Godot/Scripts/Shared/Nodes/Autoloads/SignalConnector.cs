@@ -13,38 +13,38 @@ public sealed partial class SignalConnector : Node // todo remove maybe?
         _instance.Value = this;
     }
 
-    public IDisposable ConnectSignal(GdObject obj, string signal, Action handler)
+    public IDisposable ConnectSignal(GodotObject obj, string signal, Action handler)
     {
         var connection = new Connection(handler);
         obj.Connect(signal, new Callable(connection, nameof(Connection.Handle)));
         return new DelegateDisposable(connection.Free);
     }
 
-    public IDisposable ConnectSignal<T>(GdObject obj, string signal, Action<T> handler)
+    public IDisposable ConnectSignal<T>(GodotObject obj, string signal, Action<T> handler)
     {
         var connection = new Connection<T>(handler);
         obj.Connect(signal, new Callable(connection, nameof(Connection.Handle)));
         return new DelegateDisposable(connection.Free);
     }
 
-    public IDisposable ConnectSignal<T1, T2>(GdObject obj, string signal, Action<T1, T2> handler)
+    public IDisposable ConnectSignal<T1, T2>(GodotObject obj, string signal, Action<T1, T2> handler)
     {
         var connection = new Connection<T1, T2>(handler);
         obj.Connect(signal, new Callable(connection, nameof(Connection.Handle)));
         return new DelegateDisposable(connection.Free);
     }
 
-    private sealed partial class Connection(Action handler) : GdObject
+    private sealed partial class Connection(Action handler) : GodotObject
     {
         public void Handle() => handler();
     }
 
-    private sealed partial class Connection<T>(Action<T> handler) : GdObject
+    private sealed partial class Connection<T>(Action<T> handler) : GodotObject
     {
         public void Handle(T arg) => handler(arg);
     }
 
-    private sealed partial class Connection<T1, T2>(Action<T1, T2> handler) : GdObject
+    private sealed partial class Connection<T1, T2>(Action<T1, T2> handler) : GodotObject
     {
         public void Handle(T1 arg1, T2 arg2) => handler(arg1, arg2);
     }

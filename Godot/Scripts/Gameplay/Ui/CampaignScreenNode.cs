@@ -7,5 +7,5 @@ public sealed partial class CampaignScreenNode : Control
 
     private CampaignScreenNode() { }
 
-    public static CampaignScreenNode Instance() => Scene.Instantiate<CampaignScreenNode>(); // todo rename
+    public static CampaignScreenNode Instantiate() => Scene.Instantiate<CampaignScreenNode>();
 }
