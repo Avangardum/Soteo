@@ -18,7 +18,6 @@ public sealed partial class CrashOnExceptionLogger(SceneTree sceneTree) : Logger
     {
         if (function == "void Godot.NativeInterop.ExceptionUtils.LogException(System.Exception)")
         {
-            OS.Alert(code, "Soteo crashed!");
             sceneTree.Quit(1);
         }
     }
