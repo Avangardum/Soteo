@@ -40,7 +40,6 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
     private IProcessPublisher? _processPublisher;
 
     private IServiceProvider ServiceProvider => _serviceProvider.Value;
-    private bool IsSingleplayer => ServiceProvider.GetRequiredService<SingleplayerOptions>().IsSingleplayer;
 
     public override void _Ready()
     {
@@ -102,7 +101,7 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
 
     private async Task TryLoadSnapshotAsync()
     {
-        if (!IsSingleplayer && File.Exists(SnapshotPath))
+        if (File.Exists(SnapshotPath))
         {
             _logger.Value.LogInformation("Loading a snapshot");
             byte[] bytes = File.ReadAllBytes(SnapshotPath);
@@ -134,12 +133,9 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
 
     private async Task TrySaveSnapshotAsync()
     {
-        if (!IsSingleplayer)
-        {
-            CampaignSnapshot snapshot = await _snapshotManager.Value.CreateSnapshotAsync();
-            byte[] bytes = _snapshotSerializer.Value.Serialize(snapshot);
-            File.WriteAllBytes(SnapshotPath, bytes);
-        }
+        CampaignSnapshot snapshot = await _snapshotManager.Value.CreateSnapshotAsync();
+        byte[] bytes = _snapshotSerializer.Value.Serialize(snapshot);
+        File.WriteAllBytes(SnapshotPath, bytes);
     }
 
     private string SnapshotPath
