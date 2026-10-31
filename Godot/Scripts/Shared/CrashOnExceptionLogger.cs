@@ -17,8 +17,6 @@ public sealed partial class CrashOnExceptionLogger(SceneTree sceneTree) : Logger
     )
     {
         if (function == "void Godot.NativeInterop.ExceptionUtils.LogException(System.Exception)")
-        {
             sceneTree.Quit(1);
-        }
     }
 }
