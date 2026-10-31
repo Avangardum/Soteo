@@ -86,6 +86,7 @@ public sealed class Hud : IHud
 
         node.Hud = this;
         _node = node;
+        _node.Visible = false;
         _healthBar = node.GetNode<TextureProgressBar>("VBoxContainer/UnitPanel/VBoxContainer/Health");
         _manaBar = node.GetNode<TextureProgressBar>("VBoxContainer/UnitPanel/VBoxContainer/Mana");
         _healthLabel = _healthBar.GetNode<Label>("Label");

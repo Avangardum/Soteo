@@ -63,6 +63,7 @@ public sealed partial class SoteoCamera(CameraOptions cameraOptions) : Camera2D,
         ProcessMode = ProcessModeEnum.Always;
         MakeCurrent();
         TargetZoomLog2 = DefaultZoomLog2;
+        Position = GdVector2.Zero;
     }
 
     public override void _Process(double delta)
