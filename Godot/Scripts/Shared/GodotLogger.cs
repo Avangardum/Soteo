@@ -28,11 +28,10 @@ internal sealed class GodotLogger : ILogger
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
 
-    public sealed class Provider(string? processName) : ILoggerProvider
+    public sealed class Provider : ILoggerProvider
     {
         public void Dispose() { }
 
-        public ILogger CreateLogger(string categoryName) =>
-            processName != null ? new GodotLogger($"{processName} {categoryName}") : new GodotLogger(categoryName);
+        public ILogger CreateLogger(string categoryName) => new GodotLogger(categoryName);
     }
 }

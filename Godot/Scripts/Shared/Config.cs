@@ -24,7 +24,6 @@ internal static class Config
 
     // Static fields are only for accessing the configuration in main classes before a service provider is built
     public static readonly Side Side = Side.Parse(Configuration["Side"].Required);
-    public static readonly string? ProcessName = Configuration["ProcessName"];
 
     private static IConfiguration BuildConfiguration(string? environment)
     {

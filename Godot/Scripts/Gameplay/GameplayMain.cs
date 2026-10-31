@@ -102,7 +102,7 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
     private void RegisterServices(IServiceCollection services)
     {
         Config.AddToServiceCollection(services);
-        Logging.AddToServiceCollection(services, Config.ProcessName);
+        Logging.AddToServiceCollection(services);
         RegisterSharedServices(services);
 
         if (Config.Side == Side.ShardServer)

@@ -4,6 +4,7 @@ public sealed partial class Main : Node
 {
     public override void _Ready()
     {
+        OS.AddLogger(new CrashOnExceptionLogger(GetTree()));
         Callable.From(() =>
         {
             if (Config.Side == Side.CampaignServer)
