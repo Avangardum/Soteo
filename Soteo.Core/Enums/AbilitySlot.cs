@@ -2,24 +2,17 @@ namespace Soteo.Core.Enums;
 
 public enum AbilitySlot
 {
+    // Special slots
     Attack,
     Recall,
-    Class0,
-    Class1,
-    Class2,
-    Class3,
-    Class4,
-    Class5,
-    Class6,
-    ClassLast = Class6,
-    MainHandPrimary,
-    MainHandSecondary,
-    Offhand,
-    Body,
-    Head,
-    Feet,
-    Belt0,
-    Belt1,
-    Belt2,
-    Belt3
+
+    // General slots: both innate and item abilities go here
+    General0,
+    General1,
+    General2,
+    General3,
+    General4,
+    General5,
+    General6,
+    GeneralLast = General6
 }

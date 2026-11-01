@@ -46,18 +46,18 @@ public sealed class UnitTests
     [Fact]
     public void UseAbilityCommandForEmptySlotDoesntThrow()
     {
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0, TargetUnitId = Guid.NewGuid() });
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General0, TargetUnitId = Guid.NewGuid() });
         _sut.Tick(Const.TickInterval);
     }
 
     [Fact]
     public void AbilityTargetingNonexistentUnitIsNotUsed()
     {
-        _sut.SetAbility<SpyAbility>(AbilitySlot.Class0, 1);
+        _sut.SetAbility<SpyAbility>(AbilitySlot.General0, 1);
         int useCount = 0;
         Ability.Instance<SpyAbility>().Used += () => useCount++;
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0, TargetUnitId = Guid.NewGuid() });
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General0, TargetUnitId = Guid.NewGuid() });
         _sut.Tick(Const.TickInterval);
 
         useCount.Should().Be(0);
@@ -66,7 +66,7 @@ public sealed class UnitTests
     [Fact]
     public void AbilityTargetingProjectileIsNotUsed()
     {
-        _sut.SetAbility<SpyAbility>(AbilitySlot.Class0, 1);
+        _sut.SetAbility<SpyAbility>(AbilitySlot.General0, 1);
         int useCount = 0;
         Ability.Instance<SpyAbility>().Used += () => useCount++;
         var projectileId = Guid.NewGuid();
@@ -89,7 +89,7 @@ public sealed class UnitTests
         );
         _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [projectileId] = projectile });
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0, TargetUnitId = projectileId });
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General0, TargetUnitId = projectileId });
         _sut.Tick(Const.TickInterval);
 
         useCount.Should().Be(0);
@@ -157,13 +157,13 @@ public sealed class UnitTests
     [Fact]
     public void UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing()
     {
-        _sut.SetAbility<SpyAbilityWithUseTime>(AbilitySlot.Class0, 1);
+        _sut.SetAbility<SpyAbilityWithUseTime>(AbilitySlot.General0, 1);
         int validatedStrictlyCount = 0;
         int validatedNonStrictlyCount = 0;
         Ability.Instance<SpyAbilityWithUseTime>().ValidatedStrictly += () => validatedStrictlyCount++;
         Ability.Instance<SpyAbilityWithUseTime>().ValidatedNonStrictly += () => validatedNonStrictlyCount++;
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class0 });
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General0 });
         _sut.Tick(Const.TickInterval);
 
         validatedStrictlyCount.Should().Be(1);
@@ -183,8 +183,8 @@ public sealed class UnitTests
     [Fact]
     public void UsingAbilityWhileAnotherAbilityIsBeingUsedValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing()
     {
-        _sut.SetAbility<AbilityWithUseTime>(AbilitySlot.Class1, 1);
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Class1 });
+        _sut.SetAbility<AbilityWithUseTime>(AbilitySlot.General1, 1);
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General1 });
         _sut.Tick(Const.TickInterval);
 
         UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing();

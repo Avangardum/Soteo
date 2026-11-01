@@ -556,6 +556,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         ChangeResourceStat(Stat.CurrentMana, -amount);
     }
 
+    // todo Damage type
     public void TakeDamage(double amount, IUnit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentHealth, -amount);
 
