@@ -18,6 +18,6 @@ public sealed class RecallAbility : Ability
         base.TakeEffect(context);
         context.User.Remove();
         context.GetRequiredService<IFromGameplayPacketSender>()
-            .SendReliable(new CharacterRecalledPacket { CharacterId = context.User.Id }, Const.CampaignServerId);
+            .Send(new CharacterRecalledPacket { CharacterId = context.User.Id }, Const.CampaignServerId);
     }
 }

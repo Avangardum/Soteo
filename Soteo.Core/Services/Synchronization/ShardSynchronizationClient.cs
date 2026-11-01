@@ -124,7 +124,7 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
     }
 
     private void RequestSnapshot() =>
-        _packetSender.SendReliable(new ShardSnapshotRequestPacket(), _shard.Id);
+        _packetSender.Send(new ShardSnapshotRequestPacket(), _shard.Id);
 
     private bool TrySynchronize()
     {

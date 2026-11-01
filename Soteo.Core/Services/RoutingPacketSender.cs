@@ -11,33 +11,20 @@ public sealed class RoutingPacketSender
     IFromGameplayPacketSender gameplaySender
 ) : IFromGameplayPacketSender
 {
-    public void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds)
+    public void Send(Packet packet, IReadOnlyList<Guid> receiverIds, bool reliable = true, bool deferToNextTick = false)
     {
         if (receiverIds.Contains(Const.CampaignServerId))
         {
             campaignServerSender.SendPacket(packet);
-            gameplaySender.SendReliable(packet, receiverIds.Except([Const.CampaignServerId]).ToImmutableList());
+            gameplaySender
+                .Send(packet, receiverIds.Except([Const.CampaignServerId]).ToList(), reliable, deferToNextTick);
         }
         else
         {
-            gameplaySender.SendReliable(packet, receiverIds);
+            gameplaySender.Send(packet, receiverIds, reliable, deferToNextTick);
         }
     }
 
-    public void SendUnreliable(Packet packet, params IEnumerable<Guid> receiverIds)
-    {
-        if (receiverIds.Contains(Const.CampaignServerId))
-        {
-            campaignServerSender.SendPacket(packet);
-            gameplaySender.SendUnreliable(packet, receiverIds.Except([Const.CampaignServerId]).ToImmutableList());
-        }
-        else
-        {
-            gameplaySender.SendUnreliable(packet, receiverIds);
-        }
-    }
-
-    public void BroadcastReliable(Packet packet) => gameplaySender.BroadcastReliable(packet);
-
-    public void BroadcastUnreliable(Packet packet) => gameplaySender.BroadcastUnreliable(packet);
+    public void Broadcast(Packet packet, bool reliable = true, bool deferToNextTick = false) =>
+        gameplaySender.Broadcast(packet, reliable, deferToNextTick);
 }

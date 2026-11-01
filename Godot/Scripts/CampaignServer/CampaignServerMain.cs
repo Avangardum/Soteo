@@ -72,12 +72,12 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
         _communicator.Value.BroadcastToShardServers(new CampaignInitializedPacket());
         _initRepo.Value.IsInitialized = true;
 
-        const int initialPauseDuration = 15;
+        const int initialPauseDuration = 10;
         _logger.Value.LogInformation("Initialized, unpausing in {duration} seconds", initialPauseDuration);
         await _timeProvider.Value.Delay(TimeSpan.FromSeconds(initialPauseDuration));
         _synchronizedCampaignStateRepo.Value.Unpause();
 
-        const int sessionDuration = 60;
+        const int sessionDuration = 120;
         _logger.Value.LogInformation("Unpaused, the session ends in {duration} seconds", sessionDuration);
         await _timeProvider.Value.Delay(TimeSpan.FromSeconds(sessionDuration));
         _synchronizedCampaignStateRepo.Value.Pause();

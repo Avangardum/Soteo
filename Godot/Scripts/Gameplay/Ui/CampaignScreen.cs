@@ -76,7 +76,7 @@ public sealed class CampaignScreen
     {
         if (_selectedCharacterId == null || _selectedShardId == null) return;
 
-        _packetSender.SendReliable
+        _packetSender.Send
         (
             new SpawnCharacterPacket
             {

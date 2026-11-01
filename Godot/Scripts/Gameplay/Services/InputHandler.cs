@@ -85,7 +85,7 @@ public sealed partial class InputHandler : Node2D
                 Repeat = true,
                 TargetUnitId = targetUnit.Id
             };
-            _packetSender.SendReliable
+            _packetSender.Send
             (
                 new UseAbilityPacket { UnitId = _currentCharIdRepo.Id.Required, Command = command },
                 shardId.Value
@@ -93,7 +93,7 @@ public sealed partial class InputHandler : Node2D
         }
         else
         {
-            _packetSender.SendReliable
+            _packetSender.Send
             (
                 new MovePacket
                 {
@@ -111,7 +111,7 @@ public sealed partial class InputHandler : Node2D
         _hud.TrySelectCurrentUnit();
         if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required, out IUnitPuppet? user, out Guid? shardId))
             return;
-        _packetSender.SendReliable
+        _packetSender.Send
         (
             new StopPacket { UnitId = _currentCharIdRepo.Id.Required, Command = new StopCommand() },
             shardId.Value
@@ -136,7 +136,7 @@ public sealed partial class InputHandler : Node2D
             GetGlobalMousePosition().ToSys() / Const.PixelsInMeter :
             null;
 
-        _packetSender.SendReliable
+        _packetSender.Send
         (
             new UseAbilityPacket
             {

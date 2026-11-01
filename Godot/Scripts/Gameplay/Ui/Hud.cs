@@ -332,7 +332,7 @@ public sealed class Hud : IHud
         if (!unit.Inventory.HasSlot(fromIndex)) return;
         if (!unit.Inventory.HasSlot(toIndex)) return;
 
-        _packetSender.SendReliable
+        _packetSender.Send
         (
             new MoveItemStackPacket
             {
@@ -361,7 +361,7 @@ public sealed class Hud : IHud
         if (!_crossInventoryHelper.Equip(unit.Inventory, unit.EquipmentInventory, fromInventorySlot, toEquipmentSlot))
             return;
         unit.DesyncInventory();
-        _packetSender.SendReliable(new EquipPacket
+        _packetSender.Send(new EquipPacket
         {
             UnitId = unit.Id,
             Command = new EquipCommand(fromInventorySlot)
@@ -373,7 +373,7 @@ public sealed class Hud : IHud
         if (!_crossInventoryHelper.Unequip(unit.Inventory, unit.EquipmentInventory, fromEquipmentSlot, toInventorySlot))
             return;
         unit.DesyncInventory();
-        _packetSender.SendReliable(new UnequipPacket
+        _packetSender.Send(new UnequipPacket
         {
             UnitId = unit.Id,
             Command = new UnequipCommand(fromEquipmentSlot, toInventorySlot)

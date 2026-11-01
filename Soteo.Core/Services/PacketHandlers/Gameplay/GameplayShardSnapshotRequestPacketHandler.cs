@@ -27,6 +27,6 @@ public sealed class GameplayShardSnapshotRequestPacketHandler
     {
         ShardSnapshot snapshot = shardPersistenceSnapshotManager.CreateSnapshot();
         var packet = new ShardSnapshotPacket { Snapshot = snapshot };
-        packetSender.SendReliable(packet, Const.CampaignServerId);
+        packetSender.Send(packet, Const.CampaignServerId);
     }
 }

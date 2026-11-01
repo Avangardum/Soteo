@@ -24,11 +24,11 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
     private readonly Dictionary<Guid, PeerConnectionAndChannels> _peerConnectionsAndChannels = [];
     private readonly Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
     private readonly HashSet<Guid> _connectedPeerIds = [];
+    private readonly Queue<(Packet Packet, Guid SenderId)> _handleNextTickQueue = [];
+    private readonly Queue<(WebRtcDataChannel Channel, byte[] Chunk)> _sendNextTickQueue = [];
 
     public event Action<Guid> PeerConnected = delegate { };
     public event Action<Guid> PeerDisconnected = delegate { };
-
-    private readonly Queue<(Packet Packet, Guid SenderId)> _packetQueue = [];
 
     private readonly IFromGameplayToCampaignServerPacketSender _campaignServerPacketSender;
     private readonly IPacketSerializer _packetSerializer;
@@ -67,18 +67,22 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
     {
         _isPhysicsProcess = true;
 
-        // Poll() is duplicated in _PhysicsProcess because it runs before _Process, so any packets received during
-        // _Process would be delayed to the next physics frame otherwise.
-        Poll(delta);
-
-        if (_sideOptions.Side == Side.ShardServer)
+        while (_sendNextTickQueue.Count > 0)
         {
-            while (_packetQueue.Count > 0)
-            {
-                (Packet packet, Guid senderId) = _packetQueue.Dequeue();
-                HandlePacket(packet, senderId);
-            }
+            (WebRtcDataChannel channel, byte[] bytes) = _sendNextTickQueue.Dequeue();
+            if (channel.GetReadyState() == WebRtcDataChannel.ChannelState.Open)
+                channel.PutPacket(bytes).ThrowIfError();
         }
+
+        while (_handleNextTickQueue.Count > 0)
+        {
+            (Packet packet, Guid senderId) = _handleNextTickQueue.Dequeue();
+            HandlePacket(packet, senderId);
+        }
+
+        // Poll() is duplicated in _PhysicsProcess because it runs before _Process, so any packets received during
+        // _Process would be handled in the next tick otherwise.
+        Poll(delta);
 
         _isPhysicsProcess = false;
     }
@@ -139,7 +143,7 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
                     _ping.Remove(peerId);
             _timeSinceLastPing = 0;
             _lastPingId = Guid.NewGuid();
-            BroadcastUnreliable(new PingPacket { Id = _lastPingId.Value, IsResponse = false });
+            Broadcast(new PingPacket { Id = _lastPingId.Value, IsResponse = false }, reliable: false);
         }
     }
 
@@ -170,7 +174,7 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         {
             if (_sideOptions.Side == Side.ShardServer)
             {
-                SendReliable(new BadInputPacket { Reason = e.Message }, senderId);
+                Send(new BadInputPacket { Reason = e.Message }, [senderId]);
                 return null;
             }
             throw;
@@ -196,14 +200,14 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
 
             // Server defers packet handling to _PhysicsProcess to ensure that all game logic is executed in it only
             if (_sideOptions.Side == Side.ShardServer && !_isPhysicsProcess)
-                _packetQueue.Enqueue((packet, senderId));
+                _handleNextTickQueue.Enqueue((packet, senderId));
             else
                 await _packetHandler.HandleAsync(packet, senderId);
         }
         catch (BadPacketException e)
         {
             if (_sideOptions.Side == Side.ShardServer)
-                SendReliable(new BadInputPacket { Reason = e.Message }, senderId);
+                Send(new BadInputPacket { Reason = e.Message }, [senderId]);
             else
                 AsyncExceptionCollector.Collect(e);
         }
@@ -224,7 +228,7 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         }
         else
         {
-            SendUnreliable(packet with { IsResponse = true }, senderId);
+            Send(packet with { IsResponse = true }, [senderId], reliable: false);
         }
     }
 
@@ -283,24 +287,10 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         });
     }
 
-    public void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds) =>
-        SendToMany(packet, receiverIds, it => it.ReliableChannel);
+    public void Broadcast(Packet packet, bool reliable = true, bool deferToNextTick = false) =>
+        Send(packet, _peerConnectionsAndChannels.Keys.ToList(), reliable, deferToNextTick);
 
-    public void SendUnreliable(Packet packet, params IEnumerable<Guid> receiverIds) =>
-        SendToMany(packet, receiverIds, it => it.UnreliableChannel);
-
-    public void BroadcastReliable(Packet packet) =>
-        SendToMany(packet, _peerConnectionsAndChannels.Keys, it => it.ReliableChannel);
-
-    public void BroadcastUnreliable(Packet packet) =>
-        SendToMany(packet, _peerConnectionsAndChannels.Keys, it => it.UnreliableChannel);
-
-    private void SendToMany
-    (
-        Packet packet,
-        IEnumerable<Guid> receiverIds,
-        Func<PeerConnectionAndChannels, WebRtcDataChannel> channelSelector
-    )
+    public void Send(Packet packet, IReadOnlyList<Guid> receiverIds, bool reliable = true, bool deferToNextTick = false)
     {
         // There is an undocumented packet size limit, so large packets are chunked
         byte[][] chunks = _packetChunker.SplitIntoChunks(packet, maxChunkSize: 250000);
@@ -308,11 +298,15 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         {
             PeerConnectionAndChannels? connectionAndChannels;
             if (!_peerConnectionsAndChannels.TryGetValue(receiverId, out connectionAndChannels)) continue;
-            WebRtcDataChannel channel = channelSelector(connectionAndChannels);
+            WebRtcDataChannel channel =
+                reliable ? connectionAndChannels.ReliableChannel : connectionAndChannels.UnreliableChannel;
             if (channel.GetReadyState() != WebRtcDataChannel.ChannelState.Open) continue;
             foreach (byte[] chunk in chunks)
             {
-                channel.PutPacket(chunk).ThrowIfError();
+                if (deferToNextTick)
+                    _sendNextTickQueue.Enqueue((channel, chunk));
+                else
+                    channel.PutPacket(chunk).ThrowIfError();
                 BytesSent += chunk.Length;
             }
         }

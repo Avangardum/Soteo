@@ -92,7 +92,7 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         await _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.Task;
         await _synchronizedCampaignStateInitializedTcs.Task;
         _rootServiceProvider.GetRequiredService<IFromGameplayPacketSender>()
-            .SendReliable(new ShardServerLocalInitDonePacket(), Const.CampaignServerId);
+            .Send(new ShardServerLocalInitDonePacket(), Const.CampaignServerId);
         _logger.Required.LogInformation("Local initializing done, waiting for others");
         await _campaignInitializedTcs.Task;
         _initRepo.Required.IsInitialized = true;

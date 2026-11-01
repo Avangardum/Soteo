@@ -79,7 +79,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
         if (_snapshotRequesters.Count > 0)
         {
             var shardSnapshotPacket = new ShardSnapshotPacket { Snapshot = shardSnapshot };
-            _packetSender.SendReliable(shardSnapshotPacket, _snapshotRequesters);
+            _packetSender.Send(shardSnapshotPacket, _snapshotRequesters.ToList());
             _snapshotRequesters.Clear();
         }
 
@@ -93,7 +93,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
                 ServerLoad = _frameStopwatch.ElapsedSincePhysicsProcess * Const.TicksPerSecond,
                 SnapshotDelta = shardSnapshotDelta
             };
-            _packetSender.BroadcastReliable(shardSnapshotDeltaPacket);
+            _packetSender.Broadcast(shardSnapshotDeltaPacket, deferToNextTick: true);
         }
 
         _prevShardSnapshot = shardSnapshot;
@@ -110,7 +110,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
             };
 
             var shardSnapshotPacket = new ShardSnapshotPacket { Snapshot = _prevShardSnapshot };
-            _packetSender.SendReliable(shardSnapshotPacket, _snapshotRequesters);
+            _packetSender.Send(shardSnapshotPacket, _snapshotRequesters.ToList());
             _snapshotRequesters.Clear();
         }
     }

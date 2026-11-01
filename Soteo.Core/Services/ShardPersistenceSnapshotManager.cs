@@ -27,7 +27,7 @@ public sealed class ShardPersistenceSnapshotManager
     {
         tickRepo.Tick = snapshot.Tick;
         entitySnapshotManager.ReplicateEntitySnapshots(snapshot.Entities);
-        packetSender.SendReliable(new ShardSnapshotReplicatedPacket(), Const.CampaignServerId);
+        packetSender.Send(new ShardSnapshotReplicatedPacket(), Const.CampaignServerId);
         SnapshotReplicated();
     }
 }

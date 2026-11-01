@@ -8,7 +8,7 @@ public sealed class FakeFromGameplayPacketSender : IFromGameplayPacketSender
     private readonly Dictionary<Guid, List<Packet>> _personalPackets = [];
     private readonly List<Packet> _broadcastPackets = [];
 
-    public void SendReliable(Packet packet, params IEnumerable<Guid> receiverIds)
+    public void Send(Packet packet, IReadOnlyList<Guid> receiverIds, bool reliable = true, bool deferToNextTick = false)
     {
         foreach (Guid id in receiverIds)
         {
@@ -18,12 +18,8 @@ public sealed class FakeFromGameplayPacketSender : IFromGameplayPacketSender
         }
     }
 
-    public void SendUnreliable(Packet packet, params IEnumerable<Guid> receiverIds) =>
-        SendReliable(packet, receiverIds);
-
-    public void BroadcastReliable(Packet packet) => _broadcastPackets.Add(packet);
-
-    public void BroadcastUnreliable(Packet packet) => BroadcastReliable(packet);
+    public void Broadcast(Packet packet, bool reliable = true, bool deferToNextTick = false) =>
+        _broadcastPackets.Add(packet);
 
     public IReadOnlyList<Packet> PacketsSentTo(Guid id)
     {
