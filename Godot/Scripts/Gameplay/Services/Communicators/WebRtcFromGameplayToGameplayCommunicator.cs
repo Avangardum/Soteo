@@ -14,15 +14,16 @@ namespace Soteo.Main.Gameplay.Services.Communicators;
 public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
     Node, IShardServerConnector, IFromGameplayPacketSender, IWebrtcPacketReceiver, INetworkDebugger, IConnectionNotifier
 {
-    private const double PingInterval = 1;
+    private const double PingInterval = 0.5;
+    private const double PingTimeout = 10;
 
-    private double _timeSinceLastPing;
-    private Guid? _lastPingId;
+    private double _pingCountdown;
     private bool _didPollThisFrame;
     private bool _isPhysicsProcess;
 
     private readonly Dictionary<Guid, PeerConnectionAndChannels> _peerConnectionsAndChannels = [];
-    private readonly Dictionary<Guid, (Guid PingId, double ResponseTime)> _ping = [];
+    private readonly Dictionary<Guid, (DateTime SentAtUtc, DateTime ReceivedAtUtc)> _lastPingResponseDataByPeerId = [];
+    private readonly Dictionary<Guid, DateTime> _pingSendTimeUtc = [];
     private readonly HashSet<Guid> _connectedPeerIds = [];
     private readonly Queue<(Packet Packet, Guid SenderId)> _handleNextTickQueue = [];
     private readonly Queue<(WebRtcDataChannel Channel, byte[] Chunk)> _sendNextTickQueue = [];
@@ -82,20 +83,20 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
 
         // Poll() is duplicated in _PhysicsProcess because it runs before _Process, so any packets received during
         // _Process would be handled in the next tick otherwise.
-        Poll(delta);
+        Poll();
 
         _isPhysicsProcess = false;
     }
 
     public override void _Process(double delta)
     {
-        Poll(delta);
+        Poll();
         ProcessPing(delta);
 
         _didPollThisFrame = false;
     }
 
-    private void Poll(double delta)
+    private void Poll()
     {
         if (_didPollThisFrame) return;
         _didPollThisFrame = true;
@@ -127,7 +128,7 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
     private void OnPeerDisconnected(Guid peerId)
     {
         _peerConnectionsAndChannels.Remove(peerId);
-        _ping.Remove(peerId);
+        _lastPingResponseDataByPeerId.Remove(peerId);
         if (_connectedPeerIds.Remove(peerId))
             PeerDisconnected(peerId);
     }
@@ -135,15 +136,18 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
     private void ProcessPing(double delta)
     {
         if (_sideOptions.Side == Side.ShardServer) return;
-        _timeSinceLastPing += delta;
-        if (_timeSinceLastPing >= PingInterval)
+        _pingCountdown -= delta;
+        if (_pingCountdown <= 0)
         {
-            foreach ((Guid peerId, (Guid pingId, _)) in _ping.ToList())
-                if (pingId != _lastPingId)
-                    _ping.Remove(peerId);
-            _timeSinceLastPing = 0;
-            _lastPingId = Guid.NewGuid();
-            Broadcast(new PingPacket { Id = _lastPingId.Value, IsResponse = false }, reliable: false);
+            _pingCountdown += PingInterval;
+            var newPingId = Guid.NewGuid();
+            Broadcast(new PingPacket { Id = newPingId, IsResponse = false }, reliable: false);
+            var utcNow = DateTime.UtcNow;
+            _pingSendTimeUtc[newPingId] = utcNow;
+
+            foreach ((Guid id, DateTime sentAtUtc) in _pingSendTimeUtc)
+                if ((utcNow - sentAtUtc).TotalSeconds > PingTimeout)
+                    _pingSendTimeUtc.Remove(id);
         }
     }
 
@@ -221,10 +225,9 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
     {
         if (packet.IsResponse)
         {
-            if (packet.Id == _lastPingId)
-            {
-                _ping[senderId] = (packet.Id, _timeSinceLastPing);
-            }
+            if (!_pingSendTimeUtc.TryGetValue(packet.Id, out DateTime sentAtUtc)) return;
+            var utcNow = DateTime.UtcNow;
+            _lastPingResponseDataByPeerId[senderId] = (sentAtUtc, utcNow);
         }
         else
         {
@@ -326,8 +329,15 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         connection?.AddIceCandidate(packet.Media, packet.Index, packet.Name).ThrowIfError();
     }
 
-    public double? Ping(Guid peerId) =>
-        _ping.TryGetValue(peerId, out var tuple) ? tuple.ResponseTime : null;
+    public double? Ping(Guid peerId)
+    {
+        if (!_lastPingResponseDataByPeerId.TryGetValue(peerId, out var data)) return null;
+        var utcNow = DateTime.UtcNow;
+        double timeSinceLastResponse = (utcNow - data.ReceivedAtUtc).TotalSeconds;
+        double timeSinceOldestUnansweredPing = timeSinceLastResponse - PingInterval;
+        double rtt = (data.ReceivedAtUtc - data.SentAtUtc).TotalSeconds;
+        return timeSinceLastResponse > 3 * PingInterval ? Math.Max(timeSinceOldestUnansweredPing, rtt) : rtt;
+    }
 
     private record PeerConnectionAndChannels
     (
