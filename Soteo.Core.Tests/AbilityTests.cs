@@ -45,7 +45,6 @@ public sealed class AbilityTests
         var context = new AbilityContext
         {
             Ability = Ability.Instance<TestAbility>(),
-            Level = 1,
             User = Substitute.For<IUnit>(),
             Alt = alt,
             UserStats = ImmutableDictionary<Stat, double>.Empty,
@@ -62,7 +61,7 @@ public sealed class AbilityTests
     {
         public override Targeting Targeting => Targeting.Position;
         public override Targeting AltTargeting => Targeting.Nothing;
-        public override Scalable<double> StaticRange => double.PositiveInfinity;
-        public override Scalable<double> StaticAngularRange => double.PositiveInfinity;
+        public override double StaticRange => double.PositiveInfinity;
+        public override double StaticAngularRange => double.PositiveInfinity;
     }
 }

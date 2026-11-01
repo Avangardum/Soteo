@@ -259,7 +259,6 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             AbilityContext = new AbilityContextSnapshot
             {
                 Ability = Ability.Instance<RangedAttackAbility>(),
-                Level = 1,
                 UserId = Player1Id,
                 UserStats = ImmutableDictionary<Stat, double>.Empty
             },

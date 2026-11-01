@@ -384,7 +384,6 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public void SerializeAbilitySlotState(AbilitySlotState value, Stream stream)
     {
         SerializeAbility(value.Ability, stream);
-        SerializeInt(value.Level, stream);
         SerializeDouble(value.Cooldown, stream);
         SerializeDouble(value.MaxCooldown, stream);
     }
@@ -394,7 +393,6 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         return new AbilitySlotState
         {
             Ability = DeserializeAbility(stream),
-            Level = DeserializeInt(stream),
             Cooldown = DeserializeDouble(stream),
             MaxCooldown = DeserializeDouble(stream)
         };
@@ -574,7 +572,6 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public void SerializeAbilityContextSnapshot(AbilityContextSnapshot context, Stream stream)
     {
         SerializeAbility(context.Ability, stream);
-        SerializeInt(context.Level, stream);
         SerializeGuid(context.UserId, stream);
         SerializeBool(context.Alt, stream);
         SerializeDictionary(context.UserStats, SerializeEnum, SerializeDouble, stream);
@@ -589,7 +586,6 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         return new AbilityContextSnapshot
         {
             Ability = DeserializeAbility(stream),
-            Level = DeserializeInt(stream),
             UserId = DeserializeGuid(stream),
             Alt = DeserializeBool(stream),
             UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),

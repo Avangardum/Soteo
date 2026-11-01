@@ -11,7 +11,7 @@ public sealed class RecallAbility : Ability
 {
     public override Targeting Targeting => Targeting.Nothing;
     public override bool LoopAnimation => true;
-    public override Scalable<double> StaticUseTime => 10;
+    public override double StaticUseTime => 10;
 
     public override void TakeEffect(AbilityContext context)
     {

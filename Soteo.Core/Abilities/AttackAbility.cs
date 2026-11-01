@@ -6,9 +6,9 @@ namespace Soteo.Core.Abilities;
 public abstract class AttackAbility : Ability
 {
     public override Targeting Targeting => Targeting.Enemy | Targeting.Character | Targeting.Building;
-    public sealed override Scalable<double> StaticRange => 0;
-    public sealed override Scalable<double> StaticUseTime => 0;
-    public sealed override Scalable<double> StaticCooldown => 0;
+    public sealed override double StaticRange => 0;
+    public sealed override double StaticUseTime => 0;
+    public sealed override double StaticCooldown => 0;
 
     protected sealed override double DynamicUseTime(AbilityContext context) =>
         AttackInterval(context) * context.UserStats[Stat.AttackUseTimeFraction];

@@ -10,7 +10,6 @@ namespace Soteo.Core.Abilities;
 public sealed class ProjectileBurstAbility : Ability
 {
     public override Targeting Targeting => Targeting.Nothing;
-    public override Scalable<double> StaticRange => 100;
 
     public override void TakeEffect(AbilityContext context)
     {

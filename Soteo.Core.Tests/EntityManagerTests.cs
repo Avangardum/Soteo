@@ -44,7 +44,6 @@ public sealed class EntityManagerTests
         var abilityContext = new AbilityContext
         {
             Ability = Ability.Instance<TestAbility>(),
-            Level = 0,
             User = _projectileSourceChar,
             UserStats = _projectileSourceChar.Stats.ToImmutableDictionary(),
             ServiceProvider = _serviceProvider,

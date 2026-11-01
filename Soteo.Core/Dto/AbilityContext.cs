@@ -10,7 +10,6 @@ namespace Soteo.Core.Dto;
 public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
 {
     public required Ability Ability { get; init; }
-    public required int Level { get; init; }
     public required IUnit User { get; init; }
     public bool Alt { get; init; }
 
@@ -35,7 +34,6 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
         return new AbilityContextSnapshot
         {
             Ability = Ability,
-            Level = Level,
             UserId = User.Id,
             Alt = Alt,
             UserStats = UserStats,
@@ -52,7 +50,6 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
         return new AbilityContext
         {
             Ability = snapshot.Ability,
-            Level = snapshot.Level,
             User = entityManager.GetEntity<Unit>(snapshot.UserId).Required,
             Alt = snapshot.Alt,
             UserStats = snapshot.UserStats,

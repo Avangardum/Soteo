@@ -8,5 +8,4 @@ public enum AbilityValidationResult
     InvalidTarget,
     NotEnoughHealth,
     NotEnoughMana,
-    InvalidLevel,
 }

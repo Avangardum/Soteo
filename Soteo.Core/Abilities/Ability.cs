@@ -13,7 +13,6 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     public virtual string Name =>
         GetType().Name.ReplaceRegex("Ability$", "").PascalCaseToCapitalizedText();
 
-    public virtual int MaxLevel => 1;
     public virtual Status? PassiveStatus => null;
     public virtual double? PassiveTickInterval => null;
     public abstract Targeting Targeting { get; }
@@ -28,23 +27,23 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     public virtual string IconPath => "Placeholder";
 
     // Static values define what is shown in the ability description. They are constant and independent of context.
-    public virtual Scalable<double> StaticHealthCost => 0;
-    public virtual Scalable<double> StaticManaCost => 0;
-    public virtual Scalable<double> StaticCooldown => 0;
-    public virtual Scalable<double> StaticRange => 0;
-    public virtual Scalable<double> StaticAngularRange => 30;
-    public virtual Scalable<double> StaticUseTime => 0;
+    public virtual double StaticHealthCost => 0;
+    public virtual double StaticManaCost => 0;
+    public virtual double StaticCooldown => 0;
+    public virtual double StaticRange => 0;
+    public virtual double StaticAngularRange => 30;
+    public virtual double StaticUseTime => 0;
 
     // Dynamic values are context dependent values declared by the ability before applying status effect modifiers.
     // By default, they are same as static values, but if an ability has a value that can't be declared statically, it
     // should override the matching dynamic value method, in which case the static value is used for ability description
     // only and should be 0 to hide it in most cases.
-    protected virtual double DynamicHealthCost(AbilityContext context) => StaticHealthCost[context.Level];
-    protected virtual double DynamicManaCost(AbilityContext context) => StaticManaCost[context.Level];
-    protected virtual double DynamicCooldown(AbilityContext context) => StaticCooldown[context.Level];
-    protected virtual double DynamicRange(AbilityContext context) => StaticRange[context.Level];
-    protected virtual double DynamicAngularRange(AbilityContext context) => StaticAngularRange[context.Level];
-    protected virtual double DynamicUseTime(AbilityContext context) => StaticUseTime[context.Level];
+    protected virtual double DynamicHealthCost(AbilityContext context) => StaticHealthCost;
+    protected virtual double DynamicManaCost(AbilityContext context) => StaticManaCost;
+    protected virtual double DynamicCooldown(AbilityContext context) => StaticCooldown;
+    protected virtual double DynamicRange(AbilityContext context) => StaticRange;
+    protected virtual double DynamicAngularRange(AbilityContext context) => StaticAngularRange;
+    protected virtual double DynamicUseTime(AbilityContext context) => StaticUseTime;
 
     // Unprefixed values are values after applying status modifiers and are used in actual gameplay
     // (the modifiers are not yet implemented)
@@ -77,8 +76,6 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     /// </summary>
     public virtual AbilityValidationResult Validate(AbilityContext context, bool strict)
     {
-        if (context.Level < 1 || context.Level > MaxLevel) return AbilityValidationResult.InvalidLevel;
-
         AbilityValidationResult targetValidationResult = ValidateTarget(context);
         if (targetValidationResult != AbilityValidationResult.Ok) return targetValidationResult;
 
@@ -161,18 +158,18 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         return AbilityValidationResult.Ok;
     }
 
-    public string Description(ILocalizer localizer, int? level = null)
+    public string Description(ILocalizer localizer)
     {
         string formatKey = GetType().Name.PascalCaseToSnakeCase().ToUpper() + "_DESCRIPTION";
         string format = localizer.GetString(formatKey);
 
         return format
-            .PassTo(it => FillDescriptionProperties(it, level))
+            .PassTo(it => FillDescriptionProperties(it))
             .PassTo(it => FillDescriptionPluralization(it, localizer)) +
-            DescriptionFooter(level);
+            DescriptionFooter();
     }
 
-    private string FillDescriptionProperties(string value, int? level)
+    private string FillDescriptionProperties(string value)
     {
         // example: {Duration:N2}
         const string propertyRegex = @"\{([A-Za-z0-9_]+)(?:\:([^\{\}\|\:]+))?\}";
@@ -188,7 +185,6 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
                 return propertyValue switch
                 {
                     null => "ERROR",
-                    Scalable s => s.ToBbcode(level, format),
                     IFormattable f => f.ToString(format, CultureInfo.CurrentCulture),
                     _ => propertyValue.ToString() ?? ""
                 };
@@ -211,7 +207,6 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
                 double? doubleValue = propertyValue switch
                 {
                     IConvertible => Convert.ToDouble(propertyValue),
-                    Scalable s => s.ToDoubleOrNull(),
                     _ => null
                 };
                 int pluralizationIndex = localizer.GetPluralisationIndex(doubleValue);
@@ -220,17 +215,17 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         );
     }
 
-    private string DescriptionFooter(int? level)
+    private string DescriptionFooter()
     {
         List<string> parts = [];
-        if (StaticHealthCost.Any(it => it > 0))
-            parts.Add("[img]res://Textures/Icons/BbCode/Health.png[/img] " + StaticHealthCost.ToBbcode(level));
-        if (StaticManaCost.Any(it => it > 0))
-            parts.Add("[img]res://Textures/Icons/BbCode/Mana.png[/img] " + StaticManaCost.ToBbcode(level));
-        if (StaticCooldown.Any(it => it > 0))
-            parts.Add("[img]res://Textures/Icons/BbCode/Cooldown.png[/img] " + StaticCooldown.ToBbcode(level));
-        if (StaticRange.Any(it => it > 0))
-            parts.Add("[img]res://Textures/Icons/BbCode/Range.png[/img] " + StaticRange.ToBbcode(level));
+        if (StaticHealthCost > 0)
+            parts.Add("[img]res://Textures/Icons/BbCode/Health.png[/img] " + StaticHealthCost);
+        if (StaticManaCost > 0)
+            parts.Add("[img]res://Textures/Icons/BbCode/Mana.png[/img] " + StaticManaCost);
+        if (StaticCooldown > 0)
+            parts.Add("[img]res://Textures/Icons/BbCode/Cooldown.png[/img] " + StaticCooldown);
+        if (StaticRange > 0)
+            parts.Add("[img]res://Textures/Icons/BbCode/Range.png[/img] " + StaticRange);
         return parts.Count == 0 ? "" : "\n" + string.Join("\n", parts);
     }
 }

@@ -423,7 +423,6 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         return new AbilityContext
         {
             Ability = state.Ability,
-            Level = state.Level,
             User = this,
             Alt = command.Alt,
             UserStats = Stats.ToImmutableDictionary(),
@@ -595,15 +594,15 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
 
-    protected void SetAbility<T>(AbilitySlot slot, int level) where T : Ability, new() =>
-        SetAbility(Ability.Instance<T>(), slot, level);
+    protected void SetAbility<T>(AbilitySlot slot) where T : Ability, new() =>
+        SetAbility(Ability.Instance<T>(), slot);
 
-    protected void SetAbility(Ability ability, AbilitySlot slot, int level)
+    protected void SetAbility(Ability ability, AbilitySlot slot)
     {
         if (AbilitySlotStates.ContainsKey(slot))
             throw new InvalidOperationException($"Slot {slot} already has an ability");
 
-        AbilitySlotStatesInternal[slot] = new AbilitySlotState { Ability = ability, Level = level };
+        AbilitySlotStatesInternal[slot] = new AbilitySlotState { Ability = ability };
         if (ability.PassiveStatus != null)
         {
             AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand { Slot = slot }).Required;

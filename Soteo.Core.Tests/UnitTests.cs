@@ -53,7 +53,7 @@ public sealed class UnitTests
     [Fact]
     public void AbilityTargetingNonexistentUnitIsNotUsed()
     {
-        _sut.SetAbility<SpyAbility>(AbilitySlot.General0, 1);
+        _sut.SetAbility<SpyAbility>(AbilitySlot.General0);
         int useCount = 0;
         Ability.Instance<SpyAbility>().Used += () => useCount++;
 
@@ -66,14 +66,13 @@ public sealed class UnitTests
     [Fact]
     public void AbilityTargetingProjectileIsNotUsed()
     {
-        _sut.SetAbility<SpyAbility>(AbilitySlot.General0, 1);
+        _sut.SetAbility<SpyAbility>(AbilitySlot.General0);
         int useCount = 0;
         Ability.Instance<SpyAbility>().Used += () => useCount++;
         var projectileId = Guid.NewGuid();
         var projectileAbilityContext = new AbilityContext
         {
             Ability = Ability.Instance<SpyAbility>(),
-            Level = 1,
             User = _sut,
             UserStats = _sut.Stats.ToImmutableDictionary(),
             ServiceProvider = _serviceProvider
@@ -157,7 +156,7 @@ public sealed class UnitTests
     [Fact]
     public void UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing()
     {
-        _sut.SetAbility<SpyAbilityWithUseTime>(AbilitySlot.General0, 1);
+        _sut.SetAbility<SpyAbilityWithUseTime>(AbilitySlot.General0);
         int validatedStrictlyCount = 0;
         int validatedNonStrictlyCount = 0;
         Ability.Instance<SpyAbilityWithUseTime>().ValidatedStrictly += () => validatedStrictlyCount++;
@@ -183,7 +182,7 @@ public sealed class UnitTests
     [Fact]
     public void UsingAbilityWhileAnotherAbilityIsBeingUsedValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing()
     {
-        _sut.SetAbility<AbilityWithUseTime>(AbilitySlot.General1, 1);
+        _sut.SetAbility<AbilityWithUseTime>(AbilitySlot.General1);
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General1 });
         _sut.Tick(Const.TickInterval);
 
@@ -486,8 +485,8 @@ public sealed class UnitTests
             serviceProvider
         ) { }
 
-        public new void SetAbility<T>(AbilitySlot slot, int level) where T : Ability, new() =>
-            base.SetAbility<T>(slot, level);
+        public new void SetAbility<T>(AbilitySlot slot) where T : Ability, new() =>
+            base.SetAbility<T>(slot);
     }
 
     private class SpyAbility : Ability
@@ -514,13 +513,13 @@ public sealed class UnitTests
 
     private class SpyAbilityWithUseTime : SpyAbility
     {
-        public override Scalable<double> StaticUseTime => 1;
+        public override double StaticUseTime => 1;
     }
 
     private class AbilityWithUseTime : Ability
     {
         public override Targeting Targeting => Targeting.Anything;
-        public override Scalable<double> StaticUseTime => 1;
+        public override double StaticUseTime => 1;
     }
 
     private sealed class StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff : Status

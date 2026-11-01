@@ -32,7 +32,7 @@ public sealed class VampireStatus : Status
     public override void OnDealAttackDamage(StatusContext context, IUnit target, double damage)
     {
         double lifestealFactor =
-            context.SourceAbilityAs<VampireAbility>().LifestealFactor[context.SourceAbilityContext.Level];
+            context.SourceAbilityAs<VampireAbility>().LifestealFactor;
         context.Unit.RestoreHealth(damage * lifestealFactor, context);
         target.AddStatus<BleedingStatus>(BleedingStatus.Time, BleedingStatus.TickInterval, context);
     }

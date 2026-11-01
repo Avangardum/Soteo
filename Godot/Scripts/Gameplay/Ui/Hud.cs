@@ -182,7 +182,7 @@ public sealed class Hud : IHud
         if (!SelectedUnit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
         string header = state.Ability.Name;
-        string body = state.Ability.Description(_localizer, state.Level);
+        string body = state.Ability.Description(_localizer);
         _tooltip.Show(_abilityButtons[index].TopCenterGlobalPosition.ToSys(), header, body);
     }
 
@@ -442,11 +442,11 @@ public sealed class Hud : IHud
                 unit.AbilityUseProgress.NormalizedProgress;
             button.UseProgressIndicator.MaxValue = 1;
 
-            double healthCost = state.Ability.StaticHealthCost[state.Level];
+            double healthCost = state.Ability.StaticHealthCost;
             button.HealthCostLabel.Text = Maths.CeilToInt(healthCost).ToString();
             button.HealthCostLabel.Visible = healthCost > 0;
 
-            double manaCost = state.Ability.StaticManaCost[state.Level];
+            double manaCost = state.Ability.StaticManaCost;
             button.ManaCostLabel.Text = Maths.CeilToInt(manaCost).ToString();
             button.ManaCostLabel.Visible = manaCost > 0;
         }

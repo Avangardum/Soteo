@@ -6,12 +6,11 @@ namespace Soteo.Core.Abilities;
 
 public sealed class HealAbility : Ability
 {
-    public override int MaxLevel => 4;
-    public override Scalable<double> StaticManaCost => [100, 120, 160, 180];
-    public Scalable<double> Heal => [200, 300, 400, 500];
-    public override Scalable<double> StaticCooldown => [15, 13, 11, 9];
-    public override Scalable<double> StaticUseTime => 0.5;
-    public override Scalable<double> StaticRange => 30;
+    public override double StaticManaCost => 180;
+    public double Heal => 500;
+    public override double StaticCooldown => 9;
+    public override double StaticUseTime => 0.5;
+    public override double StaticRange => 30;
     public override Targeting Targeting => Targeting.Ally | Targeting.Character;
     public override Targeting AltTargeting => Targeting.Nothing;
 
@@ -19,6 +18,6 @@ public sealed class HealAbility : Ability
     {
         base.TakeEffect(context);
         IUnit target = context.Alt ? context.User : context.TargetUnit.Required;
-        target.RestoreHealth(Heal[context.Level], context.User, this);
+        target.RestoreHealth(Heal, context.User, this);
     }
 }
