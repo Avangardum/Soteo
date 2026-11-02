@@ -39,10 +39,10 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEnti
     public virtual bool IsDead { get; protected set; }
     protected bool IsMoving { get; set; }
 
-    protected Dictionary<Stat, double> StatsInternal { get; set; } = [];
+    protected Dictionary<Stat, double> StatsInternal { get; set; } = []; // todo private in Unit and UnitPuppet
     public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
 
-    protected Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = [];
+    protected Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = []; // todo private in Unit and UnitPuppet
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
 
     public AbilityUseProgress? AbilityUseProgress { get; protected set; }

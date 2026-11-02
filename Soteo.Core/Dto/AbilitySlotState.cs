@@ -5,7 +5,7 @@ namespace Soteo.Core.Dto;
 
 public record AbilitySlotState
 {
-    public required Ability Ability { get; init; }
+    public required Ability Ability { get; init; } // todo to primary constructor
     public double Cooldown { get; init; }
 
     /// <summary>

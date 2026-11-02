@@ -601,6 +601,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     {
         if (AbilitySlotStates.ContainsKey(slot))
             throw new InvalidOperationException($"Slot {slot} already has an ability");
+        // todo support removing / replacing abilities
 
         AbilitySlotStatesInternal[slot] = new AbilitySlotState { Ability = ability };
         if (ability.PassiveStatus != null)
@@ -609,7 +610,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             AddStatus
             (
                 ability.PassiveStatus,
-                double.PositiveInfinity,
+                time: double.PositiveInfinity,
                 ability.PassiveTickInterval,
                 sourceUnit: this,
                 sourceAbilityContext: abilityContext
