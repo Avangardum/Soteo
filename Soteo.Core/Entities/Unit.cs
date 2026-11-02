@@ -30,6 +30,12 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
 
+    private Dictionary<Stat, double> StatsInternal { get; set; } = [];
+    public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
+
+    private Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = [];
+    public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
+
     public IInventory Inventory { get; }
     public IEquipmentInventory EquipmentInventory { get; }
 
@@ -51,6 +57,9 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         Inventory = inventory;
         EquipmentInventory = equipmentInventory;
         _crossInventoryHelper = crossInventoryHelper;
+
+        foreach (Stat stat in Stat.All)
+            StatsInternal[stat] = StatConst[stat].Default;
     }
 
     public override Vector2 Position
@@ -603,7 +612,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             throw new InvalidOperationException($"Slot {slot} already has an ability");
         // todo support removing / replacing abilities
 
-        AbilitySlotStatesInternal[slot] = new AbilitySlotState { Ability = ability };
+        AbilitySlotStatesInternal[slot] = new AbilitySlotState(ability);
         if (ability.PassiveStatus != null)
         {
             AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand { Slot = slot }).Required;

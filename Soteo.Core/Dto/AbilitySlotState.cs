@@ -3,9 +3,8 @@ using Soteo.Util;
 
 namespace Soteo.Core.Dto;
 
-public record AbilitySlotState
+public record AbilitySlotState(Ability Ability)
 {
-    public required Ability Ability { get; init; } // todo to primary constructor
     public double Cooldown { get; init; }
 
     /// <summary>
@@ -13,8 +12,7 @@ public record AbilitySlotState
     /// </summary>
     public double MaxCooldown { get; init; }
 
-    public static AbilitySlotState New<T>() where T : Ability, new() =>
-        new() { Ability = Ability.Instance<T>() };
+    public static AbilitySlotState New<T>() where T : Ability, new() => new(Ability.Instance<T>());
 
     public static AbilitySlotState Interpolate(AbilitySlotState from, AbilitySlotState to, double weight) =>
         to with { Cooldown = Maths.LerpDecrease(from.Cooldown, to.Cooldown, weight) };

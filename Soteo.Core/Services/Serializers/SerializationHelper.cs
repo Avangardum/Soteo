@@ -390,9 +390,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 
     public AbilitySlotState DeserializeAbilitySlotState(Stream stream)
     {
-        return new AbilitySlotState
+        return new AbilitySlotState(DeserializeAbility(stream))
         {
-            Ability = DeserializeAbility(stream),
             Cooldown = DeserializeDouble(stream),
             MaxCooldown = DeserializeDouble(stream)
         };

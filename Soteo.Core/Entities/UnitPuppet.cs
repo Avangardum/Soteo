@@ -18,6 +18,12 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
     private readonly IInventory _alwaysSynchronizedInventory;
     private readonly IEquipmentInventory _alwaysSynchronizedEquipmentInventory;
 
+    private Dictionary<Stat, double> StatsInternal { get; set; } = [];
+    public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
+
+    private Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = [];
+    public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
+
     public IInventory Inventory { get; }
     public IEquipmentInventory EquipmentInventory { get; }
 

@@ -30,21 +30,11 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEnti
 
     protected UnitBase(Guid id, TNode node) : base(id, node)
     {
-        foreach (Stat stat in Stat.All)
-            StatsInternal[stat] = StatConst[stat].Default;
-
         Faction = Id.ToString()[^1] % 2 == 0 ? Faction.Empire : Faction.Syndicate;
     }
 
     public virtual bool IsDead { get; protected set; }
     protected bool IsMoving { get; set; }
-
-    protected Dictionary<Stat, double> StatsInternal { get; set; } = []; // todo private in Unit and UnitPuppet
-    public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
-
-    protected Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = []; // todo private in Unit and UnitPuppet
-    public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
-
     public AbilityUseProgress? AbilityUseProgress { get; protected set; }
     public Faction Faction { get; }
 }
