@@ -46,18 +46,18 @@ public sealed class UnitTests
     [Fact]
     public void UseAbilityCommandForEmptySlotDoesntThrow()
     {
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General0, TargetUnitId = Guid.NewGuid() });
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar0, TargetUnitId = Guid.NewGuid() });
         _sut.Tick(Const.TickInterval);
     }
 
     [Fact]
     public void AbilityTargetingNonexistentUnitIsNotUsed()
     {
-        _sut.SetAbility<SpyAbility>(AbilitySlot.General0);
+        _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>());
         int useCount = 0;
         Ability.Instance<SpyAbility>().Used += () => useCount++;
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General0, TargetUnitId = Guid.NewGuid() });
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar0, TargetUnitId = Guid.NewGuid() });
         _sut.Tick(Const.TickInterval);
 
         useCount.Should().Be(0);
@@ -66,7 +66,7 @@ public sealed class UnitTests
     [Fact]
     public void AbilityTargetingProjectileIsNotUsed()
     {
-        _sut.SetAbility<SpyAbility>(AbilitySlot.General0);
+        _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>());
         int useCount = 0;
         Ability.Instance<SpyAbility>().Used += () => useCount++;
         var projectileId = Guid.NewGuid();
@@ -88,7 +88,7 @@ public sealed class UnitTests
         );
         _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [projectileId] = projectile });
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General0, TargetUnitId = projectileId });
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar0, TargetUnitId = projectileId });
         _sut.Tick(Const.TickInterval);
 
         useCount.Should().Be(0);
@@ -156,13 +156,14 @@ public sealed class UnitTests
     [Fact]
     public void UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing()
     {
-        _sut.SetAbility<SpyAbilityWithUseTime>(AbilitySlot.General0);
+        var slot = AbilitySlot.Hotbar0 + _sut.InnateHotbarAbilities.Count;
+        _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbilityWithUseTime>());
         int validatedStrictlyCount = 0;
         int validatedNonStrictlyCount = 0;
         Ability.Instance<SpyAbilityWithUseTime>().ValidatedStrictly += () => validatedStrictlyCount++;
         Ability.Instance<SpyAbilityWithUseTime>().ValidatedNonStrictly += () => validatedNonStrictlyCount++;
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General0 });
+        _sut.SetCommand(new UseAbilityCommand { Slot = slot });
         _sut.Tick(Const.TickInterval);
 
         validatedStrictlyCount.Should().Be(1);
@@ -182,8 +183,8 @@ public sealed class UnitTests
     [Fact]
     public void UsingAbilityWhileAnotherAbilityIsBeingUsedValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing()
     {
-        _sut.SetAbility<AbilityWithUseTime>(AbilitySlot.General1);
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.General1 });
+        _sut.InnateHotbarAbilities.Add(Ability.Instance<AbilityWithUseTime>());
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar0 });
         _sut.Tick(Const.TickInterval);
 
         UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing();
@@ -462,7 +463,124 @@ public sealed class UnitTests
         _sut.EquipmentInventory[EquipmentSlot.Potion].Should().Be(ItemStack.Of<TestPotion1>(5));
     }
 
-    private sealed class Sut : Unit
+    [Fact]
+    public void UnitWithoutInnateAbilitiesOrEquippedItemsHasNoAbilityStates()
+    {
+        _sut.AbilitySlotStates.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AddingInnateAbilitiesAndEquipmentWithAbilitiesAddsAbilitySlotStates()
+    {
+        _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>());
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+
+        _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith1SCooldown>());
+        _sut.AbilitySlotStates[AbilitySlot.Hotbar0].Ability.Should().Be(Ability.Instance<SpyAbility>());
+        _sut.AbilitySlotStates[AbilitySlot.Hotbar1].Ability.Should().Be(Ability.Instance<AbilityWith10SCooldown>());
+    }
+
+    [Fact]
+    public void AddingInnateAbilityMovesExistingItemAbilityStateToNextSlot()
+    {
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar0 } );
+        _sut.Tick(Const.TickInterval);
+        double cooldown = _sut.AbilitySlotStates[AbilitySlot.Hotbar0].Cooldown;
+        cooldown.Should().BePositive();
+
+        _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>());
+
+        _sut.AbilitySlotStates[AbilitySlot.Hotbar0].Ability.Should().Be(Ability.Instance<SpyAbility>());
+        _sut.AbilitySlotStates[AbilitySlot.Hotbar0].Cooldown.Should().Be(0);
+        _sut.AbilitySlotStates[AbilitySlot.Hotbar1].Ability.Should().Be(Ability.Instance<AbilityWith10SCooldown>());
+        _sut.AbilitySlotStates[AbilitySlot.Hotbar1].Cooldown.Should().Be(cooldown);
+    } // todo test reverse
+
+    [Fact]
+    public void AddedItemAttackReplacesExistingInnateAttackWithCooldownCarryingOver()
+    {
+        _sut.InnateSpecialAbilities[SpecialAbilitySlot.Attack] = Ability.Instance<AbilityWith10SCooldown>();
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Attack });
+        _sut.Tick(Const.TickInterval);
+        _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith10SCooldown>());
+        double cooldown = _sut.AbilitySlotStates[AbilitySlot.Attack].Cooldown;
+        cooldown.Should().BePositive();
+
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+
+        _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith1SCooldown>());
+        _sut.AbilitySlotStates[AbilitySlot.Attack].Cooldown.Should().Be(cooldown);
+    } // todo test reverse
+
+    [Fact]
+    public void AddedInnateAttackDoesNotReplaceExistingItemAttack()
+    {
+        _sut.EquipmentInventory.PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Attack });
+        _sut.Tick(Const.TickInterval);
+        _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith1SCooldown>());
+        double cooldown = _sut.AbilitySlotStates[AbilitySlot.Attack].Cooldown;
+        cooldown.Should().BePositive();
+
+        _sut.InnateSpecialAbilities[SpecialAbilitySlot.Attack] = Ability.Instance<AbilityWith10SCooldown>();
+
+        _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith1SCooldown>());
+        _sut.AbilitySlotStates[AbilitySlot.Attack].Cooldown.Should().Be(cooldown);
+    } // todo test reverse
+
+    [Fact]
+    public void AddingInnateAbilityDoesNotChangeExistingSlotCooldowns()
+    {
+        _sut.InnateSpecialAbilities[SpecialAbilitySlot.Attack] = Ability.Instance<AbilityWith1SCooldown>();
+        _sut.InnateHotbarAbilities.Add(Ability.Instance<AbilityWith10SCooldown>());
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Attack } );
+        _sut.Tick(Const.TickInterval);
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar0 } );
+        _sut.Tick(Const.TickInterval);
+        double attackCd = _sut.AbilitySlotStates[AbilitySlot.Attack].Cooldown;
+        double hotbarCd = _sut.AbilitySlotStates[AbilitySlot.Hotbar0].Cooldown;
+        attackCd.Should().BePositive();
+        hotbarCd.Should().BePositive();
+
+        _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>());
+
+        _sut.AbilitySlotStates[AbilitySlot.Attack].Cooldown.Should().Be(attackCd);
+        _sut.AbilitySlotStates[AbilitySlot.Hotbar0].Cooldown.Should().Be(hotbarCd);
+    } // todo test reverse
+
+    [Theory]
+    [MemberData(nameof(AddingAbilityResetsAbilityUseProgressAndCommandsData))]
+    public void AddingAbilityResetsAbilityUseProgressAndCommands(Action<Sut> addAbility)
+    {
+        _sut.InnateHotbarAbilities.Add(Ability.Instance<AbilityWithUseTime>());
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar0 });
+        _sut.Tick(Const.TickInterval);
+        _sut.AbilityUseProgress.Required.Slot.Should().Be(AbilitySlot.Hotbar0);
+        _sut.Commands.Should().NotBeEmpty();
+
+        addAbility(_sut);
+
+        _sut.AbilityUseProgress.Should().BeNull();
+        _sut.Commands.Should().BeEmpty();
+    }
+
+    public static List<object[]> AddingAbilityResetsAbilityUseProgressAndCommandsData =
+    [
+        [void (Sut sut) => sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>())],
+        [void (Sut sut) => sut.InnateSpecialAbilities[SpecialAbilitySlot.Attack] = Ability.Instance<SpyAbility>()],
+        [
+            void (Sut sut) => sut.EquipmentInventory.PutAt
+            (
+                EquipmentSlot.MainHand,
+                ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1)
+            )
+        ],
+    ];
+
+    // todo test duplicates
+
+    public sealed class Sut : Unit
     {
         public Sut
         (
@@ -485,8 +603,9 @@ public sealed class UnitTests
             serviceProvider
         ) { }
 
-        public new void SetAbility<T>(AbilitySlot slot) where T : Ability, new() =>
-            base.SetAbility<T>(slot);
+        public new IDictionary<SpecialAbilitySlot, Ability> InnateSpecialAbilities => base.InnateSpecialAbilities;
+        public new IList<Ability> InnateHotbarAbilities => base.InnateHotbarAbilities;
+        public new IReadOnlyList<ICommand> Commands => base.Commands;
     }
 
     private class SpyAbility : Ability
@@ -592,5 +711,34 @@ public sealed class UnitTests
     {
         public override EquipmentSlot? EquippableTo => EquipmentSlot.MainHand;
         public override IReadOnlyList<EquipmentSlot> BlocksEquipmentSlots => [EquipmentSlot.Potion];
+    }
+
+    private sealed class AbilityWith10SCooldown : Ability
+    {
+        public override Targeting Targeting => Targeting.Anything;
+        public override double StaticCooldown => 10;
+    }
+
+    private sealed class AbilityWith1SCooldown : Ability
+    {
+        public override Targeting Targeting => Targeting.Anything;
+        public override double StaticCooldown => 1;
+    }
+
+    private sealed class SwordWith1SCdAttackAnd10SCdHotbarAbility : Item
+    {
+        public override EquipmentSlot? EquippableTo => EquipmentSlot.MainHand;
+        public override IReadOnlyList<Ability> HotbarAbilities => [Ability.Instance<AbilityWith10SCooldown>()];
+
+        public override IReadOnlyDictionary<SpecialAbilitySlot, Ability> SpecialAbilities
+        {
+            get
+            {
+                return new Dictionary<SpecialAbilitySlot, Ability>
+                {
+                    [SpecialAbilitySlot.Attack] = Ability.Instance<AbilityWith1SCooldown>()
+                };
+            }
+        }
     }
 }

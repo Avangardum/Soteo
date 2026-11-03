@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Numerics;
 using System.Text;
 using Soteo.Core.Abilities;
+using Soteo.Core.Attributes;
 using Soteo.Core.Delegates;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Packets;
@@ -153,8 +154,15 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public TEnum DeserializeEnum<TEnum>(Stream stream) where TEnum : Enum
     {
         TEnum value = DeserializeEnumWithoutValidation<TEnum>(stream);
-        if (!Enum.IsDefined(typeof(TEnum), value) && !typeof(TEnum).HasAttribute<FlagsAttribute>())
+        if
+        (
+            !Enum.IsDefined(typeof(TEnum), value) &&
+            !typeof(TEnum).HasAttribute<FlagsAttribute>() &&
+            !typeof(TEnum).HasAttribute<AllowAnonymousEnumValuesAttribute>()
+        )
+        {
             throw new BadSerializedDataException($"Invalid {typeof(TEnum)} value {value}");
+        }
         return value;
     }
 

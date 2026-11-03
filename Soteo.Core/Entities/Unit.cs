@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Numerics;
 using Soteo.Core.Abilities;
 using Soteo.Core.Dto;
@@ -17,12 +18,15 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
     private readonly ICrossInventoryHelper _crossInventoryHelper;
+    private readonly ObservableCollection<Ability> _innateHotbarAbilities = [];
+    private readonly ObservableDictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = [];
 
     private long _nextStatusOrdinal;
-
     private readonly Queue<ICommand> _commands = [];
-
     private Guid? _controllingPlayerId;
+
+    // For testing
+    private protected IReadOnlyList<ICommand> Commands => _commands.ToList();
 
     public IReadOnlyList<Guid> ControllingPlayerIds =>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
@@ -60,7 +64,14 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
         foreach (Stat stat in Stat.All)
             StatsInternal[stat] = StatConst[stat].Default;
+
+        _innateHotbarAbilities.CollectionChanged += (_, _) => UpdateHotbarAbilityList();
+        _innateSpecialAbilities.Changed += UpdateSpecialAbilityList;
+        EquipmentInventory.Changed += () => { UpdateHotbarAbilityList(); UpdateSpecialAbilityList(); };
     }
+
+    protected IList<Ability> InnateHotbarAbilities => _innateHotbarAbilities;
+    protected IDictionary<SpecialAbilitySlot, Ability> InnateSpecialAbilities => _innateSpecialAbilities;
 
     public override Vector2 Position
     {
@@ -603,30 +614,6 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
 
-    protected void SetAbility<T>(AbilitySlot slot) where T : Ability, new() =>
-        SetAbility(Ability.Instance<T>(), slot);
-
-    protected void SetAbility(Ability ability, AbilitySlot slot)
-    {
-        if (AbilitySlotStates.ContainsKey(slot))
-            throw new InvalidOperationException($"Slot {slot} already has an ability");
-        // todo support removing / replacing abilities
-
-        AbilitySlotStatesInternal[slot] = new AbilitySlotState(ability);
-        if (ability.PassiveStatus != null)
-        {
-            AbilityContext abilityContext = GetAbilityContext(new UseAbilityCommand { Slot = slot }).Required;
-            AddStatus
-            (
-                ability.PassiveStatus,
-                time: double.PositiveInfinity,
-                ability.PassiveTickInterval,
-                sourceUnit: this,
-                sourceAbilityContext: abilityContext
-            );
-        }
-    }
-
     public void AddStatus
     (
         Status status,
@@ -724,4 +711,76 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     }
 
     public bool IsAlliedTo(IUnit other) => Faction != Faction.Neutral && other.Faction == Faction;
+
+    private void UpdateHotbarAbilityList()
+    {
+        IEnumerable<Ability> newItemHotbarAbilities = EquipmentInventory
+            .Where(it => it.Value != null)
+            .OrderBy(it => it.Key)
+            .SelectMany(it => it.Value.Required.Item.HotbarAbilities);
+        List<Ability> newHotbarAbilities = [..InnateHotbarAbilities, ..newItemHotbarAbilities];
+        for (int i = 0; i < newHotbarAbilities.Count; i++)
+        {
+            var slot = AbilitySlot.Hotbar0 + i;
+            Ability newAbility = newHotbarAbilities[i];
+            AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? currentState);
+            if (newAbility != currentState?.Ability)
+                InsertHotbarAbilitySlotState(slot, new AbilitySlotState(newAbility));
+        }
+
+        _commands.Clear();
+        AbilityUseProgress = null;
+    }
+
+    private void InsertHotbarAbilitySlotState(AbilitySlot slot, AbilitySlotState state)
+    {
+        if (slot < AbilitySlot.Hotbar0) throw new ArgumentException("slot must be a hotbar slot");
+        if (!AbilitySlotStates.ContainsKey(slot))
+        {
+            AbilitySlotStatesInternal[slot] = state;
+            return;
+        }
+
+        AbilitySlot lastOccupiedCommonSlot = AbilitySlotStates.Keys.Max();
+        for (AbilitySlot i = lastOccupiedCommonSlot; i >= slot; i--)
+            AbilitySlotStatesInternal[i + 1] = AbilitySlotStates[i];
+        AbilitySlotStatesInternal[slot] = state;
+    }
+
+    private void UpdateSpecialAbilityList()
+    {
+        foreach (var slot in Enum.GetValues<SpecialAbilitySlot>())
+        {
+            AbilitySlotState? currentState = AbilitySlotStates.GetValueOrDefault((AbilitySlot)slot);
+
+            Ability? itemAbility = EquipmentInventory
+                .OrderBy(it => it.Key)
+                .Select(it => it.Value?.Item.SpecialAbilities.GetValueOrDefault(slot))
+                .FirstOrDefault(it => it != null);
+            if (itemAbility != null)
+            {
+                if (currentState?.Ability != itemAbility)
+                {
+                    AbilitySlotStatesInternal[(AbilitySlot)slot] = currentState != null ?
+                        currentState with { Ability = itemAbility.Required } :
+                        new AbilitySlotState(itemAbility.Required);
+                }
+            }
+            else
+            {
+                bool shouldReplaceWithInnateAbility =
+                    _innateSpecialAbilities.TryGetValue(slot, out Ability? innateAbility) &&
+                    currentState?.Ability != innateAbility;
+                if (shouldReplaceWithInnateAbility)
+                {
+                    AbilitySlotStatesInternal[(AbilitySlot)slot] = currentState != null ?
+                        currentState with { Ability = innateAbility.Required } :
+                        new AbilitySlotState(innateAbility.Required);
+                }
+            }
+        }
+
+        _commands.Clear();
+        AbilityUseProgress = null;
+    }
 }

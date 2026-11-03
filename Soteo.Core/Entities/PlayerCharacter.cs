@@ -31,12 +31,12 @@ public sealed class PlayerCharacter : Unit
         serviceProvider
     )
     {
-        SetAbility<BloodSacrificeAbility>(AbilitySlot.General0);
-        SetAbility<HealAbility>(AbilitySlot.General1);
-        SetAbility<ProjectileBurstAbility>(AbilitySlot.General2);
-        SetAbility<VampireAbility>(AbilitySlot.General3);
-        SetAbility<RecallAbility>(AbilitySlot.Recall);
-        SetAbility<RangedAttackAbility>(AbilitySlot.Attack);
+        InnateSpecialAbilities[SpecialAbilitySlot.Attack] = Ability.Instance<RangedAttackAbility>();
+        InnateSpecialAbilities[SpecialAbilitySlot.Recall] = Ability.Instance<RecallAbility>();
+        InnateHotbarAbilities.Add(Ability.Instance<BloodSacrificeAbility>());
+        InnateHotbarAbilities.Add(Ability.Instance<HealAbility>());
+        InnateHotbarAbilities.Add(Ability.Instance<ProjectileBurstAbility>());
+        InnateHotbarAbilities.Add(Ability.Instance<VampireAbility>());
 
         Inventory.PutAt(0, ItemStack.Of<LogItem>(1));
         Inventory.PutAt(1, ItemStack.Of<LogItem>(1));

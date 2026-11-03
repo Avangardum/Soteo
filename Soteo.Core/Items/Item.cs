@@ -16,8 +16,10 @@ public abstract class Item : SingletonHierarchyBase<Item>
     /// </summary>
     public virtual IReadOnlyList<EquipmentSlot> BlocksEquipmentSlots => [];
 
-    public virtual IReadOnlyDictionary<AbilitySlot, Ability> Abilities =>
-        ImmutableDictionary<AbilitySlot, Ability>.Empty;
+    public virtual IReadOnlyList<Ability> HotbarAbilities => [];
+
+    public virtual IReadOnlyDictionary<SpecialAbilitySlot, Ability> SpecialAbilities =>
+        ImmutableDictionary<SpecialAbilitySlot, Ability>.Empty;
 
     public virtual string Name =>
         GetType().Name.ReplaceRegex("Item$", "").PascalCaseToCapitalizedText();

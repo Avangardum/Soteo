@@ -1,18 +1,22 @@
+using Soteo.Core.Attributes;
+
 namespace Soteo.Core.Enums;
 
+[AllowAnonymousEnumValues]
 public enum AbilitySlot
 {
-    // Special slots
+    // Special slots, keep synchronized with SpecialAbilitySlot
     Attack,
     Recall,
 
-    // General slots: both innate and item abilities go here
-    General0,
-    General1,
-    General2,
-    General3,
-    General4,
-    General5,
-    General6,
-    GeneralLast = General6
+    // Hotbar slots: both innate and item abilities go here
+    Hotbar0,
+    Hotbar1,
+    Hotbar2,
+    Hotbar3,
+    Hotbar4,
+    Hotbar5,
+    Hotbar6,
+    // Further hotbar slots are also valid
+    HotbarLast = Hotbar6 // todo remove, show unlimited number of abilities and statuses in the HUD
 }

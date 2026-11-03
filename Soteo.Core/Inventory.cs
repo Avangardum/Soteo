@@ -8,6 +8,8 @@ namespace Soteo.Core;
 
 public sealed class Inventory : IInventory
 {
+    public event Action Changed = delegate { };
+
     private List<ItemStack?> _stacks;
 
     public Inventory(int size)
@@ -20,7 +22,7 @@ public sealed class Inventory : IInventory
         _stacks = stacks.ToList();
     }
 
-    public IEnumerator<ItemStack?> GetEnumerator() => _stacks.AsEnumerable().GetEnumerator();
+    public IEnumerator<ItemStack?> GetEnumerator() => _stacks.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -39,26 +41,37 @@ public sealed class Inventory : IInventory
         for (int i = 0; i < _stacks.Count && remainingCount > 0; i++)
         {
             ItemStack? existingStack = _stacks[i];
-            if (existingStack?.Item == stack.Item && existingStack.Count < existingStack.Item.MaxStackCount)
+            if (existingStack?.Item == stack.Item && existingStack.FreeSpace > 0)
             {
-                long freeSpace = existingStack.Item.MaxStackCount - existingStack.Count;
-                long transferredCount = Math.Min(remainingCount, freeSpace);
+                long transferredCount = Math.Min(remainingCount, existingStack.FreeSpace);
                 remainingCount -= transferredCount;
-                _stacks[i] = new ItemStack(existingStack.Item, existingStack.Count + transferredCount);
+                _stacks[i] = existingStack.WithCount(existingStack.Count + transferredCount);
             }
         }
 
-        if (remainingCount == 0) return null;
+        if (remainingCount == 0)
+        {
+            Changed();
+            return null;
+        }
 
         for (int i = 0; i < _stacks.Count; i++)
         {
             if (_stacks[i] == null)
             {
                 _stacks[i] = new ItemStack(stack.Item, remainingCount);
+                Changed();
                 return null;
             }
         }
-        return new ItemStack(stack.Item, remainingCount);
+
+        if (remainingCount < stack.Count)
+        {
+            Changed();
+            return new ItemStack(stack.Item, remainingCount);
+        }
+
+        return stack;
     }
 
     /// <summary>
@@ -76,12 +89,14 @@ public sealed class Inventory : IInventory
         if (canMerge)
         {
             long movedCount = Math.Min(stack.Count, existingStack.Required.FreeSpace);
-            _stacks[slot] = new ItemStack(existingStack.Item, existingStack.Count + movedCount);
+            _stacks[slot] = existingStack.WithCount(existingStack.Count + movedCount);
             long remainder = stack.Count - movedCount;
+            Changed();
             return remainder == 0 ? null : new ItemStack(stack.Item, remainder);
         }
 
         _stacks[slot] = stack;
+        Changed();
         return existingStack;
     }
 
@@ -89,12 +104,22 @@ public sealed class Inventory : IInventory
     {
         ItemStack? result = _stacks[slot];
         _stacks[slot] = null;
+        if (result != null) Changed();
         return result;
     }
 
     public IReadOnlyList<ItemStack?> ToSnapshot() => this.ToImmutableList();
 
-    public void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks) => _stacks = stacks.ToList();
+    public void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks)
+    {
+        _stacks = stacks.ToList();
+        Changed();
+    }
 
-    public void ApplyDelta(ListDelta<ItemStack?> delta) => delta.MutateList(_stacks);
+    public void ApplyDelta(ListDelta<ItemStack?> delta)
+    {
+        if (!delta.HasChanged) return;
+        delta.MutateList(_stacks);
+        Changed();
+    }
 }

@@ -5,6 +5,8 @@ namespace Soteo.Core.Interfaces;
 
 public interface IInventory : IReadOnlyList<ItemStack?>
 {
+    event Action Changed;
+
     bool HasSlot(int slot);
 
     /// <summary>

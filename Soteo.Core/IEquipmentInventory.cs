@@ -7,6 +7,8 @@ namespace Soteo.Core;
 
 public interface IEquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemStack?>
 {
+    event Action Changed;
+
     /// <summary>
     /// Put an item stack into a target slot. If the slot contains a stack that can be fully or partially merged with
     /// the put stack, it's merged and a remainder is returned. If the slot contains a stack that can't be merged,

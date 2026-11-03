@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Immutable;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Dto.Snapshots;
@@ -9,6 +8,8 @@ namespace Soteo.Core;
 
 public sealed class EquipmentInventory : IEquipmentInventory
 {
+    public event Action Changed = delegate { };
+
     private Dictionary<EquipmentSlot, ItemStack?> _stacks;
 
     public EquipmentInventory(params IReadOnlyList<EquipmentSlot> slots)
@@ -45,6 +46,7 @@ public sealed class EquipmentInventory : IEquipmentInventory
         if (existingStack == null)
         {
             _stacks[slot] = stack;
+            Changed();
             return null;
         }
 
@@ -53,6 +55,7 @@ public sealed class EquipmentInventory : IEquipmentInventory
 
         long movedCount = Math.Min(existingStack.FreeSpace, stack.Count);
         _stacks[slot] = existingStack.WithCount(existingStack.Count + movedCount);
+        Changed();
         return stack.WithCount(stack.Count - movedCount);
     }
 
@@ -60,6 +63,7 @@ public sealed class EquipmentInventory : IEquipmentInventory
     {
         ItemStack? result = _stacks[slot];
         _stacks[slot] = null;
+        if (result != null) Changed();
         return result;
     }
 
@@ -83,11 +87,14 @@ public sealed class EquipmentInventory : IEquipmentInventory
     public void ReplicateSnapshot(EquipmentInventorySnapshot snapshot)
     {
         _stacks = snapshot.Stacks.ToDictionary();
+        Changed();
     }
 
     public void ApplyDelta(EquipmentInventoryDelta delta)
     {
+        if (!delta.HasChanged) return;
         delta.Stacks.MutateDictionary(_stacks);
+        Changed();
     }
 
     public IEnumerator<KeyValuePair<EquipmentSlot, ItemStack?>> GetEnumerator() => _stacks.GetEnumerator();
