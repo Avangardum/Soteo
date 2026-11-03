@@ -31,13 +31,13 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     public IReadOnlyList<Guid> ControllingPlayerIds =>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
 
-    private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = [];
+    private Dictionary<Guid, StatusContext> StatusesInternal { get; set; } = []; // todo to field
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => StatusesInternal;
 
-    private Dictionary<Stat, double> StatsInternal { get; set; } = [];
+    private Dictionary<Stat, double> StatsInternal { get; set; } = []; // todo to field
     public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
 
-    private Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = [];
+    private Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = []; // todo to field
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
 
     public IInventory Inventory { get; }
@@ -719,12 +719,20 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             .OrderBy(it => it.Key)
             .SelectMany(it => it.Value.Required.Item.HotbarAbilities);
         List<Ability> newHotbarAbilities = [..InnateHotbarAbilities, ..newItemHotbarAbilities];
+
+        List<AbilitySlot> removedHotbarAbilitySlots = AbilitySlotStatesInternal
+            .Where(it => it.Key >= AbilitySlot.Hotbar0)
+            .Where(it => !newHotbarAbilities.Contains(it.Value.Ability))
+            .Select(it => it.Key)
+            .ToList();
+        removedHotbarAbilitySlots.ForEach(RemoveHotbarAbilitySlotState);
+
         for (int i = 0; i < newHotbarAbilities.Count; i++)
         {
             var slot = AbilitySlot.Hotbar0 + i;
             Ability newAbility = newHotbarAbilities[i];
-            AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? currentState);
-            if (newAbility != currentState?.Ability)
+            AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? oldState);
+            if (newAbility != oldState?.Ability)
                 InsertHotbarAbilitySlotState(slot, new AbilitySlotState(newAbility));
         }
 
@@ -741,10 +749,25 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             return;
         }
 
-        AbilitySlot lastOccupiedCommonSlot = AbilitySlotStates.Keys.Max();
-        for (AbilitySlot i = lastOccupiedCommonSlot; i >= slot; i--)
+        AbilitySlot lastOccupiedHotbarSlot = AbilitySlotStates.Keys.Max();
+        for (AbilitySlot i = lastOccupiedHotbarSlot; i >= slot; i--)
             AbilitySlotStatesInternal[i + 1] = AbilitySlotStates[i];
         AbilitySlotStatesInternal[slot] = state;
+    }
+
+    private void RemoveHotbarAbilitySlotState(AbilitySlot slot)
+    {
+        if (slot < AbilitySlot.Hotbar0) throw new ArgumentException("slot must be a hotbar slot");
+        if (!AbilitySlotStatesInternal.ContainsKey(slot + 1))
+        {
+            AbilitySlotStatesInternal.Remove(slot);
+            return;
+        }
+
+        AbilitySlot lastOccupiedHotbarSlot = AbilitySlotStates.Keys.Max();
+        for (AbilitySlot i = slot; i < lastOccupiedHotbarSlot; i++)
+            AbilitySlotStatesInternal[i] = AbilitySlotStatesInternal[i + 1];
+        AbilitySlotStatesInternal.Remove(lastOccupiedHotbarSlot);
     }
 
     private void UpdateSpecialAbilityList()
