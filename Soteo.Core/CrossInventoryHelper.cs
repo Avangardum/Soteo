@@ -29,10 +29,10 @@ public sealed class CrossInventoryHelper : ICrossInventoryHelper
             return false;
         }
 
-        inventory.RemoveAt(fromInventorySlot);
-        ItemStack? remainder = equipmentInventory.PutAt(inventoryStack.Item.EquippableTo.Value, inventoryStack);
+        inventory.Remove(fromInventorySlot);
+        ItemStack? remainder = equipmentInventory.Put(inventoryStack.Item.EquippableTo.Value, inventoryStack);
         if (remainder != null)
-            inventory.PutAt(fromInventorySlot, remainder);
+            inventory.Put(fromInventorySlot, remainder);
         return true;
     }
 
@@ -57,12 +57,12 @@ public sealed class CrossInventoryHelper : ICrossInventoryHelper
             }
         }
 
-        equipmentInventory.RemoveAt(fromEquipmentSlot);
+        equipmentInventory.Remove(fromEquipmentSlot);
         ItemStack? remainder = toInventorySlot == null ?
             inventory.Add(equipmentStack) :
-            inventory.PutAt(toInventorySlot.Value, equipmentStack);
+            inventory.Put(toInventorySlot.Value, equipmentStack);
         if (remainder != null)
-            equipmentInventory.PutAt(fromEquipmentSlot, remainder);
+            equipmentInventory.Put(fromEquipmentSlot, remainder);
         return true;
     }
 }

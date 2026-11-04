@@ -193,8 +193,8 @@ public sealed class UnitTests
     [Fact]
     public void MovingItemStackFromInventorySlotToAnotherInventorySlotMovesItThereAndMovesExistingStackToSourceSlot()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestItem1>(1));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestItem2>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestItem1>(1));
+        _sut.Inventory.Put(1, ItemStack.Of<TestItem2>(1));
 
         _sut.SetCommand(new MoveItemStackCommand { FromIndex = 0, ToIndex = 1 });
         _sut.Tick(Const.TickInterval);
@@ -216,8 +216,8 @@ public sealed class UnitTests
     [Fact]
     public void MovingItemStackFromInvalidInventorySlotDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestItem1>(1));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestItem2>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestItem1>(1));
+        _sut.Inventory.Put(1, ItemStack.Of<TestItem2>(1));
 
         _sut.SetCommand(new MoveItemStackCommand { FromIndex = -228, ToIndex = 1 });
         _sut.Tick(Const.TickInterval);
@@ -229,8 +229,8 @@ public sealed class UnitTests
     [Fact]
     public void MovingItemStackToInvalidInventorySlotDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestItem1>(1));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestItem2>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestItem1>(1));
+        _sut.Inventory.Put(1, ItemStack.Of<TestItem2>(1));
 
         _sut.SetCommand(new MoveItemStackCommand { FromIndex = 0, ToIndex = int.MaxValue });
         _sut.Tick(Const.TickInterval);
@@ -242,7 +242,7 @@ public sealed class UnitTests
     [Fact]
     public void EquippingUnequippableItemStackDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestItem1>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestItem1>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
@@ -254,8 +254,8 @@ public sealed class UnitTests
     [Fact]
     public void EquippingItemStackIntoOccupiedSlotDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion2>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestPotion2>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
@@ -267,8 +267,8 @@ public sealed class UnitTests
     [Fact]
     public void EquippingItemStackIntoBlockedSlotDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion2>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Head, ItemStack.Of<HatThatMakesYouHatePotions>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestPotion2>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Head, ItemStack.Of<HatThatMakesYouHatePotions>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
@@ -280,8 +280,8 @@ public sealed class UnitTests
     [Fact]
     public void EquippingItemStackWhenSlotItBlocksIsOccupiedDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<HatThatMakesYouHatePotions>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<HatThatMakesYouHatePotions>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
@@ -293,8 +293,8 @@ public sealed class UnitTests
     [Fact]
     public void EquippingItemStackWhenSlotItBlocksIsBlockedDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<HatThatMakesYouHatePotions>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordThatMakesYouHatePotions>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<HatThatMakesYouHatePotions>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.MainHand, ItemStack.Of<SwordThatMakesYouHatePotions>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
@@ -318,7 +318,7 @@ public sealed class UnitTests
     [Fact]
     public void EquippingToNonexistentEquipmentSlotDoesNothing()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestBoots>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestBoots>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
@@ -331,7 +331,7 @@ public sealed class UnitTests
     [Fact]
     public void EquippingItemStackToEmptyEquipmentSlotMovesItToThatSlot()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
@@ -343,8 +343,8 @@ public sealed class UnitTests
     [Fact]
     public void EquippingItemStackToEquipmentSlotOccupiedBySameItemEquipsWhatIsPossibleAndLeavesRestInInventory()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(5));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(8));
+        _sut.Inventory.Put(0, ItemStack.Of<TestPotion1>(5));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(8));
 
         _sut.SetCommand(new EquipCommand(0));
         _sut.Tick(Const.TickInterval);
@@ -369,8 +369,8 @@ public sealed class UnitTests
     public void UnequippingItemWhenInventoryHasNoSpaceDoesNothing()
     {
         for (int i = 0; i < _sut.Inventory.Count; i++)
-            _sut.Inventory.PutAt(i, ItemStack.Of<TestBoots>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
+            _sut.Inventory.Put(i, ItemStack.Of<TestBoots>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion));
         _sut.Tick(Const.TickInterval);
@@ -382,9 +382,9 @@ public sealed class UnitTests
     [Fact]
     public void UnequippingItemFillsAvailableSpaceMergingStacksIfPossible()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(9));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1>(8));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(5));
+        _sut.Inventory.Put(0, ItemStack.Of<TestPotion1>(9));
+        _sut.Inventory.Put(1, ItemStack.Of<TestPotion1>(8));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(5));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion));
         _sut.Tick(Const.TickInterval);
@@ -398,11 +398,11 @@ public sealed class UnitTests
     [Fact]
     public void UnequippingItemStackWhenInventoryHasInsufficientSpaceFillsAvailableSpaceAndLeavesRemainderEquipped()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(9));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1>(8));
+        _sut.Inventory.Put(0, ItemStack.Of<TestPotion1>(9));
+        _sut.Inventory.Put(1, ItemStack.Of<TestPotion1>(8));
         for (int i = 2; i < _sut.Inventory.Count; i++)
-            _sut.Inventory.PutAt(i, ItemStack.Of<TestBoots>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(5));
+            _sut.Inventory.Put(i, ItemStack.Of<TestBoots>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(5));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion));
         _sut.Tick(Const.TickInterval);
@@ -419,10 +419,10 @@ public sealed class UnitTests
     [InlineData(int.MaxValue)]
     public void UnequippingItemStackToOccupiedOrNonexistentInventorySlotDoesNothing(int inventorySlot)
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(1));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1>(10));
-        _sut.Inventory.PutAt(2, ItemStack.Of<TestPotion2>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestPotion1>(1));
+        _sut.Inventory.Put(1, ItemStack.Of<TestPotion1>(10));
+        _sut.Inventory.Put(2, ItemStack.Of<TestPotion2>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, inventorySlot));
         _sut.Tick(Const.TickInterval);
@@ -437,8 +437,8 @@ public sealed class UnitTests
     [Fact]
     public void UnequippingItemStackToEmptyInventorySlotMovesItThere()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(1));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
+        _sut.Inventory.Put(0, ItemStack.Of<TestPotion1>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(1));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, 1));
         _sut.Tick(Const.TickInterval);
@@ -451,9 +451,9 @@ public sealed class UnitTests
     [Fact]
     public void UnequippingItemStackToInventorySlotWithInsufficientSpaceMovesWhatPossibleAndKeepsRestEquipped()
     {
-        _sut.Inventory.PutAt(0, ItemStack.Of<TestPotion1>(4));
-        _sut.Inventory.PutAt(1, ItemStack.Of<TestPotion1>(7));
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(8));
+        _sut.Inventory.Put(0, ItemStack.Of<TestPotion1>(4));
+        _sut.Inventory.Put(1, ItemStack.Of<TestPotion1>(7));
+        _sut.EquipmentInventory.Put(EquipmentSlot.Potion, ItemStack.Of<TestPotion1>(8));
 
         _sut.SetCommand(new UnequipCommand(EquipmentSlot.Potion, 1));
         _sut.Tick(Const.TickInterval);
@@ -473,7 +473,7 @@ public sealed class UnitTests
     public void AddingInnateAbilitiesAndEquipmentWithAbilitiesAddsAbilitySlotStates()
     {
         _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>());
-        _sut.EquipmentInventory.PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
 
         _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith1SCooldown>());
         _sut.AbilitySlotStates[AbilitySlot.Hotbar0].Ability.Should().Be(Ability.Instance<SpyAbility>());
@@ -484,7 +484,7 @@ public sealed class UnitTests
     public void AddingInnateAbilityMovesExistingItemAbilityStateToNextSlot()
     {
         _sut.EquipmentInventory
-            .PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+            .Put(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar0 } );
         _sut.Tick(Const.TickInterval);
         double cooldown = _sut.AbilitySlotStates[AbilitySlot.Hotbar0].Cooldown;
@@ -503,7 +503,7 @@ public sealed class UnitTests
     {
         _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>());
         _sut.EquipmentInventory
-            .PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+            .Put(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar1 } );
         _sut.Tick(Const.TickInterval);
         _sut.AbilitySlotStates[AbilitySlot.Hotbar1].Ability.Should().Be(Ability.Instance<AbilityWith10SCooldown>());
@@ -528,7 +528,7 @@ public sealed class UnitTests
         cooldown.Should().BePositive();
 
         _sut.EquipmentInventory
-            .PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+            .Put(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
 
         _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith1SCooldown>());
         _sut.AbilitySlotStates[AbilitySlot.Attack].Cooldown.Should().Be(cooldown);
@@ -539,14 +539,14 @@ public sealed class UnitTests
     {
         _sut.InnateSpecialAbilities[SpecialAbilitySlot.Attack] = Ability.Instance<AbilityWith10SCooldown>();
         _sut.EquipmentInventory
-            .PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+            .Put(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Attack });
         _sut.Tick(Const.TickInterval);
         _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith1SCooldown>());
         double cooldown = _sut.AbilitySlotStates[AbilitySlot.Attack].Cooldown;
         cooldown.Should().BePositive();
 
-        _sut.EquipmentInventory.RemoveAt(EquipmentSlot.MainHand);
+        _sut.EquipmentInventory.Remove(EquipmentSlot.MainHand);
 
         _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith10SCooldown>());
         _sut.AbilitySlotStates[AbilitySlot.Attack].Cooldown.Should().Be(cooldown);
@@ -556,7 +556,7 @@ public sealed class UnitTests
     public void AddedInnateAttackDoesNotReplaceExistingItemAttack()
     {
         _sut.EquipmentInventory
-            .PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+            .Put(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Attack });
         _sut.Tick(Const.TickInterval);
         _sut.AbilitySlotStates[AbilitySlot.Attack].Ability.Should().Be(Ability.Instance<AbilityWith1SCooldown>());
@@ -631,7 +631,7 @@ public sealed class UnitTests
         [void (Sut sut) => sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>())],
         [void (Sut sut) => sut.InnateSpecialAbilities[SpecialAbilitySlot.Attack] = Ability.Instance<SpyAbility>()],
         [
-            void (Sut sut) => sut.EquipmentInventory.PutAt
+            void (Sut sut) => sut.EquipmentInventory.Put
             (
                 EquipmentSlot.MainHand,
                 ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1)
@@ -644,8 +644,7 @@ public sealed class UnitTests
     {
         _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>());
         _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbilityWithUseTime>());
-        _sut.EquipmentInventory.
-            PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar2 } );
         _sut.Tick(Const.TickInterval);
         double cooldown = _sut.AbilitySlotStates[AbilitySlot.Hotbar2].Cooldown;
@@ -668,8 +667,7 @@ public sealed class UnitTests
         _sut.InnateHotbarAbilities.Add(Ability.Instance<AbilityWith10SCooldown>());
         _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbility>());
         _sut.InnateHotbarAbilities.Add(Ability.Instance<SpyAbilityWithUseTime>());
-        _sut.EquipmentInventory.
-            PutAt(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
+        _sut.EquipmentInventory.Put(EquipmentSlot.MainHand, ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1));
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar0 } );
         _sut.Tick(Const.TickInterval);
         double cooldown = _sut.AbilitySlotStates[AbilitySlot.Hotbar0].Cooldown;

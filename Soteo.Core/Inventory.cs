@@ -79,7 +79,7 @@ public sealed class Inventory : IInventory
     /// the put stack, it's merged and a remainder is returned. Otherwise, a stack that was in the slot previously is
     /// returned.
     /// </summary>
-    public ItemStack? PutAt(int slot, ItemStack stack)
+    public ItemStack? Put(int slot, ItemStack stack)
     {
         ItemStack? existingStack = _stacks[slot];
         bool canMerge = existingStack != null &&
@@ -100,7 +100,7 @@ public sealed class Inventory : IInventory
         return existingStack;
     }
 
-    public ItemStack? RemoveAt(int slot)
+    public ItemStack? Remove(int slot)
     {
         ItemStack? result = _stacks[slot];
         _stacks[slot] = null;

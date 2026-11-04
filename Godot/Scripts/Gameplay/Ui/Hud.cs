@@ -347,12 +347,12 @@ public sealed class Hud : IHud
         );
 
         unit.DesyncInventory();
-        ItemStack? stack = unit.Inventory.RemoveAt(fromIndex);
+        ItemStack? stack = unit.Inventory.Remove(fromIndex);
         if (stack != null)
         {
-            ItemStack? remainder = unit.Inventory.PutAt(toIndex, stack);
+            ItemStack? remainder = unit.Inventory.Put(toIndex, stack);
             if (remainder != null)
-                unit.Inventory.PutAt(fromIndex, remainder);
+                unit.Inventory.Put(fromIndex, remainder);
         }
     }
 

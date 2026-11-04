@@ -19,9 +19,9 @@ public interface IInventory : IReadOnlyList<ItemStack?>
     /// the put stack, it's merged and a remainder is returned. Otherwise, a stack that was in the slot previously is
     /// returned.
     /// </summary>
-    ItemStack? PutAt(int slot, ItemStack stack);
+    ItemStack? Put(int slot, ItemStack stack);
 
-    ItemStack? RemoveAt(int slot);
+    ItemStack? Remove(int slot);
     IReadOnlyList<ItemStack?> ToSnapshot();
     void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks);
     void ApplyDelta(ListDelta<ItemStack?> delta);

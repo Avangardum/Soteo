@@ -38,10 +38,10 @@ public sealed class PlayerCharacter : Unit
         InnateHotbarAbilities.Add(Ability.Instance<ProjectileBurstAbility>());
         InnateHotbarAbilities.Add(Ability.Instance<VampireAbility>());
 
-        Inventory.PutAt(0, ItemStack.Of<LogItem>(1));
-        Inventory.PutAt(1, ItemStack.Of<LogItem>(1));
-        Inventory.PutAt(2, ItemStack.Of<RockItem>(1));
-        Inventory.PutAt(3, ItemStack.Of<BlinkBootsItem>(1));
+        Inventory.Put(0, ItemStack.Of<LogItem>(1));
+        Inventory.Put(1, ItemStack.Of<LogItem>(1));
+        Inventory.Put(2, ItemStack.Of<RockItem>(1));
+        Inventory.Put(3, ItemStack.Of<BlinkBootsItem>(1));
     }
 
     public static PlayerCharacter FromSnapshot

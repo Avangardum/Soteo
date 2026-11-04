@@ -14,9 +14,9 @@ public interface IEquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemSt
     /// the put stack, it's merged and a remainder is returned. If the slot contains a stack that can't be merged,
     /// nothing is changed and the input stack is returned.
     /// </summary>
-    ItemStack? PutAt(EquipmentSlot slot, ItemStack stack);
+    ItemStack? Put(EquipmentSlot slot, ItemStack stack);
 
-    ItemStack? RemoveAt(EquipmentSlot slot);
+    ItemStack? Remove(EquipmentSlot slot);
 
     /// <summary>
     /// Slots that are empty, but blocked by items in other slots as keys and slots that block them as values

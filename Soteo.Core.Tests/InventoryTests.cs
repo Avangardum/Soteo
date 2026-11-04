@@ -85,7 +85,7 @@ public sealed class InventoryTests
     {
         var sut = new Inventory([ItemStack.Of<TestItem1>(1), null]);
 
-        ItemStack? result = sut.PutAt(0, ItemStack.Of<TestItem2>(1));
+        ItemStack? result = sut.Put(0, ItemStack.Of<TestItem2>(1));
 
         sut[0].Should().Be(ItemStack.Of<TestItem2>(1));
         sut[1].Should().BeNull();
@@ -97,7 +97,7 @@ public sealed class InventoryTests
     {
         var sut = new Inventory([ItemStack.Of<TestItem1>(10), null]);
 
-        ItemStack? result = sut.PutAt(0, ItemStack.Of<TestItem1>(1));
+        ItemStack? result = sut.Put(0, ItemStack.Of<TestItem1>(1));
 
         sut[0].Should().Be(ItemStack.Of<TestItem1>(1));
         sut[1].Should().BeNull();
@@ -109,7 +109,7 @@ public sealed class InventoryTests
     {
         var sut = new Inventory([ItemStack.Of<TestItem1>(1), null]);
 
-        ItemStack? result = sut.PutAt(0, ItemStack.Of<TestItem1>(1));
+        ItemStack? result = sut.Put(0, ItemStack.Of<TestItem1>(1));
 
         sut[0].Should().Be(ItemStack.Of<TestItem1>(2));
         sut[1].Should().BeNull();
@@ -121,7 +121,7 @@ public sealed class InventoryTests
     {
         var sut = new Inventory([ItemStack.Of<TestItem1>(6), null]);
 
-        ItemStack? result = sut.PutAt(0, ItemStack.Of<TestItem1>(6));
+        ItemStack? result = sut.Put(0, ItemStack.Of<TestItem1>(6));
 
         sut[0].Should().Be(ItemStack.Of<TestItem1>(10));
         sut[1].Should().BeNull();
@@ -133,7 +133,7 @@ public sealed class InventoryTests
     {
         var sut = new Inventory([ItemStack.Of<TestItem1>(2)]);
 
-        ItemStack? result = sut.RemoveAt(0);
+        ItemStack? result = sut.Remove(0);
 
         sut[0].Should().BeNull();
         result.Should().Be(ItemStack.Of<TestItem1>(2));
@@ -144,7 +144,7 @@ public sealed class InventoryTests
     {
         var sut = new Inventory([null]);
 
-        ItemStack? result = sut.RemoveAt(0);
+        ItemStack? result = sut.Remove(0);
 
         sut[0].Should().BeNull();
         result.Should().BeNull();

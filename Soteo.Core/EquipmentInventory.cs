@@ -29,7 +29,7 @@ public sealed class EquipmentInventory : IEquipmentInventory
     /// the put stack, it's merged and a remainder is returned. If the slot contains a stack that can't be merged,
     /// nothing is changed and the input stack is returned.
     /// </summary>
-    public ItemStack? PutAt(EquipmentSlot slot, ItemStack stack)
+    public ItemStack? Put(EquipmentSlot slot, ItemStack stack)
     {
         if (stack.Item.EquippableTo != slot) return stack;
         IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> blockedAndBlockingSlots = BlockedAndBlockingSlots;
@@ -59,7 +59,7 @@ public sealed class EquipmentInventory : IEquipmentInventory
         return stack.WithCount(stack.Count - movedCount);
     }
 
-    public ItemStack? RemoveAt(EquipmentSlot slot)
+    public ItemStack? Remove(EquipmentSlot slot)
     {
         ItemStack? result = _stacks[slot];
         _stacks[slot] = null;

@@ -22,9 +22,9 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private long _nextStatusOrdinal;
     private readonly Queue<ICommand> _commands = [];
     private Guid? _controllingPlayerId;
-    private Dictionary<Guid, StatusContext> _statusesInternal = [];
-    private Dictionary<Stat, double> _statsInternal  = [];
-    private Dictionary<AbilitySlot, AbilitySlotState> _abilitySlotStatesInternal = [];
+    private Dictionary<Guid, StatusContext> _statuses = [];
+    private Dictionary<Stat, double> _stats  = [];
+    private Dictionary<AbilitySlot, AbilitySlotState> _abilitySlotStates = [];
     private readonly ObservableCollection<Ability> _innateHotbarAbilities = []; // todo snapshot
     private readonly ObservableDictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = []; // todo snapshot
 
@@ -51,7 +51,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         _crossInventoryHelper = crossInventoryHelper;
 
         foreach (Stat stat in Stat.All)
-            _statsInternal[stat] = StatConst[stat].Default;
+            _stats[stat] = StatConst[stat].Default;
 
         _innateHotbarAbilities.CollectionChanged += (_, _) => UpdateHotbarAbilityList();
         _innateSpecialAbilities.Changed += UpdateSpecialAbilityList;
@@ -64,11 +64,11 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     public IReadOnlyList<Guid> ControllingPlayerIds =>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
 
-    public IReadOnlyDictionary<Guid, StatusContext> Statuses => _statusesInternal;
+    public IReadOnlyDictionary<Guid, StatusContext> Statuses => _statuses;
 
-    public IReadOnlyDictionary<Stat, double> Stats => _statsInternal;
+    public IReadOnlyDictionary<Stat, double> Stats => _stats;
 
-    public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => _abilitySlotStatesInternal;
+    public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => _abilitySlotStates;
 
     protected IList<Ability> InnateHotbarAbilities => _innateHotbarAbilities;
 
@@ -95,7 +95,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             IsDead = IsDead,
             IsMoving = IsMoving,
             Stats = Stats.ToImmutableDictionary(),
-            AbilitySlotStates = _abilitySlotStatesInternal.ToImmutableDictionary(),
+            AbilitySlotStates = _abilitySlotStates.ToImmutableDictionary(),
             AbilityUseProgress = AbilityUseProgress,
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot()),
             ControllingPlayerId = _controllingPlayerId,
@@ -110,10 +110,10 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         var s = (UnitSnapshot)snapshot;
         IsDead = s.IsDead;
         IsMoving = s.IsMoving;
-        _statsInternal = s.Stats.ToDictionary();
-        _abilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
+        _stats = s.Stats.ToDictionary();
+        _abilitySlotStates = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
-        _statusesInternal =
+        _statuses =
             s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _serviceProvider));
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
@@ -140,11 +140,11 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     private void DecreaseCooldowns(double delta)
     {
-        foreach (AbilitySlot slot in _abilitySlotStatesInternal.Keys.ToList())
+        foreach (AbilitySlot slot in _abilitySlotStates.Keys.ToList())
         {
-            _abilitySlotStatesInternal[slot] = _abilitySlotStatesInternal[slot] with
+            _abilitySlotStates[slot] = _abilitySlotStates[slot] with
             {
-                Cooldown = Math.Max(_abilitySlotStatesInternal[slot].Cooldown - delta, 0)
+                Cooldown = Math.Max(_abilitySlotStates[slot].Cooldown - delta, 0)
             };
         }
     }
@@ -173,7 +173,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
                 RemainingTime = context.RemainingTime - limitedDelta
             };
             if (context.RemainingTime > 0)
-                _statusesInternal[context.Id] = context;
+                _statuses[context.Id] = context;
             else
                 RemoveStatus(context.Id);
         }
@@ -211,7 +211,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         double oldMaxMana = Stats[Stat.MaxMana];
 
         foreach (Stat stat in Stat.AllComputed)
-            _statsInternal[stat] = CalculateStatValue(stat, modifiers[stat]);
+            _stats[stat] = CalculateStatValue(stat, modifiers[stat]);
 
         UpdateResourceStat(Stat.CurrentHealth, Stat.MaxHealth, oldMaxHealth);
         UpdateResourceStat(Stat.CurrentMana, Stat.MaxMana, oldMaxMana);
@@ -459,7 +459,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     {
         context.Ability.TakeEffect(context);
         double cooldown = context.Ability.Cooldown(context);
-        _abilitySlotStatesInternal[command.Slot] = _abilitySlotStatesInternal[command.Slot] with
+        _abilitySlotStates[command.Slot] = _abilitySlotStates[command.Slot] with
         {
             Cooldown = cooldown,
             MaxCooldown = cooldown
@@ -530,11 +530,11 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         if (command.ToIndex < 0) return;
         if (command.ToIndex >= Inventory.Count) return;
 
-        ItemStack? movedStack = Inventory.RemoveAt(command.FromIndex);
+        ItemStack? movedStack = Inventory.Remove(command.FromIndex);
         if (movedStack == null) return;
-        ItemStack? returnedStack = Inventory.PutAt(command.ToIndex, movedStack);
+        ItemStack? returnedStack = Inventory.Put(command.ToIndex, movedStack);
         if (returnedStack != null)
-            Inventory.PutAt(command.FromIndex, returnedStack);
+            Inventory.Put(command.FromIndex, returnedStack);
     }
 
     private void Equip(EquipCommand command)
@@ -602,7 +602,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             Stat.CurrentMana => Stats[Stat.MaxMana],
             _ => double.PositiveInfinity
         };
-        _statsInternal[stat] = Maths.Clamp(value, min, max);
+        _stats[stat] = Maths.Clamp(value, min, max);
 
         if (stat == Stat.CurrentHealth && Stats[Stat.CurrentHealth] == 0)
             Die();
@@ -651,25 +651,25 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         List<StatusContext> duplicates = Statuses.Values.Where(it => it.Status == status).ToList();
         if (duplicates.Count == 0)
         {
-            _statusesInternal[context.Id] = context;
+            _statuses[context.Id] = context;
         }
         else
         {
             switch (status.DuplicateResolution)
             {
                 case DuplicateStatusResolution.Stack:
-                    _statusesInternal[context.Id] = context;
+                    _statuses[context.Id] = context;
                     break;
                 case DuplicateStatusResolution.Refresh:
                     RefreshDuplicateStatuses(context, duplicates.Single());
                     break;
                 case DuplicateStatusResolution.StackAndRefresh:
-                    _statusesInternal[context.Id] = context;
+                    _statuses[context.Id] = context;
                     RefreshDuplicateStatuses(context, duplicates);
                     break;
                 case DuplicateStatusResolution.Replace:
                     RemoveStatus(duplicates.Single().Id);
-                    _statusesInternal[context.Id] = context;
+                    _statuses[context.Id] = context;
                     break;
                 case DuplicateStatusResolution.Discard:
                     break;
@@ -687,7 +687,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     {
         foreach (StatusContext target in targets)
         {
-            _statusesInternal[target.Id] = target with
+            _statuses[target.Id] = target with
             {
                 SourceUnit = reference.SourceUnit,
                 SourceAbilityContext = reference.SourceAbilityContext,
@@ -700,7 +700,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     public void RemoveStatus(Guid id)
     {
         if (IsRemoved) return;
-        _statusesInternal.Remove(id);
+        _statuses.Remove(id);
         UpdateStats();
     }
 
@@ -726,7 +726,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         {
             var slot = AbilitySlot.Hotbar0 + i;
             Ability ability = hotbarAbilities[i];
-            newStates[slot] = _abilitySlotStatesInternal.Values.SingleOrDefault(it => it.Ability == ability) ??
+            newStates[slot] = _abilitySlotStates.Values.SingleOrDefault(it => it.Ability == ability) ??
                 new AbilitySlotState(ability);
         }
         foreach ((AbilitySlot slot, AbilitySlotState state) in AbilitySlotStates)
@@ -734,7 +734,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             if (slot < AbilitySlot.Hotbar0)
                 newStates[slot] = state;
         }
-        _abilitySlotStatesInternal = newStates;
+        _abilitySlotStates = newStates;
 
         _commands.Clear();
         AbilityUseProgress = null;
@@ -754,7 +754,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             {
                 if (currentState?.Ability != itemAbility)
                 {
-                    _abilitySlotStatesInternal[(AbilitySlot)slot] = currentState != null ?
+                    _abilitySlotStates[(AbilitySlot)slot] = currentState != null ?
                         currentState with { Ability = itemAbility.Required } :
                         new AbilitySlotState(itemAbility.Required);
                 }
@@ -766,7 +766,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
                     currentState?.Ability != innateAbility;
                 if (shouldReplaceWithInnateAbility)
                 {
-                    _abilitySlotStatesInternal[(AbilitySlot)slot] = currentState != null ?
+                    _abilitySlotStates[(AbilitySlot)slot] = currentState != null ?
                         currentState with { Ability = innateAbility.Required } :
                         new AbilitySlotState(innateAbility.Required);
                 }
