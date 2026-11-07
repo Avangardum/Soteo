@@ -3,11 +3,22 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Soteo.Util;
 
+// todo remove
 public sealed class ObservableDictionary<TKey, TValue> : IDictionary<TKey, TValue> where TKey : notnull
 {
     private readonly Dictionary<TKey, TValue> _inner = [];
 
     public event Action Changed = delegate { };
+
+    public ObservableDictionary()
+    {
+
+    }
+
+    public ObservableDictionary(IEnumerable<KeyValuePair<TKey, TValue>> pairs)
+    {
+        _inner = pairs.ToDictionary();
+    }
 
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => _inner.GetEnumerator();
 

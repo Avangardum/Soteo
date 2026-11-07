@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Soteo.Core.Abilities;
 using Soteo.Core.Dto.Deltas;
 using Soteo.Core.Enums;
 
@@ -13,8 +14,10 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, StatusContextSnapshot> Statuses { get; init; }
     public required Guid? ControllingPlayerId { get; init; }
-    public required IReadOnlyList<ItemStack?> Items { get; init; }
+    public required IReadOnlyList<ItemStack?> Items { get; init; } // todo use special snapshot type
     public required EquipmentInventorySnapshot EquipmentInventory { get; init; }
+    public required IReadOnlyList<Ability> InnateHotbarAbilities { get; init; }
+    public required IReadOnlyDictionary<SpecialAbilitySlot, Ability> InnateSpecialAbilities { get; init; }
 
     public override EntitySnapshot ToPuppet()
     {

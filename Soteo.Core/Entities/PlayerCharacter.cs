@@ -35,13 +35,12 @@ public sealed class PlayerCharacter : Unit
         InnateSpecialAbilities[SpecialAbilitySlot.Recall] = Ability.Instance<RecallAbility>();
         InnateHotbarAbilities.Add(Ability.Instance<BloodSacrificeAbility>());
         InnateHotbarAbilities.Add(Ability.Instance<HealAbility>());
-        InnateHotbarAbilities.Add(Ability.Instance<ProjectileBurstAbility>());
         InnateHotbarAbilities.Add(Ability.Instance<VampireAbility>());
 
         Inventory.Put(0, ItemStack.Of<LogItem>(1));
         Inventory.Put(1, ItemStack.Of<LogItem>(1));
         Inventory.Put(2, ItemStack.Of<RockItem>(1));
-        Inventory.Put(3, ItemStack.Of<BlinkBootsItem>(1));
+        Inventory.Put(3, ItemStack.Of<TestBootsItem>(1));
     }
 
     public static PlayerCharacter FromSnapshot

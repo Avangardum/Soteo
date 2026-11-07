@@ -165,13 +165,13 @@ public sealed class Hud : IHud
     private void OnAbilityButtonDown(int buttonIndex)
     {
         if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepo.Id)
-            Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = true });
+            Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_hotbar" + buttonIndex, Pressed = true });
     }
 
     private void OnAbilityButtonUp(int buttonIndex)
     {
         if (SelectedUnit != null && SelectedUnit.Id == _currentCharIdRepo.Id)
-            Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_class" + buttonIndex, Pressed = false });
+            Input.ParseInputEvent(new InputEventAction{ Action = "use_ability_hotbar" + buttonIndex, Pressed = false });
     }
 
     private void OnMouseEnteredAbilityButton(int index)

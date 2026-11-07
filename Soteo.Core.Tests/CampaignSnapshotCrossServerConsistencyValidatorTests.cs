@@ -247,7 +247,9 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             Azimuth = 0,
             ControllingPlayerId = null,
             Items = [],
-            EquipmentInventory = new EquipmentInventorySnapshot(ImmutableDictionary<EquipmentSlot, ItemStack?>.Empty)
+            EquipmentInventory = new EquipmentInventorySnapshot(ImmutableDictionary<EquipmentSlot, ItemStack?>.Empty),
+            InnateHotbarAbilities = [],
+            InnateSpecialAbilities = ImmutableDictionary<SpecialAbilitySlot, Ability>.Empty
         };
     }
 

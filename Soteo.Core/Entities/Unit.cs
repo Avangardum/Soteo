@@ -25,8 +25,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private Dictionary<Guid, StatusContext> _statuses = [];
     private Dictionary<Stat, double> _stats  = [];
     private Dictionary<AbilitySlot, AbilitySlotState> _abilitySlotStates = [];
-    private readonly ObservableCollection<Ability> _innateHotbarAbilities = []; // todo snapshot
-    private readonly ObservableDictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = []; // todo snapshot
+    private ObservableCollection<Ability> _innateHotbarAbilities = []; // todo snapshot
+    private ObservableDictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = []; // todo snapshot
 
     public IInventory Inventory { get; }
     public IEquipmentInventory EquipmentInventory { get; }
@@ -64,14 +64,19 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     public IReadOnlyList<Guid> ControllingPlayerIds =>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
 
+    // todo return snapshot
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => _statuses;
 
+    // todo return snapshot
     public IReadOnlyDictionary<Stat, double> Stats => _stats;
 
+    // todo return snapshot
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => _abilitySlotStates;
 
+    // todo return snapshot, read only
     protected IList<Ability> InnateHotbarAbilities => _innateHotbarAbilities;
 
+    // todo return snapshot, read only
     protected IDictionary<SpecialAbilitySlot, Ability> InnateSpecialAbilities => _innateSpecialAbilities;
 
     public override Vector2 Position
@@ -100,7 +105,9 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot()),
             ControllingPlayerId = _controllingPlayerId,
             Items = Inventory.ToImmutableList(),
-            EquipmentInventory = EquipmentInventory.ToSnapshot()
+            EquipmentInventory = EquipmentInventory.ToSnapshot(),
+            InnateHotbarAbilities = _innateHotbarAbilities.ToImmutableList(),
+            InnateSpecialAbilities = _innateSpecialAbilities.ToImmutableDictionary()
         };
     }
 
@@ -119,6 +126,12 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.Items);
         EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
+        _innateHotbarAbilities = new ObservableCollection<Ability>(s.InnateHotbarAbilities);
+        _innateSpecialAbilities =
+            new ObservableDictionary<SpecialAbilitySlot, Ability>(s.InnateSpecialAbilities);
+
+        UpdateHotbarAbilityList();
+        UpdateSpecialAbilityList();
     }
 
     public void Tick(double delta)

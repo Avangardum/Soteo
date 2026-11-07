@@ -459,6 +459,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeNullableStruct(unit.ControllingPlayerId, SerializeGuid, stream);
         SerializeList(unit.Items, (v, _) => SerializeNullableClass(v, SerializeItemStack, stream), stream);
         SerializeEquipmentInventorySnapshot(unit.EquipmentInventory, stream);
+        SerializeList(unit.InnateHotbarAbilities, SerializeAbility, stream);
+        SerializeDictionary(unit.InnateSpecialAbilities, SerializeEnum, SerializeAbility, stream);
     }
 
     public UnitSnapshot DeserializeUnitSnapshot(Stream stream)
@@ -478,7 +480,10 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             Statuses = DeserializeIndexedDictionary(DeserializeDeflatedStatusContext, it => it.Id, stream),
             ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream),
             Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream),
-            EquipmentInventory = DeserializeEquipmentInventorySnapshot(stream)
+            EquipmentInventory = DeserializeEquipmentInventorySnapshot(stream),
+            InnateHotbarAbilities = DeserializeList(DeserializeAbility, stream),
+            InnateSpecialAbilities =
+                DeserializeDictionary(DeserializeEnum<SpecialAbilitySlot>, DeserializeAbility, stream)
         };
     }
 
