@@ -9,7 +9,7 @@ namespace Soteo.Core.Entities;
 
 public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, IEntityNode
 {
-    protected Entity(Guid id, TNode node)
+    internal Entity(Guid id, TNode node)
     {
         Id = id;
         Node = node;

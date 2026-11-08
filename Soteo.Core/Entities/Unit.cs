@@ -25,8 +25,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private Dictionary<Guid, StatusContext> _statuses = [];
     private Dictionary<Stat, double> _stats  = [];
     private Dictionary<AbilitySlot, AbilitySlotState> _abilitySlotStates = [];
-    private ObservableCollection<Ability> _innateHotbarAbilities = []; // todo snapshot
-    private ObservableDictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = []; // todo snapshot
+    private ObservableCollection<Ability> _innateHotbarAbilities = [];
+    private ObservableDictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = [];
 
     public IInventory Inventory { get; }
     public IEquipmentInventory EquipmentInventory { get; }
@@ -59,25 +59,24 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     }
 
     // For testing
-    private protected IReadOnlyList<ICommand> Commands => _commands.ToList();
+    private protected IReadOnlyList<ICommand> GetCommands() => _commands.ToList();
 
     public IReadOnlyList<Guid> ControllingPlayerIds =>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
 
-    // todo return snapshot
+    // todo to get snapshot method
     public IReadOnlyDictionary<Guid, StatusContext> Statuses => _statuses;
 
-    // todo return snapshot
+    // todo to get snapshot method
     public IReadOnlyDictionary<Stat, double> Stats => _stats;
 
-    // todo return snapshot
+    // todo to get snapshot method
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => _abilitySlotStates;
 
-    // todo return snapshot, read only
-    protected IList<Ability> InnateHotbarAbilities => _innateHotbarAbilities;
+    protected IReadOnlyList<Ability> GetInnateHotbarAbilities() => _innateHotbarAbilities.ToList();
 
-    // todo return snapshot, read only
-    protected IDictionary<SpecialAbilitySlot, Ability> InnateSpecialAbilities => _innateSpecialAbilities;
+    protected IReadOnlyDictionary<SpecialAbilitySlot, Ability> GetInnateSpecialAbilities() =>
+        _innateSpecialAbilities.ToDictionary();
 
     public override Vector2 Position
     {
@@ -732,7 +731,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             .Where(it => it.Value != null)
             .OrderBy(it => it.Key)
             .SelectMany(it => it.Value.Required.Item.HotbarAbilities);
-        List<Ability> hotbarAbilities = InnateHotbarAbilities.Concat(itemHotbarAbilities).Distinct().ToList();
+        List<Ability> hotbarAbilities = GetInnateHotbarAbilities().Concat(itemHotbarAbilities).Distinct().ToList();
 
         Dictionary<AbilitySlot, AbilitySlotState> newStates = [];
         for (int i = 0; i < hotbarAbilities.Count; i++)
@@ -788,5 +787,39 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
         _commands.Clear();
         AbilityUseProgress = null;
+    }
+
+    protected void AddInnateHotbarAbility<T>() where T : Ability, new() =>
+        AddInnateHotbarAbility(Ability.Instance<T>());
+
+    protected void AddInnateHotbarAbility(Ability ability)
+    {
+        if (_innateHotbarAbilities.Contains(ability)) return;
+        _innateHotbarAbilities.Add(ability);
+        UpdateHotbarAbilityList();
+    }
+
+    protected void RemoveInnateHotbarAbility<T>() where T : Ability, new() =>
+        RemoveInnateHotbarAbility(Ability.Instance<T>());
+
+    protected void RemoveInnateHotbarAbility(Ability ability)
+    {
+        if (_innateHotbarAbilities.Remove(ability))
+            UpdateHotbarAbilityList();
+    }
+
+    protected void SetInnateSpecialAbility<T>(SpecialAbilitySlot slot) where T : Ability, new() =>
+        SetInnateSpecialAbility(slot, Ability.Instance<T>());
+
+    protected void SetInnateSpecialAbility(SpecialAbilitySlot slot, Ability ability)
+    {
+        _innateSpecialAbilities[slot] = ability;
+        UpdateSpecialAbilityList();
+    }
+
+    protected void RemoveInnateSpecialAbility(SpecialAbilitySlot slot)
+    {
+        if (_innateSpecialAbilities.Remove(slot))
+            UpdateSpecialAbilityList();
     }
 }
