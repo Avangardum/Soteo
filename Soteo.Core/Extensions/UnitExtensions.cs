@@ -8,26 +8,25 @@ public static class UnitExtensions
 {
     extension (IUnit self)
     {
-        public void AddStatus(Status status, double time, double? tickInterval, ISourceUnitAndAbility? source)
+        public void AddStatus(Status status, double time, ISourceUnitAndAbility? source)
         {
-            self.AddStatus(status, time, tickInterval, source?.Unit, source?.AbilityContext);
+            self.AddStatus(status, time, source?.Unit, source?.AbilityContext);
         }
 
         public void AddStatus<T>
         (
             double time,
-            double? tickInterval,
             IUnit? sourceUnit,
             AbilityContext? sourceAbilityContext
         ) where T : Status, new()
         {
-            self.AddStatus(Status.Instance<T>(), time, tickInterval, sourceUnit, sourceAbilityContext);
+            self.AddStatus(Status.Instance<T>(), time, sourceUnit, sourceAbilityContext);
         }
 
-        public void AddStatus<T>(double time, double? tickInterval, ISourceUnitAndAbility? source)
+        public void AddStatus<T>(double time, ISourceUnitAndAbility? source)
             where T : Status, new()
         {
-            self.AddStatus<T>(time, tickInterval, source?.Unit, source?.AbilityContext);
+            self.AddStatus<T>(time, source?.Unit, source?.AbilityContext);
         }
 
         public void RestoreHealth(double amount, ISourceUnitAndAbility? source) =>

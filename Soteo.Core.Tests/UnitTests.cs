@@ -100,7 +100,6 @@ public sealed class UnitTests
         _sut.AddStatus<StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff>
         (
             time: double.PositiveInfinity,
-            tickInterval: null,
             source: null
         );
 
@@ -115,31 +114,28 @@ public sealed class UnitTests
     }
 
     [Fact]
-    public void StatusIsTickedForEveryElapsedTickInterval()
+    public void StatusIsTickedEveryTick()
     {
         int statusTickCount = 0;
         SpyStatus.Ticked += () => statusTickCount++;
 
-        _sut.AddStatus<SpyStatus>(time: 10, tickInterval: 1, source: null);
+        _sut.AddStatus<SpyStatus>(time: 10, source: null);
         statusTickCount.Should().Be(0);
 
-        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
+        _sut.Tick(Const.TickInterval);
         statusTickCount.Should().Be(1);
 
-        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
+        _sut.Tick(Const.TickInterval);
         statusTickCount.Should().Be(2);
 
-        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(0.5);
-        statusTickCount.Should().Be(2);
-
-        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(0.5);
+        _sut.Tick(Const.TickInterval);
         statusTickCount.Should().Be(3);
     }
 
     [Fact]
     public void StatusRemovedOnDealAttackDamageIsRemovedAccordingly()
     {
-        _sut.AddStatus<StatusRemovedOnDealAttackDamage>(time: 10, tickInterval: null, source: null);
+        _sut.AddStatus<StatusRemovedOnDealAttackDamage>(time: 10, source: null);
         _sut.Statuses.Should().NotBeEmpty();
         _sut.DealAttackDamageTo(_sut, Ability.Instance<MeleeAttackAbility>());
         _sut.Statuses.Should().BeEmpty();
@@ -148,8 +144,8 @@ public sealed class UnitTests
     [Fact]
     public void DieOnTickStatusKillsItsUnitWhenTicked()
     {
-        _sut.AddStatus<DieOnTickStatus>(time: 10, tickInterval: 1, source: null);
-        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
+        _sut.AddStatus<DieOnTickStatus>(time: 10, source: null);
+        _sut.Tick(Const.TickInterval);
         _sut.IsDead.Should().BeTrue();
     }
 

@@ -7,7 +7,6 @@ using Soteo.Core.Dto.Commands;
 using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
-using Soteo.Core.StaticHelpers;
 using Soteo.Core.Statuses;
 using Soteo.Util;
 
@@ -170,37 +169,24 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private void ProcessStatuses(double delta)
     {
         // todo if a status tick removes another status, that status will still be ticked
-        ImmutableList<StatusContext> contexts = Statuses.Values.ToImmutableList();
-        for (int i = 0; i < contexts.Count; i++)
+        foreach (StatusContext context in Statuses.Values.ToList())
         {
-            StatusContext context = contexts[i];
-            double limitedDelta = Math.Min(delta, context.RemainingTime);
-            StatusTickContext? newTick = ProcessStatusTickCountdown(context, limitedDelta);
             // todo check if self-removing status behaves correctly
-            context = context with
+            context.Status.Tick(context, delta);
+            if (context.RemainingTime > delta)
             {
-                Tick = newTick,
-                ElapsedTime = context.ElapsedTime + limitedDelta,
-                DisplayElapsedTime = context.DisplayElapsedTime + limitedDelta,
-                RemainingTime = context.RemainingTime - limitedDelta
-            };
-            if (context.RemainingTime > 0)
-                _statuses[context.Id] = context;
+                _statuses[context.Id] = context with
+                {
+                    ElapsedTime = context.ElapsedTime + delta,
+                    DisplayElapsedTime = context.DisplayElapsedTime + delta,
+                    RemainingTime = context.RemainingTime - delta
+                };
+            }
             else
+            {
                 RemoveStatus(context.Id);
+            }
         }
-    }
-
-    private StatusTickContext? ProcessStatusTickCountdown(StatusContext context, double delta)
-    {
-        if (context.Tick == null) return null;
-        double countdown = context.Tick.Countdown - delta;
-        while (countdown <= 0)
-        {
-            context.Status.Tick(context, context.Tick.Interval);
-            countdown += context.Tick.Interval;
-        }
-        return context.Tick with { Countdown = countdown };
     }
 
     private void UpdateStats()
@@ -631,14 +617,11 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     (
         Status status,
         double time,
-        double? tickInterval,
         IUnit? sourceUnit,
         AbilityContext? sourceAbilityContext
     )
     {
         if (time < 0) throw new ArgumentException();
-        const double minTickInterval = Const.TickInterval;
-        if (tickInterval < minTickInterval) throw new ArgumentException();
         if (IsRemoved) return;
 
         StatusContext context = new StatusContext
@@ -648,11 +631,6 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             SourceAbilityContext = sourceAbilityContext,
             Unit = this,
             SourceUnit = sourceUnit,
-            Tick = tickInterval == null ? null : new StatusTickContext
-            {
-                Interval = tickInterval.Value,
-                Countdown = tickInterval.Value
-            },
             ElapsedTime = 0,
             DisplayElapsedTime = 0,
             RemainingTime = time,

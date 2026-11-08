@@ -477,7 +477,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             AbilitySlotStates =
                 DeserializeDictionary(DeserializeEnum<AbilitySlot>, DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
-            Statuses = DeserializeIndexedDictionary(DeserializeDeflatedStatusContext, it => it.Id, stream),
+            Statuses = DeserializeIndexedDictionary(DeserializeStatusContextSnapshot, it => it.Id, stream),
             ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream),
             Items = DeserializeList(_ => DeserializeNullableClass(DeserializeItemStack, stream), stream),
             EquipmentInventory = DeserializeEquipmentInventorySnapshot(stream),
@@ -615,14 +615,13 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         SerializeNullableClass(value.AbilityContext, SerializeAbilityContextSnapshot, stream);
         SerializeGuid(value.UnitId, stream);
         SerializeNullableStruct(value.SourceId, SerializeGuid, stream);
-        SerializeNullableClass(value.Tick, SerializeStatusTickContext, stream);
         SerializeDouble(value.ElapsedTime, stream);
         SerializeDouble(value.DisplayElapsedTime, stream);
         SerializeDouble(value.RemainingTime, stream);
         SerializeLong(value.Ordinal, stream);
     }
 
-    public StatusContextSnapshot DeserializeDeflatedStatusContext(Stream stream)
+    public StatusContextSnapshot DeserializeStatusContextSnapshot(Stream stream)
     {
         return new StatusContextSnapshot
         {
@@ -631,28 +630,10 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             AbilityContext = DeserializeNullableClass(DeserializeAbilityContextSnapshot, stream),
             UnitId = DeserializeGuid(stream),
             SourceId = DeserializeNullableStruct(DeserializeGuid, stream),
-            Tick = DeserializeNullableClass(DeserializeStatusTickContext, stream),
             ElapsedTime = DeserializeDouble(stream),
             DisplayElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream),
             Ordinal = DeserializeLong(stream)
-        };
-    }
-
-    public void SerializeStatusTickContext(StatusTickContext value, Stream stream)
-    {
-        SerializeDouble(value.Interval, stream);
-        SerializeDouble(value.Countdown, stream);
-    }
-
-    public StatusTickContext DeserializeStatusTickContext(Stream stream)
-    {
-        double interval = DeserializeDouble(stream);
-        double countdown = DeserializeDouble(stream);
-        return new StatusTickContext
-        {
-            Interval = interval,
-            Countdown = countdown,
         };
     }
 

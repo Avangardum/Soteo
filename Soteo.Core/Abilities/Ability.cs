@@ -14,7 +14,6 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         GetType().Name.ReplaceRegex("Ability$", "").PascalCaseToCapitalizedText();
 
     public virtual Status? PassiveStatus => null;
-    public virtual double? PassiveTickInterval => null;
     public abstract Targeting Targeting { get; }
     public virtual Targeting AltTargeting => Targeting;
 

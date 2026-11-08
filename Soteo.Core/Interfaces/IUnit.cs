@@ -24,7 +24,6 @@ public interface IUnit : IEntity
     (
         Status status,
         double time,
-        double? tickInterval,
         IUnit? sourceUnit,
         AbilityContext? sourceAbilityContext
     );

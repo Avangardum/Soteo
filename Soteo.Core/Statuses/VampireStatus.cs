@@ -34,6 +34,6 @@ public sealed class VampireStatus : Status
         double lifestealFactor =
             context.SourceAbilityAs<VampireAbility>().LifestealFactor;
         context.Unit.RestoreHealth(damage * lifestealFactor, context);
-        target.AddStatus<BleedingStatus>(BleedingStatus.Time, BleedingStatus.TickInterval, context);
+        target.AddStatus<BleedingStatus>(BleedingStatus.Time, context);
     }
 }

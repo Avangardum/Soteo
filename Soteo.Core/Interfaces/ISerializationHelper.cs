@@ -121,9 +121,7 @@ public interface ISerializationHelper
     void SerializeAbilityContextSnapshot(AbilityContextSnapshot context, Stream stream);
     AbilityContextSnapshot DeserializeAbilityContextSnapshot(Stream stream);
     void SerializeStatusContextSnapshot(StatusContextSnapshot value, Stream stream);
-    StatusContextSnapshot DeserializeDeflatedStatusContext(Stream stream);
-    void SerializeStatusTickContext(StatusTickContext value, Stream stream);
-    StatusTickContext DeserializeStatusTickContext(Stream stream);
+    StatusContextSnapshot DeserializeStatusContextSnapshot(Stream stream);
     void SerializeShardSnapshot(ShardSnapshot value, Stream stream);
     ShardSnapshot DeserializeShardSnapshot(Stream stream);
     void SerializeItemStack(ItemStack value, Stream stream);

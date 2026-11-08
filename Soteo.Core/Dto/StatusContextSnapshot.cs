@@ -12,7 +12,6 @@ public sealed record StatusContextSnapshot
     public required AbilityContextSnapshot? AbilityContext { get; init; }
     public required Guid UnitId { get; init; }
     public required Guid? SourceId { get; init; }
-    public required StatusTickContext? Tick { get; init; }
     public required double ElapsedTime { get; init; }
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
