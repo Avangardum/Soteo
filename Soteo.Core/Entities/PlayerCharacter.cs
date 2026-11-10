@@ -35,7 +35,6 @@ public sealed class PlayerCharacter : Unit
         SetInnateSpecialAbility<RecallAbility>(SpecialAbilitySlot.Recall);
         AddInnateHotbarAbility<BloodSacrificeAbility>();
         AddInnateHotbarAbility<HealAbility>();
-        AddInnateHotbarAbility<VampireAbility>();
 
         Inventory.Put(0, ItemStack.Of<LogItem>(1));
         Inventory.Put(1, ItemStack.Of<LogItem>(1));

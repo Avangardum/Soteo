@@ -1,4 +1,3 @@
-using Soteo.Core.Dto;
 using Soteo.Core.Enums;
 using Soteo.Core.Statuses;
 
@@ -8,6 +7,6 @@ public sealed class VampireAbility : Ability
 {
     public override Targeting Targeting => Targeting.Passive;
     public override string IconPath => "Placeholder2";
-    public override Status PassiveStatus => Status.Instance<VampireStatus>();
+    public override AbilityPassiveStatus PassiveStatus => Status.Instance<VampireStatus>();
     public double LifestealFactor => 0.4;
 }

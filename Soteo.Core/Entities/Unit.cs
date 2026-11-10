@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.Numerics;
 using Soteo.Core.Abilities;
 using Soteo.Core.Dto;
@@ -21,11 +20,12 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
     private long _nextStatusOrdinal;
     private readonly Queue<ICommand> _commands = [];
     private Guid? _controllingPlayerId;
-    private Dictionary<Guid, StatusContext> _statuses = [];
+    private Dictionary<Guid, StatusContext> _statuses = []; // todo rename to _statusContexts and rename related members
     private Dictionary<Stat, double> _stats  = [];
     private Dictionary<AbilitySlot, AbilitySlotState> _abilitySlotStates = [];
-    private ObservableCollection<Ability> _innateHotbarAbilities = [];
-    private ObservableDictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = [];
+    private List<Ability> _innateHotbarAbilities = [];
+    private Dictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = [];
+    private bool _allowAbilityPassiveStatusManipulation;
 
     public IInventory Inventory { get; }
     public IEquipmentInventory EquipmentInventory { get; }
@@ -52,8 +52,6 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         foreach (Stat stat in Stat.All)
             _stats[stat] = StatConst[stat].Default;
 
-        _innateHotbarAbilities.CollectionChanged += (_, _) => UpdateHotbarAbilityList();
-        _innateSpecialAbilities.Changed += UpdateSpecialAbilityList;
         EquipmentInventory.Changed += () => { UpdateHotbarAbilityList(); UpdateSpecialAbilityList(); };
     }
 
@@ -124,9 +122,8 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.Items);
         EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
-        _innateHotbarAbilities = new ObservableCollection<Ability>(s.InnateHotbarAbilities);
-        _innateSpecialAbilities =
-            new ObservableDictionary<SpecialAbilitySlot, Ability>(s.InnateSpecialAbilities);
+        _innateHotbarAbilities = s.InnateHotbarAbilities.ToList();
+        _innateSpecialAbilities = s.InnateSpecialAbilities.ToDictionary();
 
         UpdateHotbarAbilityList();
         UpdateSpecialAbilityList();
@@ -453,6 +450,22 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         };
     }
 
+    private AbilityContext GetPassiveAbilityContext(Ability ability)
+    {
+        return new AbilityContext
+        {
+            Ability = ability,
+            User = this,
+            Alt = false,
+            UserStats = Stats.ToImmutableDictionary(),
+            ServiceProvider = _serviceProvider,
+            TargetPosition = null,
+            TargetUnit = null,
+            TargetDirection = null,
+            TargetShardId = null
+        };
+    }
+
     private void TriggerAbilityEffect(AbilityContext context, UseAbilityCommand command)
     {
         context.Ability.TakeEffect(context);
@@ -621,7 +634,10 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         AbilityContext? sourceAbilityContext
     )
     {
-        if (time < 0) throw new ArgumentException();
+        if (time < 0)
+            throw new ArgumentException("Time must not be negative");
+        if (!_allowAbilityPassiveStatusManipulation && status is AbilityPassiveStatus)
+            throw new InvalidOperationException("Ability passive statuses should not be added manually");
         if (IsRemoved) return;
 
         StatusContext context = new StatusContext
@@ -689,9 +705,22 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     public void RemoveStatus(Guid id)
     {
+        if (!_statuses.TryGetValue(id, out StatusContext? statusContext)) return;
+        if (!_allowAbilityPassiveStatusManipulation && statusContext.Status is AbilityPassiveStatus)
+            throw new InvalidOperationException("Ability passive statuses should not be removed manually");
         if (IsRemoved) return;
         _statuses.Remove(id);
         UpdateStats();
+    }
+
+    public void RemoveAllStatuses<T>() where T : Status, new() => RemoveAllStatuses(Status.Instance<T>());
+
+    public void RemoveAllStatuses(Status status)
+    {
+        if (IsRemoved) return;
+        foreach ((Guid id, StatusContext context) in _statuses)
+            if (context.Status == status)
+                RemoveStatus(id);
     }
 
     public void Die()
@@ -709,25 +738,31 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             .Where(it => it.Value != null)
             .OrderBy(it => it.Key)
             .SelectMany(it => it.Value.Required.Item.HotbarAbilities);
-        List<Ability> hotbarAbilities = GetInnateHotbarAbilities().Concat(itemHotbarAbilities).Distinct().ToList();
+        List<Ability> hotbarAbilities = _innateHotbarAbilities.Concat(itemHotbarAbilities).Distinct().ToList();
 
         Dictionary<AbilitySlot, AbilitySlotState> newStates = [];
+        List<Ability> addedAbilities = [];
+        List<Ability> removedAbilities = [];
         for (int i = 0; i < hotbarAbilities.Count; i++)
         {
             var slot = AbilitySlot.Hotbar0 + i;
             Ability ability = hotbarAbilities[i];
-            newStates[slot] = _abilitySlotStates.Values.SingleOrDefault(it => it.Ability == ability) ??
-                new AbilitySlotState(ability);
+            AbilitySlotState? currentState = _abilitySlotStates.Values.SingleOrDefault(it => it.Ability == ability);
+            newStates[slot] = currentState ?? new AbilitySlotState(ability);
+            if (currentState == null)
+                addedAbilities.Add(ability);
         }
-        foreach ((AbilitySlot slot, AbilitySlotState state) in AbilitySlotStates)
+        foreach ((AbilitySlot slot, AbilitySlotState state) in _abilitySlotStates)
         {
             if (slot < AbilitySlot.Hotbar0)
                 newStates[slot] = state;
+            else if (!newStates.ContainsKey(slot))
+                removedAbilities.Add(state.Ability);
         }
         _abilitySlotStates = newStates;
 
-        _commands.Clear();
-        AbilityUseProgress = null;
+        addedAbilities.ForEach(OnAbilityAdded);
+        removedAbilities.ForEach(OnAbilityRemoved);
     }
 
     private void UpdateSpecialAbilityList()
@@ -740,31 +775,72 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
                 .OrderBy(it => it.Key)
                 .Select(it => it.Value?.Item.SpecialAbilities.GetValueOrDefault(slot))
                 .FirstOrDefault(it => it != null);
-            if (itemAbility != null)
+            if (itemAbility != null && currentState?.Ability != itemAbility)
             {
-                if (currentState?.Ability != itemAbility)
+                if (currentState != null)
                 {
-                    _abilitySlotStates[(AbilitySlot)slot] = currentState != null ?
-                        currentState with { Ability = itemAbility.Required } :
-                        new AbilitySlotState(itemAbility.Required);
+                    _abilitySlotStates[(AbilitySlot)slot] = currentState with { Ability = itemAbility};
+                    OnAbilityRemoved(currentState.Ability);
                 }
+                else
+                {
+                    _abilitySlotStates[(AbilitySlot)slot] = new AbilitySlotState(itemAbility);
+                }
+                OnAbilityAdded(itemAbility);
             }
-            else
+
+            Ability? innateAbility = null;
+            if
+            (
+                itemAbility == null &&
+                _innateSpecialAbilities.TryGetValue(slot, out innateAbility) &&
+                currentState?.Ability != innateAbility
+            )
             {
-                bool shouldReplaceWithInnateAbility =
-                    _innateSpecialAbilities.TryGetValue(slot, out Ability? innateAbility) &&
-                    currentState?.Ability != innateAbility;
-                if (shouldReplaceWithInnateAbility)
+                if (currentState != null)
                 {
-                    _abilitySlotStates[(AbilitySlot)slot] = currentState != null ?
-                        currentState with { Ability = innateAbility.Required } :
-                        new AbilitySlotState(innateAbility.Required);
+                    _abilitySlotStates[(AbilitySlot)slot] = currentState with { Ability = innateAbility };
+                    OnAbilityRemoved(currentState.Ability);
                 }
+                else
+                {
+                    _abilitySlotStates[(AbilitySlot)slot] = new AbilitySlotState(innateAbility);
+                }
+                OnAbilityAdded(innateAbility);
+            }
+
+            if (itemAbility == null && innateAbility == null && currentState != null)
+            {
+                _abilitySlotStates.Remove((AbilitySlot)slot);
+                OnAbilityRemoved(currentState.Ability);
             }
         }
+    }
 
+    private void OnAbilityAdded(Ability ability)
+    {
         _commands.Clear();
         AbilityUseProgress = null;
+
+        if (ability.PassiveStatus != null)
+        {
+            _allowAbilityPassiveStatusManipulation = true;
+            AddStatus(ability.PassiveStatus, double.PositiveInfinity, this, GetPassiveAbilityContext(ability));
+            _allowAbilityPassiveStatusManipulation = false;
+        }
+    }
+
+    private void OnAbilityRemoved(Ability ability)
+    {
+        _commands.Clear();
+        AbilityUseProgress = null;
+
+        if (ability.PassiveStatus != null)
+        {
+            _allowAbilityPassiveStatusManipulation = true;
+            RemoveAllStatuses(ability.PassiveStatus);
+            _allowAbilityPassiveStatusManipulation = false;
+        }
     }
 
     protected void AddInnateHotbarAbility<T>() where T : Ability, new() =>

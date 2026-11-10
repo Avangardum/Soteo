@@ -13,7 +13,12 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     public virtual string Name =>
         GetType().Name.ReplaceRegex("Ability$", "").PascalCaseToCapitalizedText();
 
-    public virtual Status? PassiveStatus => null;
+    /// <summary>
+    /// Status applied when receiving the ability and removed when losing the ability.
+    /// This status should be unique to its ability.
+    /// </summary>
+    public virtual AbilityPassiveStatus? PassiveStatus => null;
+
     public abstract Targeting Targeting { get; }
     public virtual Targeting AltTargeting => Targeting;
 

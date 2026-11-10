@@ -6,12 +6,8 @@ using Soteo.Util;
 
 namespace Soteo.Core.Statuses;
 
-public sealed class VampireStatus : Status
+public sealed class VampireStatus : AbilityPassiveStatus
 {
-    public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Stack;
-
-    public override bool HudVisible => false;
-
     public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
     [
         new(Stat.HealthRegen, StatModifierKind.Set, 0)

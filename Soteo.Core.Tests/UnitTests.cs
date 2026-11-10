@@ -676,6 +676,52 @@ public sealed class UnitTests
         _sut.AbilitySlotStates.Should().NotContainKey(AbilitySlot.Hotbar3);
     }
 
+    [Fact]
+    public void AddingInnateAbilityWithPassiveStatusAddsThatStatus()
+    {
+        _sut.AddInnateHotbarAbility<TestPassiveAbility>();
+        _sut.Statuses.Values.Single().Status.Should().BeOfType<TestAbilityPassiveStatus>();
+    }
+
+    [Fact]
+    public void RemovingInnateAbilityWithPassiveStatusRemovesThatStatus()
+    {
+        _sut.AddInnateHotbarAbility<TestPassiveAbility>();
+        _sut.RemoveInnateHotbarAbility<TestPassiveAbility>();
+        _sut.Statuses.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AddingAttackWithPassiveStatusAddsThatStatus()
+    {
+        _sut.SetInnateSpecialAbility<TestPassiveAbility>(SpecialAbilitySlot.Attack);
+        _sut.Statuses.Values.Single().Status.Should().BeOfType<TestAbilityPassiveStatus>();
+    }
+
+    [Fact]
+    public void RemovingAttackWithPassiveStatusRemovesThatStatus()
+    {
+        _sut.SetInnateSpecialAbility<TestPassiveAbility>(SpecialAbilitySlot.Attack);
+        _sut.RemoveInnateSpecialAbility(SpecialAbilitySlot.Attack);
+        _sut.Statuses.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AddingAbilityPassiveStatusManuallyThrows()
+    {
+        FluentActions.Invoking(() => _sut.AddStatus<TestAbilityPassiveStatus>(double.PositiveInfinity, null))
+            .Should().Throw<InvalidOperationException>();
+    }
+
+    [Fact]
+    public void RemovingAbilityPassiveStatusManuallyThrows()
+    {
+        _sut.AddInnateHotbarAbility<TestPassiveAbility>();
+
+        FluentActions.Invoking(() => _sut.RemoveAllStatuses<TestAbilityPassiveStatus>())
+            .Should().Throw<InvalidOperationException>();
+    }
+
     public sealed class Sut : Unit
     {
         public Sut
@@ -867,4 +913,12 @@ public sealed class UnitTests
             Ability.Instance<AbilityWith10SCooldown>()
         ];
     }
+
+    private sealed class TestPassiveAbility : Ability
+    {
+        public override Targeting Targeting => Targeting.Passive;
+        public override AbilityPassiveStatus PassiveStatus => Status.Instance<TestAbilityPassiveStatus>();
+    }
+
+    private sealed class TestAbilityPassiveStatus : AbilityPassiveStatus;
 }
