@@ -18,6 +18,6 @@ public sealed class SceneTreePauser
 
     private void Update()
     {
-        _tree.Paused = _synchronizedCampaignStateRepo.Value.IsPaused;
+        _tree.Paused = _synchronizedCampaignStateRepo.State.IsPaused;
     }
 }

@@ -11,7 +11,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Entities;
 
-public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
+public abstract class Unit : UnitBase<IUnitNode>, IUnit
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
@@ -560,7 +560,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         _crossInventoryHelper.Unequip(Inventory, EquipmentInventory, command.EquipmentSlot, command.ToInventorySlot);
     }
 
-    public void SetCommand(ICommand command)
+    internal void SetCommand(ICommand command)
     {
         ICommand? prevCommand = _commands.PeekOrDefault();
         _commands.Clear();

@@ -6,6 +6,6 @@ namespace Soteo.Core.Interfaces;
 public interface ISynchronizedCampaignStatePuppetRepository
 {
     event Action Changed;
-    SynchronizedCampaignState Value { get; }
+    SynchronizedCampaignState State { get; }
     Task WaitForInitAsync();
 }

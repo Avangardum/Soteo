@@ -265,7 +265,7 @@ public sealed class Hud : IHud
     {
         if
         (
-            _syncCampaignStateRepo.Value.IsPaused ||
+            _syncCampaignStateRepo.State.IsPaused ||
             _isCancelingItemStackDrag ||
             SelectedUnit == null ||
             _currentUserIdRepo.Id == null ||

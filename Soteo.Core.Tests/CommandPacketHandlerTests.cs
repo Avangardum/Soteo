@@ -1,9 +1,8 @@
+using AwesomeAssertions;
 using NSubstitute;
 using Soteo.Core.Dto;
-using Soteo.Core.Dto.Packets;
 using Soteo.Core.Dto.Packets.Command;
 using Soteo.Core.Interfaces;
-using Soteo.Core.Services.PacketHandlers.Gameplay;
 using Soteo.Core.Services.PacketHandlers.Gameplay.Command;
 
 namespace Soteo.Core.Tests;
@@ -15,20 +14,18 @@ public sealed class CommandPacketHandlerTests
     private readonly ISynchronizedCampaignStatePuppetRepository _synchronizedCampaignStateRepo;
     private readonly Guid _unitId;
     private readonly Guid _controllingPlayerId;
-    private readonly ICommandableUnit _unit;
+    private readonly TestUnit _unit;
     private readonly TestCommand _command;
 
     public CommandPacketHandlerTests()
     {
         _entityManager = Substitute.For<IEntityManager>();
         _synchronizedCampaignStateRepo = Substitute.For<ISynchronizedCampaignStatePuppetRepository>();
-        _synchronizedCampaignStateRepo.Value.Returns(new SynchronizedCampaignState { IsPaused = false } );
+        _synchronizedCampaignStateRepo.State.Returns(new SynchronizedCampaignState { IsPaused = false } );
         _sut = new Sut(_entityManager, _synchronizedCampaignStateRepo);
         _unitId = Guid.NewGuid();
-        _unit = Substitute.For<ICommandableUnit>();
-        _unit.Id.Returns(_unitId);
         _controllingPlayerId = Guid.NewGuid();
-        _unit.ControllingPlayerIds.Returns([_controllingPlayerId]);
+        _unit = new TestUnit(_unitId, _controllingPlayerId);
         _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [_unitId] = _unit } );
         _command = new TestCommand();
     }
@@ -38,16 +35,16 @@ public sealed class CommandPacketHandlerTests
     {
         var packet = new TestCommandPacket { UnitId = _unitId, Command = _command };
         await _sut.HandleAsync(packet, _controllingPlayerId);
-        _unit.Received(1).SetCommand(_command);
+        _unit.GetCommands().Single().Should().Be(packet.Command);
     }
 
     [Fact]
     public async Task HandlingPacketFromControllingPlayerWhilePausedDoesNotSetUnitCommand()
     {
-        _synchronizedCampaignStateRepo.Value.Returns(new SynchronizedCampaignState { IsPaused = true });
+        _synchronizedCampaignStateRepo.State.Returns(new SynchronizedCampaignState { IsPaused = true });
         var packet = new TestCommandPacket { UnitId = _unitId, Command = _command };
         await _sut.HandleAsync(packet, _controllingPlayerId);
-        _unit.Received(0).SetCommand(_command);
+        _unit.GetCommands().Should().BeEmpty();
     }
 
     [Fact]
@@ -55,7 +52,7 @@ public sealed class CommandPacketHandlerTests
     {
         var packet = new TestCommandPacket { UnitId = _unitId, Command = _command };
         await _sut.HandleAsync(packet, Guid.NewGuid());
-        _unit.Received(0).SetCommand(Arg.Any<ICommand>());
+        _unit.GetCommands().Should().BeEmpty();
     }
 
     [Fact]
@@ -63,7 +60,7 @@ public sealed class CommandPacketHandlerTests
     {
         var packet = new TestCommandPacket { UnitId = Guid.NewGuid(), Command = _command };
         await _sut.HandleAsync(packet, _controllingPlayerId);
-        _unit.Received(0).SetCommand(Arg.Any<ICommand>());
+        _unit.GetCommands().Should().BeEmpty();
     }
 
     private class Sut(IEntityManager entityManager, ISynchronizedCampaignStatePuppetRepository pauseRepo) :

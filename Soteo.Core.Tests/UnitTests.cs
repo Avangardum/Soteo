@@ -18,7 +18,7 @@ namespace Soteo.Core.Tests;
 
 public sealed class UnitTests
 {
-    private readonly Sut _sut;
+    private readonly TestUnit _sut;
     private readonly IEntityManager _entityManager;
     private readonly IUnitNode _node;
     private readonly IServiceProvider _serviceProvider;
@@ -31,9 +31,11 @@ public sealed class UnitTests
         var inventory = new Inventory(8);
         var equipmentInventory =
             new EquipmentInventory(EquipmentSlot.MainHand ,EquipmentSlot.Head, EquipmentSlot.Potion);
-        _sut = new Sut
+        Guid id = Guid.NewGuid();
+        _sut = new TestUnit
         (
-            Guid.NewGuid(),
+            id,
+            id,
             _node,
             _entityManager,
             inventory,
@@ -608,7 +610,7 @@ public sealed class UnitTests
 
     [Theory]
     [MemberData(nameof(AddingAbilityResetsAbilityUseProgressAndCommandsData))]
-    public void AddingAbilityResetsAbilityUseProgressAndCommands(Action<Sut> addAbility)
+    public void AddingAbilityResetsAbilityUseProgressAndCommands(Action<TestUnit> addAbility)
     {
         _sut.AddInnateHotbarAbility<AbilityWithUseTime>();
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0) });
@@ -624,10 +626,10 @@ public sealed class UnitTests
 
     public static List<object[]> AddingAbilityResetsAbilityUseProgressAndCommandsData =
     [
-        [void (Sut sut) => sut.AddInnateHotbarAbility<SpyAbility>()],
-        [void (Sut sut) => sut.SetInnateSpecialAbility<SpyAbility>(AbilitySlot.Attack)],
+        [void (TestUnit sut) => sut.AddInnateHotbarAbility<SpyAbility>()],
+        [void (TestUnit sut) => sut.SetInnateSpecialAbility<SpyAbility>(AbilitySlot.Attack)],
         [
-            void (Sut sut) => sut.EquipmentInventory.Put
+            void (TestUnit sut) => sut.EquipmentInventory.Put
             (
                 EquipmentSlot.MainHand,
                 ItemStack.Of<SwordWith1SCdAttackAnd10SCdHotbarAbility>(1)
@@ -720,53 +722,6 @@ public sealed class UnitTests
 
         FluentActions.Invoking(() => _sut.RemoveAllStatuses<TestAbilityPassiveStatus>())
             .Should().Throw<InvalidOperationException>();
-    }
-
-    public sealed class Sut : Unit
-    {
-        public Sut
-        (
-            Guid id,
-            IUnitNode node,
-            IEntityManager entityManager,
-            IInventory inventory,
-            IEquipmentInventory equipmentInventory,
-            ICrossInventoryHelper crossInventoryHelper,
-            IServiceProvider serviceProvider
-        ) : base
-        (
-            id,
-            controllingPlayerId: id,
-            node,
-            entityManager,
-            inventory,
-            equipmentInventory,
-            crossInventoryHelper,
-            serviceProvider
-        ) { }
-
-        public new IReadOnlyDictionary<SpecialAbilitySlot, Ability> GetInnateSpecialAbilities() =>
-            base.GetInnateSpecialAbilities();
-
-        public new IReadOnlyList<Ability> GetInnateHotbarAbilities() => base.GetInnateHotbarAbilities();
-
-        public new IReadOnlyList<ICommand> GetCommands() => base.GetCommands();
-
-        public new void AddInnateHotbarAbility<T>() where T : Ability, new() => base.AddInnateHotbarAbility<T>();
-
-        public new void AddInnateHotbarAbility(Ability ability) => base.AddInnateHotbarAbility(ability);
-
-        public new void RemoveInnateHotbarAbility<T>() where T : Ability, new() => base.RemoveInnateHotbarAbility<T>();
-
-        public new void RemoveInnateHotbarAbility(Ability ability) => base.RemoveInnateHotbarAbility(ability);
-
-        public new void SetInnateSpecialAbility<T>(SpecialAbilitySlot slot) where T : Ability, new() =>
-            base.SetInnateSpecialAbility<T>(slot);
-
-        public new void SetInnateSpecialAbility(SpecialAbilitySlot slot, Ability ability) =>
-            base.SetInnateSpecialAbility(slot, ability);
-
-        public new void RemoveInnateSpecialAbility(SpecialAbilitySlot slot) => base.RemoveInnateSpecialAbility(slot);
     }
 
     private class SpyAbility : Ability

@@ -16,7 +16,7 @@ public sealed class SynchronizedCampaignStatePuppetRepository :
     private SynchronizedCampaignState? _value;
 
     /// <inheritdoc/>
-    public SynchronizedCampaignState Value
+    public SynchronizedCampaignState State
     {
         get
         {
@@ -32,7 +32,7 @@ public sealed class SynchronizedCampaignStatePuppetRepository :
         Changed();
     }
 
-    public bool IsPaused => Value.IsPaused;
+    public bool IsPaused => State.IsPaused;
 
     public async Task WaitForInitAsync()
     {
