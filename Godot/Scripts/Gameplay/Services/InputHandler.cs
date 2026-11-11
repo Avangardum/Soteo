@@ -47,13 +47,13 @@ public sealed partial class InputHandler : Node2D
         if (e.IsActionPressed(InputActions.Stop))
             HandleStop();
 
-        foreach (var slot in Enum.GetValues<AbilitySlot>().Distinct())
+        IEnumerable<AbilitySlot> hotbarSlots = Enumerable.Range(0, Int32.MaxValue).Select(AbilitySlot.Hotbar);
+        foreach (AbilitySlot slot in hotbarSlots.Concat(hotbarSlots))
         {
             string action = InputActions.UseAbility(slot);
-            if (InputMap.HasAction(action) && e.IsActionReleased(action))
-            {
+            if (!InputMap.HasAction(action)) break;
+            if (e.IsActionReleased(action))
                 HandleUseAbility(slot);
-            }
         }
     }
 

@@ -1,8 +1,13 @@
 namespace Soteo.Core.Enums;
 
-public enum SpecialAbilitySlot
+public sealed class SpecialAbilitySlot : AbilitySlot
 {
-    // Keep synchronized with AbilitySlot
-    Attack,
-    Recall
+    private readonly string _name;
+
+    internal SpecialAbilitySlot(string name)
+    {
+        _name = name;
+    }
+
+    public override string ToString() => _name;
 }

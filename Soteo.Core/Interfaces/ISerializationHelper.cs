@@ -4,6 +4,7 @@ using Soteo.Core.Abilities;
 using Soteo.Core.Delegates;
 using Soteo.Core.Dto;
 using Soteo.Core.Dto.Snapshots;
+using Soteo.Core.Enums;
 using Soteo.Core.Items;
 using Soteo.Core.Statuses;
 
@@ -132,4 +133,7 @@ public interface ISerializationHelper
     EquipmentSlotState DeserializeEquipmentSlotState(Stream stream);
     void SerializeEquipmentInventorySnapshot(EquipmentInventorySnapshot value, Stream stream);
     EquipmentInventorySnapshot DeserializeEquipmentInventorySnapshot(Stream stream);
+    void SerializeAbilitySlot(AbilitySlot value, Stream stream);
+    AbilitySlot DeserializeAbilitySlot(Stream stream);
+    SpecialAbilitySlot DeserializeSpecialAbilitySlot(Stream stream);
 }

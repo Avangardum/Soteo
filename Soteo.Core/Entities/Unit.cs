@@ -745,7 +745,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         List<Ability> removedAbilities = [];
         for (int i = 0; i < hotbarAbilities.Count; i++)
         {
-            var slot = AbilitySlot.Hotbar0 + i;
+            var slot = AbilitySlot.Hotbar(i);
             Ability ability = hotbarAbilities[i];
             AbilitySlotState? currentState = _abilitySlotStates.Values.SingleOrDefault(it => it.Ability == ability);
             newStates[slot] = currentState ?? new AbilitySlotState(ability);
@@ -754,7 +754,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
         }
         foreach ((AbilitySlot slot, AbilitySlotState state) in _abilitySlotStates)
         {
-            if (slot < AbilitySlot.Hotbar0)
+            if (slot is SpecialAbilitySlot)
                 newStates[slot] = state;
             else if (!newStates.ContainsKey(slot))
                 removedAbilities.Add(state.Ability);
@@ -767,9 +767,9 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     private void UpdateSpecialAbilityList()
     {
-        foreach (var slot in Enum.GetValues<SpecialAbilitySlot>())
+        foreach (SpecialAbilitySlot slot in AbilitySlot.AllSpecial)
         {
-            AbilitySlotState? currentState = AbilitySlotStates.GetValueOrDefault((AbilitySlot)slot);
+            AbilitySlotState? currentState = AbilitySlotStates.GetValueOrDefault(slot);
 
             Ability? itemAbility = EquipmentInventory
                 .OrderBy(it => it.Key)
@@ -779,12 +779,12 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             {
                 if (currentState != null)
                 {
-                    _abilitySlotStates[(AbilitySlot)slot] = currentState with { Ability = itemAbility};
+                    _abilitySlotStates[slot] = currentState with { Ability = itemAbility};
                     OnAbilityRemoved(currentState.Ability);
                 }
                 else
                 {
-                    _abilitySlotStates[(AbilitySlot)slot] = new AbilitySlotState(itemAbility);
+                    _abilitySlotStates[slot] = new AbilitySlotState(itemAbility);
                 }
                 OnAbilityAdded(itemAbility);
             }
@@ -799,19 +799,19 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
             {
                 if (currentState != null)
                 {
-                    _abilitySlotStates[(AbilitySlot)slot] = currentState with { Ability = innateAbility };
+                    _abilitySlotStates[slot] = currentState with { Ability = innateAbility };
                     OnAbilityRemoved(currentState.Ability);
                 }
                 else
                 {
-                    _abilitySlotStates[(AbilitySlot)slot] = new AbilitySlotState(innateAbility);
+                    _abilitySlotStates[slot] = new AbilitySlotState(innateAbility);
                 }
                 OnAbilityAdded(innateAbility);
             }
 
             if (itemAbility == null && innateAbility == null && currentState != null)
             {
-                _abilitySlotStates.Remove((AbilitySlot)slot);
+                _abilitySlotStates.Remove(slot);
                 OnAbilityRemoved(currentState.Ability);
             }
         }

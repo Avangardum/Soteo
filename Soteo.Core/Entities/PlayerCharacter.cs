@@ -31,8 +31,8 @@ public sealed class PlayerCharacter : Unit
         serviceProvider
     )
     {
-        SetInnateSpecialAbility<RangedAttackAbility>(SpecialAbilitySlot.Attack);
-        SetInnateSpecialAbility<RecallAbility>(SpecialAbilitySlot.Recall);
+        SetInnateSpecialAbility<RangedAttackAbility>(AbilitySlot.Attack);
+        SetInnateSpecialAbility<RecallAbility>(AbilitySlot.Recall);
         AddInnateHotbarAbility<BloodSacrificeAbility>();
         AddInnateHotbarAbility<HealAbility>();
 

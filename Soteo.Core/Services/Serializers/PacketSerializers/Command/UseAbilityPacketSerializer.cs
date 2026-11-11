@@ -11,7 +11,7 @@ public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketS
     {
         s.SerializeGuid(packet.UnitId, stream);
 
-        s.SerializeEnum(packet.Command.Slot, stream);
+        s.SerializeAbilitySlot(packet.Command.Slot, stream);
         s.SerializeBool(packet.Command.Repeat, stream);
         s.SerializeBool(packet.Command.Alt, stream);
 
@@ -28,7 +28,7 @@ public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketS
             UnitId = s.DeserializeGuid(stream),
             Command = new UseAbilityCommand
             {
-                Slot = s.DeserializeEnum<AbilitySlot>(stream),
+                Slot = s.DeserializeAbilitySlot(stream),
                 Repeat = s.DeserializeBool(stream),
                 Alt = s.DeserializeBool(stream),
                 TargetPosition = s.DeserializeNullableStruct(s.DeserializeVector2, stream),

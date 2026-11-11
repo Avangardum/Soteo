@@ -1,22 +1,31 @@
-using Soteo.Core.Attributes;
-
 namespace Soteo.Core.Enums;
 
-[AllowAnonymousEnumValues]
-public enum AbilitySlot
+public abstract class AbilitySlot
 {
-    // Special slots, keep synchronized with SpecialAbilitySlot
-    Attack,
-    Recall,
+    private static readonly BidirectionalDictionary<SpecialAbilitySlot, int> SpecialIndices = [];
 
-    // Hotbar slots: both innate and item abilities go here
-    Hotbar0,
-    Hotbar1,
-    Hotbar2,
-    Hotbar3,
-    Hotbar4,
-    Hotbar5,
-    Hotbar6,
-    // Further hotbar slots are also valid
-    HotbarLast = Hotbar6 // todo remove, show unlimited number of abilities and statuses in the HUD
+    public static readonly SpecialAbilitySlot Attack = new(nameof(Attack));
+    public static readonly SpecialAbilitySlot Recall = new(nameof(Recall));
+
+    static AbilitySlot()
+    {
+        SpecialIndices[Attack] = -1;
+        SpecialIndices[Recall] = -2;
+
+        AllSpecial = SpecialIndices.Keys.ToList();
+    }
+
+    internal AbilitySlot() { } // make closed after updating to C# 15
+
+    public static HotbarAbilitySlot Hotbar(int index) => HotbarAbilitySlot.Instance(index);
+
+    public static IReadOnlyList<SpecialAbilitySlot> AllSpecial { get; }
+
+    internal int ToInt() =>
+        this is HotbarAbilitySlot h ? h.Index : SpecialIndices[(SpecialAbilitySlot)this];
+
+    internal static AbilitySlot FromInt(int index) =>
+        index >= 0 ? Hotbar(index) : SpecialIndices.Inverse[index];
+
+    public override string ToString() => nameof(AbilitySlot);
 }

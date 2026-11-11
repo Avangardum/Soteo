@@ -178,7 +178,7 @@ public sealed class Hud : IHud
     {
         if (_isDragging) return;
         if (SelectedUnit == null) return;
-        AbilitySlot slot = AbilitySlot.Hotbar0 + index;
+        AbilitySlot slot = AbilitySlot.Hotbar(index);
         if (!SelectedUnit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
         string header = state.Ability.Name;
@@ -423,9 +423,10 @@ public sealed class Hud : IHud
 
     private void ProcessAbilities(IUnitPuppet unit)
     {
-        for (var slot = AbilitySlot.Hotbar0; slot <= AbilitySlot.HotbarLast; slot++)
+        // todo remove the 6 constant, show all abilities there are
+        for (HotbarAbilitySlot slot = AbilitySlot.Hotbar(0); slot.Index <= 6; slot++)
         {
-            AbilityButton button = _abilityButtons[slot - AbilitySlot.Hotbar0];
+            AbilityButton button = _abilityButtons[slot.Index];
             if (!unit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state))
             {
                 button.Visible = false;

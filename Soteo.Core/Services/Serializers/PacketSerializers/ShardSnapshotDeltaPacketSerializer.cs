@@ -76,7 +76,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         SerializeDelta(delta.IsDead, s.SerializeBool, stream);
         SerializeDelta(delta.IsMoving, s.SerializeBool, stream);
         SerializeDictionaryDelta(delta.Stats, s.SerializeEnum, s.SerializeDouble, stream);
-        SerializeDictionaryDelta(delta.AbilitySlotStates, s.SerializeEnum, s.SerializeAbilitySlotState, stream);
+        SerializeDictionaryDelta(delta.AbilitySlotStates, s.SerializeAbilitySlot, s.SerializeAbilitySlotState, stream);
         SerializeNullableClassDelta(delta.AbilityUseProgress, s.SerializeAbilityUseProgress, stream);
         SerializeDictionaryDelta(delta.Statuses, s.SerializeGuid, s.SerializePuppetStatusContext, stream);
         SerializeListDelta(delta.Items, (v, _) => s.SerializeNullableClass(v, s.SerializeItemStack, stream), stream);
@@ -95,7 +95,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
             IsMoving = DeserializeDelta(s.DeserializeBool, stream),
             Stats = DeserializeDictionaryDelta(s.DeserializeEnum<Stat>, s.DeserializeDouble, stream),
             AbilitySlotStates =
-                DeserializeDictionaryDelta(s.DeserializeEnum<AbilitySlot>, s.DeserializeAbilitySlotState, stream),
+                DeserializeDictionaryDelta(s.DeserializeAbilitySlot, s.DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClassDelta(s.DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeDictionaryDelta(s.DeserializeGuid, s.DeserializePuppetStatusContext, stream),
             Items = DeserializeListDelta(_ => s.DeserializeNullableClass(s.DeserializeItemStack, stream), stream),
