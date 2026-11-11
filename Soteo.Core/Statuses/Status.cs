@@ -1,4 +1,5 @@
 using Soteo.Core.Dto;
+using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 
@@ -20,7 +21,7 @@ public abstract class Status : SingletonHierarchyBase<Status>
 
     public virtual void Tick(StatusContext context, double delta) { }
 
-    public virtual void OnDealAttackDamage(StatusContext context, IUnit target, double damage) { }
+    public virtual void OnDealAttackDamage(StatusContext context, Unit target, double damage) { }
 
     public string Description(ILocalizer localizer) =>
         localizer.GetString(GetType().Name.PascalCaseToSnakeCase().ToUpperInvariant() + "_DESCRIPTION");

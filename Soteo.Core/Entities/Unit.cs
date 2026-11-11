@@ -11,7 +11,7 @@ using Soteo.Util;
 
 namespace Soteo.Core.Entities;
 
-public abstract class Unit : UnitBase<IUnitNode>, IUnit
+public abstract class Unit : UnitBase<IUnitNode>
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityManager _entityManager;
@@ -430,10 +430,10 @@ public abstract class Unit : UnitBase<IUnitNode>, IUnit
     private AbilityContext? GetAbilityContext(UseAbilityCommand command)
     {
         if (!AbilitySlotStates.TryGetValue(command.Slot, out AbilitySlotState? state)) return null;
-        IUnit? targetUnit = null;
+        Unit? targetUnit = null;
         if (command.TargetUnitId != null)
         {
-            targetUnit = _entityManager.GetEntity(command.TargetUnitId.Value) as IUnit;
+            targetUnit = _entityManager.GetEntity(command.TargetUnitId.Value) as Unit;
             if (targetUnit == null) return null;
         }
         return new AbilityContext
@@ -588,14 +588,23 @@ public abstract class Unit : UnitBase<IUnitNode>, IUnit
     }
 
     // todo Damage type
-    public void TakeDamage(double amount, IUnit? sourceUnit, Ability? sourceAbility) =>
+    public void TakeDamage(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentHealth, -amount);
 
-    public void RestoreHealth(double amount, IUnit? sourceUnit, Ability? sourceAbility) =>
+    public void TakeDamage(double amount, ISourceUnitAndAbility? source) =>
+        TakeDamage(amount, source?.Unit, source?.Ability);
+
+    public void RestoreHealth(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentHealth, amount);
 
-    public void RestoreMana(double amount, IUnit? sourceUnit, Ability? sourceAbility) =>
+    public void RestoreHealth(double amount, ISourceUnitAndAbility? source) =>
+        RestoreHealth(amount, source?.Unit, source?.Ability);
+
+    public void RestoreMana(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentMana, amount);
+
+    public void RestoreMana(double amount, ISourceUnitAndAbility? source) =>
+        RestoreMana(amount, source?.Unit, source?.Ability);
 
     protected void ChangeResourceStat(Stat stat, double delta) =>
         SetResourceStat(stat, Stats[stat] + delta);
@@ -619,18 +628,34 @@ public abstract class Unit : UnitBase<IUnitNode>, IUnit
             Die();
     }
 
-    public void DealAttackDamageTo(IUnit target, Ability sourceAbility)
+    public void DealAttackDamageTo(Unit target, Ability sourceAbility)
     {
         target.TakeDamage(Stats[Stat.AttackDamage], this, sourceAbility);
         foreach (StatusContext statusContext in Statuses.Values.ToList())
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
 
+    public void AddStatus(Status status, double time, ISourceUnitAndAbility? source) =>
+        AddStatus(status, time, source?.Unit, source?.AbilityContext);
+
+    public void AddStatus<T>
+    (
+        double time,
+        Unit? sourceUnit,
+        AbilityContext? sourceAbilityContext
+    ) where T : Status, new()
+    {
+        AddStatus(Status.Instance<T>(), time, sourceUnit, sourceAbilityContext);
+    }
+
+    public void AddStatus<T>(double time, ISourceUnitAndAbility? source) where T : Status, new() =>
+        AddStatus<T>(time, source?.Unit, source?.AbilityContext);
+
     public void AddStatus
     (
         Status status,
         double time,
-        IUnit? sourceUnit,
+        Unit? sourceUnit,
         AbilityContext? sourceAbilityContext
     )
     {
@@ -730,7 +755,7 @@ public abstract class Unit : UnitBase<IUnitNode>, IUnit
         Remove();
     }
 
-    public bool IsAlliedTo(IUnit other) => Faction != Faction.Neutral && other.Faction == Faction;
+    public bool IsAlliedTo(Unit other) => Faction != Faction.Neutral && other.Faction == Faction;
 
     private void UpdateHotbarAbilityList()
     {

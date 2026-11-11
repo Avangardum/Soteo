@@ -787,7 +787,7 @@ public sealed class UnitTests
     {
         public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
 
-        public override void OnDealAttackDamage(StatusContext context, IUnit target, double damage)
+        public override void OnDealAttackDamage(StatusContext context, Unit target, double damage)
         {
             base.OnDealAttackDamage(context, target, damage);
             context.Unit.RemoveStatus(context.Id);

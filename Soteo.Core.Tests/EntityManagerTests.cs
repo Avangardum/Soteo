@@ -10,7 +10,6 @@ using Soteo.Core.Services;
 using Soteo.Core.SidedDependencies;
 using ICamera = Soteo.Core.Interfaces.ICamera;
 using IEntityNodeManager = Soteo.Core.Interfaces.IEntityNodeManager;
-using IUnit = Soteo.Core.Interfaces.IUnit;
 
 namespace Soteo.Core.Tests;
 
@@ -20,9 +19,9 @@ public sealed class EntityManagerTests
     private readonly IServiceProvider _serviceProvider;
     private readonly IEntityNodeManager _entityNodeManager;
 
-    private readonly IUnit _projectileSourceChar;
-    private readonly IUnit _projectileTargetChar;
-    private readonly IUnit _bystanderChar;
+    private readonly Unit _projectileSourceChar;
+    private readonly Unit _projectileTargetChar;
+    private readonly Unit _bystanderChar;
     private readonly Projectile _projectile;
 
     public EntityManagerTests()
@@ -80,9 +79,9 @@ public sealed class EntityManagerTests
     {
         _projectileSourceChar.Remove();
         _projectileTargetChar.Remove();
-        IUnit newProjectileSourceChar =
+        Unit newProjectileSourceChar =
             _sut.SpawnPlayerCharacter(_projectileSourceChar.Id, _projectileSourceChar.ControllingPlayerIds.Single());
-        IUnit newProjectileTargetChar =
+        Unit newProjectileTargetChar =
             _sut.SpawnPlayerCharacter(_projectileTargetChar.Id, _projectileTargetChar.ControllingPlayerIds.Single());
 
         newProjectileSourceChar.Should().BeSameAs(_projectileSourceChar);

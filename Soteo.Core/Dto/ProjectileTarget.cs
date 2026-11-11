@@ -1,16 +1,17 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.Core.Entities;
 using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Dto;
 
 public class ProjectileTarget
 {
-    public IUnit? Unit { get; }
+    public Unit? Unit { get; }
     public Vector2? Position { get; }
 
-    public ProjectileTarget(IUnit unit) => Unit = unit;
+    public ProjectileTarget(Unit unit) => Unit = unit;
     public ProjectileTarget(Vector2 position) => Position = position;
 
     public static implicit operator ProjectileTarget(Vector2 target) => new(target);
@@ -26,7 +27,7 @@ public class ProjectileTarget
         if (snapshot.IsUnit)
         {
             var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
-            var target = entityManager.GetEntity<IUnit>(snapshot.UnitId.Value).Required;
+            var target = entityManager.GetEntity<Unit>(snapshot.UnitId.Value).Required;
             return new ProjectileTarget(target);
         }
         return snapshot.Position;

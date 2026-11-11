@@ -1,4 +1,5 @@
 using Soteo.Core.Dto;
+using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 
@@ -17,7 +18,7 @@ public sealed class HealAbility : Ability
     public override void TakeEffect(AbilityContext context)
     {
         base.TakeEffect(context);
-        IUnit target = context.Alt ? context.User : context.TargetUnit.Required;
+        Unit target = context.Alt ? context.User : context.TargetUnit.Required;
         target.RestoreHealth(Heal, context.User, this);
     }
 }

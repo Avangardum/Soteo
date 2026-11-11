@@ -5,7 +5,6 @@ using NSubstitute;
 using Soteo.Core.Abilities;
 using Soteo.Core.Dto;
 using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Tests;
 
@@ -45,7 +44,7 @@ public sealed class AbilityTests
         var context = new AbilityContext
         {
             Ability = Ability.Instance<TestAbility>(),
-            User = Substitute.For<IUnit>(),
+            User = new TestUnit(),
             Alt = alt,
             UserStats = ImmutableDictionary<Stat, double>.Empty,
             ServiceProvider = Substitute.For<IServiceProvider>(),

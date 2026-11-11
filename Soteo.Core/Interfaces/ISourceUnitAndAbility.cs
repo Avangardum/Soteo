@@ -1,5 +1,6 @@
 using Soteo.Core.Abilities;
 using Soteo.Core.Dto;
+using Soteo.Core.Entities;
 
 namespace Soteo.Core.Interfaces;
 
@@ -9,7 +10,7 @@ namespace Soteo.Core.Interfaces;
 /// </summary>
 public interface ISourceUnitAndAbility
 {
-    IUnit? Unit { get; }
+    Unit? Unit { get; }
     Ability? Ability { get; }
     AbilityContext? AbilityContext { get; }
 }

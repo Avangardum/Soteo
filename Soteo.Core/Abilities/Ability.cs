@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Numerics;
 using Soteo.Core.Dto;
+using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Core.Statuses;
@@ -115,7 +116,7 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         return AbilityValidationResult.Ok;
     }
 
-    private AbilityValidationResult ValidateTargetUnit(IUnit user, IUnit target, Targeting targeting)
+    private AbilityValidationResult ValidateTargetUnit(Unit user, Unit target, Targeting targeting)
     {
         if (user.IsAlliedTo(target))
         {

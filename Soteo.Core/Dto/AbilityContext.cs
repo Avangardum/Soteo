@@ -10,7 +10,7 @@ namespace Soteo.Core.Dto;
 public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
 {
     public required Ability Ability { get; init; }
-    public required IUnit User { get; init; }
+    public required Unit User { get; init; }
     public bool Alt { get; init; }
 
     /// <summary>
@@ -20,11 +20,11 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
 
     public required IServiceProvider ServiceProvider { get; init; }
     public Vector2? TargetPosition { get; init; }
-    public IUnit? TargetUnit { get; init; }
+    public Unit? TargetUnit { get; init; }
     public Vector2? TargetDirection { get; init; }
     public Guid? TargetShardId { get; init; }
 
-    IUnit ISourceUnitAndAbility.Unit => User;
+    Unit ISourceUnitAndAbility.Unit => User;
     AbilityContext ISourceUnitAndAbility.AbilityContext => this;
 
     public object? GetService(Type serviceType) => ServiceProvider.GetService(serviceType);

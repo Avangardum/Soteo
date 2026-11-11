@@ -1,5 +1,6 @@
 using Soteo.Core.Abilities;
 using Soteo.Core.Dto;
+using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 using Soteo.Core.Interfaces;
 using Soteo.Util;
@@ -25,7 +26,7 @@ public sealed class VampireStatus : AbilityPassiveStatus
         }
     }
 
-    public override void OnDealAttackDamage(StatusContext context, IUnit target, double damage)
+    public override void OnDealAttackDamage(StatusContext context, Unit target, double damage)
     {
         double lifestealFactor =
             context.SourceAbilityAs<VampireAbility>().LifestealFactor;
