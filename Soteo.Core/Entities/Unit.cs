@@ -848,6 +848,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     protected void AddInnateHotbarAbility(Ability ability)
     {
+        if (IsRemoved) return;
         if (_innateHotbarAbilities.Contains(ability)) return;
         _innateHotbarAbilities.Add(ability);
         UpdateHotbarAbilityList();
@@ -858,6 +859,7 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     protected void RemoveInnateHotbarAbility(Ability ability)
     {
+        if (IsRemoved) return;
         if (_innateHotbarAbilities.Remove(ability))
             UpdateHotbarAbilityList();
     }
@@ -867,12 +869,14 @@ public abstract class Unit : UnitBase<IUnitNode>, ICommandableUnit
 
     protected void SetInnateSpecialAbility(SpecialAbilitySlot slot, Ability ability)
     {
+        if (IsRemoved) return;
         _innateSpecialAbilities[slot] = ability;
         UpdateSpecialAbilityList();
     }
 
     protected void RemoveInnateSpecialAbility(SpecialAbilitySlot slot)
     {
+        if (IsRemoved) return;
         if (_innateSpecialAbilities.Remove(slot))
             UpdateSpecialAbilityList();
     }
