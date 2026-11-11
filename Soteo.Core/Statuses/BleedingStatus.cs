@@ -1,4 +1,5 @@
 using Soteo.Core.Dto;
+using Soteo.Core.Entities;
 using Soteo.Core.Enums;
 
 namespace Soteo.Core.Statuses;
@@ -18,6 +19,6 @@ public sealed class BleedingStatus : Status
     {
         const double damagePerSecond = 5;
         double damage = damagePerSecond * delta;
-        context.Unit.TakeDamage(damage, context);
+        context.Unit.TakeDamage(new Damage(damage), context);
     }
 }

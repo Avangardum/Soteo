@@ -587,12 +587,11 @@ public abstract class Unit : UnitBase<IUnitNode>
         ChangeResourceStat(Stat.CurrentMana, -amount);
     }
 
-    // todo Damage type
-    public void TakeDamage(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
-        ChangeResourceStat(Stat.CurrentHealth, -amount);
+    public void TakeDamage(Damage damage, Unit? sourceUnit, Ability? sourceAbility) =>
+        ChangeResourceStat(Stat.CurrentHealth, -damage.Amount);
 
-    public void TakeDamage(double amount, ISourceUnitAndAbility? source) =>
-        TakeDamage(amount, source?.Unit, source?.Ability);
+    public void TakeDamage(Damage damage, ISourceUnitAndAbility? source) =>
+        TakeDamage(damage, source?.Unit, source?.Ability);
 
     public void RestoreHealth(double amount, Unit? sourceUnit, Ability? sourceAbility) =>
         ChangeResourceStat(Stat.CurrentHealth, amount);
@@ -630,7 +629,7 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     public void DealAttackDamageTo(Unit target, Ability sourceAbility)
     {
-        target.TakeDamage(Stats[Stat.AttackDamage], this, sourceAbility);
+        target.TakeDamage(new Damage(Stats[Stat.AttackDamage]), this, sourceAbility);
         foreach (StatusContext statusContext in Statuses.Values.ToList())
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
