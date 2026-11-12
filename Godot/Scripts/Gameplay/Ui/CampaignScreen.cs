@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Soteo.Core;
 using Soteo.Core.Client;
 using Soteo.Core.Networking;
@@ -41,8 +40,8 @@ public sealed class CampaignScreen
 
         node.Visible = false;
         _node = node;
-        _characterButtons = node.GetNode("CharacterButtons").GetChildren().Cast<Button>().ToImmutableList();
-        _shardButtons = node.GetNode("ShardButtons").GetChildren().Cast<Button>().ToImmutableList();
+        _characterButtons = node.GetNode("CharacterButtons").GetChildren().Cast<Button>().ToList().AsReadOnly();
+        _shardButtons = node.GetNode("ShardButtons").GetChildren().Cast<Button>().ToList().AsReadOnly();
 
         node.GetNode<Button>("DeployButton").Pressed += Deploy;
         node.GetNode<Button>("SpectateButton").Pressed += Spectate;

@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Numerics;
 
 namespace Soteo.Core.Entities;
@@ -63,10 +62,10 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 
     public IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntityPuppetSnapshots()
     {
-        ImmutableDictionary<Guid, EntitySnapshot> snapshots = _entities.Values
+        IReadOnlyDictionary<Guid, EntitySnapshot> snapshots = _entities.Values
             .Select(it => it.ToSnapshot().ToPuppet())
             .Concat(_deadPuppetSnapshots)
-            .ToImmutableDictionary(it => it.Id);
+            .ToDictionary(it => it.Id).AsReadOnly();
         _deadPuppetSnapshots.Clear();
         return snapshots;
     }

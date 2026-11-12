@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Godot.Collections;
 using Soteo.Core;
 using Soteo.Core.Abilities;
@@ -210,6 +209,6 @@ public sealed partial class InputHandler : Node2D
             .ThenByDescending(it => it.PositionMeters.Y)
             .Select(it => it.UnitPuppet)
             .WhereNotNull()
-            .ToImmutableList();
+            .ToList().AsReadOnly();
     }
 }

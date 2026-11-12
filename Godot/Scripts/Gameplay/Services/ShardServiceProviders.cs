@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core;
@@ -9,7 +8,7 @@ namespace Soteo.Main.Gameplay.Services;
 public sealed class ShardServiceProviders(IReadOnlyDictionary<Guid, IServiceScope> scopes) : IShardServiceProviders
 {
     private IReadOnlyDictionary<Guid, IServiceProvider> Providers =>
-        scopes.ToImmutableDictionary(it => it.Key, it => it.Value.ServiceProvider);
+        scopes.ToDictionary(it => it.Key, it => it.Value.ServiceProvider).AsReadOnly();
 
     public IEnumerator<KeyValuePair<Guid, IServiceProvider>> GetEnumerator() => Providers.GetEnumerator();
 

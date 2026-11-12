@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Numerics;
 using AwesomeAssertions;
 using NSubstitute;
@@ -45,7 +45,7 @@ public sealed class AbilityTests
             Ability = Ability.Instance<TestAbility>(),
             User = new TestUnit(),
             Alt = alt,
-            UserStats = ImmutableDictionary<Stat, double>.Empty,
+            UserStats = ReadOnlyDictionary<Stat, double>.Empty,
             ServiceProvider = Substitute.For<IServiceProvider>(),
             TargetPosition = targetPosition,
             TargetUnit = null,

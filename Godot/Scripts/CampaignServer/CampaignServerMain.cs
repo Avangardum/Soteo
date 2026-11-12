@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Soteo.Core;
@@ -117,10 +116,10 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
         _logger.Value.LogInformation("Waiting for shard servers to finish local initializing");
         Task timeout = Task.Delay(TimeSpan.FromSeconds(30));
         await Task.WhenAny(timeout, Task.WhenAll(_shardServerLocalInitDoneTcs.Values.Select(it => it.Task)));
-        ImmutableList<Guid> uninitializedShardServerIds = _shardServerLocalInitDoneTcs
+        IReadOnlyList<Guid> uninitializedShardServerIds = _shardServerLocalInitDoneTcs
             .Where(it => !it.Value.Task.IsCompleted)
             .Select(it => it.Key)
-            .ToImmutableList();
+            .ToList().AsReadOnly();
         if (uninitializedShardServerIds.Count > 0)
         {
             string idsStr = uninitializedShardServerIds.JoinToString(", ");

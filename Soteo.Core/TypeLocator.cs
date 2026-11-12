@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Reflection;
 
 namespace Soteo.Core;
@@ -15,7 +14,7 @@ public class TypeLocator : ITypeLocator
 
     public TypeLocator(IReadOnlyList<Assembly> assemblies, IReadOnlyList<Type> types)
     {
-        Types = assemblies.SelectMany(it => it.ExportedTypes).Union(types).ToImmutableList();
+        Types = assemblies.SelectMany(it => it.ExportedTypes).Union(types).ToList().AsReadOnly();
     }
 
     public IReadOnlyList<Type> ConcreteSubclassesOf<T>(Func<Type, bool>? where = null)
@@ -27,13 +26,13 @@ public class TypeLocator : ITypeLocator
             .Where(it => it.IsAssignableTo(typeof(T)))
             .Where(where)
             .OrderBy(it => it.FullName)
-            .ToImmutableList();
+            .ToList().AsReadOnly();
     }
 
     public IReadOnlyList<T> InstanceSubclassesOf<T>(Func<Type, bool>? where = null)
     {
         return ConcreteSubclassesOf<T>(where)
             .Select(it => (T)Activator.CreateInstance(it).Required)
-            .ToImmutableList();
+            .ToList().AsReadOnly();
     }
 }

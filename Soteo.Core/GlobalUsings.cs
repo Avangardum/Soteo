@@ -1,3 +1,4 @@
+global using System.Collections.ObjectModel;
 global using Soteo.Core;
 global using Soteo.Core.Abilities;
 global using Soteo.Core.Campaign;

@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Campaign;
 
@@ -49,7 +48,7 @@ public class UserRepository
     }
 
     public IReadOnlyDictionary<Guid, UserSnapshot> ToSnapshot() =>
-        this.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot());
+        this.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly();
 
     public void ReplicateSnapshot(IReadOnlyDictionary<Guid, UserSnapshot> snapshot)
     {

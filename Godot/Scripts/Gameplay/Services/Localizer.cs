@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Soteo.Core;
 using Soteo.Core.Localization;
 
@@ -6,7 +5,7 @@ namespace Soteo.Main.Gameplay.Services;
 
 public sealed class Localizer : ILocalizer
 {
-    private readonly ImmutableDictionary<string, IPluralizer> _pluralizers;
+    private readonly IReadOnlyDictionary<string, IPluralizer> _pluralizers;
 
     public Localizer(ITypeLocator typeLocator)
     {
@@ -18,7 +17,7 @@ public sealed class Localizer : ILocalizer
                 pluralizers[languageCode] = pluralizer;
             }
         }
-        _pluralizers = pluralizers.ToImmutableDictionary();
+        _pluralizers = pluralizers.ToDictionary().AsReadOnly();
     }
 
     public string GetString(string key) => TranslationServer.Translate(key);

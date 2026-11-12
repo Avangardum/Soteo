@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Persistence;
 
@@ -70,7 +69,7 @@ public sealed class CampaignSnapshotManager
         Task completedTask =
             await Task.WhenAny(timeout, Task.WhenAll(_shardSnapshotTcs.Values.Select(it => it.Task)));
         if (completedTask == timeout) throw ShardServerSnapshotCreationTimeoutException();
-        return _shardSnapshotTcs.ToImmutableDictionary(it => it.Key, it => it.Value.Task.Result);
+        return _shardSnapshotTcs.ToDictionary(it => it.Key, it => it.Value.Task.Result).AsReadOnly();
     }
 
     private Exception ShardServerSnapshotCreationTimeoutException()

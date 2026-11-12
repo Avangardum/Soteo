@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Synchronization.Deltas;
 
@@ -10,10 +9,10 @@ public static class DictionaryDelta
         IReadOnlyDictionary<TKey, TValue> to
     ) where TKey : notnull
     {
-        ImmutableDictionary<TKey, TValue> changes = to
+        IReadOnlyDictionary<TKey, TValue> changes = to
             .Where(it => !from.TryGetValue(it.Key, out TValue? value) || !Equals(value, it.Value))
-            .ToImmutableDictionary();
-        ImmutableList<TKey> removedKeys = from.Keys.Except(to.Keys).ToImmutableList();
+            .ToDictionary().AsReadOnly();
+        IReadOnlyList<TKey> removedKeys = from.Keys.Except(to.Keys).ToList().AsReadOnly();
         return new DictionaryDelta<TKey, TValue> { Changes = changes, RemovedKeys = removedKeys };
     }
 
@@ -28,7 +27,7 @@ public static class DictionaryDelta
 
 public sealed class DictionaryDelta<TKey, TValue> where TKey : notnull
 {
-    public IReadOnlyDictionary<TKey, TValue> Changes { get; init; } = ImmutableDictionary<TKey, TValue>.Empty;
+    public IReadOnlyDictionary<TKey, TValue> Changes { get; init; } = ReadOnlyDictionary<TKey, TValue>.Empty;
     public IReadOnlyList<TKey> RemovedKeys { get; init; } = [];
 
     public bool HasChanged => Changes.Count > 0 || RemovedKeys.Count > 0;

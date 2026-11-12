@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
 using NSubstitute.ExceptionExtensions;
@@ -80,7 +80,7 @@ public sealed class CampaignSnapshotManagerTests
                     Snapshot = new ShardSnapshot
                     {
                         Tick = 123,
-                        Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
+                        Entities = ReadOnlyDictionary<Guid, EntitySnapshot>.Empty
                     }
                 },
                 Guid.NewGuid()
@@ -167,7 +167,7 @@ public sealed class CampaignSnapshotManagerTests
                         IsPlayer = true,
                         IsShard = false
                     }
-                }.ToImmutableDictionary(),
+                }.ToDictionary().AsReadOnly(),
                 PlayerCharacterTrackers = new Dictionary<Guid, PlayerCharacterTrackerSnapshot>
                 {
                     [characterId] = new()
@@ -176,9 +176,9 @@ public sealed class CampaignSnapshotManagerTests
                         PlayerId = playerId,
                         ShardId = shardId
                     }
-                }.ToImmutableDictionary()
+                }.ToDictionary().AsReadOnly()
             },
-            Shards = ImmutableDictionary<Guid, ShardSnapshot>.Empty
+            Shards = ReadOnlyDictionary<Guid, ShardSnapshot>.Empty
         };
 
         // Act
@@ -292,7 +292,7 @@ public sealed class CampaignSnapshotManagerTests
         var shard1Snapshot = new ShardSnapshot
         {
             Tick = shard.Id.ToString()[^1],
-            Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
+            Entities = ReadOnlyDictionary<Guid, EntitySnapshot>.Empty
         };
         _packetSender.ShardSnapshots[shard.Id] = shard1Snapshot;
         return shard;
@@ -320,20 +320,20 @@ public sealed class CampaignSnapshotManagerTests
         {
             CampaignServer = new CampaignServerSnapshot
             {
-                Users = ImmutableDictionary<Guid, UserSnapshot>.Empty,
-                PlayerCharacterTrackers = ImmutableDictionary<Guid, PlayerCharacterTrackerSnapshot>.Empty
+                Users = ReadOnlyDictionary<Guid, UserSnapshot>.Empty,
+                PlayerCharacterTrackers = ReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot>.Empty
             },
             Shards = new Dictionary<Guid, ShardSnapshot>
             {
                 [shard1Id] = new()
                 {
                     Tick = 123,
-                    Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
+                    Entities = ReadOnlyDictionary<Guid, EntitySnapshot>.Empty
                 },
                 [shard2Id] = new()
                 {
                     Tick = 321,
-                    Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
+                    Entities = ReadOnlyDictionary<Guid, EntitySnapshot>.Empty
                 }
             }
         };

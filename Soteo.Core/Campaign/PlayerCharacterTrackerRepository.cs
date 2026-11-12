@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Campaign;
 
@@ -9,7 +8,7 @@ public sealed class PlayerCharacterTrackerRepository :
     public void Add(PlayerCharacterTracker playerCharacter) => Add(playerCharacter.Id, playerCharacter);
 
     public IReadOnlyDictionary<Guid, PlayerCharacterTrackerSnapshot> ToSnapshot() =>
-        this.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot());
+        this.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly();
 
     public void ReplicateSnapshot
     (

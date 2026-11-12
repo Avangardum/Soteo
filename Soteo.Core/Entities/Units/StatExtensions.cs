@@ -1,25 +1,24 @@
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Entities.Units;
 
 public static class StatExtensions
 {
-    private static readonly ImmutableList<Stat> _all;
-    private static readonly ImmutableList<Stat> _allResource;
-    private static readonly ImmutableList<Stat> _allComputed;
+    private static readonly IReadOnlyList<Stat> _all;
+    private static readonly IReadOnlyList<Stat> _allResource;
+    private static readonly IReadOnlyList<Stat> _allComputed;
 
     static StatExtensions()
     {
-        _all = Enum.GetValues<Stat>().ToImmutableList();
-        _allResource = _all.Where(it => it.IsResource).ToImmutableList();
-        _allComputed = _all.Where(it => !it.IsResource).ToImmutableList();
+        _all = Enum.GetValues<Stat>().ToList().AsReadOnly();
+        _allResource = _all.Where(it => it.IsResource).ToList().AsReadOnly();
+        _allComputed = _all.Where(it => !it.IsResource).ToList().AsReadOnly();
     }
 
     extension (Stat self)
     {
-        public static ImmutableList<Stat> All => _all;
-        public static ImmutableList<Stat> AllResource => _allResource;
-        public static ImmutableList<Stat> AllComputed => _allComputed;
+        public static IReadOnlyList<Stat> All => _all;
+        public static IReadOnlyList<Stat> AllResource => _allResource;
+        public static IReadOnlyList<Stat> AllComputed => _allComputed;
 
         /// <summary>
         /// Resource stats are independent values and can change freely for any reason.

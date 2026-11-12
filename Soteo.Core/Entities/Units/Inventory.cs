@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Entities.Units;
 
@@ -105,7 +104,7 @@ public sealed class Inventory : IInventory
         return result;
     }
 
-    public IReadOnlyList<ItemStack?> ToSnapshot() => this.ToImmutableList();
+    public IReadOnlyList<ItemStack?> ToSnapshot() => this.ToList().AsReadOnly();
 
     public void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks)
     {

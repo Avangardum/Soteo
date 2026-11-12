@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Synchronization.Deltas;
 
@@ -19,7 +18,7 @@ public static class ListDelta
         return new ListDelta<T>
         {
             Count = list.Count,
-            Changes = list.Select((item, index) => new KeyValuePair<int, T>(index, item)).ToImmutableDictionary(),
+            Changes = list.Select((item, index) => new KeyValuePair<int, T>(index, item)).ToDictionary().AsReadOnly(),
             HasChanged = true
         };
     }
@@ -28,7 +27,7 @@ public static class ListDelta
 public sealed class ListDelta<T>
 {
     public required int Count { get; init; }
-    public IReadOnlyDictionary<int, T> Changes { get; init; } = ImmutableDictionary<int, T>.Empty;
+    public IReadOnlyDictionary<int, T> Changes { get; init; } = ReadOnlyDictionary<int, T>.Empty;
     public required bool HasChanged { get; init; }
 
     public void MutateList(IList<T> list, double interpolationWeight, Func<T, T, double, T> interpolateValue)

@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Entities.Units;
 
@@ -23,7 +22,7 @@ public abstract class UnitBase<TNode> : Entity<TNode> where TNode : class, IEnti
             [Stat.AttackUseTimeFraction] = (0, 0.5, 1),
             [Stat.AttackRange] = (1, 10, double.PositiveInfinity),
             [Stat.AttackProjectileSpeed] = (5, 50, 500)
-        }.ToImmutableDictionary();
+        }.ToDictionary().AsReadOnly();
 
     protected UnitBase(Guid id, TNode node) : base(id, node)
     {

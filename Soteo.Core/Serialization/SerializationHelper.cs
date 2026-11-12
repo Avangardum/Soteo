@@ -1,5 +1,4 @@
 using System.Buffers.Binary;
-using System.Collections.Immutable;
 using System.Numerics;
 using System.Text;
 
@@ -269,7 +268,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         }, stream);
     }
 
-    public ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue>
+    public IReadOnlyDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue>
     (
         Deserializer<TKey> deserializeKey,
         Deserializer<TValue> deserializeValue,
@@ -280,7 +279,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
         (
             _ => new KeyValuePair<TKey, TValue>(deserializeKey(stream), deserializeValue(stream)),
             stream
-        ).ToImmutableDictionary();
+        ).ToDictionary().AsReadOnly();
     }
 
     /// <summary>
@@ -299,14 +298,14 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     /// <summary>
     /// Deserialize a dictionary where keys are derived from values
     /// </summary>
-    public ImmutableDictionary<TKey, TValue> DeserializeIndexedDictionary<TKey, TValue>
+    public IReadOnlyDictionary<TKey, TValue> DeserializeIndexedDictionary<TKey, TValue>
     (
         Deserializer<TValue> deserializeValue,
         Func<TValue, TKey> keySelector,
         Stream stream
     ) where TKey : notnull
     {
-        return DeserializeList(deserializeValue, stream).ToImmutableDictionary(keySelector, it => it);
+        return DeserializeList(deserializeValue, stream).ToDictionary(keySelector, it => it).AsReadOnly();
     }
 
     public void SerializeAbility(Ability value, Stream stream) =>
@@ -681,7 +680,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 
     public EquipmentInventorySnapshot DeserializeEquipmentInventorySnapshot(Stream stream)
     {
-        ImmutableDictionary<EquipmentSlot, ItemStack?> stacks =
+        IReadOnlyDictionary<EquipmentSlot, ItemStack?> stacks =
             DeserializeDictionary(DeserializeEnum<EquipmentSlot>, DeserializeNullableItemStack, stream);
         return new EquipmentInventorySnapshot(stacks);
     }

@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Numerics;
 
 namespace Soteo.Util;
@@ -95,12 +94,12 @@ public static class Maths
         Func<TValue, TValue, double, TValue> interpolateValue
     ) where TKey : notnull
     {
-        return to.ToImmutableDictionary(it => it.Key, it =>
+        return to.ToDictionary(it => it.Key, it =>
         {
             TValue t = it.Value;
             if (!from.TryGetValue(it.Key, out TValue? f)) return t;
             return interpolateValue(f, t, weight);
-        });
+        }).AsReadOnly();
     }
 
     public static double Lerp(double from, double to, double weight) =>

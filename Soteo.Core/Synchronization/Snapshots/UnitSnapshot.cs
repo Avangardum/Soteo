@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Synchronization.Snapshots;
 
@@ -29,7 +28,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
             Stats = Stats,
             AbilitySlotStates = AbilitySlotStates,
             AbilityUseProgress = AbilityUseProgress,
-            Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToPuppet()),
+            Statuses = Statuses.ToDictionary(it => it.Key, it => it.Value.ToPuppet()).AsReadOnly(),
             Items = Items,
             ControllingPlayerIds = ControllingPlayerId == null ? [] : [ControllingPlayerId.Value],
             EquipmentInventory = EquipmentInventory

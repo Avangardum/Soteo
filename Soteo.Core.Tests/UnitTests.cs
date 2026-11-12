@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using AwesomeAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -74,7 +73,7 @@ public sealed class UnitTests
         {
             Ability = Ability.Instance<SpyAbility>(),
             User = _sut,
-            UserStats = _sut.Stats.ToImmutableDictionary(),
+            UserStats = _sut.Stats.ToDictionary().AsReadOnly(),
             ServiceProvider = _serviceProvider
         };
         var projectile = new Projectile

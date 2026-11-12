@@ -1,11 +1,10 @@
-﻿using System.Collections.Immutable;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace Soteo.Core.Serialization.Packet;
 
 public static class PacketSerializer
 {
-    private static ImmutableDictionary<Type, Type>? _typesByPacketType;
+    private static IReadOnlyDictionary<Type, Type>? _typesByPacketType;
 
     public static Type? TypeFor(Type packetType, ITypeLocator typeLocator)
     {
@@ -16,15 +15,15 @@ public static class PacketSerializer
     public static IReadOnlyList<Type> AllTypes(ITypeLocator typeLocator)
     {
         _typesByPacketType ??= InitTypesByPacketType(typeLocator);
-        return _typesByPacketType.Values.ToImmutableList();
+        return _typesByPacketType.Values.ToList().AsReadOnly();
     }
 
-    private static ImmutableDictionary<Type, Type> InitTypesByPacketType(ITypeLocator typeLocator)
+    private static IReadOnlyDictionary<Type, Type> InitTypesByPacketType(ITypeLocator typeLocator)
     {
         IReadOnlyList<Type> locatedSerializerTypes = typeLocator.ConcreteSubclassesOf<IPacketSerializer>();
         return typeLocator
             .ConcreteSubclassesOf<Packets.Packet>()
-            .ToImmutableDictionary(it => it, it => InitTypeFor(it, locatedSerializerTypes));
+            .ToDictionary(it => it, it => InitTypeFor(it, locatedSerializerTypes)).AsReadOnly();
     }
 
     private static Type InitTypeFor(Type packetType, IReadOnlyList<Type> locatedSerializerTypes)
@@ -36,15 +35,15 @@ public static class PacketSerializer
             null;
         IReadOnlyList<Type> typesFromLocator = locatedSerializerTypes
             .Where(it => it.SingleTypeArgOfGenericDefinitionOrNull(typeof(PacketSerializer<>)) == packetType)
-            .ToImmutableList();
+            .ToList().AsReadOnly();
         if (typesFromLocator.Count > 1)
             throw new Exception($"Found multiple classes inheriting from PacketSerializer<{packetType}>");
         Type? typeFromLocator = typesFromLocator.SingleOrDefault();
 
-        ImmutableList<Type> types =
-            ImmutableList.Create(typeFromPacketSerializerAttribute, typeFromEmptyPacketAttribute, typeFromLocator)
+        IReadOnlyList<Type> types =
+            new[] { typeFromPacketSerializerAttribute, typeFromEmptyPacketAttribute, typeFromLocator }
             .WhereNotNull()
-            .ToImmutableList();
+            .ToList().AsReadOnly();
         if (types.Count == 1) return types[0];
 
         var x1 = typeFromPacketSerializerAttribute != null ? "x" : " ";

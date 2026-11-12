@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 
 namespace Soteo.Core.Synchronization.Deltas;
 
@@ -17,8 +16,8 @@ public sealed record ShardSnapshotDelta
                 Changes = to.Entities.Values
                     .Select(it => it.DeltaFrom(from.Entities.GetOrDefault(it.Id)))
                     .Where(it => it.HasChanged)
-                    .ToImmutableDictionary(it => it.Id, it => it),
-                RemovedKeys = from.Entities.Keys.Except(to.Entities.Keys).ToImmutableList()
+                    .ToDictionary(it => it.Id, it => it).AsReadOnly(),
+                RemovedKeys = from.Entities.Keys.Except(to.Entities.Keys).ToList().AsReadOnly()
             }
         };
     }

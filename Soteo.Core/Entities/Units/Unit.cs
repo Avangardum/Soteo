@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Numerics;
 using Soteo.Core.Commands;
 using Soteo.Util;
@@ -89,15 +88,15 @@ public abstract class Unit : UnitBase<IUnitNode>
             Azimuth = Azimuth,
             IsDead = IsDead,
             IsMoving = IsMoving,
-            Stats = Stats.ToImmutableDictionary(),
-            AbilitySlotStates = _abilitySlotStates.ToImmutableDictionary(),
+            Stats = Stats.ToDictionary().AsReadOnly(),
+            AbilitySlotStates = _abilitySlotStates.ToDictionary().AsReadOnly(),
             AbilityUseProgress = AbilityUseProgress,
-            Statuses = Statuses.ToImmutableDictionary(it => it.Key, it => it.Value.ToSnapshot()),
+            Statuses = Statuses.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly(),
             ControllingPlayerId = _controllingPlayerId,
-            Items = Inventory.ToImmutableList(),
+            Items = Inventory.ToList().AsReadOnly(),
             EquipmentInventory = EquipmentInventory.ToSnapshot(),
-            InnateHotbarAbilities = _innateHotbarAbilities.ToImmutableList(),
-            InnateSpecialAbilities = _innateSpecialAbilities.ToImmutableDictionary()
+            InnateHotbarAbilities = _innateHotbarAbilities.ToList().AsReadOnly(),
+            InnateSpecialAbilities = _innateSpecialAbilities.ToDictionary().AsReadOnly()
         };
     }
 
@@ -435,7 +434,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Ability = state.Ability,
             User = this,
             Alt = command.Alt,
-            UserStats = Stats.ToImmutableDictionary(),
+            UserStats = Stats.ToDictionary().AsReadOnly(),
             ServiceProvider = _serviceProvider,
             TargetPosition = command.TargetPosition,
             TargetUnit = targetUnit,
@@ -451,7 +450,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Ability = ability,
             User = this,
             Alt = false,
-            UserStats = Stats.ToImmutableDictionary(),
+            UserStats = Stats.ToDictionary().AsReadOnly(),
             ServiceProvider = _serviceProvider,
             TargetPosition = null,
             TargetUnit = null,

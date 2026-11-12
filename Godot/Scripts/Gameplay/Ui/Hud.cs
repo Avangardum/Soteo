@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Soteo.Core.Campaign;
 using Soteo.Core.Client;
@@ -24,12 +23,12 @@ public sealed class Hud : IHud
     private readonly TextureProgressBar _manaBar;
     private readonly Label _healthLabel;
     private readonly Label _manaLabel;
-    private readonly ImmutableList<AbilityButton> _abilityButtons;
-    private readonly ImmutableList<StatusIndicator> _statusIndicators;
+    private readonly IReadOnlyList<AbilityButton> _abilityButtons;
+    private readonly IReadOnlyList<StatusIndicator> _statusIndicators;
     private readonly GridContainer _inventoryGrid;
-    private readonly ImmutableList<ItemStackSlotControl> _inventorySlotControls;
+    private readonly IReadOnlyList<ItemStackSlotControl> _inventorySlotControls;
     private readonly Control _equipmentPanel;
-    private readonly ImmutableDictionary<EquipmentSlot, ItemStackSlotControl> _equipmentSlotControls;
+    private readonly IReadOnlyDictionary<EquipmentSlot, ItemStackSlotControl> _equipmentSlotControls;
 
     private readonly IEntityLocator _entityLocator;
     private readonly ICurrentCharacterIdRepository _currentCharIdRepo;
@@ -95,21 +94,21 @@ public sealed class Hud : IHud
         _manaLabel = _manaBar.GetNode<Label>("Label");
         _abilityButtons = node.GetNode("VBoxContainer/UnitPanel/VBoxContainer/Abilities").GetChildren()
             .Cast<AbilityButton>()
-            .ToImmutableList();
+            .ToList().AsReadOnly();
         _statusIndicators = node.GetNode("VBoxContainer/Statuses").GetChildren()
             .OfType<StatusIndicator>()
-            .ToImmutableList();
+            .ToList().AsReadOnly();
         _inventoryGrid = node.GetNode<GridContainer>("Inventory/MarginContainer/Slots");
         _inventorySlotControls = _inventoryGrid.GetChildren()
             .Cast<ItemStackSlotControl>()
-            .ToImmutableList();
+            .ToList().AsReadOnly();
         _equipmentPanel = node.GetNode<Control>("Equipment");
         _equipmentSlotControls = Enum.GetValues<EquipmentSlot>()
-            .ToImmutableDictionary
+            .ToDictionary
             (
                 it => it,
                 it => _equipmentPanel.GetNode<ItemStackSlotControl>($"MarginContainer/Slots/{it}")
-            );
+            ).AsReadOnly();
 
         SubscribeToAbilityButtonEvents();
         SubscribeToStatusIndicatorEvents();
@@ -192,7 +191,7 @@ public sealed class Hud : IHud
     {
         if (_isDragging) return;
         if (SelectedUnit == null) return;
-        ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(SelectedUnit);
+        IReadOnlyList<PuppetStatusContext> contexts = GetVisibleStatusContexts(SelectedUnit);
         if (index >= contexts.Count) return;
         Status status = contexts[index].Status;
 
@@ -457,7 +456,7 @@ public sealed class Hud : IHud
 
     private void ProcessStatuses(IUnitPuppet unit)
     {
-        ImmutableList<PuppetStatusContext> contexts = GetVisibleStatusContexts(unit);
+        IReadOnlyList<PuppetStatusContext> contexts = GetVisibleStatusContexts(unit);
         for (int i = 0; i < contexts.Count; i++)
         {
             _statusIndicators[i].Visible = true;
@@ -550,12 +549,12 @@ public sealed class Hud : IHud
         }
     }
 
-    private ImmutableList<PuppetStatusContext> GetVisibleStatusContexts(IUnitPuppet unit)
+    private IReadOnlyList<PuppetStatusContext> GetVisibleStatusContexts(IUnitPuppet unit)
     {
         return unit.Statuses.Values
             .Where(it => it.Status.HudVisible)
             .OrderBy(it => it.Ordinal)
             .Take(_statusIndicators.Count)
-            .ToImmutableList();
+            .ToList().AsReadOnly();
     }
 }

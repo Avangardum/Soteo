@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using AwesomeAssertions;
 using NSubstitute;
 using Soteo.Core.Abilities;
@@ -42,7 +41,7 @@ public sealed class EntityManagerTests
         {
             Ability = Ability.Instance<TestAbility>(),
             User = _projectileSourceChar,
-            UserStats = _projectileSourceChar.Stats.ToImmutableDictionary(),
+            UserStats = _projectileSourceChar.Stats.ToDictionary().AsReadOnly(),
             ServiceProvider = _serviceProvider,
             TargetUnit = _projectileTargetChar
         };

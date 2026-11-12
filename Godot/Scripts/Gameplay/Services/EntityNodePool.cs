@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Soteo.Core.Entities;
 using Soteo.Core.Entities.Projectiles;
 using Soteo.Core.Entities.Units;
@@ -8,16 +7,16 @@ namespace Soteo.Main.Gameplay.Services;
 
 public sealed class EntityNodePool : IEntityNodePool
 {
-    private static readonly ImmutableDictionary<Type, PackedScene> Scenes = new Dictionary<Type, string>
+    private static readonly IReadOnlyDictionary<Type, PackedScene> Scenes = new Dictionary<Type, string>
     {
         [typeof(IUnitNode)] = "res://Scenes/Entities/Unit.tscn",
         [typeof(IProjectileNode)] = "res://Scenes/Entities/Projectile.tscn",
         [typeof(IUnitPuppetNode)] = "res://Scenes/Entities/UnitPuppet.tscn",
         [typeof(IProjectilePuppetNode)] = "res://Scenes/Entities/ProjectilePuppet.tscn"
-    }.ToImmutableDictionary(it => it.Key, it => ResourceLoader.Load<PackedScene>(it.Value));
+    }.ToDictionary(it => it.Key, it => ResourceLoader.Load<PackedScene>(it.Value)).AsReadOnly();
 
-    private readonly ImmutableDictionary<Type, Stack<IEntityNode>> _stacks =
-        Scenes.ToImmutableDictionary(it => it.Key, _ => new Stack<IEntityNode>());
+    private readonly IReadOnlyDictionary<Type, Stack<IEntityNode>> _stacks =
+        Scenes.ToDictionary(it => it.Key, _ => new Stack<IEntityNode>()).AsReadOnly();
 
     public T GetNode<T>() where T : class, IEntityNode
     {

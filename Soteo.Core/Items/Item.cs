@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Soteo.Core.Abilities;
 
 namespace Soteo.Core.Items;
@@ -18,7 +17,7 @@ public abstract class Item : SingletonHierarchyBase<Item>
     public virtual IReadOnlyList<Ability> HotbarAbilities => [];
 
     public virtual IReadOnlyDictionary<SpecialAbilitySlot, Ability> SpecialAbilities =>
-        ImmutableDictionary<SpecialAbilitySlot, Ability>.Empty;
+        ReadOnlyDictionary<SpecialAbilitySlot, Ability>.Empty;
 
     public virtual string Name =>
         GetType().Name.ReplaceRegex("Item$", "").PascalCaseToCapitalizedText();

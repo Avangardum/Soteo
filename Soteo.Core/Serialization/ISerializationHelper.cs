@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Numerics;
 
 namespace Soteo.Core.Serialization;
@@ -59,7 +58,7 @@ public interface ISerializationHelper
         Stream stream
     );
 
-    ImmutableDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue>
+    IReadOnlyDictionary<TKey, TValue> DeserializeDictionary<TKey, TValue>
     (
         Deserializer<TKey> deserializeKey,
         Deserializer<TValue> deserializeValue,
@@ -79,7 +78,7 @@ public interface ISerializationHelper
     /// <summary>
     /// Deserialize a dictionary where keys are derived from values
     /// </summary>
-    ImmutableDictionary<TKey, TValue> DeserializeIndexedDictionary<TKey, TValue>
+    IReadOnlyDictionary<TKey, TValue> DeserializeIndexedDictionary<TKey, TValue>
     (
         Deserializer<TValue> deserializeValue,
         Func<TValue, TKey> keySelector,

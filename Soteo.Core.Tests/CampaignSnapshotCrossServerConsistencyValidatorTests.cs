@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Numerics;
 using AwesomeAssertions;
 using Soteo.Core.Abilities;
@@ -34,7 +34,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 [Shard1Id] = CreateShardUserSnapshot(Shard1Id),
                 [Shard2Id] = CreateShardUserSnapshot(Shard2Id),
                 [Shard3Id] = CreateShardUserSnapshot(Shard3Id)
-            }.ToImmutableDictionary(),
+            }.ToDictionary().AsReadOnly(),
             PlayerCharacterTrackers = new Dictionary<Guid, PlayerCharacterTrackerSnapshot>
             {
                 [Char1Id] = new()
@@ -55,7 +55,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                     PlayerId = Player3Id,
                     ShardId = null
                 }
-            }.ToImmutableDictionary()
+            }.ToDictionary().AsReadOnly()
         },
         Shards = new Dictionary<Guid, ShardSnapshot>
         {
@@ -66,7 +66,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 {
                     [Char1Id] = CreatePlayerCharacterEntitySnapshot(Char1Id),
                     [ProjectileId] = CreateProjectileEntitySnapshot(ProjectileId)
-                }.ToImmutableDictionary()
+                }.ToDictionary().AsReadOnly()
             },
             [Shard2Id] = new()
             {
@@ -74,14 +74,14 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 Entities = new Dictionary<Guid, EntitySnapshot>
                 {
                     [Char2Id] = CreatePlayerCharacterEntitySnapshot(Char2Id)
-                }.ToImmutableDictionary()
+                }.ToDictionary().AsReadOnly()
             },
             [Shard3Id] = new()
             {
                 Tick = 0,
-                Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
+                Entities = ReadOnlyDictionary<Guid, EntitySnapshot>.Empty
             }
-        }.ToImmutableDictionary()
+        }.ToDictionary().AsReadOnly()
     };
 
     [Fact]
@@ -103,7 +103,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                 {
                     [Shard1Id] = ConsistentSnapshot.Shards[Shard1Id] with
                     {
-                        Entities = ImmutableDictionary<Guid, EntitySnapshot>.Empty
+                        Entities = ReadOnlyDictionary<Guid, EntitySnapshot>.Empty
                     }
                 }
             )
@@ -151,7 +151,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
                     {
                         Entities = ConsistentSnapshot.Shards[Shard1Id].Entities
                             .Concat(ConsistentSnapshot.Shards[Shard2Id].Entities)
-                            .ToImmutableDictionary()
+                            .ToDictionary().AsReadOnly()
                     }
                 }
             )
@@ -238,18 +238,18 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             Id = id,
             IsDead = false,
             IsMoving = false,
-            Stats = ImmutableDictionary<Stat, double>.Empty,
-            AbilitySlotStates = ImmutableDictionary<AbilitySlot, AbilitySlotState>.Empty,
+            Stats = ReadOnlyDictionary<Stat, double>.Empty,
+            AbilitySlotStates = ReadOnlyDictionary<AbilitySlot, AbilitySlotState>.Empty,
             AbilityUseProgress = null,
-            Statuses = ImmutableDictionary<Guid, StatusContextSnapshot>.Empty,
+            Statuses = ReadOnlyDictionary<Guid, StatusContextSnapshot>.Empty,
             IsRemoved = false,
             Position = default,
             Azimuth = 0,
             ControllingPlayerId = null,
             Items = [],
-            EquipmentInventory = new EquipmentInventorySnapshot(ImmutableDictionary<EquipmentSlot, ItemStack?>.Empty),
+            EquipmentInventory = new EquipmentInventorySnapshot(ReadOnlyDictionary<EquipmentSlot, ItemStack?>.Empty),
             InnateHotbarAbilities = [],
-            InnateSpecialAbilities = ImmutableDictionary<SpecialAbilitySlot, Ability>.Empty
+            InnateSpecialAbilities = ReadOnlyDictionary<SpecialAbilitySlot, Ability>.Empty
         };
     }
 
@@ -262,7 +262,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             {
                 Ability = Ability.Instance<RangedAttackAbility>(),
                 UserId = Player1Id,
-                UserStats = ImmutableDictionary<Stat, double>.Empty
+                UserStats = ReadOnlyDictionary<Stat, double>.Empty
             },
             Speed = 0,
             Target = Vector2.Zero,
