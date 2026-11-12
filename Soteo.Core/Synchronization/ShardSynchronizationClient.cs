@@ -1,5 +1,3 @@
-using Soteo.Util;
-
 namespace Soteo.Core.Synchronization;
 
 public sealed class ShardSynchronizationClient : IShardSynchronizationClient, IDisposable

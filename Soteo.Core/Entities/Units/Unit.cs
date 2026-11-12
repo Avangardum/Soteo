@@ -1,5 +1,4 @@
 using Soteo.Core.Commands;
-using Soteo.Util;
 
 namespace Soteo.Core.Entities.Units;
 

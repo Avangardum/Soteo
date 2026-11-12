@@ -1,5 +1,3 @@
-using Soteo.Util;
-
 namespace Soteo.Core.Statuses;
 
 public record PuppetStatusContext

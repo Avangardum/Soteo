@@ -1,5 +1,3 @@
-using Soteo.Util;
-
 namespace Soteo.Core.Entities.Units;
 
 public record AbilitySlotState(Ability Ability)

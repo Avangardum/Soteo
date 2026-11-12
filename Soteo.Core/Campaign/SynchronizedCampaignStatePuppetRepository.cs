@@ -1,5 +1,3 @@
-using Soteo.Util;
-
 namespace Soteo.Core.Campaign;
 
 /// <inheritdoc cref="ISynchronizedCampaignStateRepository" />
