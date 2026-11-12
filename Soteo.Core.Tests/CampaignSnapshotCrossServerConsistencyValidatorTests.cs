@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Numerics;
 using AwesomeAssertions;
 using Soteo.Core.Abilities;
 using Soteo.Core.Entities.Units;

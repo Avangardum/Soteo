@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Soteo.Core.Entities.Projectiles;

@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Soteo.Core.Entities;
 
 public interface IEntity

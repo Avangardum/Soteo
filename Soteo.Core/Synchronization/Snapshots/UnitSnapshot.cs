@@ -1,4 +1,3 @@
-
 namespace Soteo.Core.Synchronization.Snapshots;
 
 public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>

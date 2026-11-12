@@ -1,4 +1,3 @@
-
 namespace Soteo.Core.Entities.Units;
 
 public static class StatExtensions

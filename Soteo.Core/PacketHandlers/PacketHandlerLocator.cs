@@ -1,4 +1,3 @@
-
 namespace Soteo.Core.PacketHandlers;
 
 public static class PacketHandlerLocator<TAttribute> where TAttribute : Attribute

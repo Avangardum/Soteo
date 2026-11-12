@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Soteo.Core.Entities.Projectiles;
 
 public sealed class ProjectilePuppet : Entity<IProjectilePuppetNode>

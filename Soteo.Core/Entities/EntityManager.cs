@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Soteo.Core.Entities;
 
 public sealed class EntityManager : IEntityManager, IEntitySnapshotManager

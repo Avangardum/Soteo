@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Soteo.Util;
 
 public static class Maths

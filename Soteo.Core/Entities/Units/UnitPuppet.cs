@@ -1,4 +1,3 @@
-using System.Numerics;
 using Soteo.Util;
 
 namespace Soteo.Core.Entities.Units;

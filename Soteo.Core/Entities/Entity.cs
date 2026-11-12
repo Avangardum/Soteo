@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
 using Soteo.Util;
 
 namespace Soteo.Core.Entities;

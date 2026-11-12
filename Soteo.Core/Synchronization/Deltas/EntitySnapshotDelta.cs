@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Soteo.Core.Synchronization.Deltas;
 
 public abstract record EntitySnapshotDelta

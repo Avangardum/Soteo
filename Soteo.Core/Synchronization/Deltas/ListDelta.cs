@@ -1,4 +1,3 @@
-
 namespace Soteo.Core.Synchronization.Deltas;
 
 public static class ListDelta

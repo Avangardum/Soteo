@@ -1,4 +1,3 @@
-
 namespace Soteo.Core.Persistence;
 
 public sealed class CampaignSnapshotManager

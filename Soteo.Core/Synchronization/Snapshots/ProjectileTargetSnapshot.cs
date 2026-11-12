@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
 
 namespace Soteo.Core.Synchronization.Snapshots;
 

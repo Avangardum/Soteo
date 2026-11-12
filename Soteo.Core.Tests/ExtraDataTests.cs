@@ -1,4 +1,3 @@
-using System.Numerics;
 using AwesomeAssertions;
 using Soteo.Core.Serialization;
 

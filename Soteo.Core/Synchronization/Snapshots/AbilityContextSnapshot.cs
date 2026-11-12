@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Soteo.Core.Synchronization.Snapshots;
 
 public sealed record AbilityContextSnapshot

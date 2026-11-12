@@ -1,4 +1,3 @@
-
 namespace Soteo.Core.Campaign;
 
 /// <inheritdoc cref="IPlayerCharacterTrackerRepository" />

@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Soteo.Core.Serialization;
 
 public interface ISerializationHelper

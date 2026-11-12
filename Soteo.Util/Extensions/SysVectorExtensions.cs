@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Soteo.Util.Extensions;
 
 public static class SysVectorExtensions
