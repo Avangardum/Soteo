@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Soteo.Core.Abilities;
 
 public abstract class Ability : SingletonHierarchyBase<Ability>

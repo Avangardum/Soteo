@@ -1,6 +1,5 @@
 global using System.Collections.ObjectModel;
 global using System.Numerics;
-global using System.Globalization;
 global using Soteo.Core.Abilities;
 global using Soteo.Core.Campaign;
 global using Soteo.Core.Client;
