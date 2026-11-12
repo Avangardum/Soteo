@@ -1,5 +1,3 @@
-using Soteo.Core.Entities;
-
 namespace Soteo.Core.Statuses;
 
 public abstract class Status : SingletonHierarchyBase<Status>

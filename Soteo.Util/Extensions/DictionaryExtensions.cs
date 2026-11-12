@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Soteo.Util.Interfaces;
 
 namespace Soteo.Util.Extensions;

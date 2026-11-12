@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Soteo.Util;
 
 namespace Soteo.Main.Shared;
 

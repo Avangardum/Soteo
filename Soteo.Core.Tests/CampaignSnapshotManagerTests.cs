@@ -1,7 +1,5 @@
-using System.Collections.ObjectModel;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
-using NSubstitute.ExceptionExtensions;
 using Soteo.Core.Campaign;
 using Soteo.Core.Networking;
 using Soteo.Core.Packets;

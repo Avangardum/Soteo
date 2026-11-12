@@ -1,4 +1,3 @@
-using Soteo.Main.Shared.Extensions;
 using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;

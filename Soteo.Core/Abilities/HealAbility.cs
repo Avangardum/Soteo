@@ -1,5 +1,3 @@
-using Soteo.Core.Entities;
-
 namespace Soteo.Core.Abilities;
 
 public sealed class HealAbility : Ability

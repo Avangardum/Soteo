@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using AwesomeAssertions;
 using NSubstitute;
 using Soteo.Core.Abilities;

@@ -1,5 +1,3 @@
-using Soteo.Core.Abilities;
-
 namespace Soteo.Core.Items;
 
 public abstract class Item : SingletonHierarchyBase<Item>

@@ -1,5 +1,3 @@
-using Soteo.Core.Entities;
-
 namespace Soteo.Core.Statuses;
 
 public sealed class BleedingStatus : Status

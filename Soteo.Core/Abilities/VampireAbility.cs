@@ -1,5 +1,3 @@
-using Soteo.Core.Statuses;
-
 namespace Soteo.Core.Abilities;
 
 public sealed class VampireAbility : Ability
