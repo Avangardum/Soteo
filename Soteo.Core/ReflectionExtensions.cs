@@ -1,6 +1,4 @@
-using Soteo.Core.Dto.Packets;
-
-namespace Soteo.Core.Extensions;
+namespace Soteo.Core;
 
 public static class ReflectionExtensions
 {

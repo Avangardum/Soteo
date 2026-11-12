@@ -1,5 +1,3 @@
-using Soteo.Core.Enums;
-
 namespace Soteo.Core.Statuses;
 
 public abstract class AbilityPassiveStatus : Status

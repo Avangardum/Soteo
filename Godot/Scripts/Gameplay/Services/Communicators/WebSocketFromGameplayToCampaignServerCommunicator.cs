@@ -1,11 +1,11 @@
 using System.Text;
 using JWT.Builder;
-using Soteo.Core.Dto.Options;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-using Soteo.Core.SidedDependencies;
-using Soteo.Core.StaticHelpers;
+using Soteo.Core;
+using Soteo.Core.Client;
+using Soteo.Core.Networking;
+using Soteo.Core.PacketHandlers;
+using Soteo.Core.Packets;
+using Soteo.Core.Serialization;
 
 namespace Soteo.Main.Gameplay.Services.Communicators;
 

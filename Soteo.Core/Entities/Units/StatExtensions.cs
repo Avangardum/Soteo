@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Core.Enums;
 
-namespace Soteo.Core.Extensions;
+namespace Soteo.Core.Entities.Units;
 
 public static class StatExtensions
 {

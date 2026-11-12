@@ -1,5 +1,4 @@
 using Soteo.Core.Abilities;
-using Soteo.Core.Dto;
 using Soteo.Core.Items;
 using Soteo.Core.Statuses;
 

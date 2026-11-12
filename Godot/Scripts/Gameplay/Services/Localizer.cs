@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Core.Interfaces;
+using Soteo.Core;
+using Soteo.Core.Localization;
 
 namespace Soteo.Main.Gameplay.Services;
 

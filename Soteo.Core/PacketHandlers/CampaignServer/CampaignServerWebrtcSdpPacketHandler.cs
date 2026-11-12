@@ -1,7 +1,4 @@
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
+namespace Soteo.Core.PacketHandlers.CampaignServer;
 
 public sealed class CampaignServerWebrtcSdpPacketHandler
 (

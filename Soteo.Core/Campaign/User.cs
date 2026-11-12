@@ -1,6 +1,4 @@
-using Soteo.Core.Dto.Snapshots;
-
-namespace Soteo.Core.Models;
+namespace Soteo.Core.Campaign;
 
 /// <summary>
 /// Campaign server object representing a user. User can be any other party connected to the campaign server such as

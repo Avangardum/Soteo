@@ -1,9 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 using Soteo.Core.Abilities;
+using Soteo.Core.Commands;
 using Soteo.Core.Entities;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
+using Soteo.Core.Entities.Units;
 
 namespace Soteo.Core.Tests;
 

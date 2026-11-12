@@ -1,10 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Models;
-using Soteo.Util;
 
-namespace Soteo.Core.Services.Repositories;
+namespace Soteo.Core.Campaign;
 
 /// <inheritdoc cref="IUserRepository" />
 public class UserRepository

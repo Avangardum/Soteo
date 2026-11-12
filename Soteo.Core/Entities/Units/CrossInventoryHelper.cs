@@ -1,8 +1,4 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core;
+namespace Soteo.Core.Entities.Units;
 
 public sealed class CrossInventoryHelper : ICrossInventoryHelper
 {

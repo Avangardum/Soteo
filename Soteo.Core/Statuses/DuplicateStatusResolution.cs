@@ -1,4 +1,4 @@
-namespace Soteo.Core.Enums;
+namespace Soteo.Core.Statuses;
 
 /// <summary>
 /// What happens when a status is added to a unit that already has a status of this type

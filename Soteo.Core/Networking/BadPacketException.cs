@@ -1,4 +1,4 @@
-namespace Soteo.Core.Exceptions;
+namespace Soteo.Core.Networking;
 
 /// <summary>
 /// Exception thrown when handling an invalid packet

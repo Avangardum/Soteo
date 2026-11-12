@@ -1,8 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using Soteo.Core.Dto.Deltas;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
 using Soteo.Util;
 
 namespace Soteo.Core.Entities;

@@ -1,6 +1,4 @@
-using Soteo.Core.Dto;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Campaign;
 
 /// <inheritdoc cref="SynchronizedCampaignState"/>
 public interface ISynchronizedCampaignStatePuppetRepository

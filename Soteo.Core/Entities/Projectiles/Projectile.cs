@@ -1,9 +1,6 @@
 using System.Numerics;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Entities;
+namespace Soteo.Core.Entities.Projectiles;
 
 public sealed class Projectile : Entity<IProjectileNode>
 {

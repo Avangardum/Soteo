@@ -1,7 +1,4 @@
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Extensions;
+namespace Soteo.Core;
 
 public static class ProcessPublisherExtensions
 {

@@ -1,5 +1,7 @@
 using System.Collections.Immutable;
-using Soteo.Core.Interfaces;
+using Soteo.Core.Entities;
+using Soteo.Core.Entities.Projectiles;
+using Soteo.Core.Entities.Units;
 using Soteo.Main.Gameplay.Interfaces;
 
 namespace Soteo.Main.Gameplay.Services;

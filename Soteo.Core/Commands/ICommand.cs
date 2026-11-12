@@ -1,3 +1,3 @@
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Commands;
 
 public interface ICommand;

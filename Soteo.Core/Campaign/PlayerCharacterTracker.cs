@@ -1,7 +1,4 @@
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Models;
+namespace Soteo.Core.Campaign;
 
 /// <summary>
 /// Campaign server object storing information about a player character

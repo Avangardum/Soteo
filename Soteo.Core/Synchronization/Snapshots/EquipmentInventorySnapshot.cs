@@ -1,5 +1,3 @@
-using Soteo.Core.Enums;
-
-namespace Soteo.Core.Dto.Snapshots;
+namespace Soteo.Core.Synchronization.Snapshots;
 
 public sealed record EquipmentInventorySnapshot(IReadOnlyDictionary<EquipmentSlot, ItemStack?> Stacks);

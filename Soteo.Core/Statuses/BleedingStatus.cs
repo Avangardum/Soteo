@@ -1,6 +1,4 @@
-using Soteo.Core.Dto;
 using Soteo.Core.Entities;
-using Soteo.Core.Enums;
 
 namespace Soteo.Core.Statuses;
 

@@ -1,11 +1,9 @@
 using AwesomeAssertions;
 using NSubstitute;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Services.Repositories;
-using Soteo.Core.Services.Synchronization;
-using Soteo.Core.StaticHelpers;
+using Soteo.Core.Networking;
+using Soteo.Core.Packets;
+using Soteo.Core.Serialization;
+using Soteo.Core.Synchronization;
 using Soteo.TestUtil;
 
 namespace Soteo.Core.Tests;

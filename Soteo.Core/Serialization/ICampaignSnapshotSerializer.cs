@@ -1,6 +1,4 @@
-using Soteo.Core.Dto.Snapshots;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Serialization;
 
 public interface ICampaignSnapshotSerializer
 {

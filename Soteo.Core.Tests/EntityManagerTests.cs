@@ -2,14 +2,12 @@ using System.Collections.Immutable;
 using AwesomeAssertions;
 using NSubstitute;
 using Soteo.Core.Abilities;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Snapshots;
 using Soteo.Core.Entities;
-using Soteo.Core.Enums;
-using Soteo.Core.Services;
-using Soteo.Core.SidedDependencies;
-using ICamera = Soteo.Core.Interfaces.ICamera;
-using IEntityNodeManager = Soteo.Core.Interfaces.IEntityNodeManager;
+using Soteo.Core.Entities.Projectiles;
+using Soteo.Core.Entities.Units;
+using Soteo.Core.Synchronization.Snapshots;
+using ICamera = Soteo.Core.Client.ICamera;
+using IEntityNodeManager = Soteo.Core.Entities.IEntityNodeManager;
 
 namespace Soteo.Core.Tests;
 

@@ -1,6 +1,4 @@
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services.Pluralizers;
+namespace Soteo.Core.Localization.Pluralizers;
 
 public sealed class RussianPluralizer : IPluralizer
 {

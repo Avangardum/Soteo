@@ -1,4 +1,4 @@
-namespace Soteo.Core.Dto.Options;
+namespace Soteo.Core.Client;
 
 public sealed record LogInOptions
 {

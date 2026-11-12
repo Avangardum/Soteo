@@ -1,10 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Entities;
-using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Entities.Projectiles;
 
 public class ProjectileTarget
 {

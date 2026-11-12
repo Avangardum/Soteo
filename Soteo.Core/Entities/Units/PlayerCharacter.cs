@@ -1,11 +1,4 @@
-using Soteo.Core.Abilities;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Items;
-
-namespace Soteo.Core.Entities;
+namespace Soteo.Core.Entities.Units;
 
 public sealed class PlayerCharacter : Unit
 {

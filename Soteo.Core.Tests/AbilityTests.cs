@@ -3,8 +3,7 @@ using System.Numerics;
 using AwesomeAssertions;
 using NSubstitute;
 using Soteo.Core.Abilities;
-using Soteo.Core.Dto;
-using Soteo.Core.Enums;
+using Soteo.Core.Entities.Units;
 
 namespace Soteo.Core.Tests;
 

@@ -1,7 +1,4 @@
-using Soteo.Core.Interfaces;
-using Soteo.Util;
-
-namespace Soteo.Core.Services.Repositories;
+namespace Soteo.Core;
 
 public sealed class InitializationRepository : IInitializationRepository
 {

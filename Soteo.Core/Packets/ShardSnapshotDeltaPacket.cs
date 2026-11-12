@@ -1,9 +1,4 @@
-using Soteo.Core.Attributes;
-using Soteo.Core.Dto.Deltas;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
-
-namespace Soteo.Core.Dto.Packets;
+namespace Soteo.Core.Packets;
 
 public sealed record ShardSnapshotDeltaPacket : Packet
 {

@@ -1,7 +1,4 @@
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services.Serializers;
+namespace Soteo.Core.Serialization;
 
 public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampaignSnapshotSerializer
 {

@@ -1,7 +1,7 @@
 using System.Numerics;
 using Soteo.Util;
 
-namespace Soteo.Core.StaticHelpers;
+namespace Soteo.Core.Entities;
 
 public static class NodeHelper
 {

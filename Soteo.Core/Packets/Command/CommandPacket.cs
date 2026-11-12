@@ -1,6 +1,6 @@
-using Soteo.Core.Interfaces;
+using Soteo.Core.Commands;
 
-namespace Soteo.Core.Dto.Packets.Command;
+namespace Soteo.Core.Packets.Command;
 
 public abstract record CommandPacket<T> : Packet where T : ICommand
 {

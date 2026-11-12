@@ -1,11 +1,4 @@
-using Soteo.Core.Dto.Deltas;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-using Soteo.Core.StaticHelpers;
-
-namespace Soteo.Core.Services.Synchronization;
+namespace Soteo.Core.Synchronization;
 
 public sealed class ShardSynchronizationServer : IShardSynchronizationServer, IDisposable
 {

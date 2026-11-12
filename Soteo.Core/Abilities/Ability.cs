@@ -1,9 +1,6 @@
 using System.Globalization;
 using System.Numerics;
-using Soteo.Core.Dto;
 using Soteo.Core.Entities;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
 using Soteo.Core.Statuses;
 using Soteo.Util;
 

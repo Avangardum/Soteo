@@ -1,8 +1,4 @@
-using Soteo.Core.Attributes;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services.PacketHandlers.CampaignServer;
+namespace Soteo.Core.PacketHandlers.CampaignServer;
 
 [CampaignServerPacketHandler]
 public sealed class CampaignServerShardServerInitAwaitingCampaignServerInitPacketHandler

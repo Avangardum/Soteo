@@ -1,7 +1,6 @@
-using Soteo.Core.Abilities;
 using Soteo.Util;
 
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Entities.Units;
 
 public record AbilitySlotState(Ability Ability)
 {

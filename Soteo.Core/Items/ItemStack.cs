@@ -1,6 +1,4 @@
-using Soteo.Core.Items;
-
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Items;
 
 public sealed record ItemStack
 {

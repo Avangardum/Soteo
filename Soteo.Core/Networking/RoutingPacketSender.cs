@@ -1,9 +1,4 @@
-using System.Collections.Immutable;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
-using Soteo.Core.StaticHelpers;
-
-namespace Soteo.Core.Services;
+namespace Soteo.Core.Networking;
 
 public sealed class RoutingPacketSender
 (

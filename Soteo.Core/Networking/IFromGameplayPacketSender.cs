@@ -1,6 +1,4 @@
-using Soteo.Core.Dto.Packets;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Networking;
 
 /// <summary>
 /// Sends packets from clients and shard servers
@@ -23,7 +21,7 @@ public interface IFromGameplayPacketSender
     void Send(Packet packet, IReadOnlyList<Guid> receiverIds, bool reliable = true, bool deferToNextTick = false);
 
     /// <inheritdoc
-    ///     cref="Send(Soteo.Core.Dto.Packets.Packet,System.Collections.Generic.IReadOnlyList{System.Guid},bool,bool)"
+    ///     cref="Send(Soteo.Core.Packets.Packet,System.Collections.Generic.IReadOnlyList{System.Guid},bool,bool)"
     /// />
     void Send(Packet packet, Guid receiverId, bool reliable = true, bool deferToNextTick = false) =>
         Send(packet, [receiverId], reliable, deferToNextTick);
@@ -33,7 +31,7 @@ public interface IFromGameplayPacketSender
     /// (if called by a player).
     /// </summary>
     /// <inheritdoc
-    ///     cref="Send(Soteo.Core.Dto.Packets.Packet,System.Collections.Generic.IReadOnlyList{System.Guid},bool,bool)"
+    ///     cref="Send(Soteo.Core.Packets.Packet,System.Collections.Generic.IReadOnlyList{System.Guid},bool,bool)"
     /// />
     void Broadcast(Packet packet, bool reliable = true, bool deferToNextTick = false);
 }

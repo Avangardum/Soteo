@@ -1,7 +1,4 @@
-using Soteo.Core.Dto;
 using Soteo.Core.Entities;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Statuses;
 

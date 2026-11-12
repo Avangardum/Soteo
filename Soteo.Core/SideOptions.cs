@@ -1,6 +1,4 @@
-using Soteo.Core.Enums;
-
-namespace Soteo.Core.Dto.Options;
+namespace Soteo.Core;
 
 public sealed record SideOptions
 {

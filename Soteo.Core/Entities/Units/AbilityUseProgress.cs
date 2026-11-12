@@ -1,7 +1,6 @@
-using Soteo.Core.Enums;
 using Soteo.Util;
 
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Entities.Units;
 
 public sealed record AbilityUseProgress
 {

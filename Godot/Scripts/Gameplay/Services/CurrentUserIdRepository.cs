@@ -1,7 +1,5 @@
-using Soteo.Core.Dto.Options;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-using Soteo.Core.SidedDependencies;
+using Soteo.Core;
+using Soteo.Core.Client;
 
 namespace Soteo.Main.Gameplay.Services;
 

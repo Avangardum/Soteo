@@ -1,7 +1,4 @@
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services;
+namespace Soteo.Core.Persistence;
 
 public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignSnapshotCrossServerConsistencyValidator
 {

@@ -1,6 +1,6 @@
+using Soteo.Core;
 using Soteo.Core.Entities;
-using Soteo.Core.Interfaces;
-using Soteo.Core.StaticHelpers;
+using Soteo.Core.Entities.Units;
 using Soteo.Main.Gameplay.Interfaces;
 using Soteo.Util;
 

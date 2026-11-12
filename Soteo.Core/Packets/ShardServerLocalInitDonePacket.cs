@@ -1,7 +1,4 @@
-using Soteo.Core.Attributes;
-using Soteo.Core.Enums;
-
-namespace Soteo.Core.Dto.Packets;
+namespace Soteo.Core.Packets;
 
 /// <summary>
 /// Sent from a shard server to the campaign server to notify that it finished all initialization steps except

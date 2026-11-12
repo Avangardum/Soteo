@@ -2,10 +2,10 @@ using System.Collections.Immutable;
 using System.Numerics;
 using AwesomeAssertions;
 using Soteo.Core.Abilities;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
-using Soteo.Core.Services;
+using Soteo.Core.Entities.Units;
+using Soteo.Core.Items;
+using Soteo.Core.Persistence;
+using Soteo.Core.Synchronization.Snapshots;
 
 namespace Soteo.Core.Tests;
 

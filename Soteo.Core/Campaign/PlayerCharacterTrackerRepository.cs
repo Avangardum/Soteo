@@ -1,9 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Models;
 
-namespace Soteo.Core.Services.Repositories;
+namespace Soteo.Core.Campaign;
 
 /// <inheritdoc cref="IPlayerCharacterTrackerRepository" />
 public sealed class PlayerCharacterTrackerRepository :

@@ -1,4 +1,4 @@
-using Soteo.Core.Enums;
+using Soteo.Core.Entities.Units;
 
 namespace Soteo.Main.Gameplay;
 

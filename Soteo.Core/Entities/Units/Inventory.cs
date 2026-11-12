@@ -1,10 +1,7 @@
 using System.Collections;
 using System.Collections.Immutable;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Deltas;
-using Soteo.Core.Interfaces;
 
-namespace Soteo.Core;
+namespace Soteo.Core.Entities.Units;
 
 public sealed class Inventory : IInventory
 {

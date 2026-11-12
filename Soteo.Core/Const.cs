@@ -1,4 +1,4 @@
-namespace Soteo.Core.StaticHelpers;
+namespace Soteo.Core;
 
 public static class Const
 {

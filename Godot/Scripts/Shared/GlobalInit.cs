@@ -1,6 +1,5 @@
 using System.Globalization;
 using Soteo.Core;
-using Soteo.Core.StaticHelpers;
 
 namespace Soteo.Main.Shared;
 

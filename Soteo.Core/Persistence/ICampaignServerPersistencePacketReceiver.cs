@@ -1,6 +1,4 @@
-using Soteo.Core.Dto.Packets;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Persistence;
 
 public interface ICampaignServerPersistencePacketReceiver
 {

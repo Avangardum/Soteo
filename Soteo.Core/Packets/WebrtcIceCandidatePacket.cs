@@ -1,7 +1,4 @@
-using Soteo.Core.Attributes;
-using Soteo.Core.Enums;
-
-namespace Soteo.Core.Dto.Packets;
+namespace Soteo.Core.Packets;
 
 /// <summary>
 /// WebRTC ICE candidate info in the Godot format.

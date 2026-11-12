@@ -1,4 +1,4 @@
-namespace Soteo.Core.Attributes;
+namespace Soteo.Core.Serialization;
 
 [AttributeUsage(AttributeTargets.Enum)]
 public sealed class AllowAnonymousEnumValuesAttribute : Attribute;

@@ -1,9 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Entities;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Statuses;
-
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Synchronization.Snapshots;
 
 public sealed record StatusContextSnapshot
 {

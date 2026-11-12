@@ -1,6 +1,4 @@
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services.Repositories;
+namespace Soteo.Core.Client;
 
 public sealed class VisibleShardIdRepository : IVisibleShardIdRepository
 {

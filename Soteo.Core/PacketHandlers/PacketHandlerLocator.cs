@@ -1,9 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Services.PacketHandlers;
 
-namespace Soteo.Core.StaticHelpers;
+namespace Soteo.Core.PacketHandlers;
 
 public static class PacketHandlerLocator<TAttribute> where TAttribute : Attribute
 {

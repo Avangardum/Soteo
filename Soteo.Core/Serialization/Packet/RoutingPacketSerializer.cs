@@ -1,8 +1,4 @@
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Exceptions;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services.Serializers.PacketSerializers;
+namespace Soteo.Core.Serialization.Packet;
 
 public sealed class RoutingPacketSerializer
 (
@@ -10,7 +6,7 @@ public sealed class RoutingPacketSerializer
     ISerializationHelper s
 ) : IPacketSerializer
 {
-    public Packet Deserialize(Span<byte> bytes)
+    public Packets.Packet Deserialize(Span<byte> bytes)
     {
         if (bytes.IsEmpty)
             throw new BadPacketException("Packet is empty");
@@ -20,7 +16,7 @@ public sealed class RoutingPacketSerializer
         return serializer.Deserialize(bytes);
     }
 
-    public byte[] Serialize(Packet packet)
+    public byte[] Serialize(Packets.Packet packet)
     {
         IPacketSerializer? serializer = serviceProvider.GetPacketSerializerFor(packet.GetType());
         if (serializer == null)

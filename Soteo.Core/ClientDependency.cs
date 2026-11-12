@@ -1,4 +1,4 @@
-namespace Soteo.Core.SidedDependencies;
+namespace Soteo.Core;
 
 public static class ClientDependency
 {

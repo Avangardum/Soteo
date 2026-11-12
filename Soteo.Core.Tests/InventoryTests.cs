@@ -1,5 +1,6 @@
 using AwesomeAssertions;
-using Soteo.Core.Dto;
+using Soteo.Core.Entities.Units;
+using Soteo.Core.Items;
 
 namespace Soteo.Core.Tests;
 

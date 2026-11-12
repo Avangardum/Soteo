@@ -1,6 +1,4 @@
-using Soteo.Core.Services.Repositories;
-
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Campaign;
 
 /// <summary>
 /// Campaign state synchronized across all servers and clients.

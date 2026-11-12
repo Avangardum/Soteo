@@ -1,6 +1,4 @@
-using Soteo.Core.Dto.Snapshots;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Persistence;
 
 public interface IShardPersistenceSnapshotManager
 {

@@ -1,7 +1,7 @@
+using Soteo.Core;
+using Soteo.Core.Client;
 using Soteo.Core.Entities;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-using Soteo.Core.StaticHelpers;
+using Soteo.Core.Entities.Units;
 using Soteo.Main.Gameplay.Interfaces;
 
 namespace Soteo.Main.Gameplay.Ui;

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Soteo.Core.Entities;
+using Soteo.Core.Entities.Units;
 
 namespace Soteo.Main.Gameplay.Interfaces;
 

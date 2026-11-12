@@ -1,7 +1,4 @@
-using Soteo.Core.Enums;
-using Soteo.Core.Exceptions;
-
-namespace Soteo.Core.StaticHelpers;
+namespace Soteo.Core;
 
 public static class ExceptionFactory
 {

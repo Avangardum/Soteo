@@ -1,7 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Dto;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
 
 namespace Soteo.Core.Abilities;
 

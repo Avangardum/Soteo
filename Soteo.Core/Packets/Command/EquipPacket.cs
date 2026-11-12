@@ -1,5 +1,5 @@
-using Soteo.Core.Dto.Commands;
+using Soteo.Core.Commands;
 
-namespace Soteo.Core.Dto.Packets.Command;
+namespace Soteo.Core.Packets.Command;
 
 public sealed record EquipPacket : CommandPacket<EquipCommand>;

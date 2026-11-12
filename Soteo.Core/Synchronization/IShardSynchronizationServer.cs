@@ -1,4 +1,4 @@
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Synchronization;
 
 public interface IShardSynchronizationServer
 {

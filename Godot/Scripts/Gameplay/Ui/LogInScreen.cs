@@ -1,5 +1,5 @@
-using Soteo.Core.Dto.Options;
-using Soteo.Core.Interfaces;
+using Soteo.Core.Client;
+using Soteo.Core.Networking;
 
 namespace Soteo.Main.Gameplay.Ui;
 

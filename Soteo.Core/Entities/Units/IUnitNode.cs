@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Entities.Units;
 
 public interface IUnitNode : IEntityNode
 {

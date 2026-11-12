@@ -1,6 +1,6 @@
 using AwesomeAssertions;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
+using Soteo.Core.Packets;
+using Soteo.Core.Serialization;
 using Soteo.Main.Gameplay.Interfaces;
 using Soteo.Util;
 

@@ -1,5 +1,5 @@
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
+using Soteo.Core.Networking;
+using Soteo.Core.Packets;
 
 namespace Soteo.TestUtil;
 

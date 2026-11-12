@@ -1,10 +1,6 @@
 using System.Numerics;
 using AwesomeAssertions;
-using Soteo.Core.Dto;
-using Soteo.Core.Exceptions;
-using Soteo.Core.Models;
-using Soteo.Core.Services;
-using Soteo.Core.Services.Serializers;
+using Soteo.Core.Serialization;
 
 namespace Soteo.Core.Tests;
 

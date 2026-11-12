@@ -1,8 +1,6 @@
-using Soteo.Core.Abilities;
-using Soteo.Core.Statuses;
 using Soteo.Util;
 
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Statuses;
 
 public record PuppetStatusContext
 {

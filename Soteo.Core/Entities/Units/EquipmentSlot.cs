@@ -1,4 +1,4 @@
-namespace Soteo.Core.Enums;
+namespace Soteo.Core.Entities.Units;
 
 public enum EquipmentSlot
 {

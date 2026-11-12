@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Core.Dto.Snapshots;
 
-namespace Soteo.Core.Dto.Deltas;
+namespace Soteo.Core.Synchronization.Deltas;
 
 public sealed record ShardSnapshotDelta
 {

@@ -1,10 +1,4 @@
-using Soteo.Core.Attributes;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
-using Soteo.Core.StaticHelpers;
-
-namespace Soteo.Core.Services.PacketHandlers.Gameplay;
+namespace Soteo.Core.PacketHandlers.Gameplay;
 
 [GameplayPacketHandler]
 [AllowClientPackets]

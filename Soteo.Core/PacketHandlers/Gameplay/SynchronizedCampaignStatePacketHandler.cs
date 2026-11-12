@@ -1,8 +1,4 @@
-using Soteo.Core.Attributes;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services.PacketHandlers.Gameplay;
+namespace Soteo.Core.PacketHandlers.Gameplay;
 
 [GameplayPacketHandler]
 public sealed class SynchronizedCampaignStatePacketHandler(ISynchronizedCampaignStatePacketReceiver receiver) :

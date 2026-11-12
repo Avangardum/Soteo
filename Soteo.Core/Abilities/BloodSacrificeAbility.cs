@@ -1,6 +1,3 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Enums;
-
 namespace Soteo.Core.Abilities;
 
 public sealed class BloodSacrificeAbility : Ability

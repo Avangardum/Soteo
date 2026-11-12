@@ -1,4 +1,4 @@
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Entities;
 
 public interface IEntityNodeManager
 {

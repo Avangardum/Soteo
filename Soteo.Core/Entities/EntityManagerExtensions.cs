@@ -1,8 +1,4 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Entities;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Extensions;
+namespace Soteo.Core.Entities;
 
 public static class EntityManagerExtensions
 {

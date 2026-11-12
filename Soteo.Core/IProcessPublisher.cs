@@ -1,6 +1,4 @@
-using Soteo.Core.Enums;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core;
 
 /// <summary>
 /// Allows to subscribe to Godot process and physics process events.

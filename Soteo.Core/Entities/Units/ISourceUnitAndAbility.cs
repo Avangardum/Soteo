@@ -1,8 +1,4 @@
-using Soteo.Core.Abilities;
-using Soteo.Core.Dto;
-using Soteo.Core.Entities;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Entities.Units;
 
 /// <summary>
 /// Object containing information about a unit and ability being source of some effect.

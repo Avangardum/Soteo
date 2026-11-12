@@ -1,8 +1,4 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services.Serializers.PacketSerializers;
+namespace Soteo.Core.Serialization.Packet;
 
 public sealed class SynchronizedCampaignStatePacketSerializer(ISerializationHelper s) :
     PacketSerializer<SynchronizedCampaignStatePacket>(s)

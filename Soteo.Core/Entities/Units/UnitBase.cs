@@ -1,9 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Core.Dto;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Entities;
+namespace Soteo.Core.Entities.Units;
 
 /// <summary>
 /// The base class for server-side Unit and client-side UnitPuppet

@@ -1,11 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Abilities;
-using Soteo.Core.Entities;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Statuses;
 
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Statuses;
 
 public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
 {

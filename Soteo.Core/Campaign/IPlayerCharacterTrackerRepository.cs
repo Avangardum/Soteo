@@ -1,7 +1,4 @@
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Models;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Campaign;
 
 /// <summary>
 /// Campaign server repository containing trackers for all player characters

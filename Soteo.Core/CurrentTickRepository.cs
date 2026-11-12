@@ -1,7 +1,4 @@
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services.Repositories;
+namespace Soteo.Core;
 
 /// <summary>
 /// Stores current tick on a shard server

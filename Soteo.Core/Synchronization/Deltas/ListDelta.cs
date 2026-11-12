@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Soteo.Core.Dto.Deltas;
+namespace Soteo.Core.Synchronization.Deltas;
 
 public static class ListDelta
 {

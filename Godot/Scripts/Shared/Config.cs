@@ -1,8 +1,10 @@
 using System.Collections.Immutable;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Dto.Options;
-using Soteo.Core.Enums;
+using Soteo.Core;
+using Soteo.Core.Campaign;
+using Soteo.Core.Client;
+using Soteo.Core.Networking;
 using Soteo.Main.Gameplay;
 
 namespace Soteo.Main.Shared;

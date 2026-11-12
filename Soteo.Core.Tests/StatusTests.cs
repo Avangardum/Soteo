@@ -1,5 +1,4 @@
 using AwesomeAssertions;
-using Soteo.Core.Enums;
 using Soteo.Core.Statuses;
 
 namespace Soteo.Core.Tests;

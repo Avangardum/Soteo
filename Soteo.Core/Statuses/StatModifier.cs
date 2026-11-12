@@ -1,6 +1,4 @@
-using Soteo.Core.Enums;
-
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Statuses;
 
 /// <param name="Priority">
 /// When modifiers contradict each other, the one with the highest priority wins.

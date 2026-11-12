@@ -1,7 +1,4 @@
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
-
-namespace Soteo.Core.Dto.Deltas;
+namespace Soteo.Core.Synchronization.Deltas;
 
 public sealed record EquipmentInventoryDelta(DictionaryDelta<EquipmentSlot, ItemStack?> Stacks)
 {

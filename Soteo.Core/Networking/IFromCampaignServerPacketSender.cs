@@ -1,7 +1,4 @@
-using Soteo.Core.Dto.Packets;
-using Soteo.Util.Interfaces;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Networking;
 
 public interface IFromCampaignServerPacketSender
 {

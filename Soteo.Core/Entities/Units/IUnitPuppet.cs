@@ -1,10 +1,4 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Deltas;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Entities;
+namespace Soteo.Core.Entities.Units;
 
 public interface IUnitPuppet : IEntity
 {

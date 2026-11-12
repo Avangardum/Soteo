@@ -1,9 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Core.Abilities;
-using Soteo.Core.Dto.Deltas;
-using Soteo.Core.Enums;
 
-namespace Soteo.Core.Dto.Snapshots;
+namespace Soteo.Core.Synchronization.Snapshots;
 
 public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
 {

@@ -1,9 +1,7 @@
-using Soteo.Core.Dto.Packets;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Serialization;
 
 public interface IPacketSerializer
 {
-    Packet Deserialize(Span<byte> bytes);
-    byte[] Serialize(Packet packet);
+    Packets.Packet Deserialize(Span<byte> bytes);
+    byte[] Serialize(Packets.Packet packet);
 }

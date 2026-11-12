@@ -1,6 +1,6 @@
+using Soteo.Core;
 using Soteo.Core.Entities;
-using Soteo.Core.Interfaces;
-using Soteo.Core.StaticHelpers;
+using Soteo.Core.Entities.Units;
 
 namespace Soteo.Main.Gameplay.EntityNodes;
 

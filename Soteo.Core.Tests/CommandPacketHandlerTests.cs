@@ -1,9 +1,10 @@
 using AwesomeAssertions;
 using NSubstitute;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Packets.Command;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Services.PacketHandlers.Gameplay.Command;
+using Soteo.Core.Campaign;
+using Soteo.Core.Commands;
+using Soteo.Core.Entities;
+using Soteo.Core.PacketHandlers.Gameplay.Command;
+using Soteo.Core.Packets.Command;
 
 namespace Soteo.Core.Tests;
 

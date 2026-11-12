@@ -1,12 +1,12 @@
 using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
-using Soteo.Core.Dto.Options;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Exceptions;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Models;
-using Soteo.Core.StaticHelpers;
+using Soteo.Core;
+using Soteo.Core.Campaign;
+using Soteo.Core.Networking;
+using Soteo.Core.PacketHandlers;
+using Soteo.Core.Packets;
+using Soteo.Core.Serialization;
 using Soteo.Util;
 
 namespace Soteo.Main.CampaignServer.Communicators;

@@ -1,4 +1,4 @@
-namespace Soteo.Core.Enums;
+namespace Soteo.Core.Entities;
 
 public enum EntityKind : byte
 {

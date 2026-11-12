@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Interfaces;
+using Soteo.Core;
 
 namespace Soteo.Main.Gameplay.Services;
 

@@ -1,6 +1,4 @@
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Services;
+namespace Soteo.Core.Client;
 
 public sealed class ClientInitializer
 {

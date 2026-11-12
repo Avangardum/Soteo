@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Entities;
 
 /// <summary>
 /// Searches entities by id in all loaded shards

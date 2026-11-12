@@ -1,10 +1,4 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-using Soteo.Core.StaticHelpers;
-
-namespace Soteo.Core.Services.Repositories;
+namespace Soteo.Core.Campaign;
 
 /// <inheritdoc/>
 public sealed class SynchronizedCampaignStateRepository : ISynchronizedCampaignStateRepository

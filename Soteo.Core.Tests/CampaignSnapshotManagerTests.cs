@@ -2,13 +2,11 @@ using System.Collections.Immutable;
 using AwesomeAssertions;
 using Microsoft.Extensions.Time.Testing;
 using NSubstitute.ExceptionExtensions;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Models;
-using Soteo.Core.Services;
-using Soteo.Core.Services.Repositories;
+using Soteo.Core.Campaign;
+using Soteo.Core.Networking;
+using Soteo.Core.Packets;
+using Soteo.Core.Persistence;
+using Soteo.Core.Synchronization.Snapshots;
 
 namespace Soteo.Core.Tests;
 

@@ -1,7 +1,4 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Deltas;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Entities.Units;
 
 public interface IInventory : IReadOnlyList<ItemStack?>
 {

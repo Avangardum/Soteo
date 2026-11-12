@@ -1,8 +1,4 @@
-using Soteo.Core.Interfaces;
-using Soteo.Util;
-using Soteo.Util.Interfaces;
-
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Networking;
 
 public sealed class ShardServerAllowlist : IShardServerAllowlist
 {

@@ -1,12 +1,7 @@
 ﻿using System.Collections.Immutable;
 using System.Reflection;
-using Soteo.Core.Attributes;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Enums;
-using Soteo.Core.Exceptions;
-using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Services.Serializers.PacketSerializers;
+namespace Soteo.Core.Serialization.Packet;
 
 public static class PacketSerializer
 {
@@ -28,7 +23,7 @@ public static class PacketSerializer
     {
         IReadOnlyList<Type> locatedSerializerTypes = typeLocator.ConcreteSubclassesOf<IPacketSerializer>();
         return typeLocator
-            .ConcreteSubclassesOf<Packet>()
+            .ConcreteSubclassesOf<Packets.Packet>()
             .ToImmutableDictionary(it => it, it => InitTypeFor(it, locatedSerializerTypes));
     }
 
@@ -66,9 +61,9 @@ public static class PacketSerializer
     }
 }
 
-public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Packet
+public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Packets.Packet
 {
-    byte[] IPacketSerializer.Serialize(Packet packet) => Serialize((TPacket)packet);
+    byte[] IPacketSerializer.Serialize(Packets.Packet packet) => Serialize((TPacket)packet);
 
     public byte[] Serialize(TPacket packet)
     {
@@ -80,7 +75,7 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
 
     protected abstract void SerializeInternal(TPacket packet, Stream stream);
 
-    Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
+    Packets.Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
 
     public TPacket Deserialize(Span<byte> bytes)
     {

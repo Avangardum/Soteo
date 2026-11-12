@@ -1,11 +1,6 @@
 using System.Numerics;
-using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Abilities;
-using Soteo.Core.Entities;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Synchronization.Snapshots;
 
 public sealed record AbilityContextSnapshot
 {

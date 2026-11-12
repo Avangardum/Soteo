@@ -1,9 +1,6 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
 using Soteo.Util;
 
-namespace Soteo.Core.Services.Repositories;
+namespace Soteo.Core.Campaign;
 
 /// <inheritdoc cref="ISynchronizedCampaignStateRepository" />
 public sealed class SynchronizedCampaignStatePuppetRepository :

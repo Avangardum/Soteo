@@ -1,15 +1,9 @@
 using System.Collections.Immutable;
 using System.Numerics;
-using Soteo.Core.Abilities;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Commands;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Statuses;
+using Soteo.Core.Commands;
 using Soteo.Util;
 
-namespace Soteo.Core.Entities;
+namespace Soteo.Core.Entities.Units;
 
 public abstract class Unit : UnitBase<IUnitNode>
 {

@@ -1,10 +1,6 @@
 using System.Collections;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Deltas;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
 
-namespace Soteo.Core;
+namespace Soteo.Core.Entities.Units;
 
 public sealed class EquipmentInventory : IEquipmentInventory
 {

@@ -1,6 +1,4 @@
-using Soteo.Core.Attributes;
-
-namespace Soteo.Core.Dto.Packets;
+namespace Soteo.Core.Packets;
 
 [EmptyPacket]
 public sealed record CampaignServerHandshakeAckPacket : Packet;

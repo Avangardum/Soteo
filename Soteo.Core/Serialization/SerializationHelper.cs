@@ -2,27 +2,15 @@ using System.Buffers.Binary;
 using System.Collections.Immutable;
 using System.Numerics;
 using System.Text;
-using Soteo.Core.Abilities;
-using Soteo.Core.Attributes;
-using Soteo.Core.Delegates;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
-using Soteo.Core.Exceptions;
-using Soteo.Core.Interfaces;
-using Soteo.Core.Items;
-using Soteo.Core.StaticHelpers;
-using Soteo.Core.Statuses;
 
-namespace Soteo.Core.Services.Serializers;
+namespace Soteo.Core.Serialization;
 
 public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelper
 {
     private readonly IReadOnlyList<Type> _abilityTypes = typeLocator.ConcreteSubclassesOf<Ability>();
     private readonly IReadOnlyList<Type> _statusTypes = typeLocator.ConcreteSubclassesOf<Status>();
     private readonly IReadOnlyList<Type> _itemTypes = typeLocator.ConcreteSubclassesOf<Item>();
-    private readonly IReadOnlyList<Type> _packetTypes = typeLocator.ConcreteSubclassesOf<Packet>();
+    private readonly IReadOnlyList<Type> _packetTypes = typeLocator.ConcreteSubclassesOf<Packets.Packet>();
 
     public void SerializeByte(byte value, Stream stream) => stream.WriteByte(value);
 
@@ -341,7 +329,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 
     public void SerializePacketType(Type type, Stream stream)
     {
-        if (!type.IsAssignableTo(typeof(Packet)))
+        if (!type.IsAssignableTo(typeof(Packets.Packet)))
             throw new ArgumentException($"{type} is not a packet");
         int index = _packetTypes.IndexOf(type);
         SerializeInt(index, stream);

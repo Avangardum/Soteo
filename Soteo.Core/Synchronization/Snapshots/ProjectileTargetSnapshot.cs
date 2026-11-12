@@ -1,9 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using Microsoft.Extensions.DependencyInjection;
-using Soteo.Core.Interfaces;
 
-namespace Soteo.Core.Dto;
+namespace Soteo.Core.Synchronization.Snapshots;
 
 public class ProjectileTargetSnapshot
 {

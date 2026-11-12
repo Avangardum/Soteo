@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
 using Soteo.Core;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Interfaces;
-using Soteo.Core.StaticHelpers;
+using Soteo.Core.Client;
+using Soteo.Core.Networking;
+using Soteo.Core.Packets;
 using Soteo.Main.Gameplay.Interfaces;
 
 namespace Soteo.Main.Gameplay.Ui;

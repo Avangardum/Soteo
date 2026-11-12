@@ -1,7 +1,4 @@
-using Soteo.Core.Dto;
-using Soteo.Core.Entities;
-
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Entities;
 
 public interface IEntityManager
 {

@@ -1,10 +1,6 @@
 using System.Collections.Immutable;
-using Soteo.Core.Dto.Packets;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Interfaces;
-using Soteo.Util;
 
-namespace Soteo.Core.Services;
+namespace Soteo.Core.Persistence;
 
 public sealed class CampaignSnapshotManager
 (

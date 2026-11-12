@@ -1,14 +1,7 @@
 using System.Collections.Immutable;
 using System.Numerics;
-using Soteo.Core.Abilities;
-using Soteo.Core.Delegates;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Enums;
-using Soteo.Core.Items;
-using Soteo.Core.Statuses;
 
-namespace Soteo.Core.Interfaces;
+namespace Soteo.Core.Serialization;
 
 public interface ISerializationHelper
 {

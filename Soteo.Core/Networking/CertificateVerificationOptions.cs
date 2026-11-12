@@ -1,4 +1,4 @@
-namespace Soteo.Core.Dto.Options;
+namespace Soteo.Core.Networking;
 
 public sealed record CertificateVerificationOptions
 {

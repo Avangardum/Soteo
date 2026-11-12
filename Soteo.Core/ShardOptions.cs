@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Soteo.Core.Dto.Options;
+namespace Soteo.Core;
 
 public sealed record ShardOptions
 {

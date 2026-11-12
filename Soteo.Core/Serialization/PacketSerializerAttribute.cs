@@ -1,6 +1,4 @@
-using Soteo.Core.Interfaces;
-
-namespace Soteo.Core.Attributes;
+namespace Soteo.Core.Serialization;
 
 [AttributeUsage(AttributeTargets.Class)]
 public abstract class PacketSerializerAttribute : Attribute

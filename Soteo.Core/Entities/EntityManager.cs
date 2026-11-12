@@ -1,14 +1,7 @@
 using System.Collections.Immutable;
 using System.Numerics;
-using Soteo.Core.Dto;
-using Soteo.Core.Dto.Deltas;
-using Soteo.Core.Dto.Snapshots;
-using Soteo.Core.Entities;
-using Soteo.Core.Enums;
-using Soteo.Core.Interfaces;
-using Soteo.Core.SidedDependencies;
 
-namespace Soteo.Core.Services;
+namespace Soteo.Core.Entities;
 
 public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 {

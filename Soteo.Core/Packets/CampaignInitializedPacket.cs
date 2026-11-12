@@ -1,7 +1,4 @@
-using Soteo.Core.Attributes;
-using Soteo.Core.Enums;
-
-namespace Soteo.Core.Dto.Packets;
+namespace Soteo.Core.Packets;
 
 /// <summary>
 /// Sent from the campaign server to shard servers to notify that it has finished initializing and

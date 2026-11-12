@@ -1,4 +1,4 @@
-namespace Soteo.Core.Exceptions;
+namespace Soteo.Core.Serialization;
 
 /// <summary>
 /// Exception thrown when deserialization fails due to bad input data
