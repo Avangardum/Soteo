@@ -18,7 +18,7 @@ config/icon="res://Textures/icon.png"
 
 [autoload]
 
-AsyncExceptionCollectorNode="*res://Scripts/Shared/Nodes/Autoloads/AsyncExceptionCollectorNode.cs"
+AsyncExceptionCollectorNode="*res://Scripts/AsyncExceptionCollectorNode.cs"
 
 [dotnet]
 

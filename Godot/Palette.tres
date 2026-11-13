@@ -1,6 +1,6 @@
 [gd_resource type="Resource" format=3 uid="uid://bcq1igqijssco"]
 
-[ext_resource type="Script" uid="uid://dn6fu2omgbort" path="res://Scripts/Gameplay/Resources/Palette.cs" id="1"]
+[ext_resource type="Script" uid="uid://dn6fu2omgbort" path="res://Scripts/Gameplay/Ui/Palette.cs" id="1"]
 
 [resource]
 script = ExtResource("1")
