@@ -3,10 +3,8 @@ using Soteo.Core.Networking;
 using Soteo.Core.PacketHandlers;
 using Soteo.Core.Packets;
 using Soteo.Core.Serialization;
-using Soteo.Main.Gameplay.Interfaces;
-using Soteo.Util;
 
-namespace Soteo.Main.Gameplay.Services.Communicators;
+namespace Soteo.Main.Gameplay.Communicators;
 
 /// <summary>
 /// Communicates between clients and shard servers

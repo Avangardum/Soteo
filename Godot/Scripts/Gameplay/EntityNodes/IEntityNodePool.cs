@@ -1,6 +1,6 @@
 using Soteo.Core.Entities;
 
-namespace Soteo.Main.Gameplay.Interfaces;
+namespace Soteo.Main.Gameplay.EntityNodes;
 
 public interface IEntityNodePool
 {

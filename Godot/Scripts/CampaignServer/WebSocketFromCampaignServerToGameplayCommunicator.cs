@@ -7,9 +7,8 @@ using Soteo.Core.Networking;
 using Soteo.Core.PacketHandlers;
 using Soteo.Core.Packets;
 using Soteo.Core.Serialization;
-using Soteo.Util;
 
-namespace Soteo.Main.CampaignServer.Communicators;
+namespace Soteo.Main.CampaignServer;
 
 public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
     GodotObject, IFromCampaignServerCommunicator

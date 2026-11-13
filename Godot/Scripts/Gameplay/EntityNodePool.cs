@@ -1,9 +1,9 @@
 using Soteo.Core.Entities;
 using Soteo.Core.Entities.Projectiles;
 using Soteo.Core.Entities.Units;
-using Soteo.Main.Gameplay.Interfaces;
+using Soteo.Main.Gameplay.EntityNodes;
 
-namespace Soteo.Main.Gameplay.Services;
+namespace Soteo.Main.Gameplay;
 
 public sealed class EntityNodePool : IEntityNodePool
 {

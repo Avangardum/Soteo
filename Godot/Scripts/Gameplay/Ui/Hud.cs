@@ -9,8 +9,6 @@ using Soteo.Core.Localization;
 using Soteo.Core.Networking;
 using Soteo.Core.Packets.Commands;
 using Soteo.Core.Statuses;
-using Soteo.Main.Gameplay.Interfaces;
-using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.Ui;
 

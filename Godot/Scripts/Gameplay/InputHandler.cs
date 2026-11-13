@@ -8,11 +8,9 @@ using Soteo.Core.Entities.Units;
 using Soteo.Core.Networking;
 using Soteo.Core.Packets.Commands;
 using Soteo.Main.Gameplay.EntityNodes;
-using Soteo.Main.Gameplay.Enums;
-using Soteo.Main.Gameplay.Interfaces;
-using Soteo.Util;
+using Soteo.Main.Gameplay.Ui;
 
-namespace Soteo.Main.Gameplay.Services;
+namespace Soteo.Main.Gameplay;
 
 public sealed partial class InputHandler : Node2D
 {

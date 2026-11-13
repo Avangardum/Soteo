@@ -14,14 +14,12 @@ using Soteo.Core.Persistence;
 using Soteo.Core.Serialization;
 using Soteo.Core.Serialization.Packets;
 using Soteo.Core.Synchronization;
-using Soteo.Main.Gameplay.Interfaces;
-using Soteo.Main.Gameplay.Resources;
-using Soteo.Main.Gameplay.Services;
-using Soteo.Main.Gameplay.Services.Communicators;
+using Soteo.Main.Gameplay.Communicators;
+using Soteo.Main.Gameplay.EntityNodes;
 using Soteo.Main.Gameplay.Ui;
-using Soteo.Main.Shared;
-using Soteo.Main.Shared.Nodes;
-using Soteo.Util;
+using Palette = Soteo.Main.Gameplay.Ui.Palette;
+using WebRtcFromGameplayToGameplayCommunicator = Soteo.Main.Gameplay.Communicators.WebRtcFromGameplayToGameplayCommunicator;
+using WebSocketFromGameplayToCampaignServerCommunicator = Soteo.Main.Gameplay.Communicators.WebSocketFromGameplayToCampaignServerCommunicator;
 
 namespace Soteo.Main.Gameplay;
 

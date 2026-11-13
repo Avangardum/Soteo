@@ -1,7 +1,6 @@
 using Soteo.Core.Packets;
-using Soteo.Main.Gameplay.Interfaces;
 
-namespace Soteo.Main.Gameplay.Services.Communicators;
+namespace Soteo.Main.Gameplay.Communicators;
 
 public sealed class PacketChunkCollector : IPacketChunkCollector
 {

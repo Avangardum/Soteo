@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Soteo.Core;
 
-namespace Soteo.Main.Shared;
+namespace Soteo.Main;
 
 public sealed class FrameStopwatch : IFrameStopwatch
 {

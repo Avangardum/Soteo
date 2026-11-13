@@ -9,7 +9,6 @@ using Soteo.Core.Entities.Units;
 using Soteo.Core.Items;
 using Soteo.Core.Statuses;
 using Soteo.TestUtil;
-using Soteo.Util;
 
 namespace Soteo.Core.Tests;
 

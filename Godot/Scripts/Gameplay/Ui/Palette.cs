@@ -1,7 +1,6 @@
 using Soteo.Core;
-using Soteo.Main.Gameplay.Interfaces;
 
-namespace Soteo.Main.Gameplay.Resources;
+namespace Soteo.Main.Gameplay.Ui;
 
 public sealed partial class Palette : Resource, IPalette
 {

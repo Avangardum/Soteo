@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Soteo.Main.Gameplay;
 
-namespace Soteo.Main.Shared.Extensions;
+namespace Soteo.Main;
 
 public static class ServiceCollectionExtensions
 {

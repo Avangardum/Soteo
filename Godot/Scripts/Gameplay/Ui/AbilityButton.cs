@@ -1,5 +1,3 @@
-using Soteo.Util;
-
 namespace Soteo.Main.Gameplay.Ui;
 
 public sealed partial class AbilityButton : TextureButton

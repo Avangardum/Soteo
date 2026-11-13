@@ -1,7 +1,7 @@
 using Soteo.Core.Entities;
-using Soteo.Main.Gameplay.Interfaces;
+using Soteo.Main.Gameplay.EntityNodes;
 
-namespace Soteo.Main.Gameplay.Services;
+namespace Soteo.Main.Gameplay;
 
 public sealed class EntityNodeManager(ShardNode shard, IEntityNodePool pool) : IEntityNodeManager
 {

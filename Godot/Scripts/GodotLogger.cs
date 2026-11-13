@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Soteo.Main.Shared;
+namespace Soteo.Main;
 
 internal sealed class GodotLogger : ILogger
 {

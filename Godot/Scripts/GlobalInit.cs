@@ -1,7 +1,7 @@
 using System.Globalization;
 using Soteo.Core;
 
-namespace Soteo.Main.Shared;
+namespace Soteo.Main;
 
 public static class GlobalInit
 {

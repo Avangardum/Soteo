@@ -1,7 +1,6 @@
 using Soteo.Core;
 using Soteo.Core.Client;
 using Soteo.Core.Entities;
-using Soteo.Util;
 
 namespace Soteo.Main.Gameplay;
 

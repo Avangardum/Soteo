@@ -1,4 +1,4 @@
-namespace Soteo.Main.Gameplay.Interfaces;
+namespace Soteo.Main.Gameplay.Communicators;
 
 public interface IShardServerConnector
 {

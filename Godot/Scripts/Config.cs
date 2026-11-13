@@ -4,9 +4,8 @@ using Soteo.Core;
 using Soteo.Core.Campaign;
 using Soteo.Core.Client;
 using Soteo.Core.Networking;
-using Soteo.Util;
 
-namespace Soteo.Main.Shared;
+namespace Soteo.Main;
 
 internal static class Config
 {

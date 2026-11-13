@@ -2,7 +2,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using FileAccess = Godot.FileAccess;
 
-namespace Soteo.Main.Shared.Extensions;
+namespace Soteo.Main;
 
 public static class ConfigurationBuilderExtensions
 {

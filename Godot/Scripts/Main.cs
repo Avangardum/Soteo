@@ -1,4 +1,4 @@
-namespace Soteo.Main.Shared.Nodes;
+namespace Soteo.Main;
 
 public sealed partial class Main : Node
 {

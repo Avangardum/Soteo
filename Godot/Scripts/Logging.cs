@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace Soteo.Main.Shared;
+namespace Soteo.Main;
 
 public static class Logging
 {

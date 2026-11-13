@@ -2,7 +2,7 @@ using Soteo.Core.Abilities;
 using Soteo.Core.Items;
 using Soteo.Core.Statuses;
 
-namespace Soteo.Main.Shared.Extensions;
+namespace Soteo.Main;
 
 public static class IconExtensions
 {

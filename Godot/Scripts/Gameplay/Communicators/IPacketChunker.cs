@@ -1,6 +1,6 @@
 using Soteo.Core.Packets;
 
-namespace Soteo.Main.Gameplay.Interfaces;
+namespace Soteo.Main.Gameplay.Communicators;
 
 public interface IPacketChunker
 {

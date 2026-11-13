@@ -10,10 +10,6 @@ using Soteo.Core.Persistence;
 using Soteo.Core.Serialization;
 using Soteo.Core.Serialization.Packets;
 using Soteo.Core.Synchronization.Snapshots;
-using Soteo.Main.CampaignServer.Communicators;
-using Soteo.Main.Shared;
-using Soteo.Main.Shared.Nodes;
-using Soteo.Util;
 using File = System.IO.File;
 using Path = System.IO.Path;
 

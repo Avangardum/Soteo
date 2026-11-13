@@ -2,7 +2,7 @@ using Soteo.Core;
 using Soteo.Core.Client;
 using Soteo.Core.Networking;
 using Soteo.Core.Packets;
-using Soteo.Main.Gameplay.Interfaces;
+using Soteo.Main.Gameplay.Communicators;
 
 namespace Soteo.Main.Gameplay.Ui;
 

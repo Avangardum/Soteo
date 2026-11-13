@@ -1,8 +1,6 @@
 using Soteo.Core;
 using Soteo.Core.Entities;
 using Soteo.Core.Entities.Units;
-using Soteo.Main.Gameplay.Interfaces;
-using Soteo.Util;
 
 namespace Soteo.Main.Gameplay.EntityNodes;
 

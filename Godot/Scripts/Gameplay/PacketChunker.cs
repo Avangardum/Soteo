@@ -1,10 +1,9 @@
 using AwesomeAssertions;
 using Soteo.Core.Packets;
 using Soteo.Core.Serialization;
-using Soteo.Main.Gameplay.Interfaces;
-using Soteo.Util;
+using Soteo.Main.Gameplay.Communicators;
 
-namespace Soteo.Main.Gameplay.Services;
+namespace Soteo.Main.Gameplay;
 
 public sealed class PacketChunker : IPacketChunker
 {

@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 using Soteo.Core;
 
-namespace Soteo.Main.Gameplay.Services;
+namespace Soteo.Main.Gameplay;
 
 public sealed class ShardServiceProviders(IReadOnlyDictionary<Guid, IServiceScope> scopes) : IShardServiceProviders
 {

@@ -1,5 +1,3 @@
-using Soteo.Util;
-
 namespace Soteo.Main.Gameplay.EntityNodes;
 
 public sealed partial class AzimuthIndicator : Line2D

@@ -1,6 +1,6 @@
 using Godot.Collections;
 
-namespace Soteo.Main.Shared;
+namespace Soteo.Main;
 
 public sealed partial class CrashOnExceptionLogger(SceneTree sceneTree) : Logger
 {

@@ -1,6 +1,6 @@
 using Soteo.Core.Campaign;
 
-namespace Soteo.Main.Gameplay.Services;
+namespace Soteo.Main.Gameplay;
 
 public sealed class SceneTreePauser
 {

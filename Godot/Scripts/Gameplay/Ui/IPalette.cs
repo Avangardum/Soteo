@@ -1,6 +1,6 @@
 using Soteo.Core;
 
-namespace Soteo.Main.Gameplay.Interfaces;
+namespace Soteo.Main.Gameplay.Ui;
 
 public interface IPalette
 {

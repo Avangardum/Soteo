@@ -1,7 +1,6 @@
 using Soteo.Core;
-using Soteo.Util;
 
-namespace Soteo.Main.Shared.Nodes;
+namespace Soteo.Main;
 
 public sealed partial class ProcessPublisher : Node, IProcessPublisher
 {

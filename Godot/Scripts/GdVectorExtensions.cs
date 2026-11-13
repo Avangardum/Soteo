@@ -1,6 +1,4 @@
-using Soteo.Util;
-
-namespace Soteo.Main.Shared.Extensions;
+namespace Soteo.Main;
 
 public static class GdVectorExtensions
 {

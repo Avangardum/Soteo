@@ -1,7 +1,7 @@
 using Soteo.Core;
 using Soteo.Core.Localization;
 
-namespace Soteo.Main.Gameplay.Services;
+namespace Soteo.Main.Gameplay;
 
 public sealed class Localizer : ILocalizer
 {

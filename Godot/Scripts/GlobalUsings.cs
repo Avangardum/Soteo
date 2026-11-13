@@ -3,7 +3,6 @@ global using System.Collections.ObjectModel;
 global using System.Numerics;
 global using Godot;
 global using Soteo.Util;
-global using Soteo.Main.Shared.Extensions;
 global using SysEnvironment = System.Environment;
 global using GdEnvironment = Godot.Environment;
 global using GdArray = Godot.Collections.Array;
