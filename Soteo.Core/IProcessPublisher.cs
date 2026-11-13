@@ -7,7 +7,7 @@ namespace Soteo.Core;
 /// </summary>
 public interface IProcessPublisher
 {
-    IDisposable SubscribeToProcess(Action<double> handler, ProcessPriorityEnum priority, bool callWhenPaused);
+    IDisposable SubscribeToProcess(Action<double> handler, ProcessPriority priority, bool callWhenPaused);
 
-    IDisposable SubscribeToPhysicsProcess(Action<double> handler, ProcessPriorityEnum priority, bool callWhenPaused);
+    IDisposable SubscribeToPhysicsProcess(Action<double> handler, ProcessPriority priority, bool callWhenPaused);
 }

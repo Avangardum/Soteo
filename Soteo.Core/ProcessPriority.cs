@@ -1,6 +1,6 @@
 namespace Soteo.Core;
 
-public enum ProcessPriorityEnum
+public enum ProcessPriority
 {
     Min = -1000,
     FrameStopwatch,

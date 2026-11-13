@@ -29,7 +29,7 @@ public sealed class OverheadUi
         _palette = palette;
 
         node.Name = $"{nameof(OverheadUi)} {unit.Id}";
-        node.ProcessPriority = (int)ProcessPriorityEnum.OverheadUi;
+        node.ProcessPriority = (int)ProcessPriority.OverheadUi;
         node.OverheadUi = this;
         _node = node;
         _playerCharacterPanel = node.GetNode<Control>("PlayerCharacter");

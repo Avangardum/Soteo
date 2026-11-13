@@ -36,7 +36,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
 
         connectionNotifier.PeerConnected += OnPeerConnected;
         _physicsProcessSubscription = processPublisher
-            .SubscribeToPhysicsProcess(Tick, ProcessPriorityEnum.SynchronizationServer, callWhenPaused: true);
+            .SubscribeToPhysicsProcess(Tick, ProcessPriority.SynchronizationServer, callWhenPaused: true);
     }
 
     public void Dispose()

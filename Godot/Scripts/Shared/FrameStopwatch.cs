@@ -13,13 +13,13 @@ public sealed class FrameStopwatch : IFrameStopwatch
         processPublisher.SubscribeToProcess
         (
             _processStopwatch.Restart,
-            ProcessPriorityEnum.FrameStopwatch,
+            ProcessPriority.FrameStopwatch,
             callWhenPaused: true
         );
         processPublisher.SubscribeToPhysicsProcess
         (
             _physicsProcessStopwatch.Restart,
-            ProcessPriorityEnum.FrameStopwatch,
+            ProcessPriority.FrameStopwatch,
             callWhenPaused: true
         );
     }

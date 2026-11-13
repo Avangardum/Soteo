@@ -52,8 +52,8 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
         _serverOptions = serverOptions;
 
         Name = nameof(WebSocketFromGameplayToCampaignServerCommunicator);
-        ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        ProcessPhysicsPriority = (int)ProcessPriorityEnum.Communicator;
+        ProcessPriority = (int)Core.ProcessPriority.Communicator;
+        ProcessPhysicsPriority = (int)Core.ProcessPriority.Communicator;
         ProcessMode = ProcessModeEnum.Always;
 
         if (!certificateVerificationOptions.VerifyCertificate)

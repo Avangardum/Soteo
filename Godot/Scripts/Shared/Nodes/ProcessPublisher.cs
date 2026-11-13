@@ -5,14 +5,14 @@ namespace Soteo.Main.Shared.Nodes;
 
 public sealed partial class ProcessPublisher : Node, IProcessPublisher
 {
-    private readonly Dictionary<ProcessPriorityEnum, Subscriptions> _subscriptionsByPriority = [];
+    private readonly Dictionary<ProcessPriority, Subscriptions> _subscriptionsByPriority = [];
 
     public override void _Ready()
     {
         Name = nameof(ProcessPublisher);
     }
 
-    public IDisposable SubscribeToProcess(Action<double> handler, ProcessPriorityEnum priority, bool callWhenPaused)
+    public IDisposable SubscribeToProcess(Action<double> handler, ProcessPriority priority, bool callWhenPaused)
     {
         return Subscribe(it => it.Process, handler, priority, callWhenPaused);
     }
@@ -20,7 +20,7 @@ public sealed partial class ProcessPublisher : Node, IProcessPublisher
     public IDisposable SubscribeToPhysicsProcess
     (
         Action<double> handler,
-        ProcessPriorityEnum priority,
+        ProcessPriority priority,
         bool callWhenPaused
     )
     {
@@ -31,7 +31,7 @@ public sealed partial class ProcessPublisher : Node, IProcessPublisher
     (
         Func<Subscriptions, List<Action<double>>> listSelector,
         Action<double> handler,
-        ProcessPriorityEnum priority,
+        ProcessPriority priority,
         bool callWhenPaused
     )
     {
@@ -64,7 +64,7 @@ public sealed partial class ProcessPublisher : Node, IProcessPublisher
 
     private sealed record Subscriptions(List<Action<double>> Process, List<Action<double>> PhysicsProcess);
 
-    private sealed partial class ProcessListener(Subscriptions subscriptions, ProcessPriorityEnum priority) : Node
+    private sealed partial class ProcessListener(Subscriptions subscriptions, ProcessPriority priority) : Node
     {
         public override void _Ready()
         {

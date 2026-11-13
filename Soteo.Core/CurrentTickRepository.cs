@@ -12,7 +12,7 @@ public sealed class CurrentTickRepository : ICurrentTickRepository, IDisposable
     public CurrentTickRepository(IProcessPublisher processPublisher)
     {
         _physicsProcessSubscription = processPublisher
-            .SubscribeToPhysicsProcess(() => Tick++, ProcessPriorityEnum.CurrentTickRepository, callWhenPaused: false);
+            .SubscribeToPhysicsProcess(() => Tick++, ProcessPriority.CurrentTickRepository, callWhenPaused: false);
     }
 
     public void Dispose()

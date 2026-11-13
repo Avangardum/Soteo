@@ -30,7 +30,7 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         _packetSender = packetSender;
 
         _processSubscription =
-            processPublisher.SubscribeToProcess(Process, ProcessPriorityEnum.Default, callWhenPaused: true);
+            processPublisher.SubscribeToProcess(Process, ProcessPriority.Default, callWhenPaused: true);
     }
 
     public void Dispose()

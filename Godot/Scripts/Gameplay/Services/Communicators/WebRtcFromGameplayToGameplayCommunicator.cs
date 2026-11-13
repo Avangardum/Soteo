@@ -59,8 +59,8 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         _sideOptions = sideOptions;
 
         Name = nameof(WebRtcFromGameplayToGameplayCommunicator);
-        ProcessPriority = (int)ProcessPriorityEnum.Communicator;
-        ProcessPhysicsPriority = (int)ProcessPriorityEnum.Communicator;
+        ProcessPriority = (int)Core.ProcessPriority.Communicator;
+        ProcessPhysicsPriority = (int)Core.ProcessPriority.Communicator;
         ProcessMode = ProcessModeEnum.Always;
     }
 

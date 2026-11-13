@@ -19,7 +19,7 @@ public sealed class SynchronizedCampaignStateRepository : ISynchronizedCampaignS
         connectionNotifier.PeerConnected += OnPeerConnected;
 
         processPublisher
-            .SubscribeToPhysicsProcess(Tick, ProcessPriorityEnum.SynchronizationServer, callWhenPaused: true);
+            .SubscribeToPhysicsProcess(Tick, ProcessPriority.SynchronizationServer, callWhenPaused: true);
     }
 
     public SynchronizedCampaignState Value
