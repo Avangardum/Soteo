@@ -60,7 +60,7 @@ public sealed class DebugScreen
         {
             _pendingProcessCount--;
             IServiceProvider? shardServiceProvider =
-                _visibleShardIdRepository.Id?.PassTo(_shardServiceProviders.GetOrDefault);
+                _visibleShardIdRepository.Id?.PassTo(_shardServiceProviders.GetValueOrDefault);
             var synchronizationClient = shardServiceProvider?.GetRequiredService<IShardSynchronizationClient>();
             var entityManager = shardServiceProvider?.GetRequiredService<IEntityManager>();
 

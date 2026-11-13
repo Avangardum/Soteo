@@ -13,7 +13,7 @@ public sealed record ShardSnapshotDelta
             Entities = new DictionaryDelta<Guid, EntitySnapshotDelta>
             {
                 Changes = to.Entities.Values
-                    .Select(it => it.DeltaFrom(from.Entities.GetOrDefault(it.Id)))
+                    .Select(it => it.DeltaFrom(from.Entities.GetValueOrDefault(it.Id)))
                     .Where(it => it.HasChanged)
                     .ToDictionary(it => it.Id, it => it).AsReadOnly(),
                 RemovedKeys = from.Entities.Keys.Except(to.Entities.Keys).ToList().AsReadOnly()

@@ -317,13 +317,13 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
     {
         string type = _sideOptions.Side == Side.ShardServer ? "offer" : "answer";
         WebRtcPeerConnection? connection = _sideOptions.Side == Side.ShardServer ? CreateConnection(packet.PeerId) :
-            _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
+            _peerConnectionsAndChannels.GetValueOrDefault(packet.PeerId)?.Connection;
         connection?.SetRemoteDescription(type, packet.Sdp).ShouldBeOk();
     }
 
     public void ReceiveWebrtcIceCandidatePacket(WebrtcIceCandidatePacket packet)
     {
-        WebRtcPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
+        WebRtcPeerConnection? connection = _peerConnectionsAndChannels.GetValueOrDefault(packet.PeerId)?.Connection;
         connection?.AddIceCandidate(packet.Media, packet.Index, packet.Name).ShouldBeOk();
     }
 

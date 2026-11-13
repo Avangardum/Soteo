@@ -25,12 +25,6 @@ public static class DictionaryExtensions
 
     extension<TKey, TValue> (IReadOnlyDictionary<TKey, TValue> self) where TKey : notnull
     {
-        public TValue GetOrDefault(TKey key, TValue defaultValue) =>
-            self.TryGetValue(key, out TValue? value) ? value : defaultValue;
-        // todo remove these 2
-        public TValue? GetOrDefault(TKey key) =>
-            self.TryGetValue(key, out TValue? value) ? value : default;
-
         /// <summary>
         /// Create a copy of this dictionary with the specified values added / updated
         /// </summary>

@@ -9,7 +9,7 @@ public static class PacketSerializer
     public static Type? TypeFor(Type packetType, ITypeLocator typeLocator)
     {
         _typesByPacketType ??= InitTypesByPacketType(typeLocator);
-        return _typesByPacketType.GetOrDefault(packetType);
+        return _typesByPacketType.GetValueOrDefault(packetType);
     }
 
     public static IReadOnlyList<Type> AllTypes(ITypeLocator typeLocator)

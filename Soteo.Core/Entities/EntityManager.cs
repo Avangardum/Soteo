@@ -102,7 +102,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         }
         foreach (Guid id in delta.Entities.RemovedKeys)
         {
-            _entities.GetOrDefault(id)?.Remove();
+            _entities.GetValueOrDefault(id)?.Remove();
         }
     }
 
