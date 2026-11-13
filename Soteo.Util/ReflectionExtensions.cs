@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Soteo.Util.Extensions;
+namespace Soteo.Util;
 
 public static class ReflectionExtensions
 {

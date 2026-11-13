@@ -19,4 +19,3 @@ global using Soteo.Core.Synchronization;
 global using Soteo.Core.Synchronization.Deltas;
 global using Soteo.Core.Synchronization.Snapshots;
 global using Soteo.Util;
-global using Soteo.Util.Extensions;

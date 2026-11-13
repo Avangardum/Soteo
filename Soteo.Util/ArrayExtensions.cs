@@ -1,4 +1,4 @@
-namespace Soteo.Util.Extensions;
+namespace Soteo.Util;
 
 public static class ArrayExtensions
 {

@@ -5,6 +5,7 @@ using Soteo.Core.Networking;
 using Soteo.Core.Packets;
 using Soteo.Core.Persistence;
 using Soteo.Core.Synchronization.Snapshots;
+using Soteo.Util;
 
 namespace Soteo.Core.Tests;
 

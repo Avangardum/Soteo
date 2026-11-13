@@ -1,6 +1,6 @@
-namespace Soteo.Util.Extensions;
+namespace Soteo.Util;
 
-public static class SysVectorExtensions
+public static class VectorExtensions
 {
     extension (Vector2 self)
     {

@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Soteo.Util.Extensions;
+namespace Soteo.Util;
 
-public static class SysObjectExtensions
+public static class ObjectExtensions
 {
     // NotNull here means that if Required returns, self is guaranteed to be not null
     extension<T> ([NotNull] T? self) where T : class
