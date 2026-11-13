@@ -1,5 +1,5 @@
 The game runs in campaigns. A campaign is an interconnected cluster of servers running a game event independently from
-other campaigns. On the server side campaign is run by the single campaign server which orchestrates the campaign and
+other campaigns. On the server side a campaign is run by the single campaign server which orchestrates the campaign and
 multiple shard servers, each managing a single shard. The term "Gameplay" refers to shard servers and clients.
 
 The solution consists of the following projects:
@@ -37,7 +37,7 @@ plain C# objects with complex lifetime).
 # Concurrency
 
 Most of the codebase is thread-unaware, meaning that it works under the assumption that no other thread is performing
-any concurrent reads or writes on process state. Since Godot always calls scripts on the main thread and uses a
+any concurrent reads or writes on the process state. Since Godot always calls scripts on the main thread and uses a
 synchronization context that runs async continuations on the main thread, all code runs on the main thread by default,
 unless a thread is created explicitly. If any extra threads are created explicitly, they must honor the aforementioned
 assumption by not reading or writing any state.
@@ -63,23 +63,6 @@ Clients have their own initialization sequence, with their own invariants that a
 fulfilled during initialization (having connection to the campaign server established, having SynchronizedCampaignState
 immediately available). Until client initialization is complete, it works in limited mode and shows a loading screen
 until it's done.
-
-# DTO
-
-DTO (data transfer objects) are immutable groupings of data to be exchanged between functions.
-
-Snapshots are DTO that capture some state at some point of time. Packets are DTO that are serialized and transferred
-over network. Snapshots and packets should follow extra rules:
-
-- They should not reference anything mutable either directly or transitively to remain unchanged even after
-  the state they captured changes.
-- They should not reference objects that have an id, instead storing just the id 
-  to avoid duplication in serialized data.
-
-# Models
-
-Models are domain objects that are not positioned at a specific position of a specific shard, such as
-shards themselves and players (unlike player **characters** that have such a position and are entities).
 
 # Entities
 
@@ -114,12 +97,12 @@ Statuses are effects that can affect a unit temporarily or permanently (such as 
 `StatusContext` contains state for a specific instance of a status. Statuses can hook into unit events, alter stats,
 tick with a fixed interval.
 
-# Services
+### Items
 
-Services are objects that do not correspond to any specific "thing" in the game, they either perform some work
-in the background, provide methods to be used by other objects or both.
+Items represent different kinds of items. `ItemStack` represents a concrete stack of some item in some quantity.
+`Item` is the base class for items, each specific item is defined in a stateless singleton derived class.
 
-## Communication
+# Networking
 
 Services suffixed `Communicator` manage communications between servers and clients by sending and receiving packets.
 They are not used directly, instead `IFromGameplayPacketSender` / `IFromCampaignServerPacketSender` interfaces are used
@@ -127,13 +110,3 @@ for sending packets, while handling received packets is done by packet handlers 
 called automatically by communicators when a matching packet is received. By default they only accept packets
 from the server side, add `[AllowClientPackets]` to change it. Handlers allowing client packets are responsible for
 validating them.
-
-## Gameplay singleton services
-
-`EntityLocator` is a client utility to search for an entity across all loaded shards.
-
-## Gameplay shard scoped services
-
-`EntityManager` creates entities, stores the index of existing entities, notifies about entity additions and removals.
-
-`ShardSynchronizationServer` and `ShardSynchronizationClient` synchronize shard state between shard servers and clients.
