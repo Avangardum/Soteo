@@ -70,7 +70,7 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         {
             (WebRtcDataChannel channel, byte[] bytes) = _sendNextTickQueue.Dequeue();
             if (channel.GetReadyState() == WebRtcDataChannel.ChannelState.Open)
-                channel.PutPacket(bytes).ThrowIfError();
+                channel.PutPacket(bytes).ShouldBeOk();
         }
 
         while (_handleNextTickQueue.Count > 0)
@@ -307,7 +307,7 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
                 if (deferToNextTick)
                     _sendNextTickQueue.Enqueue((channel, chunk));
                 else
-                    channel.PutPacket(chunk).ThrowIfError();
+                    channel.PutPacket(chunk).ShouldBeOk();
                 BytesSent += chunk.Length;
             }
         }
@@ -318,13 +318,13 @@ public sealed partial class WebRtcFromGameplayToGameplayCommunicator :
         string type = _sideOptions.Side == Side.ShardServer ? "offer" : "answer";
         WebRtcPeerConnection? connection = _sideOptions.Side == Side.ShardServer ? CreateConnection(packet.PeerId) :
             _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
-        connection?.SetRemoteDescription(type, packet.Sdp).ThrowIfError();
+        connection?.SetRemoteDescription(type, packet.Sdp).ShouldBeOk();
     }
 
     public void ReceiveWebrtcIceCandidatePacket(WebrtcIceCandidatePacket packet)
     {
         WebRtcPeerConnection? connection = _peerConnectionsAndChannels.GetOrDefault(packet.PeerId)?.Connection;
-        connection?.AddIceCandidate(packet.Media, packet.Index, packet.Name).ThrowIfError();
+        connection?.AddIceCandidate(packet.Media, packet.Index, packet.Name).ShouldBeOk();
     }
 
     public double? Ping(Guid peerId)

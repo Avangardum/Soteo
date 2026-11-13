@@ -194,7 +194,7 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
     public void SendPacket(Packet packet)
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
-        _socket.PutPacket(bytes).ThrowIfError();
+        _socket.PutPacket(bytes).ShouldBeOk();
     }
 
     private enum Status { Disconnected, Connecting, Handshake, Connected }

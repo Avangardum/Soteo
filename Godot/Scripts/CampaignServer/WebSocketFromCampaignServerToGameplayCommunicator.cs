@@ -50,7 +50,7 @@ public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
             .WithAlgorithm(new HMACSHA256Algorithm())
             .WithSecret(Convert.FromBase64String(serverOptions.ServerSecret));
 
-        _tcpServer.Listen((ushort)portOptions.Port).ThrowIfError();
+        _tcpServer.Listen((ushort)portOptions.Port).ShouldBeOk();
     }
 
     public void SendTo(Packet packet, params IEnumerable<Guid> receiverIds)
@@ -58,14 +58,14 @@ public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
         byte[] bytes = _packetSerializer.Serialize(packet);
         foreach (Guid id in receiverIds)
             if (_userIdsByWsPeerId.Inverse.TryGetValue(id, out long wsPeerId))
-                _wsPeers[wsPeerId].PutPacket(bytes).ThrowIfError();
+                _wsPeers[wsPeerId].PutPacket(bytes).ShouldBeOk();
     }
 
     public void BroadcastToAll(Packet packet)
     {
         byte[] bytes = _packetSerializer.Serialize(packet);
         foreach (long wsPeerId in _userIdsByWsPeerId.Keys)
-            _wsPeers[wsPeerId].PutPacket(bytes).ThrowIfError();
+            _wsPeers[wsPeerId].PutPacket(bytes).ShouldBeOk();
     }
 
     public void BroadcastToShardServers(Packet packet) =>
@@ -81,7 +81,7 @@ public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
             .Where(it => _userRepo.TryGetValue(it.Value, out User? user) && predicate(user))
             .Select(it => it.Key);
         foreach (long wsPeerId in wsPeerIds)
-            _wsPeers[wsPeerId].PutPacket(bytes).ThrowIfError();
+            _wsPeers[wsPeerId].PutPacket(bytes).ShouldBeOk();
     }
 
     public void RelayFrom(RelayedPacket packet, Guid senderId) =>
@@ -105,7 +105,7 @@ public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
             var key = new CryptoKey();
             key.Load(_certificateOptions.PrivateKeyPath);
             var tlsOptions = TlsOptions.Server(key, certificate);
-            tlsTcpStream.AcceptStream(rawTcpStream, tlsOptions).ThrowIfError();
+            tlsTcpStream.AcceptStream(rawTcpStream, tlsOptions).ShouldBeOk();
             var wsPeer = new WebSocketPeer { InboundBufferSize = 100_000_000, OutboundBufferSize = 100_000_000 };
             wsPeer.AcceptStream(tlsTcpStream);
             _wsPeers[_nextWsPeerId++] = wsPeer;
@@ -170,7 +170,7 @@ public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
         }
         catch (Exception e)
         {
-            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = e.Message } )).ThrowIfError();
+            peer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = e.Message } )).ShouldBeOk();
             return null;
         }
     }
@@ -179,7 +179,7 @@ public sealed partial class WebSocketFromCampaignServerToGameplayCommunicator :
     {
         void Fail(string reason)
         {
-            wsPeer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = reason })).ThrowIfError();
+            wsPeer.PutPacket(_packetSerializer.Serialize(new BadInputPacket { Reason = reason })).ShouldBeOk();
             wsPeer.Close(reason: "Bad handshake");
         }
 
