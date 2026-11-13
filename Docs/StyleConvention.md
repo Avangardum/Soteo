@@ -32,9 +32,6 @@ Comments should be written using `//`, not `/* */`.
 
 If `//` is not in the beginning of a line, it should also be preceded by a space.
 
-Comments documenting a type or member should be in the `<summary>` format.
-
-Use `<inheritdoc />` where possible to make it obvious that there is documentation available.
 
 ### Namespaces
 
@@ -46,17 +43,17 @@ Namespaces should correspond to the folder structure (use automatic namespace ad
 
 Types with the same name that differ only by number of generic parameters should be in one file.
 
-Each non-nested type should be in its own file.
+Other non-nested types should be each in their own file.
 
-Classes that are not meant to be inherited from, but are meant to be instanced, should be sealed.
+Classes that are not meant to be inherited from, but are meant to be instantiated, should be sealed.
 
-Classes that are not meant to be instanced, but are meant to be inherited from, should be abstract.
+Classes that are not meant to be instantiated, but are meant to be inherited from, should be abstract.
 
-Classes that are meant to be neither instanced, nor inherited from, should be static.
+Classes that are meant to be neither instantiated, nor inherited from, should be static.
 
 Inside a constructor, when choosing between reading a parameter and reading a field, prefer reading a parameter.
 
-When a type is instanced using a parameterless constructor with property initializers, the parentheses
+When a type is instantiated using a parameterless constructor with property initializers, the parentheses
 should be omitted.
 
 ### Delegates, events
@@ -73,26 +70,32 @@ Events should not be nullable, they should be initialized with an empty delegate
 
 Events that are invoked before something happens should be named as verbs in present continuous (`DataSourceUpdating`).
 
-Events that are invoked after something happens should be named as verbs in past simple. (`DataSourceUpdated`).
+Events that are invoked after something happens should be named as verbs in past simple (`DataSourceUpdated`).
 
 ### Functions, properties, indexers
 
-Do not use expression body declaration if it is more than one line long. Having a signature and an expression body on
-different lines is still acceptable.
+Using the expression body style is allowed in the following situations:
+
+- The body is one line long
+- The body fully consists of a collection expression or a collection initializer (with optional .AsReadOnly())
+  (in this case the `[]` or `{}` of the collection expression/initalizer should have the same indentation level as
+  the signature)
+
+```csharp
+public IReadOnlyDictionary<int, string> GetNumberNames() => new Dictionary<int, string>
+{
+    [1] = "one",
+    [2] = "two",
+    [3] = "three"
+}.AsReadOnly();
+```
 
 Do not mutate primary constructor arguments.
 
 In `Task` returning functions, don't directly return a `Task` returned by another function.
 Instead, await it and return its result.
 
-### Collections
-
-Use collection expressions where possible (`ImmutableList<int> a = [0, 1, 2];`).
-
-Use immutable collections (`ImmutableList`, `ImmutableHashSet`, etc.) where possible.
-
-Functions should both accept and return interfaces of a specific collection type (`IReadOnlyList`, `IDictionary`),
-preferably read only versions.
+Property getters/setters should not allocate memory or take significantly more time than a simple field access.
 
 ### Formatting
 
@@ -100,16 +103,13 @@ Indentation: 4 spaces.
 
 There should be no space between a method name and its parameters.
 
-In a `new` expression there should be no space between an object type and constructor arguments. (`new Foo()`)
+In a `new` expression there should be no space between an object type and constructor arguments (`new Foo()`).
 
-In a target-typed `new` expression there should be no space between `new` and constructor arguments. (`new()`)
-
-In a `new` expression there should be a single space between constructor parameters and field initializers, or, in
-case if there are no constructor parameters, between an object type and field initializers. (`new Foo { Value = 1 }`)
+In a target-typed `new` expression there should be no space between `new` and constructor arguments (`new()`).
 
 There should be a single space between `do`, `while`, `if`, `using`, `fixed` and following parentheses.
 
-Use the Allman style for any block of `{}`, `()`, `[]` or `<>`, spanning multiple lines.
+Use the Allman style for any block of `{}`, `()`, `[]` or `<>` spanning multiple lines.
 
 ```csharp
 public class Foo
@@ -145,7 +145,8 @@ When doing a line break on an operator, the operator should be at the end of a l
 When having an inline block of `()`, `[]` or `<>`, there should be no space between
 opening and closing symbols and content.
 
-When having an inline block of `{}`, there should be a space between opening and closing braces and content.
+When having an inline block of `{}`, there should be a space between opening and closing braces and content, and also
+a space between the braces and surrounding code. Empty blocks should have a single space between braces.
 
 There should be a space or a newline between a binary/ternary operator and its operands (except `.`, `?.`, `!.`, `->`).
 
@@ -172,10 +173,10 @@ sealed, readonly, override, extern, unsafe, volatile, async, required.
 
 Declare type members in the following order:
 
-- Static state (fields, auto-properties, events) and constants
+- Static state (fields, auto-properties, auto-events) and constants
 - Static constructor
 - Instance state
-- Constructors
+- Instance constructors
 - Finalizer
 - Methods, computed properties, indexers, operators
 - Nested types
@@ -191,6 +192,14 @@ instead of the null forgiving operator `!`.
 
 Avoid using special values like `0`, `-1`, `NaN`, `Guid.Empty`, `""` to encode a special meaning like
 "nothing", "unknown", "invalid", "unchanged". Instead use `null` or a custom wrapper like `Delta`.
+
+When receiving a value from an API that doesn't use nullable reference types (such as Godot), either check it for
+null explicitly or add `.Reqired`.
+
+When receving an error code from an API that returns them (such as Godot's `Error`), either check it explicitly
+or add `.ThrowIfError()`.
+
+Do not use `Debug.Assert` or `Trace.Assert`. Instead throw exceptions manually or use AwesomeAssertions.
 
 ## Files
 
@@ -224,12 +233,13 @@ Indentation: 4 spaces.
 
 ## Units
 
-The default units are: meter, degree, second. Prefer using the default units where practical.
-Don't specify default units in names. Specify non-default units in names.
+The default units are: meter, degree, second and their derivatives.
+Prefer using default units where practical. Don't specify default units in names. Specify non-default units in names.
 
 ## Miscellaneous
 
-Abbreviations follow the same naming rules as if they were regular words (`JsonParser`, not `JSONParser`).
+Acronyms (including 2-letter ones) follow the same naming rules as if they were regular words
+(`DbContext`, not `DbContext`).
 
 When possible, format code to avoid line width exceeding 120 symbols.
 
