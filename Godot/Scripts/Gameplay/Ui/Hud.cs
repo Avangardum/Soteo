@@ -422,8 +422,7 @@ public sealed class Hud : IHud
 
     private void ProcessAbilities(IUnitPuppet unit)
     {
-        // todo remove the 6 constant, show all abilities there are
-        for (HotbarAbilitySlot slot = AbilitySlot.Hotbar(0); slot.Index <= 6; slot++)
+        for (HotbarAbilitySlot slot = AbilitySlot.Hotbar(0); slot.Index <= _abilityButtons.Count; slot++)
         {
             AbilityButton button = _abilityButtons[slot.Index];
             if (!unit.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state))
