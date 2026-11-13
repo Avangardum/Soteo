@@ -2,13 +2,13 @@ namespace Soteo.Core.Serialization.Packet;
 
 public sealed class WebrtcSdpPacketSerializer(ISerializationHelper s) : PacketSerializer<WebrtcSdpPacket>(s)
 {
-    protected override void SerializeInternal(WebrtcSdpPacket packet, Stream stream)
+    protected override void SerializeCore(WebrtcSdpPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.PeerId, stream);
         s.SerializeString(packet.Sdp, stream);
     }
 
-    protected override WebrtcSdpPacket DeserializeInternal(Stream stream)
+    protected override WebrtcSdpPacket DeserializeCore(Stream stream)
     {
         return new WebrtcSdpPacket
         {

@@ -4,14 +4,14 @@ namespace Soteo.Core.Serialization.Packet.Command;
 
 public sealed class MoveItemStackPacketSerializer(ISerializationHelper s) : PacketSerializer<MoveItemStackPacket>(s)
 {
-    protected override void SerializeInternal(MoveItemStackPacket packet, Stream stream)
+    protected override void SerializeCore(MoveItemStackPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.UnitId, stream);
         s.SerializeInt(packet.Command.FromIndex, stream);
         s.SerializeInt(packet.Command.ToIndex, stream);
     }
 
-    protected override MoveItemStackPacket DeserializeInternal(Stream stream)
+    protected override MoveItemStackPacket DeserializeCore(Stream stream)
     {
         return new MoveItemStackPacket
         {

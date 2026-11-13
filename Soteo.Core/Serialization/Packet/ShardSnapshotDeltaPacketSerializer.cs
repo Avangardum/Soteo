@@ -3,14 +3,14 @@ namespace Soteo.Core.Serialization.Packet;
 public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
     PacketSerializer<ShardSnapshotDeltaPacket>(s)
 {
-    protected override void SerializeInternal(ShardSnapshotDeltaPacket packet, Stream stream)
+    protected override void SerializeCore(ShardSnapshotDeltaPacket packet, Stream stream)
     {
         s.SerializeDouble(packet.ServerLoad, stream);
         s.SerializeLong(packet.SnapshotDelta.Tick, stream);
         SerializeIndexedDictionaryDelta(packet.SnapshotDelta.Entities, s.SerializeGuid, SerializeEntityDelta, stream);
     }
 
-    protected override ShardSnapshotDeltaPacket DeserializeInternal(Stream stream)
+    protected override ShardSnapshotDeltaPacket DeserializeCore(Stream stream)
     {
         return new ShardSnapshotDeltaPacket
         {

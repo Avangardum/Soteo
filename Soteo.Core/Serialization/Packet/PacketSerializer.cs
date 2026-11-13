@@ -54,7 +54,7 @@ public static class PacketSerializer
              Failed to find a serializer for {packetType}. Exactly one of the following conditions should be fulfilled:
              [{x1}] Packet is decorated with [PacketSerializer(...)]
              [{x2}] Packet is decorated with [EmptyPacket]
-             [{x3}] Serializer inheriting from PacketSerializer<{packetType}> exists and visible to TypeLocator
+             [{x3}] Serializer inheriting from PacketSerializer<{packetType}> exists and is visible to TypeLocator
              """;
         throw new Exception(message);
     }
@@ -68,11 +68,11 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
     {
         var stream = new MemoryStream();
         s.SerializePacketType(packet.GetType(), stream);
-        SerializeInternal(packet, stream);
+        SerializeCore(packet, stream);
         return stream.ToArray();
     }
 
-    protected abstract void SerializeInternal(TPacket packet, Stream stream);
+    protected abstract void SerializeCore(TPacket packet, Stream stream);
 
     Packets.Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
 
@@ -84,7 +84,7 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
             Type type = s.DeserializePacketType(stream);
             if (type != typeof(TPacket))
                 throw new InvalidOperationException("Wrong serializer");
-            TPacket packet = DeserializeInternal(stream);
+            TPacket packet = DeserializeCore(stream);
             if (stream.Position != bytes.Length)
             {
                 throw new BadSerializedDataException
@@ -100,5 +100,5 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacke
         }
     }
 
-    protected abstract TPacket DeserializeInternal(Stream stream);
+    protected abstract TPacket DeserializeCore(Stream stream);
 }

@@ -4,7 +4,7 @@ namespace Soteo.Core.Serialization.Packet.Command;
 
 public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketSerializer<UseAbilityPacket>(s)
 {
-    protected override void SerializeInternal(UseAbilityPacket packet, Stream stream)
+    protected override void SerializeCore(UseAbilityPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.UnitId, stream);
 
@@ -18,7 +18,7 @@ public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketS
         s.SerializeNullableStruct(packet.Command.TargetShardId, s.SerializeGuid, stream);
     }
 
-    protected override UseAbilityPacket DeserializeInternal(Stream stream)
+    protected override UseAbilityPacket DeserializeCore(Stream stream)
     {
         return new UseAbilityPacket
         {

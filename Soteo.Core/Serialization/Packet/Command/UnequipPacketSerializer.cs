@@ -4,14 +4,14 @@ namespace Soteo.Core.Serialization.Packet.Command;
 
 public sealed class UnequipPacketSerializer(ISerializationHelper s) : PacketSerializer<UnequipPacket>(s)
 {
-    protected override void SerializeInternal(UnequipPacket packet, Stream stream)
+    protected override void SerializeCore(UnequipPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.UnitId, stream);
         s.SerializeEnum(packet.Command.EquipmentSlot, stream);
         s.SerializeNullableStruct(packet.Command.ToInventorySlot, s.SerializeInt, stream);
     }
 
-    protected override UnequipPacket DeserializeInternal(Stream stream)
+    protected override UnequipPacket DeserializeCore(Stream stream)
     {
         return new UnequipPacket
         {

@@ -2,13 +2,13 @@ namespace Soteo.Core.Serialization.Packet;
 
 public class PingPacketSerializer(ISerializationHelper s) : PacketSerializer<PingPacket>(s)
 {
-    protected override void SerializeInternal(PingPacket packet, Stream stream)
+    protected override void SerializeCore(PingPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.Id, stream);
         s.SerializeBool(packet.IsResponse, stream);
     }
 
-    protected override PingPacket DeserializeInternal(Stream stream)
+    protected override PingPacket DeserializeCore(Stream stream)
     {
         return new PingPacket
         {

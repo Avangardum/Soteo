@@ -3,13 +3,13 @@ namespace Soteo.Core.Serialization.Packet;
 public sealed class CampaignServerHandshakePacketSerializer(ISerializationHelper s) :
     PacketSerializer<CampaignServerHandshakePacket>(s)
 {
-    protected override void SerializeInternal(CampaignServerHandshakePacket packet, Stream stream)
+    protected override void SerializeCore(CampaignServerHandshakePacket packet, Stream stream)
     {
         s.SerializeString(packet.Token, stream);
         s.SerializeString(packet.Version, stream);
     }
 
-    protected override CampaignServerHandshakePacket DeserializeInternal(Stream stream)
+    protected override CampaignServerHandshakePacket DeserializeCore(Stream stream)
     {
         return new CampaignServerHandshakePacket
         {

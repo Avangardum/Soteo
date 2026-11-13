@@ -2,7 +2,7 @@ namespace Soteo.Core.Serialization.Packet;
 
 public sealed class ChunkPacketSerializer(ISerializationHelper s) : PacketSerializer<ChunkPacket>(s)
 {
-    protected override void SerializeInternal(ChunkPacket packet, Stream stream)
+    protected override void SerializeCore(ChunkPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.GroupId, stream);
         s.SerializeInt(packet.Index, stream);
@@ -10,7 +10,7 @@ public sealed class ChunkPacketSerializer(ISerializationHelper s) : PacketSerial
         s.SerializeList(packet.Bytes, s.SerializeByte, stream);
     }
 
-    protected override ChunkPacket DeserializeInternal(Stream stream)
+    protected override ChunkPacket DeserializeCore(Stream stream)
     {
         return new ChunkPacket
         {

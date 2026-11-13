@@ -4,12 +4,12 @@ namespace Soteo.Core.Serialization.Packet.Command;
 
 public sealed class StopPacketSerializer(ISerializationHelper s) : PacketSerializer<StopPacket>(s)
 {
-    protected override void SerializeInternal(StopPacket packet, Stream stream)
+    protected override void SerializeCore(StopPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.UnitId, stream);
     }
 
-    protected override StopPacket DeserializeInternal(Stream stream)
+    protected override StopPacket DeserializeCore(Stream stream)
     {
         return new StopPacket
         {

@@ -2,13 +2,13 @@ namespace Soteo.Core.Serialization.Packet;
 
 public sealed class SpawnCharacterPacketSerializer(ISerializationHelper s) : PacketSerializer<SpawnCharacterPacket>(s)
 {
-    protected override void SerializeInternal(SpawnCharacterPacket packet, Stream stream)
+    protected override void SerializeCore(SpawnCharacterPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.PeerId, stream);
         s.SerializeGuid(packet.CharacterId, stream);
     }
 
-    protected override SpawnCharacterPacket DeserializeInternal(Stream stream)
+    protected override SpawnCharacterPacket DeserializeCore(Stream stream)
     {
         return new SpawnCharacterPacket
         {

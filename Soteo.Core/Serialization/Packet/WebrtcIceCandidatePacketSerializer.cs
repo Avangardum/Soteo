@@ -3,7 +3,7 @@ namespace Soteo.Core.Serialization.Packet;
 public sealed class WebrtcIceCandidatePacketSerializer(ISerializationHelper s) :
     PacketSerializer<WebrtcIceCandidatePacket>(s)
 {
-    protected override void SerializeInternal(WebrtcIceCandidatePacket packet, Stream stream)
+    protected override void SerializeCore(WebrtcIceCandidatePacket packet, Stream stream)
     {
         s.SerializeGuid(packet.PeerId, stream);
         s.SerializeString(packet.Media, stream);
@@ -11,7 +11,7 @@ public sealed class WebrtcIceCandidatePacketSerializer(ISerializationHelper s) :
         s.SerializeString(packet.Name, stream);
     }
 
-    protected override WebrtcIceCandidatePacket DeserializeInternal(Stream stream)
+    protected override WebrtcIceCandidatePacket DeserializeCore(Stream stream)
     {
         return new WebrtcIceCandidatePacket
         {
