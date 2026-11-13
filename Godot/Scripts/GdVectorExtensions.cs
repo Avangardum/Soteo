@@ -1,0 +1,27 @@
+using Soteo.Util;
+
+namespace Soteo.Main.Shared.Extensions;
+
+public static class GdVectorExtensions
+{
+    extension (GdVector2 self)
+    {
+        public Vector2 ToSys() => new(self.X, self.Y);
+
+        public GdVector2 Lerp(GdVector2 to, float weight) =>
+            new(Maths.Lerp(self.X, to.X, weight), Maths.Lerp(self.Y, to.Y, weight));
+
+        public GdVector2 Lerp(GdVector2 to, double weight) => self.Lerp(to, (float)weight);
+
+        public static GdVector2 operator *(GdVector2 a, double b) => a * (float)b;
+
+        public static GdVector2 operator /(GdVector2 a, double b) => a / (float)b;
+
+        public static GdVector2 New(double x, double y) => new((float)x, (float)y);
+    }
+
+    extension (Vector2 self)
+    {
+        public GdVector2 ToGd() => new(self.X, self.Y);
+    }
+}

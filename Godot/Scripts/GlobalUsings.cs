@@ -1,0 +1,13 @@
+global using System;
+global using System.Collections.ObjectModel;
+global using System.Numerics;
+global using Godot;
+global using Soteo.Util;
+global using Soteo.Main.Shared.Extensions;
+global using SysEnvironment = System.Environment;
+global using GdEnvironment = Godot.Environment;
+global using GdArray = Godot.Collections.Array;
+global using Vector2 = System.Numerics.Vector2;
+global using GdVector2 = Godot.Vector2;
+global using GdDictionary = Godot.Collections.Dictionary;
+global using Side = Soteo.Core.Side;

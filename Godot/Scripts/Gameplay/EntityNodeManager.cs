@@ -1,0 +1,41 @@
+using Soteo.Core.Entities;
+using Soteo.Main.Gameplay.Interfaces;
+
+namespace Soteo.Main.Gameplay.Services;
+
+public sealed class EntityNodeManager(ShardNode shard, IEntityNodePool pool) : IEntityNodeManager
+{
+    private readonly Dictionary<Guid, IEntityNode> _nodes = [];
+
+    public T AddNode<T>(Guid id) where T : class, IEntityNode
+    {
+        T node = pool.GetNode<T>();
+        ((Node)(object)node).Name = $"{typeof(T).Name} {id}";
+        shard.EntityRoot.AddChild((Node)(object)node);
+        _nodes[id] = node;
+        return node;
+    }
+
+    public void RemoveNode(Guid id)
+    {
+        IEntityNode node = _nodes[id];
+        _nodes.Remove(id);
+
+        if (node is IDeferredRemovalEntityNode deferred)
+        {
+            deferred.WaitUntilCanRemoveAsync()
+                .ContinueWithinContext(() => RemoveNodeImmediately(node))
+                .CollectException();
+        }
+        else
+        {
+            RemoveNodeImmediately(node);
+        }
+    }
+
+    private void RemoveNodeImmediately(IEntityNode node)
+    {
+        shard.EntityRoot.RemoveChild((Node)node);
+        pool.ReturnNode(node);
+    }
+}
