@@ -498,8 +498,9 @@ public abstract class Unit : UnitBase<IUnitNode>
         do
         {
             iterations++;
-            bool strict = AbilityUseProgress == null;
-            abilityValidationResult = ability.Validate(context, strict);
+            AbilityValidationMode mode =
+                AbilityUseProgress == null ? AbilityValidationMode.Initial : AbilityValidationMode.Continuous;
+            abilityValidationResult = ability.Validate(context, mode);
             switch (abilityValidationResult)
             {
                 case AbilityValidationResult.Ok:

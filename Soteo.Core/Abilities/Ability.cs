@@ -58,7 +58,7 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     /// </summary>
     public void TakeEffect(AbilityContext context)
     {
-        AbilityValidationResult validationResult = Validate(context, strict: false);
+        AbilityValidationResult validationResult = Validate(context, AbilityValidationMode.Continuous);
         if (validationResult != AbilityValidationResult.Ok)
             throw new InvalidOperationException($"Ability validation failed: {validationResult}");
         context.User.SpendHealth(HealthCost(context), this);
@@ -70,12 +70,7 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
 
     public virtual void OnProjectileHit(AbilityContext context) { }
 
-    /// <summary>
-    /// Checks whether an ability can be used and returns a reason if not.
-    /// Strict mode is used to determine whether use can be initiated.
-    /// Non-strict mode is used to determine whether in-progress use should be interrupted.
-    /// </summary>
-    public AbilityValidationResult Validate(AbilityContext context, bool strict)
+    public AbilityValidationResult Validate(AbilityContext context, AbilityValidationMode mode)
     {
         AbilityValidationResult targetValidationResult = ValidateTarget(context);
         if (targetValidationResult != AbilityValidationResult.Ok) return targetValidationResult;
@@ -83,13 +78,13 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         AbilityValidationResult costValidationResult = ValidateCost(context);
         if (costValidationResult != AbilityValidationResult.Ok) return costValidationResult;
 
-        AbilityValidationResult rangeValidationResult = ValidateRange(context, strict);
+        AbilityValidationResult rangeValidationResult = ValidateRange(context, mode);
         if (rangeValidationResult != AbilityValidationResult.Ok) return rangeValidationResult;
 
-        return ValidateCore(context, strict);
+        return ValidateCore(context, mode);
     }
 
-    protected virtual AbilityValidationResult ValidateCore(AbilityContext context, bool strict) =>
+    protected virtual AbilityValidationResult ValidateCore(AbilityContext context, AbilityValidationMode mode) =>
         AbilityValidationResult.Ok;
 
     private AbilityValidationResult ValidateTarget(AbilityContext context)
@@ -140,7 +135,7 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         return AbilityValidationResult.Ok;
     }
 
-    private AbilityValidationResult ValidateRange(AbilityContext context, bool strict)
+    private AbilityValidationResult ValidateRange(AbilityContext context, AbilityValidationMode mode)
     {
         if
         (
@@ -149,7 +144,12 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         )
         {
             Vector2 deltaPosition = targetPosition - context.User.Position;
-            double rangeMultiplier = strict ? 1 : 1.5;
+            double rangeMultiplier = mode switch
+            {
+                AbilityValidationMode.Initial => 1,
+                AbilityValidationMode.Continuous => 1.5,
+                _ => throw new ArgumentOutOfRangeException()
+            };
             if (deltaPosition.Length() > Range(context) * rangeMultiplier)
                 return AbilityValidationResult.OutOfRange;
 

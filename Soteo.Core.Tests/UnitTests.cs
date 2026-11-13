@@ -149,30 +149,30 @@ public sealed class UnitTests
     }
 
     [Fact]
-    public void UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing()
+    public void UsingAbilityValidatesItInitiallyThenContinuouslyWhileUsing()
     {
         var slot = AbilitySlot.Hotbar(_sut.GetInnateHotbarAbilities().Count);
         _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
-        int validatedStrictlyCount = 0;
-        int validatedNonStrictlyCount = 0;
-        Ability.Instance<SpyAbilityWithUseTime>().ValidatedStrictly += () => validatedStrictlyCount++;
-        Ability.Instance<SpyAbilityWithUseTime>().ValidatedNonStrictly += () => validatedNonStrictlyCount++;
+        int initialValidationCount = 0;
+        int continuousValidationCount = 0;
+        Ability.Instance<SpyAbilityWithUseTime>().ValidatedInitially += () => initialValidationCount++;
+        Ability.Instance<SpyAbilityWithUseTime>().ValidatedContinuously += () => continuousValidationCount++;
 
         _sut.SetCommand(new UseAbilityCommand { Slot = slot });
         _sut.Tick(Const.TickInterval);
 
-        validatedStrictlyCount.Should().Be(1);
-        validatedNonStrictlyCount.Should().Be(0);
+        initialValidationCount.Should().Be(1);
+        continuousValidationCount.Should().Be(0);
 
         _sut.Tick(Const.TickInterval);
 
-        validatedStrictlyCount.Should().Be(1);
-        validatedNonStrictlyCount.Should().Be(1);
+        initialValidationCount.Should().Be(1);
+        continuousValidationCount.Should().Be(1);
 
         _sut.Tick(Const.TickInterval);
 
-        validatedStrictlyCount.Should().Be(1);
-        validatedNonStrictlyCount.Should().Be(2);
+        initialValidationCount.Should().Be(1);
+        continuousValidationCount.Should().Be(2);
     }
 
     [Fact]
@@ -182,7 +182,7 @@ public sealed class UnitTests
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0) });
         _sut.Tick(Const.TickInterval);
 
-        UsingAbilityValidatesItStrictlyInitiallyThenNonStrictlyWhileUsing();
+        UsingAbilityValidatesItInitiallyThenContinuouslyWhileUsing();
     }
 
     [Fact]
@@ -724,15 +724,24 @@ public sealed class UnitTests
     private class SpyAbility : Ability
     {
         public event Action Used = delegate { };
-        public event Action ValidatedStrictly = delegate { };
-        public event Action ValidatedNonStrictly = delegate { };
+        public event Action ValidatedInitially = delegate { };
+        public event Action ValidatedContinuously = delegate { };
 
         public override Targeting Targeting => Targeting.Anything;
 
-        protected override AbilityValidationResult ValidateCore(AbilityContext context, bool strict)
+        protected override AbilityValidationResult ValidateCore(AbilityContext context, AbilityValidationMode mode)
         {
-            if (strict) ValidatedStrictly();
-            else ValidatedNonStrictly();
+            switch (mode)
+            {
+                case AbilityValidationMode.Initial:
+                    ValidatedInitially();
+                    break;
+                case AbilityValidationMode.Continuous:
+                    ValidatedContinuously();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             return AbilityValidationResult.Ok;
         }
 

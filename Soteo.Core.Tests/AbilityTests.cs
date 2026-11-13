@@ -50,7 +50,7 @@ public sealed class AbilityTests
             TargetDirection = null,
             TargetShardId = null
         };
-        Ability.Instance<TestAbility>().Validate(context, strict: true).Should().Be(expectedResult);
+        Ability.Instance<TestAbility>().Validate(context, AbilityValidationMode.Initial).Should().Be(expectedResult);
     }
 
     private class TestAbility : Ability
