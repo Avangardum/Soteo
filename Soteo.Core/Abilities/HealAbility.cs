@@ -10,9 +10,8 @@ public sealed class HealAbility : Ability
     public override Targeting Targeting => Targeting.Ally | Targeting.Character;
     public override Targeting AltTargeting => Targeting.Nothing;
 
-    public override void TakeEffect(AbilityContext context)
+    protected override void TakeEffectCore(AbilityContext context)
     {
-        base.TakeEffect(context);
         Unit target = context.Alt ? context.User : context.TargetUnit.Required;
         target.RestoreHealth(Heal, context.User, this);
     }

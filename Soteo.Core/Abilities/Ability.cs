@@ -56,14 +56,17 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     /// Called when an ability use is completed and it takes effect.
     /// This should be called only immediately after non-strict validation succeeds.
     /// </summary>
-    public virtual void TakeEffect(AbilityContext context)
+    public void TakeEffect(AbilityContext context)
     {
         AbilityValidationResult validationResult = Validate(context, strict: false);
         if (validationResult != AbilityValidationResult.Ok)
             throw new InvalidOperationException($"Ability validation failed: {validationResult}");
         context.User.SpendHealth(HealthCost(context), this);
         context.User.SpendMana(ManaCost(context), this);
+        TakeEffectCore(context);
     }
+
+    protected virtual void TakeEffectCore(AbilityContext context) { }
 
     public virtual void OnProjectileHit(AbilityContext context) { }
 
@@ -72,7 +75,7 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     /// Strict mode is used to determine whether use can be initiated.
     /// Non-strict mode is used to determine whether in-progress use should be interrupted.
     /// </summary>
-    public virtual AbilityValidationResult Validate(AbilityContext context, bool strict)
+    public AbilityValidationResult Validate(AbilityContext context, bool strict)
     {
         AbilityValidationResult targetValidationResult = ValidateTarget(context);
         if (targetValidationResult != AbilityValidationResult.Ok) return targetValidationResult;
@@ -83,8 +86,11 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         AbilityValidationResult rangeValidationResult = ValidateRange(context, strict);
         if (rangeValidationResult != AbilityValidationResult.Ok) return rangeValidationResult;
 
-        return AbilityValidationResult.Ok;
+        return ValidateCore(context, strict);
     }
+
+    protected virtual AbilityValidationResult ValidateCore(AbilityContext context, bool strict) =>
+        AbilityValidationResult.Ok;
 
     private AbilityValidationResult ValidateTarget(AbilityContext context)
     {

@@ -729,16 +729,15 @@ public sealed class UnitTests
 
         public override Targeting Targeting => Targeting.Anything;
 
-        public override AbilityValidationResult Validate(AbilityContext context, bool strict)
+        protected override AbilityValidationResult ValidateCore(AbilityContext context, bool strict)
         {
             if (strict) ValidatedStrictly();
             else ValidatedNonStrictly();
-            return base.Validate(context, strict);
+            return AbilityValidationResult.Ok;
         }
 
-        public override void TakeEffect(AbilityContext context)
+        protected override void TakeEffectCore(AbilityContext context)
         {
-            base.TakeEffect(context);
             Used();
         }
     }

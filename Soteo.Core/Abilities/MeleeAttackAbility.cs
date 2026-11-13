@@ -2,9 +2,8 @@ namespace Soteo.Core.Abilities;
 
 public sealed class MeleeAttackAbility : AttackAbility
 {
-    public override void TakeEffect(AbilityContext context)
+    protected override void TakeEffectCore(AbilityContext context)
     {
-        base.TakeEffect(context);
         context.User.DealAttackDamageTo(context.TargetUnit.Required, this);
     }
 }

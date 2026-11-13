@@ -6,9 +6,8 @@ public sealed class ProjectileBurstAbility : Ability
 {
     public override Targeting Targeting => Targeting.Nothing;
 
-    public override void TakeEffect(AbilityContext context)
+    protected override void TakeEffectCore(AbilityContext context)
     {
-        base.TakeEffect(context);
         var entityManager = context.GetRequiredService<IEntityManager>();
         for (double azimuth = 0; azimuth < 360; azimuth += 1)
         {

@@ -8,9 +8,8 @@ public sealed class BloodSacrificeAbility : Ability
     private double ManaRestored => 200;
     public override double StaticCooldown => 5;
 
-    public override void TakeEffect(AbilityContext context)
+    protected override void TakeEffectCore(AbilityContext context)
     {
-        base.TakeEffect(context);
         context.User.RestoreMana(ManaRestored, context.User, this);
     }
 }
