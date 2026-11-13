@@ -6,7 +6,7 @@ using Soteo.Core.Commands;
 using Soteo.Core.Entities;
 using Soteo.Core.Entities.Units;
 using Soteo.Core.Networking;
-using Soteo.Core.Packets.Command;
+using Soteo.Core.Packets.Commands;
 using Soteo.Main.Gameplay.EntityNodes;
 using Soteo.Main.Gameplay.Enums;
 using Soteo.Main.Gameplay.Interfaces;

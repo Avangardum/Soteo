@@ -7,7 +7,7 @@ using Soteo.Core.Entities.Units;
 using Soteo.Core.Items;
 using Soteo.Core.Localization;
 using Soteo.Core.Networking;
-using Soteo.Core.Packets.Command;
+using Soteo.Core.Packets.Commands;
 using Soteo.Core.Statuses;
 using Soteo.Main.Gameplay.Interfaces;
 using Soteo.Util;

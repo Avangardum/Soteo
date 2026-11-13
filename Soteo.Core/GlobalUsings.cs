@@ -11,7 +11,6 @@ global using Soteo.Core.Localization;
 global using Soteo.Core.Networking;
 global using Soteo.Core.PacketHandlers;
 global using Soteo.Core.Packets;
-global using Soteo.Core.Packets.Command;
 global using Soteo.Core.Persistence;
 global using Soteo.Core.Serialization;
 global using Soteo.Core.Serialization.Packets;

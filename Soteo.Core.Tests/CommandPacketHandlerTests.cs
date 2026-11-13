@@ -4,7 +4,7 @@ using Soteo.Core.Campaign;
 using Soteo.Core.Commands;
 using Soteo.Core.Entities;
 using Soteo.Core.PacketHandlers.Gameplay.Command;
-using Soteo.Core.Packets.Command;
+using Soteo.Core.Packets.Commands;
 
 namespace Soteo.Core.Tests;
 
