@@ -1,6 +1,6 @@
 namespace Soteo.Core.Entities.Units;
 
-public abstract class AbilitySlot
+public closed class AbilitySlot
 {
     private static readonly BidirectionalDictionary<SpecialAbilitySlot, int> SpecialIndices = [];
 
@@ -14,8 +14,6 @@ public abstract class AbilitySlot
 
         AllSpecial = SpecialIndices.Keys.ToList();
     }
-
-    internal AbilitySlot() { } // make closed after updating to C# 15
 
     public static HotbarAbilitySlot Hotbar(int index) => HotbarAbilitySlot.Instance(index);
 
