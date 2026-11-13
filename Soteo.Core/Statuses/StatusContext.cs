@@ -14,7 +14,7 @@ public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
     public required long Ordinal { get; init; }
-    public required IServiceProvider ServiceProvider { get; init; }
+    public required IServiceProvider ServiceProvider { get; init; } // todo use strongly typed provider
 
     Unit? ISourceUnitAndAbility.Unit => SourceUnit;
     Ability? ISourceUnitAndAbility.Ability => SourceAbilityContext?.Ability;

@@ -13,7 +13,7 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
     /// </summary>
     public required IReadOnlyDictionary<Stat, double> UserStats { get; init; }
 
-    public required IServiceProvider ServiceProvider { get; init; }
+    public required IServiceProvider ServiceProvider { get; init; } // todo use strongly typed provider
     public Vector2? TargetPosition { get; init; }
     public Unit? TargetUnit { get; init; }
     public Vector2? TargetDirection { get; init; }
