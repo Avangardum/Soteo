@@ -2,9 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <LangVersion>14</LangVersion>
         <RootNamespace>Soteo.TestUtil</RootNamespace>
     </PropertyGroup>
 
@@ -12,7 +9,7 @@
         <PackageReference Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.10.0" />
         <PackageReference Include="NSubstitute" Version="6.2.0" />
     </ItemGroup>
-    
+
     <ItemGroup>
       <ProjectReference Include="..\Soteo.Core\Soteo.Core.csproj" />
       <ProjectReference Include="..\Soteo.Util\Soteo.Util.csproj" />

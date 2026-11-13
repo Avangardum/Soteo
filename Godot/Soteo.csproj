@@ -2,9 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <LangVersion>14</LangVersion>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
+        <RootNamespace>Soteo.Main</RootNamespace>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
         <NoWarn>
@@ -14,10 +12,8 @@
             Field is never assigned to, and will always have its default value.
             Ignored because of false positives on [Export] fields.
             -->
-            CS0649,
+            CS0649
         </NoWarn>
-
-        <RootNamespace>Soteo.Main</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,15 +21,9 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="10.0.12" />
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.12" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.12" />
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.12" />
         <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.12" />
-        <PackageReference Include="Nullable" Version="1.3.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="BidirectionalDictionary" Version="3.1.5" />
         <PackageReference Include="JWT" Version="11.1.0" />
     </ItemGroup>
 

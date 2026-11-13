@@ -1,5 +1,11 @@
 <Project>
     <PropertyGroup>
+        <LangVersion>14</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
         <NoWarn>
             $(NoWarn),
 
@@ -10,17 +16,5 @@
             -->
             CS9107,
         </NoWarn>
-
-        <!--
-        This suppresses warnings like when using Microsoft.Extensions.TimeProvider.Testing with net472 because
-        the package doesnt specify net472 specifically as a target framework, but only specifies net462. This is a
-        false alarm, since a package targeting net462 technically can be used in net472 and doesn't seem to be an
-        unsupported use case just because a newer .NET Framework version is used.
-        -->
-        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-
-        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 </Project>

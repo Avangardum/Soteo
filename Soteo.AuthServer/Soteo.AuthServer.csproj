@@ -2,9 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>aspnet-RemmoPrototypeAuthServer-7038323a-d084-40e5-9e53-f4aeaea950c9</UserSecretsId>
         <RootNamespace>Soteo.AuthServer</RootNamespace>
     </PropertyGroup>
 
