@@ -1,5 +1,6 @@
 using AwesomeAssertions;
 using NSubstitute;
+using Soteo.Core.Entities;
 using Soteo.Core.Networking;
 using Soteo.Core.Packets;
 using Soteo.Core.Serialization;

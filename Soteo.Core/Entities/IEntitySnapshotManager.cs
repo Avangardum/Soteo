@@ -1,4 +1,4 @@
-namespace Soteo.Core.Serialization;
+namespace Soteo.Core.Entities;
 
 public interface IEntitySnapshotManager
 {
