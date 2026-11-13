@@ -1,6 +1,6 @@
 using Soteo.Core.Commands;
 
-namespace Soteo.Core.Serialization.Packet.Command;
+namespace Soteo.Core.Serialization.Packets.Commands;
 
 public sealed class UseAbilityPacketSerializer(ISerializationHelper s) : PacketSerializer<UseAbilityPacket>(s)
 {

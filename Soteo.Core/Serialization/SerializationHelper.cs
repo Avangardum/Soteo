@@ -8,7 +8,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     private readonly IReadOnlyList<Type> _abilityTypes = typeLocator.ConcreteSubclassesOf<Ability>();
     private readonly IReadOnlyList<Type> _statusTypes = typeLocator.ConcreteSubclassesOf<Status>();
     private readonly IReadOnlyList<Type> _itemTypes = typeLocator.ConcreteSubclassesOf<Item>();
-    private readonly IReadOnlyList<Type> _packetTypes = typeLocator.ConcreteSubclassesOf<Packets.Packet>();
+    private readonly IReadOnlyList<Type> _packetTypes = typeLocator.ConcreteSubclassesOf<Packet>();
 
     public void SerializeByte(byte value, Stream stream) => stream.WriteByte(value);
 
@@ -327,7 +327,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 
     public void SerializePacketType(Type type, Stream stream)
     {
-        if (!type.IsAssignableTo(typeof(Packets.Packet)))
+        if (!type.IsAssignableTo(typeof(Packet)))
             throw new ArgumentException($"{type} is not a packet");
         int index = _packetTypes.IndexOf(type);
         SerializeInt(index, stream);

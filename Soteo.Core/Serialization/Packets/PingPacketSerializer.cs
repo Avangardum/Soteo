@@ -1,4 +1,4 @@
-namespace Soteo.Core.Serialization.Packet;
+namespace Soteo.Core.Serialization.Packets;
 
 public class PingPacketSerializer(ISerializationHelper s) : PacketSerializer<PingPacket>(s)
 {

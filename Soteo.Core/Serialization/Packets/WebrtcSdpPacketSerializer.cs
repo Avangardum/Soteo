@@ -1,4 +1,4 @@
-namespace Soteo.Core.Serialization.Packet;
+namespace Soteo.Core.Serialization.Packets;
 
 public sealed class WebrtcSdpPacketSerializer(ISerializationHelper s) : PacketSerializer<WebrtcSdpPacket>(s)
 {

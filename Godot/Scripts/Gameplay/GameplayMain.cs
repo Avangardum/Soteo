@@ -12,7 +12,7 @@ using Soteo.Core.PacketHandlers.Gameplay;
 using Soteo.Core.Packets;
 using Soteo.Core.Persistence;
 using Soteo.Core.Serialization;
-using Soteo.Core.Serialization.Packet;
+using Soteo.Core.Serialization.Packets;
 using Soteo.Core.Synchronization;
 using Soteo.Main.Gameplay.Interfaces;
 using Soteo.Main.Gameplay.Resources;

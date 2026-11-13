@@ -1,4 +1,4 @@
-namespace Soteo.Core.Serialization.Packet;
+namespace Soteo.Core.Serialization.Packets;
 
 public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
     PacketSerializer<ShardSnapshotDeltaPacket>(s)

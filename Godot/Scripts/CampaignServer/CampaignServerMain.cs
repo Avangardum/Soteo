@@ -8,7 +8,7 @@ using Soteo.Core.PacketHandlers.CampaignServer;
 using Soteo.Core.Packets;
 using Soteo.Core.Persistence;
 using Soteo.Core.Serialization;
-using Soteo.Core.Serialization.Packet;
+using Soteo.Core.Serialization.Packets;
 using Soteo.Core.Synchronization.Snapshots;
 using Soteo.Main.CampaignServer.Communicators;
 using Soteo.Main.Shared;
