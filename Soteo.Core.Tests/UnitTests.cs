@@ -81,7 +81,6 @@ public sealed class UnitTests
             projectileAbilityContext,
             speed: 1,
             target: new ProjectileTarget(_sut),
-            Substitute.For<IProjectileNode>(),
             new Services(_serviceProvider)
         );
         _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [projectileId] = projectile });

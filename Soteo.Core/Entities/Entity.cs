@@ -1,19 +1,17 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Soteo.Core.Entities;
 
-public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, IEntityNode
+public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class?, IEntityNode?
 {
     internal Entity(Guid id, TNode node)
     {
         Id = id;
         Node = node;
-        node.Entity = this;
+        node?.Entity = this;
     }
 
     public event Action Removed = delegate { };
 
-    [MemberNotNullWhen(false, nameof(Node))] public bool IsRemoved { get; private set; }
+    public bool IsRemoved { get; private set; }
     protected TNode? Node { get; private set; }
     public Guid Id { get; }
     public virtual Vector2 Position { get; set; }
@@ -44,7 +42,7 @@ public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, 
     {
         if (IsRemoved) return;
         IsRemoved = true;
-        Node.Entity = null;
+        Node?.Entity = null;
         Node = null;
         Removed();
     }
@@ -53,7 +51,7 @@ public abstract class Entity<TNode> : ISnapshottableEntity where TNode : class, 
     {
         if (!IsRemoved) throw new InvalidOperationException("Only removed entities can be respawned");
         Node = node;
-        node.Entity = this;
+        node?.Entity = this;
         IsRemoved = false;
     }
 }

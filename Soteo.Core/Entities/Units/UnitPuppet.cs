@@ -163,7 +163,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
     {
         if (IsRemoved) return;
 
-        Node.FlipSpriteH = Azimuth >= 180;
+        Node.Required.FlipSpriteH = Azimuth >= 180;
 
         if (IsDead)
         {

@@ -1,6 +1,6 @@
 namespace Soteo.Core.Entities.Projectiles;
 
-public sealed class Projectile : Entity<IProjectileNode>
+public sealed class Projectile : Entity<IEntityNode?>
 {
     private readonly Services _services;
 
@@ -21,9 +21,8 @@ public sealed class Projectile : Entity<IProjectileNode>
         AbilityContext abilityContext,
         double speed,
         ProjectileTarget target,
-        IProjectileNode node,
         Services services
-    ) : base(id, node)
+    ) : base(id, null)
     {
         _abilityContext = abilityContext;
         _speed = speed;
@@ -34,7 +33,6 @@ public sealed class Projectile : Entity<IProjectileNode>
     public static Projectile FromSnapshot
     (
         ProjectileSnapshot snapshot,
-        IProjectileNode node,
         Services serviceProvider
     )
     {
@@ -47,7 +45,6 @@ public sealed class Projectile : Entity<IProjectileNode>
             abilityContext: null!,
             snapshot.Speed,
             target: null!,
-            node,
             serviceProvider
         )
         {

@@ -145,7 +145,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                     _services.Required
                 )
             ),
-            ProjectileSnapshot s => Add(Projectile.FromSnapshot(s, AddNode<IProjectileNode>(s.Id), _services.Required)),
+            ProjectileSnapshot s => Add(Projectile.FromSnapshot(s, _services.Required)),
             UnitPuppetSnapshot s => Add
             (
                 new UnitPuppet
@@ -232,7 +232,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     public Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target)
     {
         var id = Guid.NewGuid();
-        return Add(new Projectile(id, abilityContext, speed, target, AddNode<IProjectileNode>(id), _services.Required)
+        return Add(new Projectile(id, abilityContext, speed, target, _services.Required)
         {
             // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
             // of the projectile over the source

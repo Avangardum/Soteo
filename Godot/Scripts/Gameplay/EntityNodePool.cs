@@ -10,7 +10,6 @@ public sealed class EntityNodePool : IEntityNodePool
     private static readonly IReadOnlyDictionary<Type, PackedScene> Scenes = new Dictionary<Type, string>
     {
         [typeof(IUnitNode)] = "res://Scenes/Entities/Unit.tscn",
-        [typeof(IProjectileNode)] = "res://Scenes/Entities/Projectile.tscn",
         [typeof(IUnitPuppetNode)] = "res://Scenes/Entities/UnitPuppet.tscn",
         [typeof(IProjectilePuppetNode)] = "res://Scenes/Entities/ProjectilePuppet.tscn"
     }.ToDictionary(it => it.Key, it => ResourceLoader.Load<PackedScene>(it.Value)).AsReadOnly();
