@@ -37,7 +37,7 @@ public sealed class UnitTests
             inventory,
             equipmentInventory,
             new CrossInventoryHelper(),
-            _serviceProvider
+            new Services(_serviceProvider)
         );
     }
 
@@ -73,7 +73,7 @@ public sealed class UnitTests
             Ability = Ability.Instance<SpyAbility>(),
             User = _sut,
             UserStats = _sut.Stats.ToDictionary().AsReadOnly(),
-            ServiceProvider = _serviceProvider
+            Services = new Services(_serviceProvider)
         };
         var projectile = new Projectile
         (
@@ -82,7 +82,7 @@ public sealed class UnitTests
             speed: 1,
             target: new ProjectileTarget(_sut),
             Substitute.For<IProjectileNode>(),
-            _serviceProvider
+            new Services(_serviceProvider)
         );
         _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [projectileId] = projectile });
 

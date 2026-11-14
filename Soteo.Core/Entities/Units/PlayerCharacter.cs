@@ -11,7 +11,7 @@ public sealed class PlayerCharacter : Unit
         IInventory inventory,
         IEquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
-        IServiceProvider serviceProvider
+        Services services
     ) : base
     (
         id,
@@ -21,7 +21,7 @@ public sealed class PlayerCharacter : Unit
         inventory,
         equipmentInventory,
         crossInventoryHelper,
-        serviceProvider
+        services
     )
     {
         SetInnateSpecialAbility<RangedAttackAbility>(AbilitySlot.Attack);
@@ -43,7 +43,7 @@ public sealed class PlayerCharacter : Unit
         IInventory inventory,
         IEquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
-        IServiceProvider serviceProvider
+        Services services
     )
     {
         return new
@@ -55,7 +55,7 @@ public sealed class PlayerCharacter : Unit
             inventory,
             equipmentInventory,
             crossInventoryHelper,
-            serviceProvider
+            services
         );
     }
 }

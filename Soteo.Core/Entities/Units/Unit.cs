@@ -4,7 +4,7 @@ namespace Soteo.Core.Entities.Units;
 
 public abstract class Unit : UnitBase<IUnitNode>
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly Services _services;
     private readonly IEntityManager _entityManager;
     private readonly ICrossInventoryHelper _crossInventoryHelper;
 
@@ -30,10 +30,10 @@ public abstract class Unit : UnitBase<IUnitNode>
         IInventory inventory,
         IEquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
-        IServiceProvider serviceProvider
+        Services services
     ) : base(id, node)
     {
-        _serviceProvider = serviceProvider;
+        _services = services;
         _entityManager = entityManager;
         _controllingPlayerId = controllingPlayerId;
         Inventory = inventory;
@@ -108,7 +108,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         _abilitySlotStates = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
         _statuses =
-            s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _serviceProvider));
+            s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.Items);
@@ -433,7 +433,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             User = this,
             Alt = command.Alt,
             UserStats = Stats.ToDictionary().AsReadOnly(),
-            ServiceProvider = _serviceProvider,
+            Services = _services,
             TargetPosition = command.TargetPosition,
             TargetUnit = targetUnit,
             TargetDirection = command.TargetDirection,
@@ -449,7 +449,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             User = this,
             Alt = false,
             UserStats = Stats.ToDictionary().AsReadOnly(),
-            ServiceProvider = _serviceProvider,
+            Services = _services,
             TargetPosition = null,
             TargetUnit = null,
             TargetDirection = null,
@@ -667,7 +667,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             DisplayElapsedTime = 0,
             RemainingTime = time,
             Ordinal = _nextStatusOrdinal++,
-            ServiceProvider = _serviceProvider
+            Services = _services
         };
 
         List<StatusContext> duplicates = Statuses.Values.Where(it => it.Status == status).ToList();

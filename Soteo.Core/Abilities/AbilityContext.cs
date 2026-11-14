@@ -2,7 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Soteo.Core.Abilities;
 
-public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
+public sealed record AbilityContext : ISourceUnitAndAbility
 {
     public required Ability Ability { get; init; }
     public required Unit User { get; init; }
@@ -13,7 +13,7 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
     /// </summary>
     public required IReadOnlyDictionary<Stat, double> UserStats { get; init; }
 
-    public required IServiceProvider ServiceProvider { get; init; } // todo use strongly typed provider
+    public required Services Services { get; init; }
     public Vector2? TargetPosition { get; init; }
     public Unit? TargetUnit { get; init; }
     public Vector2? TargetDirection { get; init; }
@@ -21,8 +21,6 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
 
     Unit ISourceUnitAndAbility.Unit => User;
     AbilityContext ISourceUnitAndAbility.AbilityContext => this;
-
-    public object? GetService(Type serviceType) => ServiceProvider.GetService(serviceType);
 
     public AbilityContextSnapshot ToSnapshot()
     {
@@ -39,19 +37,18 @@ public sealed record AbilityContext : IServiceProvider, ISourceUnitAndAbility
         };
     }
 
-    public static AbilityContext FromSnapshot(AbilityContextSnapshot snapshot, IServiceProvider serviceProvider)
+    public static AbilityContext FromSnapshot(AbilityContextSnapshot snapshot, Services services)
     {
-        var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
         return new AbilityContext
         {
             Ability = snapshot.Ability,
-            User = entityManager.GetEntity<Unit>(snapshot.UserId).Required,
+            User = services.EntityManager.GetEntity<Unit>(snapshot.UserId).Required,
             Alt = snapshot.Alt,
             UserStats = snapshot.UserStats,
-            ServiceProvider = serviceProvider,
+            Services = services,
             TargetPosition = snapshot.TargetPosition,
             TargetUnit = snapshot.TargetUnitId == null ? null :
-                entityManager.GetEntity<Unit>(snapshot.TargetUnitId.Value).Required,
+                services.EntityManager.GetEntity<Unit>(snapshot.TargetUnitId.Value).Required,
             TargetDirection = snapshot.TargetDirection,
             TargetShardId = snapshot.TargetShardId
         };

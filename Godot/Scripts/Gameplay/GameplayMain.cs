@@ -174,6 +174,7 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         services.AddScoped<IShardSynchronizationServer, ShardSynchronizationServer>();
         services.AddScoped<ICurrentTickRepository, CurrentTickRepository>();
         services.AddScoped<IShardPersistenceSnapshotManager, ShardPersistenceSnapshotManager>();
+        services.AddScoped<Services>();
     }
 
     private void RegisterClientServices(IServiceCollection services)

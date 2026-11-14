@@ -11,7 +11,7 @@ public sealed class RecallAbility : Ability
     protected override void TakeEffectCore(AbilityContext context)
     {
         context.User.Remove();
-        context.GetRequiredService<IFromGameplayPacketSender>()
+        context.Services.PacketSender
             .Send(new CharacterRecalledPacket { CharacterId = context.User.Id }, Const.CampaignServerId);
     }
 }

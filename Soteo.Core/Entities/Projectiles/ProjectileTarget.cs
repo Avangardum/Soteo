@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Soteo.Core.Entities.Projectiles;
 
-public class ProjectileTarget
+public class ProjectileTarget // todo to union
 {
     public Unit? Unit { get; }
     public Vector2? Position { get; }
@@ -12,6 +12,7 @@ public class ProjectileTarget
     public ProjectileTarget(Vector2 position) => Position = position;
 
     public static implicit operator ProjectileTarget(Vector2 target) => new(target);
+    public static implicit operator ProjectileTarget(Unit target) => new(target);
 
     [MemberNotNullWhen(true, nameof(Unit))]
     [MemberNotNullWhen(false, nameof(Position))]
@@ -19,14 +20,8 @@ public class ProjectileTarget
 
     public ProjectileTargetSnapshot ToSnapshot() => IsUnit ? Unit.Id : Position;
 
-    public static ProjectileTarget FromSnapshot(ProjectileTargetSnapshot snapshot, IServiceProvider serviceProvider)
+    public static ProjectileTarget FromSnapshot(ProjectileTargetSnapshot snapshot, IEntityManager entityManager)
     {
-        if (snapshot.IsUnit)
-        {
-            var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
-            var target = entityManager.GetEntity<Unit>(snapshot.UnitId.Value).Required;
-            return new ProjectileTarget(target);
-        }
-        return snapshot.Position;
+        return snapshot.IsUnit ? entityManager.GetEntity<Unit>(snapshot.UnitId.Value).Required : snapshot.Position;
     }
 }

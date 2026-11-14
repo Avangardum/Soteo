@@ -44,7 +44,7 @@ public sealed class AbilityTests
             User = new TestUnit(),
             Alt = alt,
             UserStats = ReadOnlyDictionary<Stat, double>.Empty,
-            ServiceProvider = Substitute.For<IServiceProvider>(),
+            Services = new Services(Substitute.For<IServiceProvider>()),
             TargetPosition = targetPosition,
             TargetUnit = null,
             TargetDirection = null,

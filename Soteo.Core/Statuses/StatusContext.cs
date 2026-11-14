@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Soteo.Core.Statuses;
 
-public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
+public sealed record StatusContext : ISourceUnitAndAbility
 {
     public required Guid Id { get; init; }
     public required Status Status { get; init; }
@@ -14,13 +14,11 @@ public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
     public required double DisplayElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
     public required long Ordinal { get; init; }
-    public required IServiceProvider ServiceProvider { get; init; } // todo use strongly typed provider
+    public required Services Services { get; init; }
 
     Unit? ISourceUnitAndAbility.Unit => SourceUnit;
     Ability? ISourceUnitAndAbility.Ability => SourceAbilityContext?.Ability;
     AbilityContext? ISourceUnitAndAbility.AbilityContext => SourceAbilityContext;
-
-    public object? GetService(Type type) => ServiceProvider.GetService(type);
 
     [MemberNotNull(nameof(SourceAbilityContext))]
     public T SourceAbilityAs<T>() where T : Ability => (T)SourceAbilityContext.Required.Ability;
@@ -41,22 +39,21 @@ public sealed record StatusContext : IServiceProvider, ISourceUnitAndAbility
         };
     }
 
-    public static StatusContext FromSnapshot(StatusContextSnapshot snapshot, IServiceProvider serviceProvider)
+    public static StatusContext FromSnapshot(StatusContextSnapshot snapshot, Services services)
     {
-        var entityManager = serviceProvider.GetRequiredService<IEntityManager>();
         return new StatusContext
         {
             Id = snapshot.Id,
             Status = snapshot.Status,
             SourceAbilityContext =
-                snapshot.AbilityContext?.PassTo(it => AbilityContext.FromSnapshot(it, serviceProvider)),
-            Unit = entityManager.GetEntity<Unit>(snapshot.UnitId).Required,
-            SourceUnit = snapshot.SourceId?.PassTo(it => entityManager.GetEntity<Unit>(it).Required),
+                snapshot.AbilityContext?.PassTo(it => AbilityContext.FromSnapshot(it, services)),
+            Unit = services.EntityManager.GetEntity<Unit>(snapshot.UnitId).Required,
+            SourceUnit = snapshot.SourceId?.PassTo(it => services.EntityManager.GetEntity<Unit>(it).Required),
             ElapsedTime = snapshot.ElapsedTime,
             DisplayElapsedTime = snapshot.DisplayElapsedTime,
             RemainingTime = snapshot.RemainingTime,
             Ordinal = snapshot.Ordinal,
-            ServiceProvider = serviceProvider
+            Services = services
         };
     }
 }

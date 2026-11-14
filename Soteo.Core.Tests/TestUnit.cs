@@ -18,7 +18,7 @@ public sealed class TestUnit : Unit
         IInventory? inventory = null,
         IEquipmentInventory? equipmentInventory = null,
         ICrossInventoryHelper? crossInventoryHelper = null,
-        IServiceProvider? serviceProvider = null
+        Services? services = null
     ) : base
     (
         id ?? Guid.NewGuid(),
@@ -28,7 +28,7 @@ public sealed class TestUnit : Unit
         inventory ?? new Inventory(0),
         equipmentInventory ?? new EquipmentInventory(0),
         crossInventoryHelper ?? new CrossInventoryHelper(),
-        serviceProvider ?? new ServiceCollection().BuildServiceProvider()
+        services ?? new Services(new ServiceCollection().BuildServiceProvider())
     ) { }
 
     public new IReadOnlyDictionary<SpecialAbilitySlot, Ability> GetInnateSpecialAbilities() =>

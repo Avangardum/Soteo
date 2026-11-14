@@ -27,7 +27,7 @@ public sealed class EntityManagerTests
         _entityNodeManager = Substitute.For<IEntityNodeManager>();
         _sut = new EntityManager
         (
-            _serviceProvider,
+            ServerDependency.From(new Services(_serviceProvider)),
             ClientDependency.Null<ICamera>(),
             _entityNodeManager,
             new CrossInventoryHelper()
@@ -42,7 +42,7 @@ public sealed class EntityManagerTests
             Ability = Ability.Instance<TestAbility>(),
             User = _projectileSourceChar,
             UserStats = _projectileSourceChar.Stats.ToDictionary().AsReadOnly(),
-            ServiceProvider = _serviceProvider,
+            Services = new Services(_serviceProvider),
             TargetUnit = _projectileTargetChar
         };
 

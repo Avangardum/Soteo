@@ -2,7 +2,7 @@ namespace Soteo.Core.Entities;
 
 public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 {
-    private readonly IServiceProvider _serviceProvider;
+    private readonly ServerDependency<Services> _services;
     private readonly ClientDependency<ICamera> _camera;
     private readonly IEntityNodeManager _entityNodeManager;
     private readonly ICrossInventoryHelper _crossInventoryHelper;
@@ -26,13 +26,13 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 
     public EntityManager
     (
-        IServiceProvider serviceProvider,
+        ServerDependency<Services> services,
         ClientDependency<ICamera> camera,
         IEntityNodeManager entityNodeManager,
         ICrossInventoryHelper crossInventoryHelper
     )
     {
-        _serviceProvider = serviceProvider;
+        _services = services;
         _camera = camera;
         _entityNodeManager = entityNodeManager;
         _crossInventoryHelper = crossInventoryHelper;
@@ -120,10 +120,10 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
                     MakePlayerCharacterInventory(),
                     MakePlayerCharacterEquipmentInventory(),
                     _crossInventoryHelper,
-                    _serviceProvider
+                    _services.Required
                 )
             ),
-            ProjectileSnapshot s => Add(Projectile.FromSnapshot(s, AddNode<IProjectileNode>(s.Id), _serviceProvider)),
+            ProjectileSnapshot s => Add(Projectile.FromSnapshot(s, AddNode<IProjectileNode>(s.Id), _services.Required)),
             UnitPuppetSnapshot s => Add
             (
                 new UnitPuppet
@@ -201,7 +201,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
                     MakePlayerCharacterInventory(),
                     MakePlayerCharacterEquipmentInventory(),
                     _crossInventoryHelper,
-                    _serviceProvider
+                    _services.Required
                 )
             );
         }
@@ -210,7 +210,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
     public Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target)
     {
         var id = Guid.NewGuid();
-        return Add(new Projectile(id, abilityContext, speed, target, AddNode<IProjectileNode>(id), _serviceProvider)
+        return Add(new Projectile(id, abilityContext, speed, target, AddNode<IProjectileNode>(id), _services.Required)
         {
             // Offset the position 1 pixel up so that the projectile starts behind the source, avoiding 1 frame flicker
             // of the projectile over the source
