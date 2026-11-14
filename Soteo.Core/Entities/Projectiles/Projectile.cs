@@ -89,7 +89,7 @@ public sealed class Projectile : Entity<IProjectileNode>
         _isSnapshotReplicationPendingToFinishInit = false;
     }
 
-    public void Tick(double delta)
+    public override void Tick(double delta)
     {
         if (_isSnapshotReplicationPendingToFinishInit)
             throw new InvalidOperationException("Snapshot replication is pending to finish initialization");

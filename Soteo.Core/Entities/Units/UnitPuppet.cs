@@ -208,7 +208,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
 
     public void DesyncInventory() => _inventoryDesyncTimeRemaining = 0.5;
 
-    public void Process(double delta)
+    public override void Tick(double delta)
     {
         double prevInventoryDesyncTimeRemaining = _inventoryDesyncTimeRemaining;
         _inventoryDesyncTimeRemaining = Math.Max(_inventoryDesyncTimeRemaining - delta, 0);

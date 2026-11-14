@@ -30,7 +30,9 @@ public sealed class EntityManagerTests
             ServerDependency.From(new Services(_serviceProvider)),
             ClientDependency.Null<ICamera>(),
             _entityNodeManager,
-            new CrossInventoryHelper()
+            new CrossInventoryHelper(),
+            Substitute.For<IProcessPublisher>(),
+            new SideOptions { Side = Side.ShardServer }
         );
 
         _projectileSourceChar = _sut.SpawnPlayerCharacter(Guid.NewGuid(), Guid.NewGuid());

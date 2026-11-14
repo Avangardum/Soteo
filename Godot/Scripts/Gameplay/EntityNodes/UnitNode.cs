@@ -21,9 +21,4 @@ public sealed partial class UnitNode : CharacterBody2D, IUnitNode
     }
 
     public void MoveAndCollide(Vector2 movement) => base.MoveAndCollide(movement.ToGd() * Const.PixelsInMeter);
-
-    public override void _PhysicsProcess(double delta)
-    {
-        Unit?.Tick(delta);
-    }
 }

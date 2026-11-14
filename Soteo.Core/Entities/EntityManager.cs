@@ -1,13 +1,15 @@
 namespace Soteo.Core.Entities;
 
-public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
+public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDisposable
 {
     private readonly ServerDependency<Services> _services;
     private readonly ClientDependency<ICamera> _camera;
     private readonly IEntityNodeManager _entityNodeManager;
     private readonly ICrossInventoryHelper _crossInventoryHelper;
 
-    private readonly Dictionary<Guid, ISnapshottableEntity> _entities = [];
+    private readonly IDisposable _processSubscription;
+    private readonly SortedDictionary<Guid, ISnapshottableEntity> _entities = [];
+    private ISnapshottableEntity[] _entityIterationBuffer = new ISnapshottableEntity[1024];
 
     /// <summary>
     /// Removed entities are stored as WeakReference and are included in persistence snapshots as long as they are
@@ -29,13 +31,24 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
         ServerDependency<Services> services,
         ClientDependency<ICamera> camera,
         IEntityNodeManager entityNodeManager,
-        ICrossInventoryHelper crossInventoryHelper
+        ICrossInventoryHelper crossInventoryHelper,
+        IProcessPublisher processPublisher,
+        SideOptions sideOptions
     )
     {
         _services = services;
         _camera = camera;
         _entityNodeManager = entityNodeManager;
         _crossInventoryHelper = crossInventoryHelper;
+
+        _processSubscription = sideOptions.Side is Side.Client ?
+            processPublisher.SubscribeToProcess(Tick, ProcessPriority.Default, callWhenPaused: false) :
+            processPublisher.SubscribeToPhysicsProcess(Tick, ProcessPriority.Default, callWhenPaused: false);
+    }
+
+    public void Dispose()
+    {
+        _processSubscription.Dispose();
     }
 
     public IReadOnlyDictionary<Guid, IEntity> Entities =>
@@ -43,6 +56,15 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager
 
     public event Action<IEntity> EntityAdded = delegate { };
     public event Action<IEntity> EntityRemoved = delegate { };
+
+    private void Tick(double delta)
+    {
+        while (_entityIterationBuffer.Length < _entities.Count)
+            Array.Resize(ref _entityIterationBuffer, _entityIterationBuffer.Length * 2);
+        _entities.Values.CopyTo(_entityIterationBuffer, 0);
+        foreach (ISnapshottableEntity entity in _entityIterationBuffer.AsSpan(.._entities.Count))
+            entity.Tick(delta);
+    }
 
     public IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntitySnapshots()
     {

@@ -19,9 +19,4 @@ public sealed partial class ProjectileNode : Area2D, IProjectileNode
         get => Position.ToSys() / Const.PixelsInMeter;
         set => Position = value.ToGd() * Const.PixelsInMeter;
     }
-
-    public override void _PhysicsProcess(double delta)
-    {
-        Projectile?.Tick(delta);
-    }
 }

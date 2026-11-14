@@ -1,6 +1,6 @@
 namespace Soteo.Core.Entities;
 
-public interface IEntity
+public interface IEntity // todo remove
 {
     event Action Removed;
 

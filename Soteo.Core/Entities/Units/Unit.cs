@@ -120,7 +120,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         UpdateSpecialAbilityList();
     }
 
-    public void Tick(double delta)
+    public override void Tick(double delta)
     {
         if (IsRemoved) return;
         IsMoving = false;
