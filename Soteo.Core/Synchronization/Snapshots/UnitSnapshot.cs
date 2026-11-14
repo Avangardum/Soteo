@@ -9,7 +9,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, StatusContextSnapshot> Statuses { get; init; }
     public required Guid? ControllingPlayerId { get; init; }
-    public required IReadOnlyList<ItemStack?> Items { get; init; } // todo use special snapshot type
+    public required InventorySnapshot InventorySnapshot { get; init; }
     public required EquipmentInventorySnapshot EquipmentInventory { get; init; }
     public required IReadOnlyList<Ability> InnateHotbarAbilities { get; init; }
     public required IReadOnlyDictionary<SpecialAbilitySlot, Ability> InnateSpecialAbilities { get; init; }
@@ -28,7 +28,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
             AbilitySlotStates = AbilitySlotStates,
             AbilityUseProgress = AbilityUseProgress,
             Statuses = Statuses.ToDictionary(it => it.Key, it => it.Value.ToPuppet()).AsReadOnly(),
-            Items = Items,
+            InventorySnapshot = InventorySnapshot,
             ControllingPlayerIds = ControllingPlayerId == null ? [] : [ControllingPlayerId.Value],
             EquipmentInventory = EquipmentInventory
         };

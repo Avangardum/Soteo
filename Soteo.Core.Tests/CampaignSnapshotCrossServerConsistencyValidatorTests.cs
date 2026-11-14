@@ -244,7 +244,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             Position = default,
             Azimuth = 0,
             ControllingPlayerId = null,
-            Items = [],
+            InventorySnapshot = new InventorySnapshot([]),
             EquipmentInventory = new EquipmentInventorySnapshot(ReadOnlyDictionary<EquipmentSlot, ItemStack?>.Empty),
             InnateHotbarAbilities = [],
             InnateSpecialAbilities = ReadOnlyDictionary<SpecialAbilitySlot, Ability>.Empty

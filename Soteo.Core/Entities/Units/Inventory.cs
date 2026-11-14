@@ -104,18 +104,18 @@ public sealed class Inventory : IInventory
         return result;
     }
 
-    public IReadOnlyList<ItemStack?> ToSnapshot() => this.ToList().AsReadOnly();
+    public InventorySnapshot ToSnapshot() => new(_stacks.ToList().AsReadOnly());
 
-    public void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks)
+    public void ReplicateSnapshot(InventorySnapshot snapshot)
     {
-        _stacks = stacks.ToList();
+        _stacks = snapshot.Stacks.ToList();
         Changed();
     }
 
-    public void ApplyDelta(ListDelta<ItemStack?> delta)
+    public void ApplyDelta(InventoryDelta delta)
     {
         if (!delta.HasChanged) return;
-        delta.MutateList(_stacks);
+        delta.Stacks.MutateList(_stacks);
         Changed();
     }
 }

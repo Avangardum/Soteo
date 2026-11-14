@@ -103,11 +103,11 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         StatusesInternal = s.Statuses.ToDictionary();
         _controllingPlayerIds = s.ControllingPlayerIds.ToList();
 
-        _alwaysSynchronizedInventory.ReplicateSnapshot(s.Items);
+        _alwaysSynchronizedInventory.ReplicateSnapshot(s.InventorySnapshot);
         _alwaysSynchronizedEquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
         if (_inventoryDesyncTimeRemaining == 0)
         {
-            Inventory.ReplicateSnapshot(s.Items);
+            Inventory.ReplicateSnapshot(s.InventorySnapshot);
             EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
         }
 
@@ -142,11 +142,11 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         d.Statuses.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
         d.ControllingPlayerIds.MutateList(_controllingPlayerIds);
 
-        _alwaysSynchronizedInventory.ApplyDelta(d.Items);
+        _alwaysSynchronizedInventory.ApplyDelta(d.Inventory);
         _alwaysSynchronizedEquipmentInventory.ApplyDelta(d.EquipmentInventory);
         if (_inventoryDesyncTimeRemaining == 0)
         {
-            Inventory.ApplyDelta(d.Items);
+            Inventory.ApplyDelta(d.Inventory);
             EquipmentInventory.ApplyDelta(d.EquipmentInventory);
         }
 

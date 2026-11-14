@@ -8,8 +8,8 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
     public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses { get; init; }
-    public required IReadOnlyList<ItemStack?> Items { get; init; }
     public required IReadOnlyList<Guid> ControllingPlayerIds { get; init; }
+    public required InventorySnapshot InventorySnapshot { get; init; }
     public required EquipmentInventorySnapshot EquipmentInventory { get; init; }
 
     public override EntitySnapshotDelta DeltaFrom(UnitPuppetSnapshot? from)
@@ -27,8 +27,8 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
                 AbilitySlotStates = DictionaryDelta.FromNew(AbilitySlotStates),
                 AbilityUseProgress = AbilityUseProgress,
                 Statuses = DictionaryDelta.FromNew(Statuses),
-                Items = ListDelta.FromNew(Items),
                 ControllingPlayerIds = ListDelta.FromNew(ControllingPlayerIds),
+                Inventory = InventoryDelta.FromNew(InventorySnapshot),
                 EquipmentInventory = EquipmentInventoryDelta.FromNew(EquipmentInventory)
             };
         }
@@ -46,8 +46,8 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
             AbilitySlotStates = DictionaryDelta.Between(from.AbilitySlotStates, AbilitySlotStates),
             AbilityUseProgress = Delta.Between(from.AbilityUseProgress, AbilityUseProgress),
             Statuses = DictionaryDelta.Between(from.Statuses, Statuses),
-            Items = ListDelta.Between(from.Items, Items),
             ControllingPlayerIds = ListDelta.Between(from.ControllingPlayerIds, ControllingPlayerIds),
+            Inventory = InventoryDelta.Between(from.InventorySnapshot, InventorySnapshot),
             EquipmentInventory = EquipmentInventoryDelta.Between(from.EquipmentInventory, EquipmentInventory)
         };
     }

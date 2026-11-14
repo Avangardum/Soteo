@@ -19,7 +19,7 @@ public interface IInventory : IReadOnlyList<ItemStack?>
     ItemStack? Put(int slot, ItemStack stack);
 
     ItemStack? Remove(int slot);
-    IReadOnlyList<ItemStack?> ToSnapshot();
-    void ReplicateSnapshot(IReadOnlyList<ItemStack?> stacks);
-    void ApplyDelta(ListDelta<ItemStack?> delta);
+    InventorySnapshot ToSnapshot();
+    void ReplicateSnapshot(InventorySnapshot snapshot);
+    void ApplyDelta(InventoryDelta delta);
 }

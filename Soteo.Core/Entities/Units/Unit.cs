@@ -91,7 +91,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             AbilityUseProgress = AbilityUseProgress,
             Statuses = Statuses.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly(),
             ControllingPlayerId = _controllingPlayerId,
-            Items = Inventory.ToList().AsReadOnly(),
+            InventorySnapshot = Inventory.ToSnapshot(),
             EquipmentInventory = EquipmentInventory.ToSnapshot(),
             InnateHotbarAbilities = _innateHotbarAbilities.ToList().AsReadOnly(),
             InnateSpecialAbilities = _innateSpecialAbilities.ToDictionary().AsReadOnly()
@@ -111,7 +111,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
         _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
-        Inventory.ReplicateSnapshot(s.Items);
+        Inventory.ReplicateSnapshot(s.InventorySnapshot);
         EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
         _innateHotbarAbilities = s.InnateHotbarAbilities.ToList();
         _innateSpecialAbilities = s.InnateSpecialAbilities.ToDictionary();

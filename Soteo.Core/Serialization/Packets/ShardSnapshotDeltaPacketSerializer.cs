@@ -71,8 +71,8 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         SerializeDictionaryDelta(delta.AbilitySlotStates, s.SerializeAbilitySlot, s.SerializeAbilitySlotState, stream);
         SerializeNullableClassDelta(delta.AbilityUseProgress, s.SerializeAbilityUseProgress, stream);
         SerializeDictionaryDelta(delta.Statuses, s.SerializeGuid, s.SerializePuppetStatusContext, stream);
-        SerializeListDelta(delta.Items, (v, _) => s.SerializeNullableClass(v, s.SerializeItemStack, stream), stream);
         SerializeListDelta(delta.ControllingPlayerIds, s.SerializeGuid, stream);
+        SerializeInventoryDelta(delta.Inventory, stream);
         SerializeEquipmentInventoryDelta(delta.EquipmentInventory, stream);
     }
 
@@ -90,9 +90,9 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
                 DeserializeDictionaryDelta(s.DeserializeAbilitySlot, s.DeserializeAbilitySlotState, stream),
             AbilityUseProgress = DeserializeNullableClassDelta(s.DeserializeAbilityUseProgress, stream),
             Statuses = DeserializeDictionaryDelta(s.DeserializeGuid, s.DeserializePuppetStatusContext, stream),
-            Items = DeserializeListDelta(_ => s.DeserializeNullableClass(s.DeserializeItemStack, stream), stream),
             ControllingPlayerIds = DeserializeListDelta(s.DeserializeGuid, stream),
-            EquipmentInventory = DeserializeEquipmentInventoryDelta(stream),
+            Inventory = DeserializeInventoryDelta(stream),
+            EquipmentInventory = DeserializeEquipmentInventoryDelta(stream)
         };
     }
 
@@ -202,6 +202,17 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
             Changes = s.DeserializeDictionary(s.DeserializeInt, deserializeValue, stream),
             HasChanged = s.DeserializeBool(stream)
         };
+    }
+
+    private void SerializeInventoryDelta(InventoryDelta delta, Stream stream)
+    {
+        SerializeListDelta(delta.Stacks, s.SerializeNullableItemStack, stream);
+    }
+
+    private InventoryDelta DeserializeInventoryDelta(Stream stream)
+    {
+        ListDelta<ItemStack?> stacks = DeserializeListDelta(s.DeserializeNullableItemStack, stream);
+        return new InventoryDelta(stacks);
     }
 
     private void SerializeEquipmentInventoryDelta(EquipmentInventoryDelta delta, Stream stream)
