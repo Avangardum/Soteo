@@ -2,6 +2,6 @@ namespace Soteo.Core.Serialization;
 
 public interface IPacketSerializer
 {
-    Packet Deserialize(Span<byte> bytes);
+    Packet Deserialize(byte[] bytes);
     byte[] Serialize(Packet packet);
 }

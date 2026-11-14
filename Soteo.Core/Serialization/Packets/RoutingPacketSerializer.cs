@@ -6,11 +6,11 @@ public sealed class RoutingPacketSerializer
     ISerializationHelper s
 ) : IPacketSerializer
 {
-    public Packet Deserialize(Span<byte> bytes)
+    public Packet Deserialize(byte[] bytes)
     {
-        if (bytes.IsEmpty)
+        if (bytes.Length == 0)
             throw new BadPacketException("Packet is empty");
-        Type packetType = s.DeserializePacketType(new MemoryStream(bytes.ToArray()));
+        Type packetType = s.DeserializePacketType(new MemoryStream(bytes));
         IPacketSerializer serializer = serviceProvider.GetPacketSerializerFor(packetType) ??
             throw new BadPacketException($"No serializer exists for packet type {packetType}");
         return serializer.Deserialize(bytes);

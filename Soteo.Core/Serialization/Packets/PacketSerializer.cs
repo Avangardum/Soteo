@@ -85,13 +85,13 @@ public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : Packet
 
     protected abstract void SerializeCore(TPacket packet, Stream stream);
 
-    Packet IPacketSerializer.Deserialize(Span<byte> bytes) => Deserialize(bytes);
+    Packet IPacketSerializer.Deserialize(byte[] bytes) => Deserialize(bytes);
 
-    public TPacket Deserialize(Span<byte> bytes)
+    public TPacket Deserialize(byte[] bytes)
     {
         try
         {
-            var stream = new MemoryStream(bytes.ToArray());
+            var stream = new MemoryStream(bytes);
             Type type = s.DeserializePacketType(stream);
             if (type != typeof(TPacket))
                 throw new InvalidOperationException("Wrong serializer");
