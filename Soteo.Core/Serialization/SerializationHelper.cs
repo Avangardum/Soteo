@@ -71,32 +71,30 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 
     public void SerializeFloat(float value, Stream stream)
     {
-        byte[] buffer = BitConverter.GetBytes(value);
-        if (BitConverter.IsLittleEndian) buffer.Reverse();
+        Span<byte> buffer = stackalloc byte[sizeof(float)];
+        BinaryPrimitives.WriteSingleBigEndian(buffer, value);
         stream.Write(buffer);
     }
 
     public float DeserializeFloat(Stream stream)
     {
-        byte[] buffer = new byte[sizeof(float)];
+        Span<byte> buffer = stackalloc byte[sizeof(float)];
         stream.ReadExactly(buffer);
-        if (BitConverter.IsLittleEndian) buffer.Reverse();
-        return BitConverter.ToSingle(buffer, 0);
+        return BinaryPrimitives.ReadSingleBigEndian(buffer);
     }
 
     public void SerializeDouble(double value, Stream stream)
     {
-        byte[] buffer = BitConverter.GetBytes(value);
-        if (BitConverter.IsLittleEndian) buffer.Reverse();
+        Span<byte> buffer = stackalloc byte[sizeof(double)];
+        BinaryPrimitives.WriteDoubleBigEndian(buffer, value);
         stream.Write(buffer);
     }
 
     public double DeserializeDouble(Stream stream)
     {
-        byte[] buffer = new byte[sizeof(double)];
+        Span<byte> buffer = stackalloc byte[sizeof(double)];
         stream.ReadExactly(buffer);
-        if (BitConverter.IsLittleEndian) buffer.Reverse();
-        return BitConverter.ToDouble(buffer, 0);
+        return BinaryPrimitives.ReadDoubleBigEndian(buffer);
     }
 
     public void SerializeVector2(Vector2 value, Stream stream)
@@ -114,12 +112,14 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
 
     public void SerializeGuid(Guid value, Stream stream)
     {
-        stream.Write(value.ToByteArray());
+        Span<byte> buffer = stackalloc byte[Const.BytesInGuid];
+        value.TryWriteBytes(buffer);
+        stream.Write(buffer);
     }
 
     public Guid DeserializeGuid(Stream stream)
     {
-        byte[] buffer = new byte[Const.BytesInGuid];
+        Span<byte> buffer = stackalloc byte[Const.BytesInGuid];
         stream.ReadExactly(buffer);
         return new Guid(buffer);
     }
@@ -140,15 +140,8 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     public TEnum DeserializeEnum<TEnum>(Stream stream) where TEnum : Enum
     {
         TEnum value = DeserializeEnumWithoutValidation<TEnum>(stream);
-        if
-        (
-            !Enum.IsDefined(typeof(TEnum), value) &&
-            !typeof(TEnum).HasAttribute<FlagsAttribute>() &&
-            !typeof(TEnum).HasAttribute<AllowAnonymousEnumValuesAttribute>()
-        )
-        {
+        if (!EnumValidator<TEnum>.IsValid(value))
             throw new BadSerializedDataException($"Invalid {typeof(TEnum)} value {value}");
-        }
         return value;
     }
 

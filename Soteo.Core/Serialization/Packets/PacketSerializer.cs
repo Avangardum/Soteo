@@ -2,9 +2,11 @@
 
 namespace Soteo.Core.Serialization.Packets;
 
-public static class PacketSerializer
+public abstract class PacketSerializer
 {
     private static IReadOnlyDictionary<Type, Type>? _typesByPacketType;
+    protected static readonly Stream SharedMemoryStream = new MemoryStream(10_000_000);
+    protected static bool IsUsingSharedMemoryStream { get; set; }
 
     public static Type? TypeFor(Type packetType, ITypeLocator typeLocator)
     {
@@ -60,16 +62,25 @@ public static class PacketSerializer
     }
 }
 
-public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : IPacketSerializer where TPacket : Packet
+public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : PacketSerializer, IPacketSerializer
+    where TPacket : Packet
 {
     byte[] IPacketSerializer.Serialize(Packet packet) => Serialize((TPacket)packet);
 
     public byte[] Serialize(TPacket packet)
     {
-        var stream = new MemoryStream();
+        if (IsUsingSharedMemoryStream)
+            throw new InvalidOperationException("Shared memory stream is already in use");
+        IsUsingSharedMemoryStream = true;
+        Stream stream = SharedMemoryStream;
+        stream.Position = 0;
         s.SerializePacketType(packet.GetType(), stream);
         SerializeCore(packet, stream);
-        return stream.ToArray();
+        var result = new byte[stream.Position];
+        stream.Position = 0;
+        stream.ReadExactly(result);
+        IsUsingSharedMemoryStream = false;
+        return result;
     }
 
     protected abstract void SerializeCore(TPacket packet, Stream stream);
