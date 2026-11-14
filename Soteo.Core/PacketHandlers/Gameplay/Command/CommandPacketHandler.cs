@@ -5,7 +5,7 @@ namespace Soteo.Core.PacketHandlers.Gameplay.Command;
 
 [GameplayPacketHandler]
 [AllowClientPackets]
-public abstract class CommandPacketHandler<TPacket, TCommand>
+public closed class CommandPacketHandler<TPacket, TCommand>
 (
     IEntityManager entityManager,
     ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo
