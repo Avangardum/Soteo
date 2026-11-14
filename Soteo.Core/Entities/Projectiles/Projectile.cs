@@ -100,8 +100,7 @@ public sealed class Projectile : Entity<IProjectileNode>
             return;
         }
 
-        Vector2 targetPosition = _target.IsUnit ? _target.Unit.Position : _target.Position.Value;
-        Vector2 directionToTarget = targetPosition - Position;
+        Vector2 directionToTarget = _target.Position - Position;
         double movementLength = _speed * delta;
         if (movementLength * movementLength < directionToTarget.LengthSquared())
         {
@@ -115,7 +114,7 @@ public sealed class Projectile : Entity<IProjectileNode>
             // a snapshot where the projectile reaches the target, to prevent it from visually disappearing near the
             // target. If targeting a unit, offset it 1 pixel up so that when coming from above it doesn't flicker for 1
             // frame in front of the target.
-            Position = _target.IsUnit ? targetPosition - Vector2.UnitY : targetPosition;
+            Position = _target is Unit ? _target.Position - Vector2.UnitY : _target.Position;
         }
     }
 }
