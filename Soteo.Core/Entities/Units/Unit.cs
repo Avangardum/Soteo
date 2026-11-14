@@ -9,7 +9,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     private readonly ICrossInventoryHelper _crossInventoryHelper;
 
     private long _nextStatusOrdinal;
-    private readonly Queue<ICommand> _commands = [];
+    private readonly Queue<Command> _commands = [];
     private Guid? _controllingPlayerId;
     private Dictionary<Guid, StatusContext> _statuses = []; // todo rename to _statusContexts and rename related members
     private Dictionary<Stat, double> _stats  = [];
@@ -47,7 +47,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     }
 
     // For testing
-    private protected IReadOnlyList<ICommand> GetCommands() => _commands.ToList();
+    private protected IReadOnlyList<Command> GetCommands() => _commands.ToList();
 
     public IReadOnlyList<Guid> ControllingPlayerIds =>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
@@ -297,7 +297,7 @@ public abstract class Unit : UnitBase<IUnitNode>
                 case UnequipCommand command:
                     Unequip(command);
                     break;
-                case ICommand command:
+                case Command command:
                     throw new Exception($"Unknown command type {command.GetType()}");
             }
         }
@@ -552,9 +552,9 @@ public abstract class Unit : UnitBase<IUnitNode>
         _crossInventoryHelper.Unequip(Inventory, EquipmentInventory, command.EquipmentSlot, command.ToInventorySlot);
     }
 
-    internal void SetCommand(ICommand command)
+    internal void SetCommand(Command command)
     {
-        ICommand? prevCommand = _commands.PeekOrDefault();
+        Command? prevCommand = _commands.PeekOrDefault();
         _commands.Clear();
 
         if (command is UseAbilityCommand a && prevCommand is UseAbilityCommand b && a.Slot == b.Slot)

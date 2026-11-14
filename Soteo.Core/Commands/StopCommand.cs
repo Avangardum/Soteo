@@ -1,3 +1,3 @@
 namespace Soteo.Core.Commands;
 
-public sealed record StopCommand : ICommand;
+public sealed record StopCommand : Command;

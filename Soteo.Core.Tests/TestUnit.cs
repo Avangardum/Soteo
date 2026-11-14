@@ -36,7 +36,7 @@ public sealed class TestUnit : Unit
 
     public new IReadOnlyList<Ability> GetInnateHotbarAbilities() => base.GetInnateHotbarAbilities();
 
-    public new IReadOnlyList<ICommand> GetCommands() => base.GetCommands();
+    public new IReadOnlyList<Command> GetCommands() => base.GetCommands();
 
     public new void AddInnateHotbarAbility<T>() where T : Ability, new() => base.AddInnateHotbarAbility<T>();
 

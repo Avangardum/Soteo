@@ -1,3 +1,3 @@
 namespace Soteo.Core.Commands;
 
-public interface ICommand; // todo to closed class
+public closed record Command;

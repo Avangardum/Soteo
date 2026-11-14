@@ -1,6 +1,6 @@
 namespace Soteo.Core.Commands;
 
-public sealed record UseAbilityCommand : ICommand
+public sealed record UseAbilityCommand : Command
 {
     public required AbilitySlot Slot { get; init; }
     public bool Repeat { get; init; }

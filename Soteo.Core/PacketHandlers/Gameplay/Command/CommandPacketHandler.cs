@@ -9,7 +9,7 @@ public abstract class CommandPacketHandler<TPacket, TCommand>
 (
     IEntityManager entityManager,
     ISynchronizedCampaignStatePuppetRepository synchronizedCampaignStateRepo
-) : PacketHandler<TPacket> where TPacket : CommandPacket<TCommand> where TCommand : ICommand
+) : PacketHandler<TPacket> where TPacket : CommandPacket<TCommand> where TCommand : Commands.Command
 {
     protected override void Handle(TPacket packet, Guid senderId)
     {
