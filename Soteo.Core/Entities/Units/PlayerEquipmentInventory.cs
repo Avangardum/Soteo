@@ -2,18 +2,18 @@ using System.Collections;
 
 namespace Soteo.Core.Entities.Units;
 
-public sealed class EquipmentInventory : IEquipmentInventory
+public sealed class PlayerEquipmentInventory : EquipmentInventory
 {
     public override event Action Changed = delegate { };
 
     private Dictionary<EquipmentSlot, ItemStack?> _stacks;
 
-    public EquipmentInventory(params IReadOnlyList<EquipmentSlot> slots)
+    public PlayerEquipmentInventory(params IReadOnlyList<EquipmentSlot> slots)
     {
         _stacks = slots.ToDictionary(it => it, ItemStack? (it) => null);
     }
 
-    public EquipmentInventory(IReadOnlyDictionary<EquipmentSlot, ItemStack?> stacks)
+    public PlayerEquipmentInventory(IReadOnlyDictionary<EquipmentSlot, ItemStack?> stacks)
     {
         _stacks = stacks.ToDictionary();
     }

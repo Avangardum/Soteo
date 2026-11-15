@@ -19,7 +19,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     private bool _allowAbilityPassiveStatusManipulation;
 
     public Inventory Inventory { get; }
-    public IEquipmentInventory EquipmentInventory { get; }
+    public EquipmentInventory EquipmentInventory { get; }
 
     protected Unit
     (
@@ -28,7 +28,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         IUnitNode node,
         IEntityManager entityManager,
         Inventory inventory,
-        IEquipmentInventory equipmentInventory,
+        EquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
         Services services
     ) : base(id, node)

@@ -2,7 +2,7 @@ using System.Collections;
 
 namespace Soteo.Core.Entities.Units;
 
-public abstract class IEquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemStack?>
+public abstract class EquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemStack?>
 {
     public abstract event Action Changed;
 

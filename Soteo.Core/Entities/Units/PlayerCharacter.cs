@@ -9,7 +9,7 @@ public sealed class PlayerCharacter : Unit
         IUnitNode node,
         IEntityManager entityManager,
         Inventory inventory,
-        IEquipmentInventory equipmentInventory,
+        EquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
         Services services
     ) : base
@@ -41,7 +41,7 @@ public sealed class PlayerCharacter : Unit
         IUnitNode node,
         IEntityManager entityManager,
         Inventory inventory,
-        IEquipmentInventory equipmentInventory,
+        EquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
         Services services
     )

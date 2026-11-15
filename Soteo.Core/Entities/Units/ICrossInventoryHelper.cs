@@ -5,7 +5,7 @@ public interface ICrossInventoryHelper
     bool Equip
     (
         Inventory inventory,
-        IEquipmentInventory equipmentInventory,
+        EquipmentInventory equipmentInventory,
         int fromInventorySlot,
         EquipmentSlot? toEquipmentSlot
     );
@@ -13,7 +13,7 @@ public interface ICrossInventoryHelper
     bool Unequip
     (
         Inventory inventory,
-        IEquipmentInventory equipmentInventory,
+        EquipmentInventory equipmentInventory,
         EquipmentSlot fromEquipmentSlot,
         int? toInventorySlot
     );

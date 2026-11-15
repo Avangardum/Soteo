@@ -274,8 +274,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     }
 
     private Inventory MakePlayerCharacterInventory() =>
-        new SimpleInventory(8);
+        new PlayerInventory(8);
 
-    private IEquipmentInventory MakePlayerCharacterEquipmentInventory() =>
-        new EquipmentInventory(Enum.GetValues<EquipmentSlot>());
+    private EquipmentInventory MakePlayerCharacterEquipmentInventory() =>
+        new PlayerEquipmentInventory(Enum.GetValues<EquipmentSlot>());
 }

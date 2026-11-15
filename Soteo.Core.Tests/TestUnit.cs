@@ -16,7 +16,7 @@ public sealed class TestUnit : Unit
         IUnitNode? node = null,
         IEntityManager? entityManager = null,
         Inventory? inventory = null,
-        IEquipmentInventory? equipmentInventory = null,
+        EquipmentInventory? equipmentInventory = null,
         ICrossInventoryHelper? crossInventoryHelper = null,
         Services? services = null
     ) : base
@@ -25,8 +25,8 @@ public sealed class TestUnit : Unit
         controllingPlayerId ?? Guid.NewGuid(),
         node ?? Substitute.For<IUnitNode>(),
         entityManager ?? Substitute.For<IEntityManager>(),
-        inventory ?? new SimpleInventory(0),
-        equipmentInventory ?? new EquipmentInventory(0),
+        inventory ?? new PlayerInventory(0),
+        equipmentInventory ?? new PlayerEquipmentInventory(0),
         crossInventoryHelper ?? new CrossInventoryHelper(),
         services ?? new Services(new ServiceCollection().BuildServiceProvider())
     ) { }

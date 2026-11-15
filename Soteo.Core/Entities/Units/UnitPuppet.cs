@@ -6,7 +6,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
     private double _inventoryDesyncTimeRemaining;
     private List<Guid> _controllingPlayerIds = [];
     private readonly Inventory _alwaysSynchronizedInventory;
-    private readonly IEquipmentInventory _alwaysSynchronizedEquipmentInventory;
+    private readonly EquipmentInventory _alwaysSynchronizedEquipmentInventory;
 
     private Dictionary<Stat, double> StatsInternal { get; set; } = [];
     public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
@@ -15,7 +15,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
 
     public Inventory Inventory { get; }
-    public IEquipmentInventory EquipmentInventory { get; }
+    public EquipmentInventory EquipmentInventory { get; }
 
     public IReadOnlyList<Guid> ControllingPlayerIds => _controllingPlayerIds;
 
@@ -25,7 +25,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         IUnitPuppetNode node,
         ICamera camera,
         Func<Inventory> makeInventory,
-        Func<IEquipmentInventory> makeEquipmentInventory
+        Func<EquipmentInventory> makeEquipmentInventory
     ) : base(id, node)
     {
         _camera = camera;

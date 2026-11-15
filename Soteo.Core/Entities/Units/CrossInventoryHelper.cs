@@ -5,7 +5,7 @@ public sealed class CrossInventoryHelper : ICrossInventoryHelper
     public bool Equip
     (
         Inventory inventory,
-        IEquipmentInventory equipmentInventory,
+        EquipmentInventory equipmentInventory,
         int fromInventorySlot,
         EquipmentSlot? toEquipmentSlot
     )
@@ -35,7 +35,7 @@ public sealed class CrossInventoryHelper : ICrossInventoryHelper
     public bool Unequip
     (
         Inventory inventory,
-        IEquipmentInventory equipmentInventory,
+        EquipmentInventory equipmentInventory,
         EquipmentSlot fromEquipmentSlot,
         int? toInventorySlot
     )
