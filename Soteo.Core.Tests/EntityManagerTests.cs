@@ -78,10 +78,16 @@ public sealed class EntityManagerTests
     {
         _projectileSourceChar.Remove();
         _projectileTargetChar.Remove();
-        Unit newProjectileSourceChar =
-            _sut.SpawnPlayerCharacter(_projectileSourceChar.Id, _projectileSourceChar.ControllingPlayerIds.Single());
-        Unit newProjectileTargetChar =
-            _sut.SpawnPlayerCharacter(_projectileTargetChar.Id, _projectileTargetChar.ControllingPlayerIds.Single());
+        Unit newProjectileSourceChar = _sut.SpawnPlayerCharacter
+        (
+            _projectileSourceChar.Id,
+            _projectileSourceChar.GetControllingPlayerIds().Single()
+        );
+        Unit newProjectileTargetChar = _sut.SpawnPlayerCharacter
+        (
+            _projectileTargetChar.Id,
+            _projectileTargetChar.GetControllingPlayerIds().Single()
+        );
 
         newProjectileSourceChar.Should().BeSameAs(_projectileSourceChar);
         newProjectileSourceChar.IsRemoved.Should().BeFalse();
@@ -107,7 +113,10 @@ public sealed class EntityManagerTests
     [Fact]
     public void SpawningPlayerCharacterWithSameIdAsAnotherPlayerCharacterThrows()
     {
-        _sut.Invoking(it => it.SpawnPlayerCharacter(_bystanderChar.Id, _bystanderChar.ControllingPlayerIds.Single()))
+        _sut.Invoking
+            (
+                it => it.SpawnPlayerCharacter(_bystanderChar.Id, _bystanderChar.GetControllingPlayerIds().Single())
+            )
             .Should().Throw<InvalidOperationException>();
     }
 

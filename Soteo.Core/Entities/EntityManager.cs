@@ -202,7 +202,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 );
             }
 
-            if (!playerCharacter.ControllingPlayerIds.SequenceEqual([controllingPlayerId]))
+            if (!playerCharacter.GetControllingPlayerIds().SequenceEqual([controllingPlayerId]))
                 throw new InvalidOperationException("Player character control transfer is not supported");
 
             playerCharacter.Respawn(AddNode<IUnitNode>(id));

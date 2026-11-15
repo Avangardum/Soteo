@@ -15,7 +15,7 @@ public closed class CommandPacketHandler<TPacket, TCommand>
     {
         if (synchronizedCampaignStateRepo.State.IsPaused) return;
         Unit? unit = entityManager.GetEntity<Unit>(packet.UnitId);
-        if (unit != null && unit.ControllingPlayerIds.Contains(senderId))
+        if (unit != null && unit.IsControlledByPlayer(senderId))
             unit.SetCommand(packet.Command);
     }
 }

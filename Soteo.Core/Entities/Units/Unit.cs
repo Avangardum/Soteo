@@ -49,8 +49,9 @@ public abstract class Unit : UnitBase<IUnitNode>
     // For testing
     private protected IReadOnlyList<Command> GetCommands() => _commands.ToList();
 
-    // todo to method
-    public IReadOnlyList<Guid> ControllingPlayerIds =>
+    public bool IsControlledByPlayer(Guid id) => _controllingPlayerId == id;
+
+    public IReadOnlyList<Guid> GetControllingPlayerIds() =>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
 
     public StatusContext? GetStatusContext(Guid id) =>
