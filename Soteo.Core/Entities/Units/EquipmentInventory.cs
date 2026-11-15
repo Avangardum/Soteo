@@ -4,7 +4,7 @@ namespace Soteo.Core.Entities.Units;
 
 public sealed class EquipmentInventory : IEquipmentInventory
 {
-    public event Action Changed = delegate { };
+    public override event Action Changed = delegate { };
 
     private Dictionary<EquipmentSlot, ItemStack?> _stacks;
 
@@ -18,14 +18,9 @@ public sealed class EquipmentInventory : IEquipmentInventory
         _stacks = stacks.ToDictionary();
     }
 
-    public ItemStack? this[EquipmentSlot slot] => _stacks[slot];
+    public override ItemStack? this[EquipmentSlot slot] => _stacks[slot];
 
-    /// <summary>
-    /// Put an item stack into a target slot. If the slot contains a stack that can be fully or partially merged with
-    /// the put stack, it's merged and a remainder is returned. If the slot contains a stack that can't be merged,
-    /// nothing is changed and the input stack is returned.
-    /// </summary>
-    public ItemStack? Put(EquipmentSlot slot, ItemStack stack)
+    public override ItemStack? Put(EquipmentSlot slot, ItemStack stack)
     {
         if (stack.Item.EquippableTo != slot) return stack;
         IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> blockedAndBlockingSlots = BlockedAndBlockingSlots;
@@ -55,7 +50,7 @@ public sealed class EquipmentInventory : IEquipmentInventory
         return stack.WithCount(stack.Count - movedCount);
     }
 
-    public ItemStack? Remove(EquipmentSlot slot)
+    public override ItemStack? Remove(EquipmentSlot slot)
     {
         ItemStack? result = _stacks[slot];
         _stacks[slot] = null;
@@ -63,7 +58,7 @@ public sealed class EquipmentInventory : IEquipmentInventory
         return result;
     }
 
-    public IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> BlockedAndBlockingSlots
+    public override IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> BlockedAndBlockingSlots
     {
         get
         {
@@ -78,32 +73,30 @@ public sealed class EquipmentInventory : IEquipmentInventory
         }
     }
 
-    public EquipmentInventorySnapshot ToSnapshot() => new(_stacks.ToDictionary());
+    public override EquipmentInventorySnapshot ToSnapshot() => new(_stacks.ToDictionary());
 
-    public void ReplicateSnapshot(EquipmentInventorySnapshot snapshot)
+    public override void ReplicateSnapshot(EquipmentInventorySnapshot snapshot)
     {
         _stacks = snapshot.Stacks.ToDictionary();
         Changed();
     }
 
-    public void ApplyDelta(EquipmentInventoryDelta delta)
+    public override void ApplyDelta(EquipmentInventoryDelta delta)
     {
         if (!delta.HasChanged) return;
         delta.Stacks.MutateDictionary(_stacks);
         Changed();
     }
 
-    public IEnumerator<KeyValuePair<EquipmentSlot, ItemStack?>> GetEnumerator() => _stacks.GetEnumerator();
+    public override IEnumerator<KeyValuePair<EquipmentSlot, ItemStack?>> GetEnumerator() => _stacks.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public override int Count => _stacks.Count;
 
-    public int Count => _stacks.Count;
+    public override bool ContainsKey(EquipmentSlot key) => _stacks.ContainsKey(key);
 
-    public bool ContainsKey(EquipmentSlot key) => _stacks.ContainsKey(key);
+    public override bool TryGetValue(EquipmentSlot key, out ItemStack? value) => _stacks.TryGetValue(key, out value);
 
-    public bool TryGetValue(EquipmentSlot key, out ItemStack? value) => _stacks.TryGetValue(key, out value);
+    public override IEnumerable<EquipmentSlot> Keys => _stacks.Keys;
 
-    public IEnumerable<EquipmentSlot> Keys => _stacks.Keys;
-
-    public IEnumerable<ItemStack?> Values => _stacks.Values;
+    public override IEnumerable<ItemStack?> Values => _stacks.Values;
 }

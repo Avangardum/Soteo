@@ -1,26 +1,46 @@
+using System.Collections;
+
 namespace Soteo.Core.Entities.Units;
 
-public interface IEquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemStack?>
+public abstract class IEquipmentInventory : IReadOnlyDictionary<EquipmentSlot, ItemStack?>
 {
-    event Action Changed;
+    public abstract event Action Changed;
 
     /// <summary>
-    /// Put an item stack into a target slot. If the slot contains a stack that can be fully or partially merged with
-    /// the put stack, it's merged and a remainder is returned. If the slot contains a stack that can't be merged,
-    /// nothing is changed and the input stack is returned.
+    /// Put an item stack into a target slot, returning a remainder of the stack if it didn't fit,
+    /// or a stack it replaced
     /// </summary>
-    ItemStack? Put(EquipmentSlot slot, ItemStack stack);
+    public abstract ItemStack? Put(EquipmentSlot slot, ItemStack stack);
 
-    ItemStack? Remove(EquipmentSlot slot);
+    public ItemStack? Put<T>(EquipmentSlot slot, long count) where T : Item, new() =>
+        Put(slot, ItemStack.Of<T>(count));
+
+    public abstract ItemStack? Remove(EquipmentSlot slot);
 
     /// <summary>
     /// Slots that are empty, but blocked by items in other slots as keys and slots that block them as values
-    /// </summary>
-    IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> BlockedAndBlockingSlots { get; }
+    /// </summary> // todo to method
+    public abstract IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> BlockedAndBlockingSlots { get; }
 
-    EquipmentInventorySnapshot ToSnapshot();
+    public abstract int Count { get; }
 
-    void ReplicateSnapshot(EquipmentInventorySnapshot snapshot);
+    public abstract IEnumerable<EquipmentSlot> Keys { get; }
 
-    void ApplyDelta(EquipmentInventoryDelta delta);
+    public abstract IEnumerable<ItemStack?> Values { get; }
+
+    public abstract EquipmentInventorySnapshot ToSnapshot();
+
+    public abstract void ReplicateSnapshot(EquipmentInventorySnapshot snapshot);
+
+    public abstract void ApplyDelta(EquipmentInventoryDelta delta);
+
+    public abstract IEnumerator<KeyValuePair<EquipmentSlot, ItemStack?>> GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public abstract bool ContainsKey(EquipmentSlot key);
+
+    public abstract bool TryGetValue(EquipmentSlot key, out ItemStack? value);
+
+    public abstract ItemStack? this[EquipmentSlot key] { get; }
 }
