@@ -11,7 +11,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     private long _nextStatusOrdinal;
     private readonly Queue<Command> _commands = [];
     private Guid? _controllingPlayerId;
-    private Dictionary<Guid, StatusContext> _statuses = []; // todo rename to _statusContexts and rename related members
+    private Dictionary<Guid, StatusContext> _statusContexts = [];
     private Dictionary<Stat, double> _stats  = [];
     private Dictionary<AbilitySlot, AbilitySlotState> _abilitySlotStates = [];
     private List<Ability> _innateHotbarAbilities = [];
@@ -53,7 +53,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
 
     // todo to get snapshot method
-    public IReadOnlyDictionary<Guid, StatusContext> Statuses => _statuses;
+    public IReadOnlyDictionary<Guid, StatusContext> StatusContexts => _statusContexts;
 
     // todo to get snapshot method
     public IReadOnlyDictionary<Stat, double> Stats => _stats;
@@ -89,7 +89,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Stats = Stats.ToDictionary().AsReadOnly(),
             AbilitySlotStates = _abilitySlotStates.ToDictionary().AsReadOnly(),
             AbilityUseProgress = AbilityUseProgress,
-            Statuses = Statuses.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly(),
+            Statuses = StatusContexts.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly(),
             ControllingPlayerId = _controllingPlayerId,
             InventorySnapshot = Inventory.ToSnapshot(),
             EquipmentInventory = EquipmentInventory.ToSnapshot(),
@@ -107,9 +107,9 @@ public abstract class Unit : UnitBase<IUnitNode>
         _stats = s.Stats.ToDictionary();
         _abilitySlotStates = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
-        _statuses =
+        _statusContexts =
             s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
-        _nextStatusOrdinal = Statuses.Count > 0 ? Statuses.Values.Max(it => it.Ordinal) + 1 : 0;
+        _nextStatusOrdinal = StatusContexts.Count > 0 ? StatusContexts.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.InventorySnapshot);
         EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
@@ -157,13 +157,13 @@ public abstract class Unit : UnitBase<IUnitNode>
     private void ProcessStatuses(double delta)
     {
         // todo if a status tick removes another status, that status will still be ticked
-        foreach (StatusContext context in Statuses.Values.ToList())
+        foreach (StatusContext context in StatusContexts.Values.ToList())
         {
             // todo check if self-removing status behaves correctly
             context.Status.Tick(context, delta);
             if (context.RemainingTime > delta)
             {
-                _statuses[context.Id] = context with
+                _statusContexts[context.Id] = context with
                 {
                     ElapsedTime = context.ElapsedTime + delta,
                     DisplayElapsedTime = context.DisplayElapsedTime + delta,
@@ -190,7 +190,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             }
         }
 
-        foreach (StatModifier modifier in Statuses.Values.SelectMany(it => it.Status.StatModifiers(it)))
+        foreach (StatModifier modifier in StatusContexts.Values.SelectMany(it => it.Status.StatModifiers(it)))
             modifiers[modifier.Stat][modifier.Kind].Add(modifier);
 
         double oldMaxHealth = Stats[Stat.MaxHealth];
@@ -622,7 +622,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     public void DealAttackDamageTo(Unit target, Ability sourceAbility)
     {
         target.TakeDamage(new Damage(Stats[Stat.AttackDamage]), this, sourceAbility);
-        foreach (StatusContext statusContext in Statuses.Values.ToList())
+        foreach (StatusContext statusContext in StatusContexts.Values.ToList())
             statusContext.Status.OnDealAttackDamage(statusContext, target, Stats[Stat.AttackDamage]);
     }
 
@@ -670,28 +670,28 @@ public abstract class Unit : UnitBase<IUnitNode>
             Services = _services
         };
 
-        List<StatusContext> duplicates = Statuses.Values.Where(it => it.Status == status).ToList();
+        List<StatusContext> duplicates = StatusContexts.Values.Where(it => it.Status == status).ToList();
         if (duplicates.Count == 0)
         {
-            _statuses[context.Id] = context;
+            _statusContexts[context.Id] = context;
         }
         else
         {
             switch (status.DuplicateResolution)
             {
                 case DuplicateStatusResolution.Stack:
-                    _statuses[context.Id] = context;
+                    _statusContexts[context.Id] = context;
                     break;
                 case DuplicateStatusResolution.Refresh:
                     RefreshDuplicateStatuses(context, duplicates.Single());
                     break;
                 case DuplicateStatusResolution.StackAndRefresh:
-                    _statuses[context.Id] = context;
+                    _statusContexts[context.Id] = context;
                     RefreshDuplicateStatuses(context, duplicates);
                     break;
                 case DuplicateStatusResolution.Replace:
                     RemoveStatus(duplicates.Single().Id);
-                    _statuses[context.Id] = context;
+                    _statusContexts[context.Id] = context;
                     break;
                 case DuplicateStatusResolution.Discard:
                     break;
@@ -709,7 +709,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     {
         foreach (StatusContext target in targets)
         {
-            _statuses[target.Id] = target with
+            _statusContexts[target.Id] = target with
             {
                 SourceUnit = reference.SourceUnit,
                 SourceAbilityContext = reference.SourceAbilityContext,
@@ -721,11 +721,11 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     public void RemoveStatus(Guid id)
     {
-        if (!_statuses.TryGetValue(id, out StatusContext? statusContext)) return;
+        if (!_statusContexts.TryGetValue(id, out StatusContext? statusContext)) return;
         if (!_allowAbilityPassiveStatusManipulation && statusContext.Status is AbilityPassiveStatus)
             throw new InvalidOperationException("Ability passive statuses should not be removed manually");
         if (IsRemoved) return;
-        _statuses.Remove(id);
+        _statusContexts.Remove(id);
         UpdateStats();
     }
 
@@ -734,7 +734,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     public void RemoveAllStatuses(Status status)
     {
         if (IsRemoved) return;
-        foreach ((Guid id, StatusContext context) in _statuses)
+        foreach ((Guid id, StatusContext context) in _statusContexts)
             if (context.Status == status)
                 RemoveStatus(id);
     }

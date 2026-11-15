@@ -133,9 +133,9 @@ public sealed class UnitTests
     public void StatusRemovedOnDealAttackDamageIsRemovedAccordingly()
     {
         _sut.AddStatus<StatusRemovedOnDealAttackDamage>(time: 10, source: null);
-        _sut.Statuses.Should().NotBeEmpty();
+        _sut.StatusContexts.Should().NotBeEmpty();
         _sut.DealAttackDamageTo(_sut, Ability.Instance<MeleeAttackAbility>());
-        _sut.Statuses.Should().BeEmpty();
+        _sut.StatusContexts.Should().BeEmpty();
     }
 
     [Fact]
@@ -677,7 +677,7 @@ public sealed class UnitTests
     public void AddingInnateAbilityWithPassiveStatusAddsThatStatus()
     {
         _sut.AddInnateHotbarAbility<TestPassiveAbility>();
-        _sut.Statuses.Values.Single().Status.Should().BeOfType<TestAbilityPassiveStatus>();
+        _sut.StatusContexts.Values.Single().Status.Should().BeOfType<TestAbilityPassiveStatus>();
     }
 
     [Fact]
@@ -685,14 +685,14 @@ public sealed class UnitTests
     {
         _sut.AddInnateHotbarAbility<TestPassiveAbility>();
         _sut.RemoveInnateHotbarAbility<TestPassiveAbility>();
-        _sut.Statuses.Should().BeEmpty();
+        _sut.StatusContexts.Should().BeEmpty();
     }
 
     [Fact]
     public void AddingAttackWithPassiveStatusAddsThatStatus()
     {
         _sut.SetInnateSpecialAbility<TestPassiveAbility>(AbilitySlot.Attack);
-        _sut.Statuses.Values.Single().Status.Should().BeOfType<TestAbilityPassiveStatus>();
+        _sut.StatusContexts.Values.Single().Status.Should().BeOfType<TestAbilityPassiveStatus>();
     }
 
     [Fact]
@@ -700,7 +700,7 @@ public sealed class UnitTests
     {
         _sut.SetInnateSpecialAbility<TestPassiveAbility>(AbilitySlot.Attack);
         _sut.RemoveInnateSpecialAbility(AbilitySlot.Attack);
-        _sut.Statuses.Should().BeEmpty();
+        _sut.StatusContexts.Should().BeEmpty();
     }
 
     [Fact]
