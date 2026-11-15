@@ -8,7 +8,7 @@ public sealed partial class UnitNode : CharacterBody2D, IUnitNode
 {
     public Unit? Unit { get; set; }
 
-    public IEntity? Entity
+    public Entity? Entity
     {
         get => Unit;
         set => Unit = (Unit?)value;

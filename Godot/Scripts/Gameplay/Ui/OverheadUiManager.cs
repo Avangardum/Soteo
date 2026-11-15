@@ -21,9 +21,9 @@ public sealed partial class OverheadUiManager : Control
         entityManager.EntityAdded += OnEntityAdded;
     }
 
-    private void OnEntityAdded(IEntity entity)
+    private void OnEntityAdded(Entity entity)
     {
-        if (entity is not IUnitPuppet unit) return;
+        if (entity is not UnitPuppet unit) return;
 
         var node = OverheadUiNode.Instantiate();
         AddChild(node);

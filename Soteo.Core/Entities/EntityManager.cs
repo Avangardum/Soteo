@@ -8,14 +8,14 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     private readonly ICrossInventoryHelper _crossInventoryHelper;
 
     private readonly IDisposable _processSubscription;
-    private readonly SortedDictionary<Guid, ISnapshottableEntity> _entities = [];
-    private ISnapshottableEntity[] _entityIterationBuffer = new ISnapshottableEntity[1024];
+    private readonly SortedDictionary<Guid, Entity> _entities = [];
+    private Entity[] _entityIterationBuffer = new Entity[1024];
 
     /// <summary>
     /// Removed entities are stored as WeakReference and are included in persistence snapshots as long as they are
     /// referenced by any other object. That is required to replicate references to removed entities across restarts.
     /// </summary>
-    private readonly Dictionary<Guid, WeakReference<ISnapshottableEntity>> _removedEntities = [];
+    private readonly Dictionary<Guid, WeakReference<Entity>> _removedEntities = [];
 
     private const int CleanupRemovedEntitiesEveryXRemovals = 1000;
     private int _removalsUntilRemovedEntitiesCleanup = CleanupRemovedEntitiesEveryXRemovals;
@@ -51,18 +51,17 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         _processSubscription.Dispose();
     }
 
-    public IReadOnlyDictionary<Guid, IEntity> Entities =>
-        _entities.CovariantCast<Guid, ISnapshottableEntity, IEntity>();
+    public IReadOnlyDictionary<Guid, Entity> Entities => _entities;
 
-    public event Action<IEntity> EntityAdded = delegate { };
-    public event Action<IEntity> EntityRemoved = delegate { };
+    public event Action<Entity> EntityAdded = delegate { };
+    public event Action<Entity> EntityRemoved = delegate { };
 
     private void Tick(double delta)
     {
         while (_entityIterationBuffer.Length < _entities.Count)
             Array.Resize(ref _entityIterationBuffer, _entityIterationBuffer.Length * 2);
         _entities.Values.CopyTo(_entityIterationBuffer, 0);
-        foreach (ISnapshottableEntity entity in _entityIterationBuffer.AsSpan(.._entities.Count))
+        foreach (Entity entity in _entityIterationBuffer.AsSpan(.._entities.Count))
             entity.Tick(delta);
     }
 
@@ -70,11 +69,11 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     {
         Dictionary<Guid, EntitySnapshot> snapshots = [];
 
-        foreach ((Guid id, ISnapshottableEntity entity) in _entities)
+        foreach ((Guid id, Entity entity) in _entities)
             snapshots[id] = entity.ToSnapshot();
 
-        foreach ((Guid id, WeakReference<ISnapshottableEntity> entityRef) in _removedEntities)
-            if (entityRef.TryGetTarget(out ISnapshottableEntity? entity))
+        foreach ((Guid id, WeakReference<Entity> entityRef) in _removedEntities)
+            if (entityRef.TryGetTarget(out Entity? entity))
                 snapshots[id] = entity.ToSnapshot();
 
         return snapshots;
@@ -115,7 +114,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     {
         foreach (EntitySnapshotDelta entityDelta in delta.Entities.Changes.Values)
         {
-            bool isNew = !_entities.TryGetValue(entityDelta.Id, out ISnapshottableEntity? entity);
+            bool isNew = !_entities.TryGetValue(entityDelta.Id, out Entity? entity);
             if (isNew)
                 entity = SpawnEntityFromDelta(entityDelta);
             // Unlike in ReplicateSnapshotEntities, deltas are applied without waiting for all new entities to spawn,
@@ -128,7 +127,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         }
     }
 
-    private ISnapshottableEntity SpawnEntityFromSnapshot(EntitySnapshot snapshot)
+    private Entity SpawnEntityFromSnapshot(EntitySnapshot snapshot)
     {
         return snapshot switch
         {
@@ -163,7 +162,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         };
     }
 
-    private ISnapshottableEntity SpawnEntityFromDelta(EntitySnapshotDelta delta)
+    private Entity SpawnEntityFromDelta(EntitySnapshotDelta delta)
     {
         return delta switch
         {
@@ -191,8 +190,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
 
         if
         (
-            _removedEntities.TryGetValue(id, out WeakReference<ISnapshottableEntity>? removedEntityRef) &&
-            removedEntityRef.TryGetTarget(out ISnapshottableEntity? removedEntity)
+            _removedEntities.TryGetValue(id, out WeakReference<Entity>? removedEntityRef) &&
+            removedEntityRef.TryGetTarget(out Entity? removedEntity)
         )
         {
             if (removedEntity is not PlayerCharacter playerCharacter)
@@ -240,7 +239,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         });
     }
 
-    private T Add<T>(T entity) where T : ISnapshottableEntity
+    private T Add<T>(T entity) where T : Entity
     {
         entity.Removed += () => OnEntityRemoved(entity);
         _entities.Add(entity.Id, entity);
@@ -251,11 +250,11 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     private T AddNode<T>(Guid id) where T : class, IEntityNode =>
         _entityNodeManager.AddNode<T>(id);
 
-    private void OnEntityRemoved(ISnapshottableEntity entity)
+    private void OnEntityRemoved(Entity entity)
     {
         _entityNodeManager.RemoveNode(entity.Id);
         _entities.Remove(entity.Id);
-        _removedEntities[entity.Id] = new WeakReference<ISnapshottableEntity>(entity);
+        _removedEntities[entity.Id] = new WeakReference<Entity>(entity);
         if (--_removalsUntilRemovedEntitiesCleanup == 0)
             CleanupRemovedEntities();
 
@@ -267,7 +266,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
 
     private void CleanupRemovedEntities()
     {
-        foreach ((Guid id, WeakReference<ISnapshottableEntity> reference) in _removedEntities.ToDictionary())
+        foreach ((Guid id, WeakReference<Entity> reference) in _removedEntities.ToDictionary())
             if (!reference.TryGetTarget(out _))
                 _removedEntities.Remove(id);
 

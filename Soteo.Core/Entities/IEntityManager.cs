@@ -2,10 +2,10 @@ namespace Soteo.Core.Entities;
 
 public interface IEntityManager
 {
-    IReadOnlyDictionary<Guid, IEntity> Entities { get; }
+    IReadOnlyDictionary<Guid, Entity> Entities { get; }
 
-    event Action<IEntity> EntityAdded;
-    event Action<IEntity> EntityRemoved;
+    event Action<Entity> EntityAdded;
+    event Action<Entity> EntityRemoved;
 
     PlayerCharacter SpawnPlayerCharacter(Guid id, Guid controllingPlayerId);
     Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target);

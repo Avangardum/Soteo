@@ -27,7 +27,7 @@ public sealed class CommandPacketHandlerTests
         _unitId = Guid.NewGuid();
         _controllingPlayerId = Guid.NewGuid();
         _unit = new TestUnit(_unitId, _controllingPlayerId);
-        _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [_unitId] = _unit } );
+        _entityManager.Entities.Returns(new Dictionary<Guid, Entity> { [_unitId] = _unit } );
         _command = new MoveCommand(Vector2.Zero);
     }
 

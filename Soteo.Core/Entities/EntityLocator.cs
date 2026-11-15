@@ -11,7 +11,7 @@ public sealed class EntityLocator(IShardServiceProviders shardServiceProviders) 
         Guid entityId,
         [NotNullWhen(true)] out T? entity,
         [NotNullWhen(true)] out Guid? shardId
-    ) where T : class, IEntity
+    ) where T : Entity
     {
         foreach ((Guid currentShardId, IServiceProvider services) in shardServiceProviders)
         {

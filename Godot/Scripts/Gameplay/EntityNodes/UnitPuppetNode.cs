@@ -51,7 +51,7 @@ public sealed partial class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode,
         _removalCountdown = 5;
     }
 
-    public IEntity? Entity
+    public Entity? Entity
     {
         get => UnitPuppet;
         set => UnitPuppet = (UnitPuppet?)value;

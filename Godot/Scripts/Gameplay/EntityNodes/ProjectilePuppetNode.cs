@@ -17,7 +17,7 @@ public sealed partial class ProjectilePuppetNode : Node2D, IProjectilePuppetNode
 
     public ProjectilePuppet? ProjectilePuppet { get; set; }
 
-    public IEntity? Entity
+    public Entity? Entity
     {
         get => ProjectilePuppet;
         set => ProjectilePuppet = (ProjectilePuppet?)value;

@@ -42,7 +42,7 @@ public sealed class Hud : IHud
     private bool _isDragging;
     private bool _isCancelingItemStackDrag;
 
-    public IUnitPuppet? SelectedUnit
+    public UnitPuppet? SelectedUnit
     {
         get;
         set
@@ -326,7 +326,7 @@ public sealed class Hud : IHud
             position.Y <= control.GlobalPosition.Y + control.Size.Y;
     }
 
-    private void MoveInventoryItemStack(int fromIndex, int toIndex, Guid shardId, IUnitPuppet unit)
+    private void MoveInventoryItemStack(int fromIndex, int toIndex, Guid shardId, UnitPuppet unit)
     {
         if (!unit.Inventory.HasSlot(fromIndex)) return;
         if (!unit.Inventory.HasSlot(toIndex)) return;
@@ -355,7 +355,7 @@ public sealed class Hud : IHud
         }
     }
 
-    private void Equip(int fromInventorySlot, EquipmentSlot? toEquipmentSlot, Guid shardId, IUnitPuppet unit)
+    private void Equip(int fromInventorySlot, EquipmentSlot? toEquipmentSlot, Guid shardId, UnitPuppet unit)
     {
         if (!_crossInventoryHelper.Equip(unit.Inventory, unit.EquipmentInventory, fromInventorySlot, toEquipmentSlot))
             return;
@@ -367,7 +367,7 @@ public sealed class Hud : IHud
         }, shardId);
     }
 
-    private void Unequip(EquipmentSlot fromEquipmentSlot, int? toInventorySlot, Guid shardId, IUnitPuppet unit)
+    private void Unequip(EquipmentSlot fromEquipmentSlot, int? toInventorySlot, Guid shardId, UnitPuppet unit)
     {
         if (!_crossInventoryHelper.Unequip(unit.Inventory, unit.EquipmentInventory, fromEquipmentSlot, toInventorySlot))
             return;
@@ -399,14 +399,14 @@ public sealed class Hud : IHud
     public bool TrySelectCurrentUnit()
     {
         if (_currentCharIdRepo.Id == null) return false;
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required, out IUnitPuppet? unit, out _))
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required, out UnitPuppet? unit, out _))
             return false;
 
         SelectedUnit = unit;
         return true;
     }
 
-    private void ProcessBars(IUnitPuppet unit)
+    private void ProcessBars(UnitPuppet unit)
     {
         _healthBar.TintProgress = _palette.FactionColor(unit.Faction);
 
@@ -420,7 +420,7 @@ public sealed class Hud : IHud
             $"{Maths.CeilToInt(unit.Stats[Stat.MaxMana])}";
     }
 
-    private void ProcessAbilities(IUnitPuppet unit)
+    private void ProcessAbilities(UnitPuppet unit)
     {
         for (HotbarAbilitySlot slot = AbilitySlot.Hotbar(0); slot.Index < _abilityButtons.Count; slot++)
         {
@@ -451,7 +451,7 @@ public sealed class Hud : IHud
         }
     }
 
-    private void ProcessStatuses(IUnitPuppet unit)
+    private void ProcessStatuses(UnitPuppet unit)
     {
         IReadOnlyList<PuppetStatusContext> contexts = GetVisibleStatusContexts(unit);
         for (int i = 0; i < contexts.Count; i++)
@@ -466,7 +466,7 @@ public sealed class Hud : IHud
         }
     }
 
-    private void ProcessInventory(IUnitPuppet unit)
+    private void ProcessInventory(UnitPuppet unit)
     {
         _inventoryGrid.Columns = Maths.CeilToInt(unit.Inventory.Count / 2.0);
         bool canControlSelectedUnit = CanControlSelectedUnit(out _);
@@ -491,7 +491,7 @@ public sealed class Hud : IHud
         }
     }
 
-    private void ProcessEquipment(IUnitPuppet unit)
+    private void ProcessEquipment(UnitPuppet unit)
     {
         if (!unit.EquipmentInventory.Any())
         {
@@ -546,7 +546,7 @@ public sealed class Hud : IHud
         }
     }
 
-    private IReadOnlyList<PuppetStatusContext> GetVisibleStatusContexts(IUnitPuppet unit)
+    private IReadOnlyList<PuppetStatusContext> GetVisibleStatusContexts(UnitPuppet unit)
     {
         return unit.Statuses.Values
             .Where(it => it.Status.HudVisible)

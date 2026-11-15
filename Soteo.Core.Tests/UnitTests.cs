@@ -83,7 +83,7 @@ public sealed class UnitTests
             target: new ProjectileTarget(_sut),
             new Services(_serviceProvider)
         );
-        _entityManager.Entities.Returns(new Dictionary<Guid, IEntity> { [projectileId] = projectile });
+        _entityManager.Entities.Returns(new Dictionary<Guid, Entity> { [projectileId] = projectile });
 
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetUnitId = projectileId });
         _sut.Tick(Const.TickInterval);

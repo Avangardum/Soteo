@@ -1,6 +1,6 @@
 namespace Soteo.Core.Entities.Units;
 
-public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
+public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
 {
     private readonly ICamera _camera;
     private double _inventoryDesyncTimeRemaining;
@@ -204,7 +204,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>, IUnitPuppet
         }
     }
 
-    public bool IsAlliedTo(IUnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
+    public bool IsAlliedTo(UnitPuppet other) => Faction != Faction.Neutral && other.Faction == Faction;
 
     public void DesyncInventory() => _inventoryDesyncTimeRemaining = 0.5;
 

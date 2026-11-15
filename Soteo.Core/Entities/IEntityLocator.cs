@@ -8,5 +8,5 @@ namespace Soteo.Core.Entities;
 public interface IEntityLocator
 {
     bool TryFindEntity<T>(Guid entityId, [NotNullWhen(true)] out T? entity, [NotNullWhen(true)] out Guid? shardId)
-        where T : class, IEntity;
+        where T : Entity;
 }
