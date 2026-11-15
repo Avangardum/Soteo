@@ -2,36 +2,31 @@ using System.Collections;
 
 namespace Soteo.Core.Entities.Units;
 
-public sealed class Inventory : IInventory
+public sealed class SimpleInventory : Inventory
 {
-    public event Action Changed = delegate { };
+    public override event Action Changed = delegate { };
 
     private List<ItemStack?> _stacks;
 
-    public Inventory(int size)
+    public SimpleInventory(int size)
     {
         _stacks = Enumerable.Repeat<ItemStack?>(null, size).ToList();
     }
 
-    public Inventory(IReadOnlyList<ItemStack?> stacks)
+    public SimpleInventory(IReadOnlyList<ItemStack?> stacks)
     {
         _stacks = stacks.ToList();
     }
 
-    public IEnumerator<ItemStack?> GetEnumerator() => _stacks.GetEnumerator();
+    public override IEnumerator<ItemStack?> GetEnumerator() => _stacks.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public override int Count => _stacks.Count;
 
-    public int Count => _stacks.Count;
+    public override ItemStack? this[int index] => _stacks[index];
 
-    public ItemStack? this[int index] => _stacks[index];
+    public override bool HasSlot(int slot) => slot >= 0 && slot < _stacks.Count;
 
-    public bool HasSlot(int slot) => slot >= 0 && slot < _stacks.Count;
-
-    /// <summary>
-    /// Add a stack to the inventory. If inventory space is insufficient, the remainder is returned.
-    /// </summary>
-    public ItemStack? Add(ItemStack stack)
+    public override ItemStack? Add(ItemStack stack)
     {
         long remainingCount = stack.Count;
         for (int i = 0; i < _stacks.Count && remainingCount > 0; i++)
@@ -70,12 +65,7 @@ public sealed class Inventory : IInventory
         return stack;
     }
 
-    /// <summary>
-    /// Put an item stack into a target slot. If the slot contains a stack that can be fully or partially merged with
-    /// the put stack, it's merged and a remainder is returned. Otherwise, a stack that was in the slot previously is
-    /// returned.
-    /// </summary>
-    public ItemStack? Put(int slot, ItemStack stack)
+    public override ItemStack? Put(int slot, ItemStack stack)
     {
         ItemStack? existingStack = _stacks[slot];
         bool canMerge = existingStack != null &&
@@ -96,7 +86,7 @@ public sealed class Inventory : IInventory
         return existingStack;
     }
 
-    public ItemStack? Remove(int slot)
+    public override ItemStack? Remove(int slot)
     {
         ItemStack? result = _stacks[slot];
         _stacks[slot] = null;
@@ -104,15 +94,15 @@ public sealed class Inventory : IInventory
         return result;
     }
 
-    public InventorySnapshot ToSnapshot() => new(_stacks.ToList().AsReadOnly());
+    public override InventorySnapshot ToSnapshot() => new(_stacks.ToList().AsReadOnly());
 
-    public void ReplicateSnapshot(InventorySnapshot snapshot)
+    public override void ReplicateSnapshot(InventorySnapshot snapshot)
     {
         _stacks = snapshot.Stacks.ToList();
         Changed();
     }
 
-    public void ApplyDelta(InventoryDelta delta)
+    public override void ApplyDelta(InventoryDelta delta)
     {
         if (!delta.HasChanged) return;
         delta.Stacks.MutateList(_stacks);

@@ -24,7 +24,7 @@ public sealed class UnitTests
         _entityManager = Substitute.For<IEntityManager>();
         _node = Substitute.For<IUnitNode>();
         _serviceProvider = new ServiceCollection().AddSingleton(_entityManager).BuildServiceProvider();
-        var inventory = new Inventory(8);
+        var inventory = new SimpleInventory(8);
         var equipmentInventory =
             new EquipmentInventory(EquipmentSlot.MainHand ,EquipmentSlot.Head, EquipmentSlot.Potion);
         Guid id = Guid.NewGuid();

@@ -8,7 +8,7 @@ public sealed class PlayerCharacter : Unit
         Guid controllingPlayerId,
         IUnitNode node,
         IEntityManager entityManager,
-        IInventory inventory,
+        Inventory inventory,
         IEquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
         Services services
@@ -40,7 +40,7 @@ public sealed class PlayerCharacter : Unit
         UnitSnapshot snapshot,
         IUnitNode node,
         IEntityManager entityManager,
-        IInventory inventory,
+        Inventory inventory,
         IEquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
         Services services

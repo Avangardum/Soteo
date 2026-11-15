@@ -4,12 +4,12 @@ using Soteo.Core.Items;
 
 namespace Soteo.Core.Tests;
 
-public sealed class InventoryTests
+public sealed class SimpleInventoryTests
 {
     [Fact]
     public void AddingStackPutsItInFirstSlot()
     {
-        var sut = new Inventory(10);
+        var sut = new SimpleInventory(10);
 
         ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(1));
 
@@ -20,7 +20,7 @@ public sealed class InventoryTests
     [Fact]
     public void AddingDifferentItemStacksPutsThemInFirstSlots()
     {
-        var sut = new Inventory(10);
+        var sut = new SimpleInventory(10);
 
         ItemStack? remainder1 = sut.Add(ItemStack.Of<TestItem1>(1));
         ItemStack? remainder2 = sut.Add(ItemStack.Of<TestItem2>(1));
@@ -34,7 +34,7 @@ public sealed class InventoryTests
     [Fact]
     public void AddingDifferentItemStackWhenFullFails()
     {
-        var sut = new Inventory([ItemStack.Of<TestItem1>(1)]);
+        var sut = new SimpleInventory([ItemStack.Of<TestItem1>(1)]);
 
         ItemStack? remainder = sut.Add(ItemStack.Of<TestItem2>(1));
 
@@ -45,7 +45,7 @@ public sealed class InventoryTests
     [Fact]
     public void AddingItemStackThatCanBeFullyMergedWithExistingStacksIsFullyMerged()
     {
-        var sut = new Inventory([null, ItemStack.Of<TestItem1>(8), ItemStack.Of<TestItem1>(9), null]);
+        var sut = new SimpleInventory([null, ItemStack.Of<TestItem1>(8), ItemStack.Of<TestItem1>(9), null]);
 
         ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(3));
 
@@ -59,7 +59,7 @@ public sealed class InventoryTests
     [Fact]
     public void AddingItemStackThatCanBePartiallyMergedWithExistingStacksIsMergedAndRemainderIsAddedToFirstEmptySlot()
     {
-        var sut = new Inventory([null, ItemStack.Of<TestItem1>(8), ItemStack.Of<TestItem1>(9), null]);
+        var sut = new SimpleInventory([null, ItemStack.Of<TestItem1>(8), ItemStack.Of<TestItem1>(9), null]);
 
         ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(5));
 
@@ -73,7 +73,7 @@ public sealed class InventoryTests
     [Fact]
     public void AddingItemStackWhenSpaceIsInsufficientAddsWhatFitsAndReturnsRemainder()
     {
-        var sut = new Inventory([ItemStack.Of<TestItem1>(8)]);
+        var sut = new SimpleInventory([ItemStack.Of<TestItem1>(8)]);
 
         ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(4));
 
@@ -84,7 +84,7 @@ public sealed class InventoryTests
     [Fact]
     public void PutAtSwapsStacksOfDifferentItems()
     {
-        var sut = new Inventory([ItemStack.Of<TestItem1>(1), null]);
+        var sut = new SimpleInventory([ItemStack.Of<TestItem1>(1), null]);
 
         ItemStack? result = sut.Put(0, ItemStack.Of<TestItem2>(1));
 
@@ -96,7 +96,7 @@ public sealed class InventoryTests
     [Fact]
     public void PutAtSwapsStacksOfSameItemsIfExistingStackIsFull()
     {
-        var sut = new Inventory([ItemStack.Of<TestItem1>(10), null]);
+        var sut = new SimpleInventory([ItemStack.Of<TestItem1>(10), null]);
 
         ItemStack? result = sut.Put(0, ItemStack.Of<TestItem1>(1));
 
@@ -108,7 +108,7 @@ public sealed class InventoryTests
     [Fact]
     public void PutAtFullyMergesStacksIfPossible()
     {
-        var sut = new Inventory([ItemStack.Of<TestItem1>(1), null]);
+        var sut = new SimpleInventory([ItemStack.Of<TestItem1>(1), null]);
 
         ItemStack? result = sut.Put(0, ItemStack.Of<TestItem1>(1));
 
@@ -120,7 +120,7 @@ public sealed class InventoryTests
     [Fact]
     public void PutAtPartiallyMergesStacksOfSameItemAndReturnsRemainderIfFullMergeIsImpossible()
     {
-        var sut = new Inventory([ItemStack.Of<TestItem1>(6), null]);
+        var sut = new SimpleInventory([ItemStack.Of<TestItem1>(6), null]);
 
         ItemStack? result = sut.Put(0, ItemStack.Of<TestItem1>(6));
 
@@ -132,7 +132,7 @@ public sealed class InventoryTests
     [Fact]
     public void RemoveAtFilledSlotRemovesAndReturnsStack()
     {
-        var sut = new Inventory([ItemStack.Of<TestItem1>(2)]);
+        var sut = new SimpleInventory([ItemStack.Of<TestItem1>(2)]);
 
         ItemStack? result = sut.Remove(0);
 
@@ -143,7 +143,7 @@ public sealed class InventoryTests
     [Fact]
     public void RemoveAtEmptySlotLeavesItEmptyAndReturnsNull()
     {
-        var sut = new Inventory([null]);
+        var sut = new SimpleInventory([null]);
 
         ItemStack? result = sut.Remove(0);
 

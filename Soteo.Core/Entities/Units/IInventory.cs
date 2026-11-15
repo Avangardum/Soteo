@@ -1,25 +1,36 @@
+using System.Collections;
+
 namespace Soteo.Core.Entities.Units;
 
-public interface IInventory : IReadOnlyList<ItemStack?>
+public abstract class Inventory : IReadOnlyList<ItemStack?>
 {
-    event Action Changed;
-
-    bool HasSlot(int slot);
-
-    /// <summary>
-    /// Add a stack to the inventory. If inventory space is insufficient, the remainder is returned.
-    /// </summary>
-    ItemStack? Add(ItemStack stack);
+    public abstract event Action Changed;
+    public abstract int Count { get; }
+    public abstract bool HasSlot(int slot);
 
     /// <summary>
-    /// Put an item stack into a target slot. If the slot contains a stack that can be fully or partially merged with
-    /// the put stack, it's merged and a remainder is returned. Otherwise, a stack that was in the slot previously is
-    /// returned.
+    /// Add a stack to the inventory, returning a remainder of the stack if it didn't fit
     /// </summary>
-    ItemStack? Put(int slot, ItemStack stack);
+    public abstract ItemStack? Add(ItemStack stack);
 
-    ItemStack? Remove(int slot);
-    InventorySnapshot ToSnapshot();
-    void ReplicateSnapshot(InventorySnapshot snapshot);
-    void ApplyDelta(InventoryDelta delta);
+    /// <inheritdoc cref="Add"/>
+    public ItemStack? Add<T>(int count) where T : Item, new() =>
+        Add(ItemStack.Of<T>(count));
+
+    /// <summary>
+    /// Put an item stack into a target slot, returning a remainder of the stack if it didn't fit
+    /// or a stack that it replaced
+    /// </summary>
+    public abstract ItemStack? Put(int slot, ItemStack stack);
+
+    public ItemStack? Put<T>(int slot, int count) where T : Item, new() =>
+        Put(slot, ItemStack.Of<T>(count));
+
+    public abstract ItemStack? Remove(int slot);
+    public abstract InventorySnapshot ToSnapshot();
+    public abstract void ReplicateSnapshot(InventorySnapshot snapshot);
+    public abstract void ApplyDelta(InventoryDelta delta);
+    public abstract IEnumerator<ItemStack?> GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public abstract ItemStack? this[int index] { get; }
 }

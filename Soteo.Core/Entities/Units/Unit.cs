@@ -18,7 +18,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     private Dictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = [];
     private bool _allowAbilityPassiveStatusManipulation;
 
-    public IInventory Inventory { get; }
+    public Inventory Inventory { get; }
     public IEquipmentInventory EquipmentInventory { get; }
 
     protected Unit
@@ -27,7 +27,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         Guid controllingPlayerId,
         IUnitNode node,
         IEntityManager entityManager,
-        IInventory inventory,
+        Inventory inventory,
         IEquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
         Services services

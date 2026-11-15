@@ -273,8 +273,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         _removalsUntilRemovedEntitiesCleanup = CleanupRemovedEntitiesEveryXRemovals;
     }
 
-    private IInventory MakePlayerCharacterInventory() =>
-        new Inventory(8);
+    private Inventory MakePlayerCharacterInventory() =>
+        new SimpleInventory(8);
 
     private IEquipmentInventory MakePlayerCharacterEquipmentInventory() =>
         new EquipmentInventory(Enum.GetValues<EquipmentSlot>());
