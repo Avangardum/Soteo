@@ -43,14 +43,14 @@ public abstract class Entity
     }
 }
 
-public abstract class Entity<TNode> : Entity where TNode : class?, IEntityNode?
+public abstract class Entity<TNode> : Entity where TNode : class, IEntityNode
 {
     protected TNode? Node { get; private set; }
 
-    internal Entity(Guid id, TNode? node) : base(id)
+    internal Entity(Guid id, TNode node) : base(id)
     {
         Node = node;
-        node?.Entity = this;
+        node.Entity = this;
     }
 
     public override void Remove()
@@ -65,7 +65,7 @@ public abstract class Entity<TNode> : Entity where TNode : class?, IEntityNode?
     {
         if (!IsRemoved) throw new InvalidOperationException("Only removed entities can be respawned");
         Node = node;
-        node?.Entity = this;
+        node.Entity = this;
         IsRemoved = false;
     }
 }

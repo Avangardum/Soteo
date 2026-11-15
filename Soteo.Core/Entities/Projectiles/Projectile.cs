@@ -1,6 +1,6 @@
 namespace Soteo.Core.Entities.Projectiles;
 
-public sealed class Projectile : Entity<IEntityNode?>
+public sealed class Projectile : Entity
 {
     private readonly Services _services;
 
@@ -22,7 +22,7 @@ public sealed class Projectile : Entity<IEntityNode?>
         double speed,
         ProjectileTarget target,
         Services services
-    ) : base(id, null)
+    ) : base(id)
     {
         _abilityContext = abilityContext;
         _speed = speed;
@@ -50,16 +50,6 @@ public sealed class Projectile : Entity<IEntityNode?>
         {
             _isSnapshotReplicationPendingToFinishInit = true
         };
-    }
-
-    public override Vector2 Position
-    {
-        get => base.Position;
-        set
-        {
-            base.Position = value;
-            Node?.PositionMeters = value;
-        }
     }
 
     public override EntitySnapshot ToSnapshot()
