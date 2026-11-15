@@ -1,3 +1,4 @@
+using SoftCircuits.Collections;
 using Soteo.Core.Commands;
 
 namespace Soteo.Core.Entities.Units;
@@ -11,7 +12,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     private long _nextStatusOrdinal;
     private readonly Queue<Command> _commands = [];
     private Guid? _controllingPlayerId;
-    private Dictionary<Guid, StatusContext> _statusContexts = [];
+    private OrderedDictionary<Guid, StatusContext> _statusContexts = [];
     private Dictionary<Stat, double> _stats  = [];
     private Dictionary<AbilitySlot, AbilitySlotState> _abilitySlotStates = [];
     private List<Ability> _innateHotbarAbilities = [];
@@ -120,8 +121,9 @@ public abstract class Unit : UnitBase<IUnitNode>
         _stats = s.Stats.ToDictionary();
         _abilitySlotStates = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
-        _statusContexts =
-            s.StatusesContexts.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
+         _statusContexts = s.StatusesContexts
+             .OrderBy(it => it.Value.Ordinal)
+             .ToOrderedDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
         _nextStatusOrdinal = _statusContexts.Count > 0 ? _statusContexts.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.InventorySnapshot);
@@ -169,7 +171,7 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void ProcessStatuses(double delta)
     {
-        foreach (Guid id in _statusContexts.OrderBy(it => it.Value.Ordinal).Select(it => it.Key).ToList()) // todo make the dictionary ordered
+        foreach (Guid id in _statusContexts.Keys.ToList())
         {
             StatusContext? context = GetStatusContext(id);
             if (context == null) continue;
@@ -788,7 +790,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     public void RemoveAllStatuses(Status status)
     {
         if (IsRemoved) return;
-        foreach ((Guid id, StatusContext context) in _statusContexts)
+        foreach ((Guid id, StatusContext context) in _statusContexts.ToList())
             if (context.Status == status)
                 RemoveStatus(id);
     }

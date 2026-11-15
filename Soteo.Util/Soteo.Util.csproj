@@ -7,7 +7,7 @@
         <RootNamespace>Soteo.Util</RootNamespace>
         <LangVersion>14</LangVersion>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="AwesomeAssertions" Version="9.6.0" />
         <PackageReference Include="Microsoft.Bcl.TimeProvider" Version="10.0.12" />
@@ -19,6 +19,7 @@
         <PackageReference Include="System.Collections.Immutable" Version="10.0.12" />
         <PackageReference Include="Microsoft.Bcl.Memory" Version="10.0.12" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+        <PackageReference Include="SoftCircuits.OrderedDictionary" Version="3.4.0" />
     </ItemGroup>
 
 </Project>
