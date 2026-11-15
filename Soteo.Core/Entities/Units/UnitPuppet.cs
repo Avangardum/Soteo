@@ -100,7 +100,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         StatsInternal = s.Stats.ToDictionary();
         AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
-        StatusesInternal = s.Statuses.ToDictionary();
+        StatusesInternal = s.StatusesContexts.ToDictionary();
         _controllingPlayerIds = s.ControllingPlayerIds.ToList();
 
         _alwaysSynchronizedInventory.ReplicateSnapshot(s.InventorySnapshot);
@@ -139,7 +139,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
                 AbilityUseProgress.Interpolate
             );
         }
-        d.Statuses.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
+        d.StatusContexts.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
         d.ControllingPlayerIds.MutateList(_controllingPlayerIds);
 
         _alwaysSynchronizedInventory.ApplyDelta(d.Inventory);

@@ -7,7 +7,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
     public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
-    public required IReadOnlyDictionary<Guid, StatusContextSnapshot> Statuses { get; init; }
+    public required IReadOnlyDictionary<Guid, StatusContextSnapshot> StatusesContexts { get; init; }
     public required Guid? ControllingPlayerId { get; init; }
     public required InventorySnapshot InventorySnapshot { get; init; }
     public required EquipmentInventorySnapshot EquipmentInventory { get; init; }
@@ -27,7 +27,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
             Stats = Stats,
             AbilitySlotStates = AbilitySlotStates,
             AbilityUseProgress = AbilityUseProgress,
-            Statuses = Statuses.ToDictionary(it => it.Key, it => it.Value.ToPuppet()).AsReadOnly(),
+            StatusesContexts = StatusesContexts.ToDictionary(it => it.Key, it => it.Value.ToPuppet()).AsReadOnly(),
             InventorySnapshot = InventorySnapshot,
             ControllingPlayerIds = ControllingPlayerId == null ? [] : [ControllingPlayerId.Value],
             EquipmentInventory = EquipmentInventory

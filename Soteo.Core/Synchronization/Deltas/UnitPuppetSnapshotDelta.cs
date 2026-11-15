@@ -7,7 +7,7 @@ public sealed record UnitPuppetSnapshotDelta : EntitySnapshotDelta
     public required DictionaryDelta<Stat, double> Stats { get; init; }
     public required DictionaryDelta<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
     public required Delta<AbilityUseProgress?> AbilityUseProgress { get; init; }
-    public required DictionaryDelta<Guid, PuppetStatusContext> Statuses { get; init; }
+    public required DictionaryDelta<Guid, PuppetStatusContext> StatusContexts { get; init; }
     public required ListDelta<Guid> ControllingPlayerIds { get; init; }
     public required InventoryDelta Inventory { get; init; }
     public required EquipmentInventoryDelta EquipmentInventory { get; init; }
@@ -17,7 +17,7 @@ public sealed record UnitPuppetSnapshotDelta : EntitySnapshotDelta
         get
         {
             return base.HasChanged || IsDead.HasChanged || IsMoving.HasChanged || Stats.HasChanged ||
-                AbilitySlotStates.HasChanged || AbilityUseProgress.HasChanged || Statuses.HasChanged ||
+                AbilitySlotStates.HasChanged || AbilityUseProgress.HasChanged || StatusContexts.HasChanged ||
                 Inventory.HasChanged || ControllingPlayerIds.HasChanged || EquipmentInventory.HasChanged;
         }
     }

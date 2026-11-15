@@ -239,7 +239,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
             Stats = ReadOnlyDictionary<Stat, double>.Empty,
             AbilitySlotStates = ReadOnlyDictionary<AbilitySlot, AbilitySlotState>.Empty,
             AbilityUseProgress = null,
-            Statuses = ReadOnlyDictionary<Guid, StatusContextSnapshot>.Empty,
+            StatusesContexts = ReadOnlyDictionary<Guid, StatusContextSnapshot>.Empty,
             IsRemoved = false,
             Position = default,
             Azimuth = 0,

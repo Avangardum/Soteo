@@ -7,7 +7,7 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
     public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
     public required AbilityUseProgress? AbilityUseProgress { get; init; }
-    public required IReadOnlyDictionary<Guid, PuppetStatusContext> Statuses { get; init; }
+    public required IReadOnlyDictionary<Guid, PuppetStatusContext> StatusesContexts { get; init; }
     public required IReadOnlyList<Guid> ControllingPlayerIds { get; init; }
     public required InventorySnapshot InventorySnapshot { get; init; }
     public required EquipmentInventorySnapshot EquipmentInventory { get; init; }
@@ -26,7 +26,7 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
                 Stats = DictionaryDelta.FromNew(Stats),
                 AbilitySlotStates = DictionaryDelta.FromNew(AbilitySlotStates),
                 AbilityUseProgress = AbilityUseProgress,
-                Statuses = DictionaryDelta.FromNew(Statuses),
+                StatusContexts = DictionaryDelta.FromNew(StatusesContexts),
                 ControllingPlayerIds = ListDelta.FromNew(ControllingPlayerIds),
                 Inventory = InventoryDelta.FromNew(InventorySnapshot),
                 EquipmentInventory = EquipmentInventoryDelta.FromNew(EquipmentInventory)
@@ -45,7 +45,7 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
             Stats = DictionaryDelta.Between(from.Stats, Stats),
             AbilitySlotStates = DictionaryDelta.Between(from.AbilitySlotStates, AbilitySlotStates),
             AbilityUseProgress = Delta.Between(from.AbilityUseProgress, AbilityUseProgress),
-            Statuses = DictionaryDelta.Between(from.Statuses, Statuses),
+            StatusContexts = DictionaryDelta.Between(from.StatusesContexts, StatusesContexts),
             ControllingPlayerIds = ListDelta.Between(from.ControllingPlayerIds, ControllingPlayerIds),
             Inventory = InventoryDelta.Between(from.InventorySnapshot, InventorySnapshot),
             EquipmentInventory = EquipmentInventoryDelta.Between(from.EquipmentInventory, EquipmentInventory)

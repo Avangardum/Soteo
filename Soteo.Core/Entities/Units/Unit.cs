@@ -90,7 +90,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Stats = GetStats(),
             AbilitySlotStates = _abilitySlotStates.ToDictionary().AsReadOnly(),
             AbilityUseProgress = AbilityUseProgress,
-            Statuses = _statusContexts.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly(),
+            StatusesContexts = _statusContexts.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly(),
             ControllingPlayerId = _controllingPlayerId,
             InventorySnapshot = Inventory.ToSnapshot(),
             EquipmentInventory = EquipmentInventory.ToSnapshot(),
@@ -109,7 +109,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         _abilitySlotStates = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
         _statusContexts =
-            s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
+            s.StatusesContexts.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
         _nextStatusOrdinal = _statusContexts.Count > 0 ? _statusContexts.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.InventorySnapshot);
