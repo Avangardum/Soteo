@@ -121,7 +121,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         _stats = s.Stats.ToDictionary();
         _abilitySlotStates = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
-         _statusContexts = s.StatusesContexts
+        _statusContexts = s.StatusesContexts
              .OrderBy(it => it.Value.Ordinal)
              .ToOrderedDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
         _nextStatusOrdinal = _statusContexts.Count > 0 ? _statusContexts.Values.Max(it => it.Ordinal) + 1 : 0;
