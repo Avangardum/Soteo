@@ -169,14 +169,17 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void ProcessStatuses(double delta)
     {
-        // todo if a status tick removes another status, that status will still be ticked
-        foreach (StatusContext context in _statusContexts.Values.ToList())
+        foreach (Guid id in _statusContexts.OrderBy(it => it.Value.Ordinal).Select(it => it.Key).ToList()) // todo make the dictionary ordered
         {
-            // todo check if self-removing status behaves correctly
+            StatusContext? context = GetStatusContext(id);
+            if (context == null) continue;
             context.Status.Tick(context, delta);
+            // It's possible that the status context was removed or changed while ticked, so we get a new one
+            context = GetStatusContext(id);
+            if (context == null) continue;
             if (context.RemainingTime > delta)
             {
-                _statusContexts[context.Id] = context with
+                _statusContexts[id] = context with
                 {
                     ElapsedTime = context.ElapsedTime + delta,
                     DisplayElapsedTime = context.DisplayElapsedTime + delta,
@@ -185,7 +188,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             }
             else
             {
-                RemoveStatus(context.Id);
+                RemoveStatus(id);
             }
         }
     }
@@ -642,23 +645,23 @@ public abstract class Unit : UnitBase<IUnitNode>
             statusContext.Status.OnDealAttackDamage(statusContext, target, _stats[Stat.AttackDamage]);
     }
 
-    public void AddStatus(Status status, double time, ISourceUnitAndAbility? source) =>
+    public Guid? AddStatus(Status status, double time, ISourceUnitAndAbility? source) =>
         AddStatus(status, time, source?.Unit, source?.AbilityContext);
 
-    public void AddStatus<T>
+    public Guid? AddStatus<T>
     (
         double time,
         Unit? sourceUnit,
         AbilityContext? sourceAbilityContext
     ) where T : Status, new()
     {
-        AddStatus(Status.Instance<T>(), time, sourceUnit, sourceAbilityContext);
+        return AddStatus(Status.Instance<T>(), time, sourceUnit, sourceAbilityContext);
     }
 
-    public void AddStatus<T>(double time, ISourceUnitAndAbility? source) where T : Status, new() =>
+    public Guid? AddStatus<T>(double time, ISourceUnitAndAbility? source) where T : Status, new() =>
         AddStatus<T>(time, source?.Unit, source?.AbilityContext);
 
-    public void AddStatus
+    public Guid? AddStatus
     (
         Status status,
         double time,
@@ -670,67 +673,102 @@ public abstract class Unit : UnitBase<IUnitNode>
             throw new ArgumentException("Time must not be negative");
         if (!_allowAbilityPassiveStatusManipulation && status is AbilityPassiveStatus)
             throw new InvalidOperationException("Ability passive statuses should not be added manually");
-        if (IsRemoved) return;
+        if (IsRemoved) return null;
 
-        StatusContext context = new StatusContext
+        StatusContext CreateContext()
         {
-            Id = Guid.NewGuid(),
-            Status = status,
-            SourceAbilityContext = sourceAbilityContext,
-            Unit = this,
-            SourceUnit = sourceUnit,
-            ElapsedTime = 0,
-            DisplayElapsedTime = 0,
-            RemainingTime = time,
-            Ordinal = _nextStatusOrdinal++,
-            Services = _services
-        };
+            return new StatusContext
+            {
+                Id = Guid.NewGuid(),
+                Status = status,
+                SourceAbilityContext = sourceAbilityContext,
+                Unit = this,
+                SourceUnit = sourceUnit,
+                ElapsedTime = 0,
+                DisplayElapsedTime = 0,
+                RemainingTime = time,
+                Ordinal = _nextStatusOrdinal++,
+                Services = _services
+            };
+        }
 
         List<StatusContext> duplicates = _statusContexts.Values.Where(it => it.Status == status).ToList();
+        Guid? result;
         if (duplicates.Count == 0)
         {
+            StatusContext context = CreateContext();
             _statusContexts[context.Id] = context;
+            result = context.Id;
         }
         else
         {
             switch (status.DuplicateResolution)
             {
                 case DuplicateStatusResolution.Stack:
+                {
+                    StatusContext context = CreateContext();
                     _statusContexts[context.Id] = context;
+                    result = context.Id;
                     break;
+                }
                 case DuplicateStatusResolution.Refresh:
-                    RefreshDuplicateStatuses(context, duplicates.Single());
+                {
+                    RefreshDuplicateStatuses(sourceUnit, sourceAbilityContext, time, duplicates.Single());
+                    result = null;
                     break;
+                }
                 case DuplicateStatusResolution.StackAndRefresh:
+                {
+                    StatusContext context = CreateContext();
                     _statusContexts[context.Id] = context;
-                    RefreshDuplicateStatuses(context, duplicates);
+                    RefreshDuplicateStatuses(sourceUnit, sourceAbilityContext, time, duplicates);
+                    result = context.Id;
                     break;
+                }
                 case DuplicateStatusResolution.Replace:
+                {
+                    StatusContext context = CreateContext();
                     RemoveStatus(duplicates.Single().Id);
                     _statusContexts[context.Id] = context;
+                    result = context.Id;
                     break;
+                }
                 case DuplicateStatusResolution.Discard:
+                {
+                    result = null;
                     break;
+                }
                 case DuplicateStatusResolution.Throw:
+                {
                     throw new InvalidOperationException($"{status} does not allow duplicates");
+                }
                 default:
+                {
                     throw new ArgumentOutOfRangeException();
+                }
             }
         }
 
         UpdateStats();
+        return result;
     }
 
-    private void RefreshDuplicateStatuses(StatusContext reference, params IReadOnlyList<StatusContext> targets)
+    private void RefreshDuplicateStatuses
+    (
+        Unit? sourceUnit,
+        AbilityContext? sourceAbilityContext,
+        double time,
+        params IReadOnlyList<StatusContext> targets
+    )
     {
         foreach (StatusContext target in targets)
         {
             _statusContexts[target.Id] = target with
             {
-                SourceUnit = reference.SourceUnit,
-                SourceAbilityContext = reference.SourceAbilityContext,
+                SourceUnit = sourceUnit,
+                SourceAbilityContext = sourceAbilityContext,
                 DisplayElapsedTime = 0,
-                RemainingTime = Math.Max(target.RemainingTime, reference.RemainingTime)
+                RemainingTime = Math.Max(target.RemainingTime, time)
             };
         }
     }

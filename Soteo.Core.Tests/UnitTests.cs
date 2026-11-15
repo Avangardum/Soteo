@@ -114,9 +114,9 @@ public sealed class UnitTests
     public void StatusIsTickedEveryTick()
     {
         int statusTickCount = 0;
-        SpyStatus.Ticked += () => statusTickCount++;
+        RefreshableSpyStatus.Ticked += () => statusTickCount++;
 
-        _sut.AddStatus<SpyStatus>(time: 10, source: null);
+        _sut.AddStatus<RefreshableSpyStatus>(time: 10, source: null);
         statusTickCount.Should().Be(0);
 
         _sut.Tick(Const.TickInterval);
@@ -747,6 +747,24 @@ public sealed class UnitTests
         _sut.GetStat(Stat.CurrentMana).Should().Be(0);
     }
 
+    [Fact]
+    public void StatusThatRemovesAllStatusesOnTickRemovesAllStatusesAndPreventsOnlyStatusesAfterItFromTicking()
+    {
+        bool wasStackableSpyStatusTicked = false;
+        StackableSpyStatus.Ticked += () => wasStackableSpyStatusTicked = true;
+        bool wasRefreshableSpyStatusTicked = false;
+        RefreshableSpyStatus.Ticked += () => wasRefreshableSpyStatusTicked = true;
+
+        _sut.AddStatus<StackableSpyStatus>(double.PositiveInfinity, null);
+        _sut.AddStatus<StatusThatRemovesAllStatusesOnTick>(double.PositiveInfinity, null);
+        _sut.AddStatus<RefreshableSpyStatus>(double.PositiveInfinity, null);
+        _sut.Tick(Const.TickInterval);
+
+        _sut.GetStatusContexts().Should().BeEmpty();
+        wasStackableSpyStatusTicked.Should().BeTrue();
+        wasRefreshableSpyStatusTicked.Should().BeFalse();
+    }
+
     private class SpyAbility : Ability
     {
         public event Action Used = delegate { };
@@ -801,11 +819,24 @@ public sealed class UnitTests
         }
     }
 
-    private sealed class SpyStatus : Status
+    private sealed class StackableSpyStatus : Status
     {
         public static event Action Ticked = delegate { };
 
-        public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
+        public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Stack;
+
+        public override void Tick(StatusContext context, double delta)
+        {
+            base.Tick(context, delta);
+            Ticked();
+        }
+    }
+
+    private sealed class RefreshableSpyStatus : Status
+    {
+        public static event Action Ticked = delegate { };
+
+        public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Refresh;
 
         public override void Tick(StatusContext context, double delta)
         {
@@ -914,5 +945,16 @@ public sealed class UnitTests
 
         public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
             [new(Stat.MaxMana, StatModifierKind.Set, 0)];
+    }
+
+    private sealed class StatusThatRemovesAllStatusesOnTick : Status
+    {
+        public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Stack;
+
+        public override void Tick(StatusContext context, double delta)
+        {
+            foreach (Guid id in context.Unit.GetStatusContexts().Keys)
+                context.Unit.RemoveStatus(id);
+        }
     }
 }
