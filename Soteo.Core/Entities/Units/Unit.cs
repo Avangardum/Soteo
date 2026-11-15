@@ -524,12 +524,10 @@ public abstract class Unit : UnitBase<IUnitNode>
                 case AbilityValidationResult.Ok:
                     return abilityValidationResult;
                 case AbilityValidationResult.OutOfRange:
-                    // todo handle targetPosition == null
-                    MoveToPosition(targetPosition!.Value, ref remainingDeltaTime, node);
+                    MoveToPosition(targetPosition.Required, ref remainingDeltaTime, node);
                     break;
                 case AbilityValidationResult.OutOfAngularRange:
-                    // todo handle targetPosition == null
-                    LookAtPosition(targetPosition!.Value, ref remainingDeltaTime);
+                    LookAtPosition(targetPosition.Required, ref remainingDeltaTime);
                     break;
                 default:
                     if (command.Repeat)
