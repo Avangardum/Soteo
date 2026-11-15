@@ -501,7 +501,7 @@ public sealed class Hud : IHud
 
         _equipmentPanel.Visible = true;
         IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> blockedAndBlockingSlots =
-            unit.EquipmentInventory.BlockedAndBlockingSlots;
+            unit.EquipmentInventory.GetBlockedAndBlockingSlots();
         bool canControlSelectedUnit = CanControlSelectedUnit(out _);
 
         foreach ((EquipmentSlot slot, ItemStackSlotControl control) in _equipmentSlotControls)

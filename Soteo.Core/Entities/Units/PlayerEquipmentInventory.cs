@@ -23,7 +23,7 @@ public sealed class PlayerEquipmentInventory : EquipmentInventory
     public override ItemStack? Put(EquipmentSlot slot, ItemStack stack)
     {
         if (stack.Item.EquippableTo != slot) return stack;
-        IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> blockedAndBlockingSlots = BlockedAndBlockingSlots;
+        IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> blockedAndBlockingSlots = GetBlockedAndBlockingSlots();
         if (blockedAndBlockingSlots.ContainsKey(slot)) return stack;
 
         foreach (EquipmentSlot blockingSlot in stack.Item.BlocksEquipmentSlots)
@@ -58,19 +58,16 @@ public sealed class PlayerEquipmentInventory : EquipmentInventory
         return result;
     }
 
-    public override IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> BlockedAndBlockingSlots
+    public override IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> GetBlockedAndBlockingSlots()
     {
-        get
+        Dictionary<EquipmentSlot, EquipmentSlot> result = [];
+        foreach ((EquipmentSlot blockingSlot, ItemStack? stack) in _stacks)
         {
-            Dictionary<EquipmentSlot, EquipmentSlot> result = [];
-            foreach ((EquipmentSlot blockingSlot, ItemStack? stack) in _stacks)
-            {
-                if (stack == null) continue;
-                foreach (EquipmentSlot blockedSlot in stack.Item.BlocksEquipmentSlots)
-                    result[blockedSlot] = blockingSlot;
-            }
-            return result;
+            if (stack == null) continue;
+            foreach (EquipmentSlot blockedSlot in stack.Item.BlocksEquipmentSlots)
+                result[blockedSlot] = blockingSlot;
         }
+        return result;
     }
 
     public override EquipmentInventorySnapshot ToSnapshot() => new(_stacks.ToDictionary());

@@ -19,8 +19,8 @@ public abstract class EquipmentInventory : IReadOnlyDictionary<EquipmentSlot, It
 
     /// <summary>
     /// Slots that are empty, but blocked by items in other slots as keys and slots that block them as values
-    /// </summary> // todo to method
-    public abstract IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> BlockedAndBlockingSlots { get; }
+    /// </summary>
+    public abstract IReadOnlyDictionary<EquipmentSlot, EquipmentSlot> GetBlockedAndBlockingSlots();
 
     public abstract int Count { get; }
 
