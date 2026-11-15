@@ -17,6 +17,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     private List<Ability> _innateHotbarAbilities = [];
     private Dictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = [];
     private bool _allowAbilityPassiveStatusManipulation;
+    private bool _isExecutingCommands;
 
     public Inventory Inventory { get; }
     public EquipmentInventory EquipmentInventory { get; }
@@ -281,8 +282,7 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void ExecuteCommands(IUnitNode node, double deltaTime)
     {
-        // todo Bad stuff will happen if the command stack changes during execution.
-        // While this shouldn't happen, some guard against this should probably be added.
+        _isExecutingCommands = true;
         double remainingDeltaTime = deltaTime;
         int iterations = 0;
         const int maxIterations = 5;
@@ -313,6 +313,7 @@ public abstract class Unit : UnitBase<IUnitNode>
                     throw new Exception($"Unknown command type {command.GetType()}");
             }
         }
+        _isExecutingCommands = false;
     }
 
     private void LookAtPosition(Vector2 position, ref double remainingDeltaTime)
@@ -566,6 +567,9 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     internal void SetCommand(Command command)
     {
+        if (_isExecutingCommands)
+            throw new InvalidOperationException("SetCommand should not be called while executing commands");
+
         Command? prevCommand = _commands.PeekOrDefault();
         _commands.Clear();
 
