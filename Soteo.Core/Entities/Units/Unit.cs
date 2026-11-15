@@ -41,7 +41,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         _crossInventoryHelper = crossInventoryHelper;
 
         foreach (Stat stat in Stat.All)
-            _stats[stat] = StatConst[stat].Default;
+            _stats[stat] = stat.Default;
 
         EquipmentInventory.Changed += () => { UpdateHotbarAbilityList(); UpdateSpecialAbilityList(); };
     }
@@ -221,18 +221,18 @@ public abstract class Unit : UnitBase<IUnitNode>
         double maxFloor = floorModifiers
             .Select(it => it.Value)
             .OrderDescending()
-            .FirstOrDefault(StatConst[stat].Min);
+            .FirstOrDefault(stat.Min);
         double minCeiling = ceilingModifiers
             .Select(it => it.Value)
             .Order()
-            .FirstOrDefault(StatConst[stat].Max);
+            .FirstOrDefault(stat.Max);
         if (maxFloor > minCeiling)
             return ResolveNonOverlappingStatLimits(floorModifiers, ceilingModifiers);
         // todo will crash if a floor is above max or ceiling is below min
 
         double addTotal = modifiers[StatModifierKind.Add].Sum(it => it.Value);
         double multiplyTotal = modifiers[StatModifierKind.Multiply].Product(it => it.Value);
-        return Maths.Clamp((StatConst[stat].Default + addTotal) * multiplyTotal, maxFloor, minCeiling);
+        return Maths.Clamp((stat.Default + addTotal) * multiplyTotal, maxFloor, minCeiling);
     }
 
     private double ResolveNonOverlappingStatLimits

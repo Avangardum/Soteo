@@ -101,13 +101,13 @@ public sealed class UnitTests
         );
 
         const double buffValue = StatusAlternatingBetweenMoveSpeedAndAttackSpeedBuff.BuffValue;
-        _sut.GetStats()[Stat.MoveSpeed].Should().Be(Unit.StatConst[Stat.MoveSpeed].Default + buffValue);
-        _sut.GetStats()[Stat.AttackSpeed].Should().Be(Unit.StatConst[Stat.AttackSpeed].Default);
+        _sut.GetStats()[Stat.MoveSpeed].Should().Be(Stat.MoveSpeed.Default + buffValue);
+        _sut.GetStats()[Stat.AttackSpeed].Should().Be(Stat.AttackSpeed.Default);
 
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1.5);
 
-        _sut.GetStats()[Stat.MoveSpeed].Should().Be(Unit.StatConst[Stat.MoveSpeed].Default);
-        _sut.GetStats()[Stat.AttackSpeed].Should().Be(Unit.StatConst[Stat.AttackSpeed].Default + buffValue);
+        _sut.GetStats()[Stat.MoveSpeed].Should().Be(Stat.MoveSpeed.Default);
+        _sut.GetStats()[Stat.AttackSpeed].Should().Be(Stat.AttackSpeed.Default + buffValue);
     }
 
     [Fact]
