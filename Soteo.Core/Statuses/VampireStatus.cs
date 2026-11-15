@@ -9,8 +9,8 @@ public sealed class VampireStatus : AbilityPassiveStatus
 
     public override void Tick(StatusContext context, double delta)
     {
-        double maxStableHealth = context.Unit.Stats[Stat.MaxHealth] * 0.7;
-        double unstableHealth = context.Unit.Stats[Stat.CurrentHealth] - maxStableHealth;
+        double maxStableHealth = context.Unit.GetStats()[Stat.MaxHealth] * 0.7;
+        double unstableHealth = context.Unit.GetStats()[Stat.CurrentHealth] - maxStableHealth;
         if (unstableHealth > 0)
         {
             const double healthDrainPerSecond = 5;

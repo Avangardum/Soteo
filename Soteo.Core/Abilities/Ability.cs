@@ -128,9 +128,9 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
 
     private AbilityValidationResult ValidateCost(AbilityContext context)
     {
-        if (HealthCost(context) > 0 && context.User.Stats[Stat.CurrentHealth] <= HealthCost(context))
+        if (HealthCost(context) > 0 && context.User.GetStats()[Stat.CurrentHealth] <= HealthCost(context))
             return AbilityValidationResult.NotEnoughHealth;
-        if (context.User.Stats[Stat.CurrentMana] < ManaCost(context))
+        if (context.User.GetStats()[Stat.CurrentMana] < ManaCost(context))
             return AbilityValidationResult.NotEnoughMana;
         return AbilityValidationResult.Ok;
     }
