@@ -49,14 +49,24 @@ public abstract class Unit : UnitBase<IUnitNode>
     // For testing
     private protected IReadOnlyList<Command> GetCommands() => _commands.ToList();
 
+    // todo to method
     public IReadOnlyList<Guid> ControllingPlayerIds =>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
+
+    public StatusContext? GetStatusContext(Guid id) =>
+        _statusContexts.GetValueOrDefault(id);
 
     public IReadOnlyDictionary<Guid, StatusContext> GetStatusContexts() =>
         _statusContexts.ToDictionary().AsReadOnly();
 
+    public double GetStat(Stat stat) =>
+        _stats[stat];
+
     public IReadOnlyDictionary<Stat, double> GetStats() =>
         _stats.ToDictionary().AsReadOnly();
+
+    public AbilitySlotState? GetAbilitySlotState(AbilitySlot slot) =>
+        _abilitySlotStates.GetValueOrDefault(slot);
 
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> GetAbilitySlotStates() =>
         _abilitySlotStates.ToDictionary().AsReadOnly();
