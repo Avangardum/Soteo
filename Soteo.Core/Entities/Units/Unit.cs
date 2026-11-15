@@ -52,14 +52,17 @@ public abstract class Unit : UnitBase<IUnitNode>
     public IReadOnlyList<Guid> ControllingPlayerIds =>
         _controllingPlayerId == null ? [] : [_controllingPlayerId.Value];
 
-    public IReadOnlyDictionary<Guid, StatusContext> GetStatusContexts() => _statusContexts.ToDictionary().AsReadOnly();
+    public IReadOnlyDictionary<Guid, StatusContext> GetStatusContexts() =>
+        _statusContexts.ToDictionary().AsReadOnly();
 
-    public IReadOnlyDictionary<Stat, double> GetStats() => _stats.ToDictionary().AsReadOnly();
+    public IReadOnlyDictionary<Stat, double> GetStats() =>
+        _stats.ToDictionary().AsReadOnly();
 
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> GetAbilitySlotStates() =>
         _abilitySlotStates.ToDictionary().AsReadOnly();
 
-    protected IReadOnlyList<Ability> GetInnateHotbarAbilities() => _innateHotbarAbilities.ToList();
+    protected IReadOnlyList<Ability> GetInnateHotbarAbilities() =>
+        _innateHotbarAbilities.ToList();
 
     protected IReadOnlyDictionary<SpecialAbilitySlot, Ability> GetInnateSpecialAbilities() =>
         _innateSpecialAbilities.ToDictionary();
@@ -84,10 +87,10 @@ public abstract class Unit : UnitBase<IUnitNode>
             Azimuth = Azimuth,
             IsDead = IsDead,
             IsMoving = IsMoving,
-            Stats = GetStats().ToDictionary().AsReadOnly(),
+            Stats = GetStats(),
             AbilitySlotStates = _abilitySlotStates.ToDictionary().AsReadOnly(),
             AbilityUseProgress = AbilityUseProgress,
-            Statuses = GetStatusContexts().ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly(),
+            Statuses = _statusContexts.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly(),
             ControllingPlayerId = _controllingPlayerId,
             InventorySnapshot = Inventory.ToSnapshot(),
             EquipmentInventory = EquipmentInventory.ToSnapshot(),
@@ -107,7 +110,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         AbilityUseProgress = s.AbilityUseProgress;
         _statusContexts =
             s.Statuses.ToDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
-        _nextStatusOrdinal = GetStatusContexts().Count > 0 ? GetStatusContexts().Values.Max(it => it.Ordinal) + 1 : 0;
+        _nextStatusOrdinal = _statusContexts.Count > 0 ? _statusContexts.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.InventorySnapshot);
         EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
@@ -148,14 +151,14 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void ApplyRegen(double delta)
     {
-        ChangeResourceStat(Stat.CurrentHealth, GetStats()[Stat.HealthRegen] * delta);
-        ChangeResourceStat(Stat.CurrentMana, GetStats()[Stat.ManaRegen] * delta);
+        ChangeResourceStat(Stat.CurrentHealth, _stats[Stat.HealthRegen] * delta);
+        ChangeResourceStat(Stat.CurrentMana, _stats[Stat.ManaRegen] * delta);
     }
 
     private void ProcessStatuses(double delta)
     {
         // todo if a status tick removes another status, that status will still be ticked
-        foreach (StatusContext context in GetStatusContexts().Values.ToList())
+        foreach (StatusContext context in _statusContexts.Values.ToList())
         {
             // todo check if self-removing status behaves correctly
             context.Status.Tick(context, delta);
@@ -188,11 +191,11 @@ public abstract class Unit : UnitBase<IUnitNode>
             }
         }
 
-        foreach (StatModifier modifier in GetStatusContexts().Values.SelectMany(it => it.Status.StatModifiers(it)))
+        foreach (StatModifier modifier in _statusContexts.Values.SelectMany(it => it.Status.StatModifiers(it)))
             modifiers[modifier.Stat][modifier.Kind].Add(modifier);
 
-        double oldMaxHealth = GetStats()[Stat.MaxHealth];
-        double oldMaxMana = GetStats()[Stat.MaxMana];
+        double oldMaxHealth = _stats[Stat.MaxHealth];
+        double oldMaxMana = _stats[Stat.MaxMana];
 
         foreach (Stat stat in Stat.AllComputed)
             _stats[stat] = CalculateStatValue(stat, modifiers[stat]);
@@ -261,8 +264,8 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void UpdateResourceStat(Stat stat, Stat maxStat, double oldMax)
     {
-        double normalized = GetStats()[stat] / oldMax; // todo division by 0
-        SetResourceStat(stat, GetStats()[maxStat] * normalized);
+        double normalized = _stats[stat] / oldMax; // todo division by 0
+        SetResourceStat(stat, _stats[maxStat] * normalized);
     }
 
     private void ExecuteCommands(IUnitNode node, double deltaTime)
@@ -313,14 +316,14 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void LookAtAzimuth(double azimuth, ref double remainingDeltaTime)
     {
-        if (remainingDeltaTime == 0 || GetStats()[Stat.TurnSpeed] == 0) return;
+        if (remainingDeltaTime == 0 || _stats[Stat.TurnSpeed] == 0) return;
 
         double desiredDeltaAzimuth = Maths.ModularDelta(Azimuth, azimuth, 360);
 
-        double timeToComplete = Math.Abs(desiredDeltaAzimuth) / GetStats()[Stat.TurnSpeed];
+        double timeToComplete = Math.Abs(desiredDeltaAzimuth) / _stats[Stat.TurnSpeed];
         if (remainingDeltaTime < timeToComplete)
         {
-            Azimuth += Maths.Sign(desiredDeltaAzimuth) * remainingDeltaTime * GetStats()[Stat.TurnSpeed];
+            Azimuth += Maths.Sign(desiredDeltaAzimuth) * remainingDeltaTime * _stats[Stat.TurnSpeed];
             remainingDeltaTime = 0;
         }
         else
@@ -335,7 +338,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     private void MoveToPosition(Vector2 position, ref double remainingDeltaTime, IUnitNode node)
     {
         LookAtPosition(position, ref remainingDeltaTime);
-        if (remainingDeltaTime == 0 || GetStats()[Stat.MoveSpeed] == 0) return;
+        if (remainingDeltaTime == 0 || _stats[Stat.MoveSpeed] == 0) return;
 
         Vector2 desiredMovement = position - Position;
         double desiredMovementLength = desiredMovement.Length();
@@ -345,10 +348,10 @@ public abstract class Unit : UnitBase<IUnitNode>
             return;
         }
         Vector2 normalizedDesiredMovement = desiredMovement / desiredMovementLength;
-        double timeToComplete = desiredMovementLength / GetStats()[Stat.MoveSpeed];
+        double timeToComplete = desiredMovementLength / _stats[Stat.MoveSpeed];
         if (remainingDeltaTime < timeToComplete)
         {
-            Vector2 movement = normalizedDesiredMovement * GetStats()[Stat.MoveSpeed] * remainingDeltaTime;
+            Vector2 movement = normalizedDesiredMovement * _stats[Stat.MoveSpeed] * remainingDeltaTime;
             MoveAndCollide(movement, node);
             remainingDeltaTime = 0;
         }
@@ -377,7 +380,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             return;
         }
 
-        if (GetAbilitySlotStates()[command.Slot].Cooldown > 0)
+        if (_abilitySlotStates[command.Slot].Cooldown > 0)
         {
             if (command.Repeat)
                 WaitForAbilityCooldown(context, ref remainingDeltaTime);
@@ -418,7 +421,7 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private AbilityContext? GetAbilityContext(UseAbilityCommand command)
     {
-        if (!GetAbilitySlotStates().TryGetValue(command.Slot, out AbilitySlotState? state)) return null;
+        if (!_abilitySlotStates.TryGetValue(command.Slot, out AbilitySlotState? state)) return null;
         Unit? targetUnit = null;
         if (command.TargetUnitId != null)
         {
@@ -430,7 +433,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Ability = state.Ability,
             User = this,
             Alt = command.Alt,
-            UserStats = GetStats().ToDictionary().AsReadOnly(),
+            UserStats = GetStats(),
             Services = _services,
             TargetPosition = command.TargetPosition,
             TargetUnit = targetUnit,
@@ -446,7 +449,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Ability = ability,
             User = this,
             Alt = false,
-            UserStats = GetStats().ToDictionary().AsReadOnly(),
+            UserStats = GetStats(),
             Services = _services,
             TargetPosition = null,
             TargetUnit = null,
@@ -596,7 +599,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         RestoreMana(amount, source?.Unit, source?.Ability);
 
     protected void ChangeResourceStat(Stat stat, double delta) =>
-        SetResourceStat(stat, GetStats()[stat] + delta);
+        SetResourceStat(stat, _stats[stat] + delta);
 
     protected void SetResourceStat(Stat stat, double value)
     {
@@ -607,21 +610,21 @@ public abstract class Unit : UnitBase<IUnitNode>
         double min = 0;
         double max = stat switch
         {
-            Stat.CurrentHealth => GetStats()[Stat.MaxHealth],
-            Stat.CurrentMana => GetStats()[Stat.MaxMana],
+            Stat.CurrentHealth => _stats[Stat.MaxHealth],
+            Stat.CurrentMana => _stats[Stat.MaxMana],
             _ => double.PositiveInfinity
         };
         _stats[stat] = Maths.Clamp(value, min, max);
 
-        if (stat == Stat.CurrentHealth && GetStats()[Stat.CurrentHealth] == 0)
+        if (stat == Stat.CurrentHealth && _stats[Stat.CurrentHealth] == 0)
             Die();
     }
 
     public void DealAttackDamageTo(Unit target, Ability sourceAbility)
     {
-        target.TakeDamage(new Damage(GetStats()[Stat.AttackDamage]), this, sourceAbility);
-        foreach (StatusContext statusContext in GetStatusContexts().Values.ToList())
-            statusContext.Status.OnDealAttackDamage(statusContext, target, GetStats()[Stat.AttackDamage]);
+        target.TakeDamage(new Damage(_stats[Stat.AttackDamage]), this, sourceAbility);
+        foreach (StatusContext statusContext in _statusContexts.Values.ToList())
+            statusContext.Status.OnDealAttackDamage(statusContext, target, _stats[Stat.AttackDamage]);
     }
 
     public void AddStatus(Status status, double time, ISourceUnitAndAbility? source) =>
@@ -668,7 +671,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Services = _services
         };
 
-        List<StatusContext> duplicates = GetStatusContexts().Values.Where(it => it.Status == status).ToList();
+        List<StatusContext> duplicates = _statusContexts.Values.Where(it => it.Status == status).ToList();
         if (duplicates.Count == 0)
         {
             _statusContexts[context.Id] = context;
@@ -783,7 +786,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     {
         foreach (SpecialAbilitySlot slot in AbilitySlot.AllSpecial)
         {
-            AbilitySlotState? currentState = GetAbilitySlotStates().GetValueOrDefault(slot);
+            AbilitySlotState? currentState = _abilitySlotStates.GetValueOrDefault(slot);
 
             Ability? itemAbility = EquipmentInventory
                 .OrderBy(it => it.Key)
