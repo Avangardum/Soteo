@@ -8,5 +8,5 @@ public interface IShardSynchronizationClient
     double? ServerLoad { get; }
 
     void ReceiveShardSnapshotPacket(ShardSnapshotPacket packet);
-    void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet);
+    void ReceiveShardDeltaPacket(ShardDeltaPacket packet);
 }

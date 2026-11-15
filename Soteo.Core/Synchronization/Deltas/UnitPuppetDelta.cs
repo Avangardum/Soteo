@@ -1,6 +1,6 @@
 namespace Soteo.Core.Synchronization.Deltas;
 
-public sealed record UnitPuppetSnapshotDelta : EntitySnapshotDelta
+public sealed record UnitPuppetDelta : EntityDelta
 {
     public required Delta<bool> IsDead { get; init; }
     public required Delta<bool> IsMoving { get; init; }

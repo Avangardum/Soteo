@@ -101,7 +101,7 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
 
         if (_syncData.Tick % 1 > 0)
         {
-            ShardSnapshotDelta partialDelta = _syncData.DeltaRing.RingGet(lastFullDeltaTick + 1).Required;
+            ShardDelta partialDelta = _syncData.DeltaRing.RingGet(lastFullDeltaTick + 1).Required;
             if ((long)prevTick < (long)_syncData.Tick)
             {
                 double interpolationWeight = _syncData.Tick.Value % 1;
@@ -170,22 +170,22 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         _entitySnapshotManager.ReplicateEntitySnapshots(packet.Snapshot.Entities);
     }
 
-    public void ReceiveShardSnapshotDeltaPacket(ShardSnapshotDeltaPacket packet)
+    public void ReceiveShardDeltaPacket(ShardDeltaPacket packet)
     {
         if (State == StateEnum.Desynchronized) return;
 
         long expectedTick = _syncData.ReceivedDeltaCount > 0 ?
             _syncData.LastDeltaTick.Required + 1 :
             _syncData.LastSnapshotPacket.Required.Snapshot.Tick + 1;
-        if (packet.SnapshotDelta.Tick < expectedTick) return;
-        if (packet.SnapshotDelta.Tick > expectedTick)
-            throw new Exception($"Expected delta for tick {expectedTick}, received for {packet.SnapshotDelta.Tick}");
+        if (packet.Delta.Tick < expectedTick) return;
+        if (packet.Delta.Tick > expectedTick)
+            throw new Exception($"Expected delta for tick {expectedTick}, received for {packet.Delta.Tick}");
 
-        _syncData.DeltaRing.RingSet(packet.SnapshotDelta.Tick, packet.SnapshotDelta);
+        _syncData.DeltaRing.RingSet(packet.Delta.Tick, packet.Delta);
         _syncData.ServerLoad = packet.ServerLoad;
         _syncData.ApproxServerTick =
-            packet.SnapshotDelta.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
-        _syncData.LastDeltaTick = packet.SnapshotDelta.Tick;
+            packet.Delta.Tick + _networkDebugger.Ping(_shard.Id) / 2 * Const.TicksPerSecond;
+        _syncData.LastDeltaTick = packet.Delta.Tick;
         _syncData.ReceivedDeltaCount++;
     }
 
@@ -202,7 +202,7 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         public double? ApproxServerTick { get; set; }
         public long? LastDeltaTick { get; set; }
         public ShardSnapshotPacket? LastSnapshotPacket { get; set; }
-        public ShardSnapshotDelta?[] DeltaRing { get; } = new ShardSnapshotDelta[10 * Const.TicksPerSecond];
+        public ShardDelta?[] DeltaRing { get; } = new ShardDelta[10 * Const.TicksPerSecond];
         public long ReceivedDeltaCount { get; set; }
 
         // Stores minimal difference between _tick and _lastDeltaTick for every recent second. This number

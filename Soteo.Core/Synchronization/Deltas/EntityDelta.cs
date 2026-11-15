@@ -1,6 +1,6 @@
 namespace Soteo.Core.Synchronization.Deltas;
 
-public abstract record EntitySnapshotDelta
+public abstract record EntityDelta
 {
     public required Guid Id { get; init; }
     public Delta<Vector2> Position { get; init; }

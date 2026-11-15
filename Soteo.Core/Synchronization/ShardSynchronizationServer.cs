@@ -76,17 +76,17 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
             _snapshotRequesters.Clear();
         }
 
-        ShardSnapshotDelta? shardSnapshotDelta = _prevShardSnapshot == null ? null :
-            ShardSnapshotDelta.Between(_prevShardSnapshot, shardSnapshot);
+        ShardDelta? shardDelta = _prevShardSnapshot == null ? null :
+            ShardDelta.Between(_prevShardSnapshot, shardSnapshot);
 
-        if (shardSnapshotDelta != null)
+        if (shardDelta != null)
         {
-            var shardSnapshotDeltaPacket = new ShardSnapshotDeltaPacket
+            var shardDeltaPacket = new ShardDeltaPacket
             {
                 ServerLoad = _frameStopwatch.ElapsedSincePhysicsProcess * Const.TicksPerSecond,
-                SnapshotDelta = shardSnapshotDelta
+                Delta = shardDelta
             };
-            _packetSender.Broadcast(shardSnapshotDeltaPacket, deferToNextTick: true);
+            _packetSender.Broadcast(shardDeltaPacket, deferToNextTick: true);
         }
 
         _prevShardSnapshot = shardSnapshot;

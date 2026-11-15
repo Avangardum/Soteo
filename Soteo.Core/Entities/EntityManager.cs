@@ -110,9 +110,9 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         }
     }
 
-    public void ApplyDelta(ShardSnapshotDelta delta, double lerpWeight)
+    public void ApplyDelta(ShardDelta delta, double lerpWeight)
     {
-        foreach (EntitySnapshotDelta entityDelta in delta.Entities.Changes.Values)
+        foreach (EntityDelta entityDelta in delta.Entities.Changes.Values)
         {
             bool isNew = !_entities.TryGetValue(entityDelta.Id, out Entity? entity);
             if (isNew)
@@ -162,11 +162,11 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         };
     }
 
-    private Entity SpawnEntityFromDelta(EntitySnapshotDelta delta)
+    private Entity SpawnEntityFromDelta(EntityDelta delta)
     {
         return delta switch
         {
-            UnitPuppetSnapshotDelta d => Add
+            UnitPuppetDelta d => Add
             (
                 new UnitPuppet
                 (
@@ -177,7 +177,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                     MakePlayerCharacterEquipmentInventory
                 )
             ),
-            ProjectilePuppetSnapshotDelta d =>
+            ProjectilePuppetDelta d =>
                 Add(new ProjectilePuppet(d.Id, AddNode<IProjectilePuppetNode>(d.Id), _camera.Required)),
             _ => throw new ArgumentOutOfRangeException()
         };

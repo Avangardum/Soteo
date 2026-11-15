@@ -1,21 +1,21 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
-    PacketSerializer<ShardSnapshotDeltaPacket>(s)
+public sealed class ShardDeltaPacketSerializer(ISerializationHelper s) :
+    PacketSerializer<ShardDeltaPacket>(s)
 {
-    protected override void SerializeCore(ShardSnapshotDeltaPacket packet, Stream stream)
+    protected override void SerializeCore(ShardDeltaPacket packet, Stream stream)
     {
         s.SerializeDouble(packet.ServerLoad, stream);
-        s.SerializeLong(packet.SnapshotDelta.Tick, stream);
-        SerializeIndexedDictionaryDelta(packet.SnapshotDelta.Entities, s.SerializeGuid, SerializeEntityDelta, stream);
+        s.SerializeLong(packet.Delta.Tick, stream);
+        SerializeIndexedDictionaryDelta(packet.Delta.Entities, s.SerializeGuid, SerializeEntityDelta, stream);
     }
 
-    protected override ShardSnapshotDeltaPacket DeserializeCore(Stream stream)
+    protected override ShardDeltaPacket DeserializeCore(Stream stream)
     {
-        return new ShardSnapshotDeltaPacket
+        return new ShardDeltaPacket
         {
             ServerLoad = s.DeserializeDouble(stream),
-            SnapshotDelta = new ShardSnapshotDelta
+            Delta = new ShardDelta
             {
                 Tick = s.DeserializeLong(stream),
                 Entities = DeserializeIndexedDictionaryDelta
@@ -29,14 +29,14 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         };
     }
 
-    private void SerializeEntityDelta(EntitySnapshotDelta entity, Stream stream)
+    private void SerializeEntityDelta(EntityDelta entity, Stream stream)
     {
         switch (entity)
         {
-            case UnitPuppetSnapshotDelta unitPuppet:
+            case UnitPuppetDelta unitPuppet:
                 SerializeUnitPuppetDelta(unitPuppet, stream);
                 break;
-            case ProjectilePuppetSnapshotDelta projectilePuppet:
+            case ProjectilePuppetDelta projectilePuppet:
                 SerializeProjectilePuppetDelta(projectilePuppet, stream);
                 break;
             default:
@@ -44,7 +44,7 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         }
     }
 
-    private EntitySnapshotDelta DeserializeEntityDelta(Stream stream)
+    private EntityDelta DeserializeEntityDelta(Stream stream)
     {
         return s.DeserializeEnum<EntityKind>(stream) switch
         {
@@ -54,14 +54,14 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         };
     }
 
-    private void SerializeBaseEntityDelta(EntitySnapshotDelta delta, Stream stream)
+    private void SerializeBaseEntityDelta(EntityDelta delta, Stream stream)
     {
         s.SerializeGuid(delta.Id, stream);
         SerializeDelta(delta.Position, s.SerializeVector2, stream);
         SerializeDelta(delta.Azimuth, s.SerializeDouble, stream);
     }
 
-    private void SerializeUnitPuppetDelta(UnitPuppetSnapshotDelta delta, Stream stream)
+    private void SerializeUnitPuppetDelta(UnitPuppetDelta delta, Stream stream)
     {
         s.SerializeEnum(EntityKind.UnitPuppet, stream);
         SerializeBaseEntityDelta(delta, stream);
@@ -76,9 +76,9 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         SerializeEquipmentInventoryDelta(delta.EquipmentInventory, stream);
     }
 
-    private UnitPuppetSnapshotDelta DeserializeUnitPuppetDelta(Stream stream)
+    private UnitPuppetDelta DeserializeUnitPuppetDelta(Stream stream)
     {
-        return new UnitPuppetSnapshotDelta
+        return new UnitPuppetDelta
         {
             Id = s.DeserializeGuid(stream),
             Position = DeserializeDelta(s.DeserializeVector2, stream),
@@ -96,15 +96,15 @@ public sealed class ShardSnapshotDeltaPacketSerializer(ISerializationHelper s) :
         };
     }
 
-    private void SerializeProjectilePuppetDelta(ProjectilePuppetSnapshotDelta delta, Stream stream)
+    private void SerializeProjectilePuppetDelta(ProjectilePuppetDelta delta, Stream stream)
     {
         s.SerializeEnum(EntityKind.ProjectilePuppet, stream);
         SerializeBaseEntityDelta(delta, stream);
     }
 
-    private ProjectilePuppetSnapshotDelta DeserializeProjectilePuppetDelta(Stream stream)
+    private ProjectilePuppetDelta DeserializeProjectilePuppetDelta(Stream stream)
     {
-        return new ProjectilePuppetSnapshotDelta
+        return new ProjectilePuppetDelta
         {
             Id = s.DeserializeGuid(stream),
             Position = DeserializeDelta(s.DeserializeVector2, stream),

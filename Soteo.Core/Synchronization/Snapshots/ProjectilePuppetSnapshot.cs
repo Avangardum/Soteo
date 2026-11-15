@@ -2,11 +2,11 @@ namespace Soteo.Core.Synchronization.Snapshots;
 
 public sealed record ProjectilePuppetSnapshot : EntitySnapshot<ProjectilePuppetSnapshot>
 {
-    public override EntitySnapshotDelta DeltaFrom(ProjectilePuppetSnapshot? from)
+    public override EntityDelta DeltaFrom(ProjectilePuppetSnapshot? from)
     {
         if (from == null)
         {
-            return new ProjectilePuppetSnapshotDelta
+            return new ProjectilePuppetDelta
             {
                 Id = Id,
                 Position = Position,
@@ -16,7 +16,7 @@ public sealed record ProjectilePuppetSnapshot : EntitySnapshot<ProjectilePuppetS
 
         if (from.Id != Id) throw new ArgumentException();
 
-        return new ProjectilePuppetSnapshotDelta
+        return new ProjectilePuppetDelta
         {
             Id = Id,
             Position = Delta.Between(from.Position, Position),

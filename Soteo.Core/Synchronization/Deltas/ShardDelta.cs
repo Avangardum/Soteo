@@ -1,16 +1,16 @@
 namespace Soteo.Core.Synchronization.Deltas;
 
-public sealed record ShardSnapshotDelta
+public sealed record ShardDelta
 {
     public required long Tick { get; init; }
-    public required DictionaryDelta<Guid, EntitySnapshotDelta> Entities { get; init; }
+    public required DictionaryDelta<Guid, EntityDelta> Entities { get; init; }
 
-    public static ShardSnapshotDelta Between(ShardSnapshot from, ShardSnapshot to)
+    public static ShardDelta Between(ShardSnapshot from, ShardSnapshot to)
     {
-        return new ShardSnapshotDelta
+        return new ShardDelta
         {
             Tick = to.Tick,
-            Entities = new DictionaryDelta<Guid, EntitySnapshotDelta>
+            Entities = new DictionaryDelta<Guid, EntityDelta>
             {
                 Changes = to.Entities.Values
                     .Select(it => it.DeltaFrom(from.Entities.GetValueOrDefault(it.Id)))

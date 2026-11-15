@@ -114,10 +114,10 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         UpdateAnimation();
     }
 
-    public override void ApplyDelta(EntitySnapshotDelta delta, double interpolationWeight)
+    public override void ApplyDelta(EntityDelta delta, double interpolationWeight)
     {
         base.ApplyDelta(delta, interpolationWeight);
-        var d = (UnitPuppetSnapshotDelta)delta;
+        var d = (UnitPuppetDelta)delta;
         if (d.IsDead.HasChanged)
             IsDead = d.IsDead.NewValue;
         if (d.IsMoving.HasChanged)

@@ -17,6 +17,6 @@ public sealed record ProjectileSnapshot : EntitySnapshot<ProjectileSnapshot>
         };
     }
 
-    public override EntitySnapshotDelta DeltaFrom(ProjectileSnapshot? from) =>
+    public override EntityDelta DeltaFrom(ProjectileSnapshot? from) =>
         throw new NotSupportedException();
 }

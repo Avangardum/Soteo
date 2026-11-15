@@ -12,11 +12,11 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
     public required InventorySnapshot InventorySnapshot { get; init; }
     public required EquipmentInventorySnapshot EquipmentInventory { get; init; }
 
-    public override EntitySnapshotDelta DeltaFrom(UnitPuppetSnapshot? from)
+    public override EntityDelta DeltaFrom(UnitPuppetSnapshot? from)
     {
         if (from == null)
         {
-            return new UnitPuppetSnapshotDelta
+            return new UnitPuppetDelta
             {
                 Id = Id,
                 Position = Position,
@@ -35,7 +35,7 @@ public record UnitPuppetSnapshot : EntitySnapshot<UnitPuppetSnapshot>
 
         if (from.Id != Id) throw new ArgumentException();
 
-        return new UnitPuppetSnapshotDelta
+        return new UnitPuppetDelta
         {
             Id = Id,
             Position = Delta.Between(from.Position, Position),

@@ -9,12 +9,12 @@ public abstract record EntitySnapshot
 
     public abstract EntitySnapshot ToPuppet();
 
-    public abstract EntitySnapshotDelta DeltaFrom(EntitySnapshot? from);
+    public abstract EntityDelta DeltaFrom(EntitySnapshot? from);
 }
 
 public abstract record EntitySnapshot<T> : EntitySnapshot where T : EntitySnapshot<T>
 {
-    public abstract EntitySnapshotDelta DeltaFrom(T? from);
+    public abstract EntityDelta DeltaFrom(T? from);
 
-    public sealed override EntitySnapshotDelta DeltaFrom(EntitySnapshot? from) => DeltaFrom((T?)from);
+    public sealed override EntityDelta DeltaFrom(EntitySnapshot? from) => DeltaFrom((T?)from);
 }

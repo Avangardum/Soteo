@@ -34,6 +34,6 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
         };
     }
 
-    public override EntitySnapshotDelta DeltaFrom(UnitSnapshot? from) =>
+    public override EntityDelta DeltaFrom(UnitSnapshot? from) =>
         throw new NotSupportedException();
 }

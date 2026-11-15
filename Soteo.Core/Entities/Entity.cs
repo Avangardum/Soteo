@@ -27,7 +27,7 @@ public abstract class Entity
             Remove();
     }
 
-    public virtual void ApplyDelta(EntitySnapshotDelta delta, double interpolationWeight)
+    public virtual void ApplyDelta(EntityDelta delta, double interpolationWeight)
     {
         if (delta.Position.HasChanged)
             Position = Position.Lerp(delta.Position.NewValue, interpolationWeight);
