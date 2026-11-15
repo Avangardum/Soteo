@@ -81,7 +81,20 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         AbilityValidationResult rangeValidationResult = ValidateRange(context, mode);
         if (rangeValidationResult != AbilityValidationResult.Ok) return rangeValidationResult;
 
-        return ValidateCore(context, mode);
+        AbilityValidationResult coreValidationResult = ValidateCore(context, mode);
+        if
+        (
+            coreValidationResult is AbilityValidationResult.OutOfRange or AbilityValidationResult.OutOfAngularRange &&
+            context.TargetUnit == null &&
+            context.TargetPosition == null
+        )
+        {
+            throw new InvalidOperationException
+            (
+                $"{coreValidationResult} should only be returned when an ability context has a target"
+            );
+        }
+        return coreValidationResult;
     }
 
     protected virtual AbilityValidationResult ValidateCore(AbilityContext context, AbilityValidationMode mode) =>
