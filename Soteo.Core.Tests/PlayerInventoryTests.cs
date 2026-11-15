@@ -11,7 +11,7 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory(10);
 
-        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(1));
+        ItemStack? remainder = sut.Add<TestItem1>(1);
 
         remainder.Should().BeNull();
         sut[0].Should().Be(ItemStack.Of<TestItem1>(1));
@@ -22,8 +22,8 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory(10);
 
-        ItemStack? remainder1 = sut.Add(ItemStack.Of<TestItem1>(1));
-        ItemStack? remainder2 = sut.Add(ItemStack.Of<TestItem2>(1));
+        ItemStack? remainder1 = sut.Add<TestItem1>(1);
+        ItemStack? remainder2 = sut.Add<TestItem2>(1);
 
         remainder1.Should().BeNull();
         remainder2.Should().BeNull();
@@ -36,7 +36,7 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory([ItemStack.Of<TestItem1>(1)]);
 
-        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem2>(1));
+        ItemStack? remainder = sut.Add<TestItem2>(1);
 
         remainder.Should().Be(ItemStack.Of<TestItem2>(1));
         sut[0].Should().Be(ItemStack.Of<TestItem1>(1));
@@ -47,7 +47,7 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory([null, ItemStack.Of<TestItem1>(8), ItemStack.Of<TestItem1>(9), null]);
 
-        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(3));
+        ItemStack? remainder = sut.Add<TestItem1>(3);
 
         remainder.Should().BeNull();
         sut[0].Should().BeNull();
@@ -61,7 +61,7 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory([null, ItemStack.Of<TestItem1>(8), ItemStack.Of<TestItem1>(9), null]);
 
-        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(5));
+        ItemStack? remainder = sut.Add<TestItem1>(5);
 
         remainder.Should().BeNull();
         sut[0].Should().Be(ItemStack.Of<TestItem1>(2));
@@ -75,7 +75,7 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory([ItemStack.Of<TestItem1>(8)]);
 
-        ItemStack? remainder = sut.Add(ItemStack.Of<TestItem1>(4));
+        ItemStack? remainder = sut.Add<TestItem1>(4);
 
         remainder.Should().Be(ItemStack.Of<TestItem1>(2));
         sut[0].Should().Be(ItemStack.Of<TestItem1>(10));
@@ -86,7 +86,7 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory([ItemStack.Of<TestItem1>(1), null]);
 
-        ItemStack? result = sut.Put(0, ItemStack.Of<TestItem2>(1));
+        ItemStack? result = sut.Put<TestItem2>(0, 1);
 
         sut[0].Should().Be(ItemStack.Of<TestItem2>(1));
         sut[1].Should().BeNull();
@@ -98,7 +98,7 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory([ItemStack.Of<TestItem1>(10), null]);
 
-        ItemStack? result = sut.Put(0, ItemStack.Of<TestItem1>(1));
+        ItemStack? result = sut.Put<TestItem1>(0, 1);
 
         sut[0].Should().Be(ItemStack.Of<TestItem1>(1));
         sut[1].Should().BeNull();
@@ -110,7 +110,7 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory([ItemStack.Of<TestItem1>(1), null]);
 
-        ItemStack? result = sut.Put(0, ItemStack.Of<TestItem1>(1));
+        ItemStack? result = sut.Put<TestItem1>(0, 1);
 
         sut[0].Should().Be(ItemStack.Of<TestItem1>(2));
         sut[1].Should().BeNull();
@@ -122,7 +122,7 @@ public sealed class PlayerInventoryTests
     {
         var sut = new PlayerInventory([ItemStack.Of<TestItem1>(6), null]);
 
-        ItemStack? result = sut.Put(0, ItemStack.Of<TestItem1>(6));
+        ItemStack? result = sut.Put<TestItem1>(0, 6);
 
         sut[0].Should().Be(ItemStack.Of<TestItem1>(10));
         sut[1].Should().BeNull();

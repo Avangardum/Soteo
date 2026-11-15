@@ -29,10 +29,10 @@ public sealed class PlayerCharacter : Unit
         AddInnateHotbarAbility<BloodSacrificeAbility>();
         AddInnateHotbarAbility<HealAbility>();
 
-        Inventory.Put(0, ItemStack.Of<LogItem>(1));
-        Inventory.Put(1, ItemStack.Of<LogItem>(1));
-        Inventory.Put(2, ItemStack.Of<RockItem>(1));
-        Inventory.Put(3, ItemStack.Of<TestBootsItem>(1));
+        Inventory.Put<LogItem>(0, 1);
+        Inventory.Put<LogItem>(1, 1);
+        Inventory.Put<RockItem>(2, 1);
+        Inventory.Put<TestBootsItem>(3, 1);
     }
 
     public static PlayerCharacter FromSnapshot

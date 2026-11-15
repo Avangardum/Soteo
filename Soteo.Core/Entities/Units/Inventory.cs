@@ -14,7 +14,7 @@ public abstract class Inventory : IReadOnlyList<ItemStack?>
     public abstract ItemStack? Add(ItemStack stack);
 
     /// <inheritdoc cref="Add"/>
-    public ItemStack? Add<T>(int count) where T : Item, new() =>
+    public ItemStack? Add<T>(long count) where T : Item, new() =>
         Add(ItemStack.Of<T>(count));
 
     /// <summary>
@@ -23,7 +23,7 @@ public abstract class Inventory : IReadOnlyList<ItemStack?>
     /// </summary>
     public abstract ItemStack? Put(int slot, ItemStack stack);
 
-    public ItemStack? Put<T>(int slot, int count) where T : Item, new() =>
+    public ItemStack? Put<T>(int slot, long count) where T : Item, new() =>
         Put(slot, ItemStack.Of<T>(count));
 
     public abstract ItemStack? Remove(int slot);
