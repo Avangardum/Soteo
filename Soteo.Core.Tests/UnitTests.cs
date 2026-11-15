@@ -719,6 +719,15 @@ public sealed class UnitTests
             .Should().Throw<InvalidOperationException>();
     }
 
+    [Fact]
+    public void AddingThenRemovingStatusThatSetsMaxManaTo0SetsCurrentManaTo0()
+    {
+        _sut.AddStatus<StatusThatSetsMaxManaTo0>(10, null);
+        _sut.RemoveAllStatuses<StatusThatSetsMaxManaTo0>();
+
+        _sut.GetStats()[Stat.CurrentMana].Should().Be(0);
+    }
+
     private class SpyAbility : Ability
     {
         public event Action Used = delegate { };
@@ -879,4 +888,12 @@ public sealed class UnitTests
     }
 
     private sealed class TestAbilityPassiveStatus : AbilityPassiveStatus;
+
+    private sealed class StatusThatSetsMaxManaTo0 : Status
+    {
+        public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Throw;
+
+        public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
+            [new(Stat.MaxMana, StatModifierKind.Set, 0)];
+    }
 }

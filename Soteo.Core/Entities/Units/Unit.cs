@@ -264,7 +264,7 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void UpdateResourceStat(Stat stat, Stat maxStat, double oldMax)
     {
-        double normalized = _stats[stat] / oldMax; // todo division by 0
+        double normalized = oldMax == 0 ? 0 : _stats[stat] / oldMax;
         SetResourceStat(stat, _stats[maxStat] * normalized);
     }
 
