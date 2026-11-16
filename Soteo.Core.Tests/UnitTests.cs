@@ -775,6 +775,24 @@ public sealed class UnitTests
         wasRefreshableSpyStatusTicked.Should().BeFalse();
     }
 
+    [Fact]
+    public void AddingStatusThatSetsMoveSpeedBelowMinAndAttackSpeedAboveMaxSetsMoveSpeedToMinAndAttackSpeedToMax()
+    {
+        _sut.AddStatus<StatusThatSetsMoveSpeedBelowMinAndAttackSpeedAboveMax>(double.PositiveInfinity, null);
+
+        _sut.GetStat(Stat.MoveSpeed).Should().Be(Stat.MoveSpeed.Min);
+        _sut.GetStat(Stat.AttackSpeed).Should().Be(Stat.AttackSpeed.Max);
+    }
+
+    [Fact]
+    public void AddingStatusThatCeilsMoveSpeedBelowMinAndFloorsAttackSpeedAboveMaxSetsMoveSpeedToMinAndAttackSpeedToMax()
+    {
+        _sut.AddStatus<StatusThatCeilsMoveSpeedBelowMinAndFloorsAttackSpeedAboveMax>(double.PositiveInfinity, null);
+
+        _sut.GetStat(Stat.MoveSpeed).Should().Be(Stat.MoveSpeed.Min);
+        _sut.GetStat(Stat.AttackSpeed).Should().Be(Stat.AttackSpeed.Max);
+    }
+
     private class SpyAbility : Ability
     {
         public event Action Used = delegate { };
@@ -827,6 +845,28 @@ public sealed class UnitTests
             Stat stat = Maths.FloorToInt(context.ElapsedTime) % 2 == 0 ? Stat.MoveSpeed : Stat.AttackSpeed;
             return [new StatModifier(stat, StatModifierKind.Add, BuffValue)];
         }
+    }
+
+    private sealed class StatusThatSetsMoveSpeedBelowMinAndAttackSpeedAboveMax : Status
+    {
+        public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Stack;
+
+        public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
+        [
+            new(Stat.MoveSpeed, StatModifierKind.Set, Stat.MoveSpeed.Min - 5),
+            new(Stat.AttackSpeed, StatModifierKind.Set, Stat.AttackSpeed.Max + 5)
+        ];
+    }
+
+    private sealed class StatusThatCeilsMoveSpeedBelowMinAndFloorsAttackSpeedAboveMax : Status
+    {
+        public override DuplicateStatusResolution DuplicateResolution => DuplicateStatusResolution.Stack;
+
+        public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
+        [
+            new(Stat.MoveSpeed, StatModifierKind.Ceiling, Stat.MoveSpeed.Min - 5),
+            new(Stat.AttackSpeed, StatModifierKind.Floor, Stat.AttackSpeed.Max + 5)
+        ];
     }
 
     private sealed class StackableSpyStatus : Status

@@ -229,7 +229,8 @@ public abstract class Unit : UnitBase<IUnitNode>
             .OrderByDescending(it => it.Priority)
             .ThenByDescending(it => it.Value)
             .FirstOrDefault();
-        if (setModifier != null) return setModifier.Value;
+        if (setModifier != null)
+            return Math.Clamp(setModifier.Value, stat.Min, stat.Max);
 
         List<StatModifier> floorModifiers = modifiers[StatModifierKind.Floor];
         List<StatModifier> ceilingModifiers = modifiers[StatModifierKind.Ceiling];
@@ -237,17 +238,20 @@ public abstract class Unit : UnitBase<IUnitNode>
             .Select(it => it.Value)
             .OrderDescending()
             .FirstOrDefault(stat.Min);
+        if (maxFloor > stat.Max)
+            maxFloor = stat.Max;
         double minCeiling = ceilingModifiers
             .Select(it => it.Value)
             .Order()
             .FirstOrDefault(stat.Max);
+        if (minCeiling < stat.Min)
+            minCeiling = stat.Min;
         if (maxFloor > minCeiling)
             return ResolveNonOverlappingStatLimits(floorModifiers, ceilingModifiers);
-        // todo will crash if a floor is above max or ceiling is below min
 
         double addTotal = modifiers[StatModifierKind.Add].Sum(it => it.Value);
         double multiplyTotal = modifiers[StatModifierKind.Multiply].Product(it => it.Value);
-        return Maths.Clamp((stat.Default + addTotal) * multiplyTotal, maxFloor, minCeiling);
+        return Math.Clamp((stat.Default + addTotal) * multiplyTotal, maxFloor, minCeiling);
     }
 
     private double ResolveNonOverlappingStatLimits
