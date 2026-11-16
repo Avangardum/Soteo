@@ -139,7 +139,6 @@ public abstract class Unit : UnitBase<IUnitNode>
     {
         if (IsRemoved) return;
         IsMoving = false;
-        // todo check IsRemoved between ticking statuses
         ProcessStatuses(delta);
         if (IsRemoved) return;
         UpdateStats();
@@ -148,7 +147,6 @@ public abstract class Unit : UnitBase<IUnitNode>
         if (IsRemoved) return;
         ApplyRegen(delta);
         if (IsRemoved) return;
-        // todo check IsRemoved between executing commands
         ExecuteCommands(Node.Required, delta);
     }
 
@@ -176,7 +174,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             StatusContext? context = GetStatusContext(id);
             if (context == null) continue;
             context.Status.Tick(context, delta);
-            // It's possible that the status context was removed or changed while ticked, so we get a new one
+            if (IsRemoved) return;
             context = GetStatusContext(id);
             if (context == null) continue;
             if (context.RemainingTime > delta)
@@ -291,7 +289,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         double remainingDeltaTime = deltaTime;
         int iterations = 0;
         const int maxIterations = 5;
-        while (_commands.Count > 0 && remainingDeltaTime > 0 && iterations < maxIterations)
+        while (!IsRemoved && _commands.Count > 0 && remainingDeltaTime > 0 && iterations < maxIterations)
         {
             iterations++;
             switch (_commands.Peek())

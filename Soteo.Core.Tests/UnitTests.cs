@@ -139,11 +139,21 @@ public sealed class UnitTests
     }
 
     [Fact]
-    public void DieOnTickStatusKillsItsUnitWhenTicked()
+    public void DieOnTickStatusKillsItsUnitWhenTickedAndPreventsOnlyStatusesAfterItFromTicking()
     {
-        _sut.AddStatus<DieOnTickStatus>(time: 10, source: null);
+        bool wasStackableSpyStatusTicked = false;
+        StackableSpyStatus.Ticked += () => wasStackableSpyStatusTicked = true;
+        bool wasRefreshableSpyStatusTicked = false;
+        RefreshableSpyStatus.Ticked += () => wasRefreshableSpyStatusTicked = true;
+
+        _sut.AddStatus<StackableSpyStatus>(double.PositiveInfinity, null);
+        _sut.AddStatus<DieOnTickStatus>(double.PositiveInfinity, null);
+        _sut.AddStatus<RefreshableSpyStatus>(double.PositiveInfinity, null);
         _sut.Tick(Const.TickInterval);
+
         _sut.IsDead.Should().BeTrue();
+        wasStackableSpyStatusTicked.Should().BeTrue();
+        wasRefreshableSpyStatusTicked.Should().BeFalse();
     }
 
     [Fact]
