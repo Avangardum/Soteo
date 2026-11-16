@@ -233,7 +233,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             return Math.Clamp(setModifier.Value, stat.Min, stat.Max);
 
         List<StatModifier> floorModifiers = modifiers[StatModifierKind.Floor];
-        List<StatModifier> ceilingModifiers = modifiers[StatModifierKind.Ceiling];
+        List<StatModifier> ceilingModifiers = modifiers[StatModifierKind.Ceil];
         double maxFloor = floorModifiers
             .Select(it => it.Value)
             .OrderDescending()

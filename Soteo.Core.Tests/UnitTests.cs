@@ -864,7 +864,7 @@ public sealed class UnitTests
 
         public override IReadOnlyList<StatModifier> StatModifiers(StatusContext context) =>
         [
-            new(Stat.MoveSpeed, StatModifierKind.Ceiling, Stat.MoveSpeed.Min - 5),
+            new(Stat.MoveSpeed, StatModifierKind.Ceil, Stat.MoveSpeed.Min - 5),
             new(Stat.AttackSpeed, StatModifierKind.Floor, Stat.AttackSpeed.Max + 5)
         ];
     }

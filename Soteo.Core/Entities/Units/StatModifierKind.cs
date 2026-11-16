@@ -5,6 +5,6 @@ public enum StatModifierKind : byte
     Set,
     Add,
     Multiply,
-    Ceiling,
-    Floor,
+    Ceil,
+    Floor
 }
