@@ -8,6 +8,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     private readonly Services _services;
     private readonly IEntityManager _entityManager;
     private readonly ICrossInventoryHelper _crossInventoryHelper;
+    private readonly UnitAi? _ai;
 
     private long _nextStatusOrdinal;
     private readonly Queue<Command> _commands = [];
@@ -26,13 +27,14 @@ public abstract class Unit : UnitBase<IUnitNode>
     protected Unit
     (
         Guid id,
-        Guid controllingPlayerId,
+        Guid? controllingPlayerId,
         IUnitNode node,
         IEntityManager entityManager,
         Inventory inventory,
         EquipmentInventory equipmentInventory,
         ICrossInventoryHelper crossInventoryHelper,
-        Services services
+        Services services,
+        UnitAi? ai = null
     ) : base(id, node)
     {
         _services = services;
@@ -41,6 +43,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         Inventory = inventory;
         EquipmentInventory = equipmentInventory;
         _crossInventoryHelper = crossInventoryHelper;
+        _ai = ai;
 
         foreach (Stat stat in Stat.All)
             _stats[stat] = stat.Default;
@@ -139,6 +142,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     {
         if (IsRemoved) return;
         IsMoving = false;
+        Think();
         ProcessStatuses(delta);
         if (IsRemoved) return;
         UpdateStats();
@@ -148,6 +152,13 @@ public abstract class Unit : UnitBase<IUnitNode>
         ApplyRegen(delta);
         if (IsRemoved) return;
         ExecuteCommands(Node.Required, delta);
+    }
+
+    private void Think()
+    {
+        if (_ai == null) return;
+        var context = new UnitAiContext(this);
+        _ai.Think(context);
     }
 
     private void DecreaseCooldowns(double delta)

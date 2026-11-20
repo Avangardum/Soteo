@@ -239,6 +239,28 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         });
     }
 
+    public Dude SpawnDude(Vector2 position)
+    {
+        var id = Guid.NewGuid();
+        return Add
+        (
+            new Dude
+            (
+                id,
+                controllingPlayerId: null,
+                AddNode<IUnitNode>(id),
+                this,
+                MakePlayerCharacterInventory(),
+                MakePlayerCharacterEquipmentInventory(),
+                _crossInventoryHelper,
+                _services.Required
+            )
+            {
+                Position = position
+            }
+        );
+    }
+
     private T Add<T>(T entity) where T : Entity
     {
         entity.Removed += () => OnEntityRemoved(entity);

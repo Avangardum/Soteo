@@ -9,4 +9,5 @@ public interface IEntityManager
 
     PlayerCharacter SpawnPlayerCharacter(Guid id, Guid controllingPlayerId);
     Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target);
+    Dude SpawnDude(Vector2 position);
 }

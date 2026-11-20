@@ -7,6 +7,7 @@ public sealed class TestBootsItem : Item
     public override IReadOnlyList<Ability> HotbarAbilities =>
     [
         Ability.Instance<ProjectileBurstAbility>(),
+        Ability.Instance<SpawnDudesAbility>(),
         Ability.Instance<VampireAbility>()
     ];
 }
