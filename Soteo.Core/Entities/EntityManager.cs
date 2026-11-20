@@ -138,21 +138,13 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 new PlayerCharacter
                 (
                     s.Id,
-                    s.ControllingPlayerId.Required,
                     AddNode<IUnitNode>(s.Id),
-                    _services.Required
+                    _services.Required,
+                    s.ControllingPlayerId.Required
                 )
             ),
-            UnitSnapshot s when s.Type == typeof(Dude)  => Add
-            (
-                new Dude
-                (
-                    s.Id,
-                    null,
-                    AddNode<IUnitNode>(s.Id),
-                    _services.Required
-                )
-            ),
+            UnitSnapshot s when s.Type == typeof(Dude) =>
+                Add(new Dude(s.Id, AddNode<IUnitNode>(s.Id), _services.Required)),
             ProjectileSnapshot s => Add(Projectile.FromSnapshot(s, _services.Required)),
             UnitPuppetSnapshot s => Add
             (
@@ -221,9 +213,9 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 new PlayerCharacter
                 (
                     id,
-                    controllingPlayerId,
                     AddNode<IUnitNode>(id),
-                    _services.Required
+                    _services.Required,
+                    controllingPlayerId
                 )
             );
         }
@@ -245,16 +237,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         var id = Guid.NewGuid();
         return Add
         (
-            new Dude
-            (
-                id,
-                controllingPlayerId: null,
-                AddNode<IUnitNode>(id),
-                _services.Required
-            )
-            {
-                Position = position
-            }
+            new Dude(id, AddNode<IUnitNode>(id), _services.Required) { Position = position }
         );
     }
 

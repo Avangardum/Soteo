@@ -25,12 +25,12 @@ public abstract class Unit : UnitBase<IUnitNode>
     protected Unit
     (
         Guid id,
-        Guid? controllingPlayerId,
         IUnitNode node,
         Inventory inventory,
         EquipmentInventory equipmentInventory,
         Services services,
-        UnitAi? ai = null
+        UnitAi? ai = null,
+        Guid? controllingPlayerId = null
     ) : base(id, node)
     {
         _services = services;

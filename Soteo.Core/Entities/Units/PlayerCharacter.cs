@@ -5,17 +5,17 @@ public sealed class PlayerCharacter : Unit
     public PlayerCharacter
     (
         Guid id,
-        Guid controllingPlayerId,
         IUnitNode node,
-        Services services
+        Services services,
+        Guid controllingPlayerId
     ) : base
     (
         id,
-        controllingPlayerId,
         node,
         new Inventory(8),
         new EquipmentInventory(Enum.GetValues<EquipmentSlot>()),
-        services
+        services,
+        controllingPlayerId: controllingPlayerId
     )
     {
         SetInnateSpecialAbility<RangedAttackAbility>(AbilitySlot.Attack);

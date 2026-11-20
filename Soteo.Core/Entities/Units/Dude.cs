@@ -7,13 +7,11 @@ public sealed class Dude : Unit
     public Dude
     (
         Guid id,
-        Guid? controllingPlayerId,
         IUnitNode node,
         Services services
     ) : base
     (
         id,
-        controllingPlayerId,
         node,
         new Inventory(0),
         new EquipmentInventory(),

@@ -20,11 +20,11 @@ public sealed class TestUnit : Unit
     ) : base
     (
         id ?? Guid.NewGuid(),
-        controllingPlayerId ?? Guid.NewGuid(),
         node ?? Substitute.For<IUnitNode>(),
         inventory ?? new Inventory(0),
         equipmentInventory ?? new EquipmentInventory(0),
-        services ?? DefaultServices()
+        services ?? DefaultServices(),
+        controllingPlayerId: controllingPlayerId
     ) { }
 
     private static Services DefaultServices()
