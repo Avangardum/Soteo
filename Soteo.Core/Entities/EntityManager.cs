@@ -303,8 +303,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     }
 
     private Inventory MakePlayerCharacterInventory() =>
-        new SimpleInventory(8);
+        new Inventory(8);
 
     private EquipmentInventory MakePlayerCharacterEquipmentInventory() =>
-        new SimpleEquipmentInventory(Enum.GetValues<EquipmentSlot>());
+        new EquipmentInventory(Enum.GetValues<EquipmentSlot>());
 }

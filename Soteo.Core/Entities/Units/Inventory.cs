@@ -2,16 +2,67 @@ using System.Collections;
 
 namespace Soteo.Core.Entities.Units;
 
-public abstract class Inventory : IReadOnlyList<ItemStack?>
+public class Inventory : IReadOnlyList<ItemStack?>
 {
-    public abstract event Action Changed;
-    public abstract int Count { get; }
-    public abstract bool HasSlot(int slot);
+    private List<ItemStack?> _stacks;
+
+    public event Action Changed = delegate { };
+
+    public Inventory(int size)
+    {
+        _stacks = Enumerable.Repeat<ItemStack?>(null, size).ToList();
+    }
+
+    public Inventory(IReadOnlyList<ItemStack?> stacks)
+    {
+        _stacks = stacks.ToList();
+    }
+
+
+    public int Count => _stacks.Count;
+    public bool HasSlot(int slot) => slot >= 0 && slot < _stacks.Count;
 
     /// <summary>
     /// Add a stack to the inventory, returning a remainder of the stack if it didn't fit
     /// </summary>
-    public abstract ItemStack? Add(ItemStack stack);
+    public ItemStack? Add(ItemStack stack)
+    {
+        long remainingCount = stack.Count;
+        for (int i = 0; i < _stacks.Count && remainingCount > 0; i++)
+        {
+            ItemStack? existingStack = _stacks[i];
+            if (existingStack?.Item == stack.Item && existingStack.FreeSpace > 0)
+            {
+                long transferredCount = Math.Min(remainingCount, existingStack.FreeSpace);
+                remainingCount -= transferredCount;
+                _stacks[i] = existingStack.WithCount(existingStack.Count + transferredCount);
+            }
+        }
+
+        if (remainingCount == 0)
+        {
+            Changed();
+            return null;
+        }
+
+        for (int i = 0; i < _stacks.Count; i++)
+        {
+            if (_stacks[i] == null)
+            {
+                _stacks[i] = new ItemStack(stack.Item, remainingCount);
+                Changed();
+                return null;
+            }
+        }
+
+        if (remainingCount < stack.Count)
+        {
+            Changed();
+            return new ItemStack(stack.Item, remainingCount);
+        }
+
+        return stack;
+    }
 
     /// <inheritdoc cref="Add"/>
     public ItemStack? Add<T>(long count) where T : Item, new() =>
@@ -21,16 +72,56 @@ public abstract class Inventory : IReadOnlyList<ItemStack?>
     /// Put an item stack into a target slot, returning a remainder of the stack if it didn't fit
     /// or a stack that it replaced
     /// </summary>
-    public abstract ItemStack? Put(int slot, ItemStack stack);
+    public ItemStack? Put(int slot, ItemStack stack)
+    {
+        ItemStack? existingStack = _stacks[slot];
+        bool canMerge = existingStack != null &&
+            stack.Item == existingStack.Item &&
+            existingStack.FreeSpace > 0;
+
+        if (canMerge)
+        {
+            long movedCount = Math.Min(stack.Count, existingStack.Required.FreeSpace);
+            _stacks[slot] = existingStack.WithCount(existingStack.Count + movedCount);
+            long remainder = stack.Count - movedCount;
+            Changed();
+            return remainder == 0 ? null : new ItemStack(stack.Item, remainder);
+        }
+
+        _stacks[slot] = stack;
+        Changed();
+        return existingStack;
+    }
 
     public ItemStack? Put<T>(int slot, long count) where T : Item, new() =>
         Put(slot, ItemStack.Of<T>(count));
 
-    public abstract ItemStack? Remove(int slot);
-    public abstract InventorySnapshot ToSnapshot();
-    public abstract void ReplicateSnapshot(InventorySnapshot snapshot);
-    public abstract void ApplyDelta(InventoryDelta delta);
-    public abstract IEnumerator<ItemStack?> GetEnumerator();
+    public ItemStack? Remove(int slot)
+    {
+        ItemStack? result = _stacks[slot];
+        _stacks[slot] = null;
+        if (result != null) Changed();
+        return result;
+    }
+
+    public InventorySnapshot ToSnapshot() => new(_stacks.ToList().AsReadOnly());
+
+    public void ReplicateSnapshot(InventorySnapshot snapshot)
+    {
+        _stacks = snapshot.Stacks.ToList();
+        Changed();
+    }
+
+    public void ApplyDelta(InventoryDelta delta)
+    {
+        if (!delta.HasChanged) return;
+        delta.Stacks.MutateList(_stacks);
+        Changed();
+    }
+
+    public IEnumerator<ItemStack?> GetEnumerator() => _stacks.GetEnumerator();
+
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public abstract ItemStack? this[int index] { get; }
+
+    public ItemStack? this[int index] => _stacks[index];
 }

@@ -22,8 +22,8 @@ public sealed class TestUnit : Unit
         id ?? Guid.NewGuid(),
         controllingPlayerId ?? Guid.NewGuid(),
         node ?? Substitute.For<IUnitNode>(),
-        inventory ?? new SimpleInventory(0),
-        equipmentInventory ?? new SimpleEquipmentInventory(0),
+        inventory ?? new Inventory(0),
+        equipmentInventory ?? new EquipmentInventory(0),
         services ?? DefaultServices()
     ) { }
 
