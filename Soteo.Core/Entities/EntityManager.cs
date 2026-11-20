@@ -127,13 +127,28 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         }
     }
 
+    // todo OCP violation: adding unit types requires updating EntityManager
+
     private Entity SpawnEntityFromSnapshot(EntitySnapshot snapshot)
     {
         return snapshot switch
         {
-            UnitSnapshot s => Add
+            UnitSnapshot s when s.Type == typeof(PlayerCharacter)  => Add
             (
                 PlayerCharacter.FromSnapshot
+                (
+                    s,
+                    AddNode<IUnitNode>(s.Id),
+                    this,
+                    MakePlayerCharacterInventory(),
+                    MakePlayerCharacterEquipmentInventory(),
+                    _crossInventoryHelper,
+                    _services.Required
+                )
+            ),
+            UnitSnapshot s when s.Type == typeof(Dude)  => Add
+            (
+                Dude.FromSnapshot
                 (
                     s,
                     AddNode<IUnitNode>(s.Id),

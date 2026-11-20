@@ -9,6 +9,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     private readonly IReadOnlyList<Type> _statusTypes = typeLocator.ConcreteSubclassesOf<Status>();
     private readonly IReadOnlyList<Type> _itemTypes = typeLocator.ConcreteSubclassesOf<Item>();
     private readonly IReadOnlyList<Type> _packetTypes = typeLocator.ConcreteSubclassesOf<Packet>();
+    private readonly IReadOnlyList<Type> _unitTypes = typeLocator.ConcreteSubclassesOf<Unit>();
 
     public void SerializeByte(byte value, Stream stream) => stream.WriteByte(value);
 
@@ -322,11 +323,21 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     {
         if (!type.IsAssignableTo(typeof(Packet)))
             throw new ArgumentException($"{type} is not a packet");
-        int index = _packetTypes.IndexOf(type);
+        int index = _packetTypes.RequiredIndexOf(type);
         SerializeInt(index, stream);
     }
 
     public Type DeserializePacketType(Stream stream) => _packetTypes[DeserializeInt(stream)];
+
+    public void SerializeUnitType(Type type, Stream stream)
+    {
+        if (!type.IsAssignableTo(typeof(Unit)))
+            throw new ArgumentException($"{type} is not a unit");
+        int index = _unitTypes.RequiredIndexOf(type);
+        SerializeInt(index, stream);
+    }
+
+    public Type DeserializeUnitType(Stream stream) => _unitTypes[DeserializeInt(stream)];
 
     public void SerializePuppetStatusContext(PuppetStatusContext value, Stream stream)
     {
@@ -429,6 +440,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
     {
         SerializeEnum(EntityKind.Unit, stream);
         SerializeBaseEntitySnapshot(unit, stream);
+        SerializeUnitType(unit.Type, stream);
         SerializeBool(unit.IsDead, stream);
         SerializeBool(unit.IsMoving, stream);
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeDouble, stream);
@@ -450,6 +462,7 @@ public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelpe
             IsRemoved = DeserializeBool(stream),
             Position = DeserializeVector2(stream),
             Azimuth = DeserializeDouble(stream),
+            Type = DeserializeUnitType(stream),
             IsDead = DeserializeBool(stream),
             IsMoving = DeserializeBool(stream),
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),

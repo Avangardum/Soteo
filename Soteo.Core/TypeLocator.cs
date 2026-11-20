@@ -25,7 +25,7 @@ public class TypeLocator : ITypeLocator
             .Where(it => !it.IsGenericTypeDefinition)
             .Where(it => it.IsAssignableTo(typeof(T)))
             .Where(where)
-            .OrderBy(it => it.FullName)
+            .OrderBy(it => it.AssemblyQualifiedName)
             .ToList().AsReadOnly();
     }
 

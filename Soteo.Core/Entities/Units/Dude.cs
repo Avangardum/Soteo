@@ -52,7 +52,7 @@ public sealed class Dude : Unit
         return new
         (
             snapshot.Id,
-            snapshot.ControllingPlayerId.Required,
+            controllingPlayerId: null,
             node,
             entityManager,
             inventory,

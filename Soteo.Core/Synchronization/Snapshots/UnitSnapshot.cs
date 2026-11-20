@@ -2,6 +2,7 @@ namespace Soteo.Core.Synchronization.Snapshots;
 
 public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
 {
+    public required Type Type { get; init; }
     public required bool IsDead { get; init; }
     public required bool IsMoving { get; init; }
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }

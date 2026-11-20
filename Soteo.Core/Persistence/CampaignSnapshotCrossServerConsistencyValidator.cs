@@ -35,11 +35,13 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
     {
         foreach ((Guid shardId, ShardSnapshot shard) in snapshot.Shards)
         {
-            foreach (UnitSnapshot unit in shard.Entities.Values.OfType<UnitSnapshot>())
+            IEnumerable<UnitSnapshot> characters =
+                shard.Entities.Values.OfType<UnitSnapshot>().Where(it => it.Type == typeof(PlayerCharacter));
+            foreach (UnitSnapshot character in characters)
             {
-                if (!snapshot.CampaignServer.PlayerCharacterTrackers.TryGetValue(unit.Id, out var character))
+                if (!snapshot.CampaignServer.PlayerCharacterTrackers.TryGetValue(character.Id, out var tracker))
                     return false;
-                if (character.ShardId != shardId)
+                if (tracker.ShardId != shardId)
                     return false;
             }
         }

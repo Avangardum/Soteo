@@ -101,6 +101,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             IsRemoved = IsRemoved,
             Position = Position,
             Azimuth = Azimuth,
+            Type = GetType(),
             IsDead = IsDead,
             IsMoving = IsMoving,
             Stats = GetStats(),
@@ -119,6 +120,8 @@ public abstract class Unit : UnitBase<IUnitNode>
     {
         base.ReplicateSnapshot(snapshot);
         var s = (UnitSnapshot)snapshot;
+        if (s.Type != GetType())
+            throw new ArgumentException($"{GetType()} can't replicate a {s.Type} snapshot");
         IsDead = s.IsDead;
         IsMoving = s.IsMoving;
         _stats = s.Stats.ToDictionary();

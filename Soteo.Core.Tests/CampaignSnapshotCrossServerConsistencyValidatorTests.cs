@@ -233,6 +233,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidatorTests
     {
         return new()
         {
+            Type = typeof(PlayerCharacter),
             Id = id,
             IsDead = false,
             IsMoving = false,

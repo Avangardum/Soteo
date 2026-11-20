@@ -12,5 +12,13 @@ public static class ListExtensions
 
             return -1;
         }
+
+        public int RequiredIndexOf(T item)
+        {
+            int result = self.IndexOf(item);
+            if (result == -1)
+                throw new ArgumentException($"{item} is not in the list");
+            return result;
+        }
     }
 }
