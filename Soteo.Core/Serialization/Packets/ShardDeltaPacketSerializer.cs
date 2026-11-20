@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public sealed class ShardDeltaPacketSerializer(ISerializationHelper s) :
+public sealed class ShardDeltaPacketSerializer(SerializationHelper s) :
     PacketSerializer<ShardDeltaPacket>(s)
 {
     protected override void SerializeCore(ShardDeltaPacket packet, Stream stream)

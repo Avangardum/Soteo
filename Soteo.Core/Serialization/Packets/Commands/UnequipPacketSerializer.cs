@@ -3,7 +3,7 @@ using Soteo.Core.Packets.Commands;
 
 namespace Soteo.Core.Serialization.Packets.Commands;
 
-public sealed class UnequipPacketSerializer(ISerializationHelper s) : PacketSerializer<UnequipPacket>(s)
+public sealed class UnequipPacketSerializer(SerializationHelper s) : PacketSerializer<UnequipPacket>(s)
 {
     protected override void SerializeCore(UnequipPacket packet, Stream stream)
     {

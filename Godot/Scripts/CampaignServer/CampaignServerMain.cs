@@ -157,7 +157,7 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddAlias<IFromCampaignServerPacketSender, IFromCampaignServerCommunicator>();
         services.AddAlias<IConnectionNotifier, IFromCampaignServerCommunicator>();
-        services.AddSingleton<ISerializationHelper, SerializationHelper>();
+        services.AddSingleton<SerializationHelper, SerializationHelper>();
         services.AddSingleton<ITypeLocator>(new TypeLocator(SoteoCoreAssembly.Value));
         services.AddSingleton<CampaignSnapshotManager>();
         services.AddAlias<ICampaignServerPersistencePacketReceiver, CampaignSnapshotManager>();

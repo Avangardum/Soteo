@@ -4,7 +4,7 @@ namespace Soteo.Core;
 /// Serializable data container included in AbilityContext / StatusContext
 /// for storing data specific to a concrete ability / status.
 /// </summary>
-public sealed class ExtraData(object?[] values, ISerializationHelper s)
+public sealed class ExtraData(object?[] values, SerializationHelper s)
 {
     public void Set<T>(Key<T> key, T value)
     {

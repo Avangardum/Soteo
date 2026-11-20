@@ -3,7 +3,7 @@ namespace Soteo.Core.Serialization.Packets;
 public sealed class RoutingPacketSerializer
 (
     IServiceProvider serviceProvider,
-    ISerializationHelper s
+    SerializationHelper s
 ) : IPacketSerializer
 {
     public Packet Deserialize(byte[] bytes)

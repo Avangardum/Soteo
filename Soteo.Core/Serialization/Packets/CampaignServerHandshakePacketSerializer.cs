@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public sealed class CampaignServerHandshakePacketSerializer(ISerializationHelper s) :
+public sealed class CampaignServerHandshakePacketSerializer(SerializationHelper s) :
     PacketSerializer<CampaignServerHandshakePacket>(s)
 {
     protected override void SerializeCore(CampaignServerHandshakePacket packet, Stream stream)

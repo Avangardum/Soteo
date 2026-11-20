@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public sealed class SynchronizedCampaignStatePacketSerializer(ISerializationHelper s) :
+public sealed class SynchronizedCampaignStatePacketSerializer(SerializationHelper s) :
     PacketSerializer<SynchronizedCampaignStatePacket>(s)
 {
     protected override void SerializeCore(SynchronizedCampaignStatePacket packet, Stream stream)

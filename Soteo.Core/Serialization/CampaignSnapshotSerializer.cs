@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization;
 
-public sealed class CampaignSnapshotSerializer(ISerializationHelper s) : ICampaignSnapshotSerializer
+public sealed class CampaignSnapshotSerializer(SerializationHelper s) : ICampaignSnapshotSerializer
 {
     public byte[] Serialize(CampaignSnapshot snapshot)
     {

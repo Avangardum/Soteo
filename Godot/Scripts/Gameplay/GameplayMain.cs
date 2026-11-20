@@ -123,7 +123,7 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         services.AddSingleton<IEntityNodePool, EntityNodePool>();
         services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
-        services.AddSingleton<ISerializationHelper, SerializationHelper>();
+        services.AddSingleton<SerializationHelper, SerializationHelper>();
         var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
         services.AddSingleton<ITypeLocator>(typeLocator);
         services.AddScoped<ShardNode>

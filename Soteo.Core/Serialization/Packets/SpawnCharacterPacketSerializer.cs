@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public sealed class SpawnCharacterPacketSerializer(ISerializationHelper s) : PacketSerializer<SpawnCharacterPacket>(s)
+public sealed class SpawnCharacterPacketSerializer(SerializationHelper s) : PacketSerializer<SpawnCharacterPacket>(s)
 {
     protected override void SerializeCore(SpawnCharacterPacket packet, Stream stream)
     {

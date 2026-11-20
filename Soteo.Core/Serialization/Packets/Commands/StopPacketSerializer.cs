@@ -3,7 +3,7 @@ using Soteo.Core.Packets.Commands;
 
 namespace Soteo.Core.Serialization.Packets.Commands;
 
-public sealed class StopPacketSerializer(ISerializationHelper s) : PacketSerializer<StopPacket>(s)
+public sealed class StopPacketSerializer(SerializationHelper s) : PacketSerializer<StopPacket>(s)
 {
     protected override void SerializeCore(StopPacket packet, Stream stream)
     {

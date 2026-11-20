@@ -3,7 +3,7 @@ using Soteo.Core.Packets.Commands;
 
 namespace Soteo.Core.Serialization.Packets.Commands;
 
-public sealed class EquipPacketSerializer(ISerializationHelper s) : PacketSerializer<EquipPacket>(s)
+public sealed class EquipPacketSerializer(SerializationHelper s) : PacketSerializer<EquipPacket>(s)
 {
     protected override void SerializeCore(EquipPacket packet, Stream stream)
     {

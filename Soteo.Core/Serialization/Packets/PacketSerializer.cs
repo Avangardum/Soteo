@@ -62,7 +62,7 @@ public abstract class PacketSerializer
     }
 }
 
-public abstract class PacketSerializer<TPacket>(ISerializationHelper s) : PacketSerializer, IPacketSerializer
+public abstract class PacketSerializer<TPacket>(SerializationHelper s) : PacketSerializer, IPacketSerializer
     where TPacket : Packet
 {
     byte[] IPacketSerializer.Serialize(Packet packet) => Serialize((TPacket)packet);

@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public sealed class BadInputPacketSerializer(ISerializationHelper s) : PacketSerializer<BadInputPacket>(s)
+public sealed class BadInputPacketSerializer(SerializationHelper s) : PacketSerializer<BadInputPacket>(s)
 {
     protected override void SerializeCore(BadInputPacket packet, Stream stream)
     {

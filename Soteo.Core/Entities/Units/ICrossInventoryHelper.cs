@@ -1,6 +1,6 @@
 namespace Soteo.Core.Entities.Units;
 
-public interface ICrossInventoryHelper // todo inline into Unit maybe?
+public interface ICrossInventoryHelper
 {
     bool Equip
     (

@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public sealed class ChunkPacketSerializer(ISerializationHelper s) : PacketSerializer<ChunkPacket>(s)
+public sealed class ChunkPacketSerializer(SerializationHelper s) : PacketSerializer<ChunkPacket>(s)
 {
     protected override void SerializeCore(ChunkPacket packet, Stream stream)
     {

@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public sealed class ShardSnapshotPacketSerializer(ISerializationHelper s) : PacketSerializer<ShardSnapshotPacket>(s)
+public sealed class ShardSnapshotPacketSerializer(SerializationHelper s) : PacketSerializer<ShardSnapshotPacket>(s)
 {
     protected override void SerializeCore(ShardSnapshotPacket packet, Stream stream) =>
         s.SerializeShardSnapshot(packet.Snapshot, stream);

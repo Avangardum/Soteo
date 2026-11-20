@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Soteo.Core.Serialization;
 
-public class SerializationHelper(ITypeLocator typeLocator) : ISerializationHelper
+public class SerializationHelper(ITypeLocator typeLocator)
 {
     private readonly IReadOnlyList<Type> _abilityTypes = typeLocator.ConcreteSubclassesOf<Ability>();
     private readonly IReadOnlyList<Type> _statusTypes = typeLocator.ConcreteSubclassesOf<Status>();

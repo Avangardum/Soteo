@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public class PingPacketSerializer(ISerializationHelper s) : PacketSerializer<PingPacket>(s)
+public class PingPacketSerializer(SerializationHelper s) : PacketSerializer<PingPacket>(s)
 {
     protected override void SerializeCore(PingPacket packet, Stream stream)
     {

@@ -1,6 +1,6 @@
 namespace Soteo.Core.Serialization.Packets;
 
-public sealed class WebrtcSdpPacketSerializer(ISerializationHelper s) : PacketSerializer<WebrtcSdpPacket>(s)
+public sealed class WebrtcSdpPacketSerializer(SerializationHelper s) : PacketSerializer<WebrtcSdpPacket>(s)
 {
     protected override void SerializeCore(WebrtcSdpPacket packet, Stream stream)
     {
