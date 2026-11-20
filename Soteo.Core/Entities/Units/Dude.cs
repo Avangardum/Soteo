@@ -9,49 +9,19 @@ public sealed class Dude : Unit
         Guid id,
         Guid? controllingPlayerId,
         IUnitNode node,
-        Inventory inventory,
-        EquipmentInventory equipmentInventory,
         Services services
     ) : base
     (
         id,
         controllingPlayerId,
         node,
-        inventory,
-        equipmentInventory,
+        new Inventory(0),
+        new EquipmentInventory(),
         services,
         new Ai()
     )
     {
         SetInnateSpecialAbility<RangedAttackAbility>(AbilitySlot.Attack);
-        SetInnateSpecialAbility<RecallAbility>(AbilitySlot.Recall);
-        AddInnateHotbarAbility<BloodSacrificeAbility>();
-        AddInnateHotbarAbility<HealAbility>();
-
-        Inventory.Put<LogItem>(0, 1);
-        Inventory.Put<LogItem>(1, 1);
-        Inventory.Put<RockItem>(2, 1);
-        Inventory.Put<TestBootsItem>(3, 1);
-    }
-
-    public static Dude FromSnapshot
-    (
-        UnitSnapshot snapshot,
-        IUnitNode node,
-        Inventory inventory,
-        EquipmentInventory equipmentInventory,
-        Services services
-    )
-    {
-        return new
-        (
-            snapshot.Id,
-            controllingPlayerId: null,
-            node,
-            inventory,
-            equipmentInventory,
-            services
-        );
     }
 
     private sealed class Ai : UnitAi

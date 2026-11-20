@@ -5,8 +5,8 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
     private readonly ICamera _camera;
     private double _inventoryDesyncTimeRemaining;
     private List<Guid> _controllingPlayerIds = [];
-    private readonly Inventory _alwaysSynchronizedInventory;
-    private readonly EquipmentInventory _alwaysSynchronizedEquipmentInventory;
+    private readonly Inventory _alwaysSynchronizedInventory = new(0);
+    private readonly EquipmentInventory _alwaysSynchronizedEquipmentInventory = new();
 
     private Dictionary<Stat, double> StatsInternal { get; set; } = [];
     public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
@@ -14,8 +14,8 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
     private Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = [];
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
 
-    public Inventory Inventory { get; }
-    public EquipmentInventory EquipmentInventory { get; }
+    public Inventory Inventory { get; } = new(0);
+    public EquipmentInventory EquipmentInventory { get; } = new();
 
     public IReadOnlyList<Guid> ControllingPlayerIds => _controllingPlayerIds;
 
@@ -23,18 +23,11 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
     (
         Guid id,
         IUnitPuppetNode node,
-        ICamera camera,
-        Func<Inventory> makeInventory,
-        Func<EquipmentInventory> makeEquipmentInventory
+        ICamera camera
     ) : base(id, node)
     {
         _camera = camera;
         camera.ZoomChanged += OnZoomChanged;
-
-        Inventory = makeInventory();
-        EquipmentInventory = makeEquipmentInventory();
-        _alwaysSynchronizedInventory = makeInventory();
-        _alwaysSynchronizedEquipmentInventory = makeEquipmentInventory();
     }
 
     public override void Remove()

@@ -7,16 +7,14 @@ public sealed class PlayerCharacter : Unit
         Guid id,
         Guid controllingPlayerId,
         IUnitNode node,
-        Inventory inventory,
-        EquipmentInventory equipmentInventory,
         Services services
     ) : base
     (
         id,
         controllingPlayerId,
         node,
-        inventory,
-        equipmentInventory,
+        new Inventory(8),
+        new EquipmentInventory(Enum.GetValues<EquipmentSlot>()),
         services
     )
     {
@@ -29,25 +27,5 @@ public sealed class PlayerCharacter : Unit
         Inventory.Put<LogItem>(1, 1);
         Inventory.Put<RockItem>(2, 1);
         Inventory.Put<TestBootsItem>(3, 1);
-    }
-
-    public static PlayerCharacter FromSnapshot
-    (
-        UnitSnapshot snapshot,
-        IUnitNode node,
-        Inventory inventory,
-        EquipmentInventory equipmentInventory,
-        Services services
-    )
-    {
-        return new
-        (
-            snapshot.Id,
-            snapshot.ControllingPlayerId.Required,
-            node,
-            inventory,
-            equipmentInventory,
-            services
-        );
     }
 }

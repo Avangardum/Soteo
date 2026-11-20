@@ -135,23 +135,21 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         {
             UnitSnapshot s when s.Type == typeof(PlayerCharacter)  => Add
             (
-                PlayerCharacter.FromSnapshot
+                new PlayerCharacter
                 (
-                    s,
+                    s.Id,
+                    s.ControllingPlayerId.Required,
                     AddNode<IUnitNode>(s.Id),
-                    MakePlayerCharacterInventory(),
-                    MakePlayerCharacterEquipmentInventory(),
                     _services.Required
                 )
             ),
             UnitSnapshot s when s.Type == typeof(Dude)  => Add
             (
-                Dude.FromSnapshot
+                new Dude
                 (
-                    s,
+                    s.Id,
+                    null,
                     AddNode<IUnitNode>(s.Id),
-                    MakePlayerCharacterInventory(),
-                    MakePlayerCharacterEquipmentInventory(),
                     _services.Required
                 )
             ),
@@ -162,9 +160,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 (
                     s.Id,
                     AddNode<IUnitPuppetNode>(s.Id),
-                    _camera.Required,
-                    MakePlayerCharacterInventory,
-                    MakePlayerCharacterEquipmentInventory
+                    _camera.Required
                 )
             ),
             ProjectilePuppetSnapshot s =>
@@ -183,9 +179,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 (
                     d.Id,
                     AddNode<IUnitPuppetNode>(d.Id),
-                    _camera.Required,
-                    MakePlayerCharacterInventory,
-                    MakePlayerCharacterEquipmentInventory
+                    _camera.Required
                 )
             ),
             ProjectilePuppetDelta d =>
@@ -229,8 +223,6 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                     id,
                     controllingPlayerId,
                     AddNode<IUnitNode>(id),
-                    MakePlayerCharacterInventory(),
-                    MakePlayerCharacterEquipmentInventory(),
                     _services.Required
                 )
             );
@@ -258,8 +250,6 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 id,
                 controllingPlayerId: null,
                 AddNode<IUnitNode>(id),
-                MakePlayerCharacterInventory(),
-                MakePlayerCharacterEquipmentInventory(),
                 _services.Required
             )
             {
@@ -301,10 +291,4 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
 
         _removalsUntilRemovedEntitiesCleanup = CleanupRemovedEntitiesEveryXRemovals;
     }
-
-    private Inventory MakePlayerCharacterInventory() =>
-        new Inventory(8);
-
-    private EquipmentInventory MakePlayerCharacterEquipmentInventory() =>
-        new EquipmentInventory(Enum.GetValues<EquipmentSlot>());
 }
