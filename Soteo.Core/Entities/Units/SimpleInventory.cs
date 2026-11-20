@@ -2,18 +2,18 @@ using System.Collections;
 
 namespace Soteo.Core.Entities.Units;
 
-public sealed class PlayerInventory : Inventory
+public sealed class SimpleInventory : Inventory
 {
     public override event Action Changed = delegate { };
 
     private List<ItemStack?> _stacks;
 
-    public PlayerInventory(int size)
+    public SimpleInventory(int size)
     {
         _stacks = Enumerable.Repeat<ItemStack?>(null, size).ToList();
     }
 
-    public PlayerInventory(IReadOnlyList<ItemStack?> stacks)
+    public SimpleInventory(IReadOnlyList<ItemStack?> stacks)
     {
         _stacks = stacks.ToList();
     }
