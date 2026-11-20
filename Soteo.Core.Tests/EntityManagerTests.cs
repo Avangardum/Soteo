@@ -4,7 +4,7 @@ using Soteo.Core.Abilities;
 using Soteo.Core.Entities;
 using Soteo.Core.Entities.Projectiles;
 using Soteo.Core.Entities.Units;
-using Soteo.Core.Synchronization.Snapshots;
+using Soteo.Core.Snapshots;
 using ICamera = Soteo.Core.Client.ICamera;
 using IEntityNodeManager = Soteo.Core.Entities.IEntityNodeManager;
 

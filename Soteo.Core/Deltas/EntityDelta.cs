@@ -1,4 +1,4 @@
-namespace Soteo.Core.Synchronization.Deltas;
+namespace Soteo.Core.Deltas;
 
 public abstract record EntityDelta
 {

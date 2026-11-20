@@ -1,4 +1,4 @@
-namespace Soteo.Core.Synchronization.Deltas;
+namespace Soteo.Core.Deltas;
 
 public static class DictionaryDelta
 {

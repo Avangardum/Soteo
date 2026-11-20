@@ -16,6 +16,4 @@ global using Soteo.Core.Serialization;
 global using Soteo.Core.Serialization.Packets;
 global using Soteo.Core.Statuses;
 global using Soteo.Core.Synchronization;
-global using Soteo.Core.Synchronization.Deltas;
-global using Soteo.Core.Synchronization.Snapshots;
 global using Soteo.Util;

@@ -1,3 +1,6 @@
+using Soteo.Core.Deltas;
+using Soteo.Core.Snapshots;
+
 namespace Soteo.Core.Synchronization;
 
 public sealed class ShardSynchronizationServer : IShardSynchronizationServer, IDisposable

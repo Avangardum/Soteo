@@ -1,3 +1,5 @@
+using Soteo.Core.Deltas;
+
 namespace Soteo.Core.Serialization.Packets;
 
 public sealed class ShardDeltaPacketSerializer(SerializationHelper s) :

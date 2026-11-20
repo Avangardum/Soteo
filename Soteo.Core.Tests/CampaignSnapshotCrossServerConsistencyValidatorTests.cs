@@ -3,7 +3,7 @@ using Soteo.Core.Abilities;
 using Soteo.Core.Entities.Units;
 using Soteo.Core.Items;
 using Soteo.Core.Persistence;
-using Soteo.Core.Synchronization.Snapshots;
+using Soteo.Core.Snapshots;
 
 namespace Soteo.Core.Tests;
 

@@ -1,3 +1,5 @@
+using Soteo.Core.Snapshots;
+
 namespace Soteo.Core.Entities.Projectiles;
 
 public sealed class Projectile : Entity

@@ -1,4 +1,6 @@
 using System.Collections;
+using Soteo.Core.Deltas;
+using Soteo.Core.Snapshots;
 
 namespace Soteo.Core.Entities.Units;
 

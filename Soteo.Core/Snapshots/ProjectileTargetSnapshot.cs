@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Soteo.Core.Synchronization.Snapshots;
+namespace Soteo.Core.Snapshots;
 
 public class ProjectileTargetSnapshot
 {

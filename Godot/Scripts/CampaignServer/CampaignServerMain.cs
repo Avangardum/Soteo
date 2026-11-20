@@ -9,7 +9,7 @@ using Soteo.Core.Packets;
 using Soteo.Core.Persistence;
 using Soteo.Core.Serialization;
 using Soteo.Core.Serialization.Packets;
-using Soteo.Core.Synchronization.Snapshots;
+using Soteo.Core.Snapshots;
 using File = System.IO.File;
 using Path = System.IO.Path;
 

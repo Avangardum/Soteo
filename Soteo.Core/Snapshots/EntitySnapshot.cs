@@ -1,4 +1,6 @@
-namespace Soteo.Core.Synchronization.Snapshots;
+using Soteo.Core.Deltas;
+
+namespace Soteo.Core.Snapshots;
 
 public abstract record EntitySnapshot
 {

@@ -1,3 +1,6 @@
+using Soteo.Core.Deltas;
+using Soteo.Core.Snapshots;
+
 namespace Soteo.Core.Entities.Units;
 
 public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>

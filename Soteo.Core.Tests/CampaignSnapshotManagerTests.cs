@@ -4,7 +4,7 @@ using Soteo.Core.Campaign;
 using Soteo.Core.Networking;
 using Soteo.Core.Packets;
 using Soteo.Core.Persistence;
-using Soteo.Core.Synchronization.Snapshots;
+using Soteo.Core.Snapshots;
 
 namespace Soteo.Core.Tests;
 

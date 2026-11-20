@@ -1,5 +1,6 @@
 using System.Buffers.Binary;
 using System.Text;
+using Soteo.Core.Snapshots;
 
 namespace Soteo.Core.Serialization;
 

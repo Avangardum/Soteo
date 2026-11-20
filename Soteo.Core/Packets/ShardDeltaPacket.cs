@@ -1,3 +1,5 @@
+using Soteo.Core.Deltas;
+
 namespace Soteo.Core.Packets;
 
 public sealed record ShardDeltaPacket : Packet

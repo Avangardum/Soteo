@@ -1,4 +1,4 @@
-namespace Soteo.Core.Synchronization.Snapshots;
+namespace Soteo.Core.Snapshots;
 
 public sealed record UserSnapshot
 {

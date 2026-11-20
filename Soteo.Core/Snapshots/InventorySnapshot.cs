@@ -1,3 +1,3 @@
-namespace Soteo.Core.Synchronization.Snapshots;
+namespace Soteo.Core.Snapshots;
 
 public sealed record InventorySnapshot(IReadOnlyList<ItemStack?> Stacks);
