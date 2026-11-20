@@ -6,8 +6,6 @@ namespace Soteo.Core.Entities.Units;
 public abstract class Unit : UnitBase<IUnitNode>
 {
     private readonly Services _services;
-    private readonly IEntityManager _entityManager;
-    private readonly ICrossInventoryHelper _crossInventoryHelper;
     private readonly UnitAi? _ai;
 
     private long _nextStatusOrdinal;
@@ -29,20 +27,16 @@ public abstract class Unit : UnitBase<IUnitNode>
         Guid id,
         Guid? controllingPlayerId,
         IUnitNode node,
-        IEntityManager entityManager,
         Inventory inventory,
         EquipmentInventory equipmentInventory,
-        ICrossInventoryHelper crossInventoryHelper,
         Services services,
         UnitAi? ai = null
     ) : base(id, node)
     {
         _services = services;
-        _entityManager = entityManager;
         _controllingPlayerId = controllingPlayerId;
         Inventory = inventory;
         EquipmentInventory = equipmentInventory;
-        _crossInventoryHelper = crossInventoryHelper;
         _ai = ai;
 
         foreach (Stat stat in Stat.All)
@@ -458,7 +452,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         Unit? targetUnit = null;
         if (command.TargetUnitId != null)
         {
-            targetUnit = _entityManager.GetEntity(command.TargetUnitId.Value) as Unit;
+            targetUnit = _services.EntityManager.GetEntity(command.TargetUnitId.Value) as Unit;
             if (targetUnit == null) return null;
         }
         return new AbilityContext
@@ -575,13 +569,13 @@ public abstract class Unit : UnitBase<IUnitNode>
     private void Equip(EquipCommand command)
     {
         _commands.Dequeue();
-        _crossInventoryHelper.Equip(Inventory, EquipmentInventory, command.InventorySlot, toEquipmentSlot: null);
+        _services.CrossInventoryHelper.Equip(Inventory, EquipmentInventory, command.InventorySlot, toEquipmentSlot: null);
     }
 
     private void Unequip(UnequipCommand command)
     {
         _commands.Dequeue();
-        _crossInventoryHelper.Unequip(Inventory, EquipmentInventory, command.EquipmentSlot, command.ToInventorySlot);
+        _services.CrossInventoryHelper.Unequip(Inventory, EquipmentInventory, command.EquipmentSlot, command.ToInventorySlot);
     }
 
     internal void SetCommand(Command command)

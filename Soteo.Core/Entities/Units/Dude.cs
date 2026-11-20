@@ -9,20 +9,16 @@ public sealed class Dude : Unit
         Guid id,
         Guid? controllingPlayerId,
         IUnitNode node,
-        IEntityManager entityManager,
         Inventory inventory,
         EquipmentInventory equipmentInventory,
-        ICrossInventoryHelper crossInventoryHelper,
         Services services
     ) : base
     (
         id,
         controllingPlayerId,
         node,
-        entityManager,
         inventory,
         equipmentInventory,
-        crossInventoryHelper,
         services,
         new Ai()
     )
@@ -42,10 +38,8 @@ public sealed class Dude : Unit
     (
         UnitSnapshot snapshot,
         IUnitNode node,
-        IEntityManager entityManager,
         Inventory inventory,
         EquipmentInventory equipmentInventory,
-        ICrossInventoryHelper crossInventoryHelper,
         Services services
     )
     {
@@ -54,10 +48,8 @@ public sealed class Dude : Unit
             snapshot.Id,
             controllingPlayerId: null,
             node,
-            entityManager,
             inventory,
             equipmentInventory,
-            crossInventoryHelper,
             services
         );
     }

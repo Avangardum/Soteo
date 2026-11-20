@@ -33,11 +33,8 @@ public sealed class UnitTests
             id,
             id,
             _node,
-            _entityManager,
             inventory,
-            equipmentInventory,
-            new CrossInventoryHelper(),
-            new Services(_serviceProvider)
+            equipmentInventory
         );
     }
 

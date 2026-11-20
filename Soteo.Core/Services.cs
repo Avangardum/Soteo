@@ -16,4 +16,5 @@ public sealed class Services
 
     public IEntityManager EntityManager => _serviceProvider.GetRequiredService<IEntityManager>();
     public IFromGameplayPacketSender PacketSender => _serviceProvider.GetRequiredService<IFromGameplayPacketSender>();
+    public ICrossInventoryHelper CrossInventoryHelper => _serviceProvider.GetRequiredService<ICrossInventoryHelper>();
 }

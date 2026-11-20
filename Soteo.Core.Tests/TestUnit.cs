@@ -14,22 +14,26 @@ public sealed class TestUnit : Unit
         Guid? id = null,
         Guid? controllingPlayerId = null,
         IUnitNode? node = null,
-        IEntityManager? entityManager = null,
         Inventory? inventory = null,
         EquipmentInventory? equipmentInventory = null,
-        ICrossInventoryHelper? crossInventoryHelper = null,
         Services? services = null
     ) : base
     (
         id ?? Guid.NewGuid(),
         controllingPlayerId ?? Guid.NewGuid(),
         node ?? Substitute.For<IUnitNode>(),
-        entityManager ?? Substitute.For<IEntityManager>(),
         inventory ?? new PlayerInventory(0),
         equipmentInventory ?? new PlayerEquipmentInventory(0),
-        crossInventoryHelper ?? new CrossInventoryHelper(),
-        services ?? new Services(new ServiceCollection().BuildServiceProvider())
+        services ?? DefaultServices()
     ) { }
+
+    private static Services DefaultServices()
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton(Substitute.For<IEntityManager>());
+        services.AddSingleton<ICrossInventoryHelper>(new CrossInventoryHelper());
+        return new Services(services.BuildServiceProvider());
+    }
 
     public new IReadOnlyDictionary<SpecialAbilitySlot, Ability> GetInnateSpecialAbilities() =>
         base.GetInnateSpecialAbilities();

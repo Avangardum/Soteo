@@ -139,10 +139,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 (
                     s,
                     AddNode<IUnitNode>(s.Id),
-                    this,
                     MakePlayerCharacterInventory(),
                     MakePlayerCharacterEquipmentInventory(),
-                    _crossInventoryHelper,
                     _services.Required
                 )
             ),
@@ -152,10 +150,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 (
                     s,
                     AddNode<IUnitNode>(s.Id),
-                    this,
                     MakePlayerCharacterInventory(),
                     MakePlayerCharacterEquipmentInventory(),
-                    _crossInventoryHelper,
                     _services.Required
                 )
             ),
@@ -233,10 +229,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                     id,
                     controllingPlayerId,
                     AddNode<IUnitNode>(id),
-                    this,
                     MakePlayerCharacterInventory(),
                     MakePlayerCharacterEquipmentInventory(),
-                    _crossInventoryHelper,
                     _services.Required
                 )
             );
@@ -264,10 +258,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 id,
                 controllingPlayerId: null,
                 AddNode<IUnitNode>(id),
-                this,
                 MakePlayerCharacterInventory(),
                 MakePlayerCharacterEquipmentInventory(),
-                _crossInventoryHelper,
                 _services.Required
             )
             {

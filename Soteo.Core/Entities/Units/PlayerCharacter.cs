@@ -7,20 +7,16 @@ public sealed class PlayerCharacter : Unit
         Guid id,
         Guid controllingPlayerId,
         IUnitNode node,
-        IEntityManager entityManager,
         Inventory inventory,
         EquipmentInventory equipmentInventory,
-        ICrossInventoryHelper crossInventoryHelper,
         Services services
     ) : base
     (
         id,
         controllingPlayerId,
         node,
-        entityManager,
         inventory,
         equipmentInventory,
-        crossInventoryHelper,
         services
     )
     {
@@ -39,10 +35,8 @@ public sealed class PlayerCharacter : Unit
     (
         UnitSnapshot snapshot,
         IUnitNode node,
-        IEntityManager entityManager,
         Inventory inventory,
         EquipmentInventory equipmentInventory,
-        ICrossInventoryHelper crossInventoryHelper,
         Services services
     )
     {
@@ -51,10 +45,8 @@ public sealed class PlayerCharacter : Unit
             snapshot.Id,
             snapshot.ControllingPlayerId.Required,
             node,
-            entityManager,
             inventory,
             equipmentInventory,
-            crossInventoryHelper,
             services
         );
     }
