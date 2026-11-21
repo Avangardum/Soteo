@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Soteo.Core.Snapshots;
 
 namespace Soteo.Core;
 
@@ -17,4 +18,7 @@ public sealed class Services
     public IEntityManager EntityManager => _serviceProvider.GetRequiredService<IEntityManager>();
     public IFromGameplayPacketSender PacketSender => _serviceProvider.GetRequiredService<IFromGameplayPacketSender>();
     public ICrossInventoryHelper CrossInventoryHelper => _serviceProvider.GetRequiredService<ICrossInventoryHelper>();
+    public ShardSnapshotArchive ShardSnapshotArchive => _serviceProvider.GetRequiredService<ShardSnapshotArchive>();
+    public ICurrentTickRepository CurrentTickRepository =>
+        _serviceProvider.GetRequiredService<ICurrentTickRepository>();
 }

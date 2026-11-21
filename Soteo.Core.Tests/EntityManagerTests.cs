@@ -54,7 +54,7 @@ public sealed class EntityManagerTests
     [Fact]
     public void GetEntitySnapshotsReturnsSnapshotsForAllNotRemovedEntities()
     {
-        IReadOnlyDictionary<Guid, EntitySnapshot> snapshots = _sut.CreateEntitySnapshots();
+        IReadOnlyDictionary<Guid, EntitySnapshot> snapshots = _sut.GetPersistenceEntitySnapshots();
 
         snapshots[_projectileSourceChar.Id].Id.Should().Be(_projectileSourceChar.Id);
         snapshots[_projectileTargetChar.Id].Id.Should().Be(_projectileTargetChar.Id);
@@ -67,7 +67,7 @@ public sealed class EntityManagerTests
     {
         _projectileSourceChar.Remove();
         _projectileTargetChar.Remove();
-        IReadOnlyDictionary<Guid, EntitySnapshot> snapshots = _sut.CreateEntitySnapshots();
+        IReadOnlyDictionary<Guid, EntitySnapshot> snapshots = _sut.GetPersistenceEntitySnapshots();
 
         snapshots[_projectileSourceChar.Id].Id.Should().Be(_projectileSourceChar.Id);
         snapshots[_projectileTargetChar.Id].Id.Should().Be(_projectileTargetChar.Id);

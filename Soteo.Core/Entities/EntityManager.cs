@@ -68,13 +68,21 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
             entity.Tick(delta);
     }
 
-    public IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntitySnapshots()
+    public IReadOnlyDictionary<Guid, EntitySnapshot> GetArchiveEntitySnapshots()
+    {
+        return _entities.Values
+            .Select(it => it.ToSnapshot())
+            .ToDictionary(it => it.Id).AsReadOnly();
+    }
+
+    public IReadOnlyDictionary<Guid, EntitySnapshot> GetPersistenceEntitySnapshots()
     {
         Dictionary<Guid, EntitySnapshot> snapshots = [];
 
         foreach ((Guid id, Entity entity) in _entities)
             snapshots[id] = entity.ToSnapshot();
 
+        GC.Collect();
         foreach ((Guid id, WeakReference<Entity> entityRef) in _removedEntities)
             if (entityRef.TryGetTarget(out Entity? entity))
                 snapshots[id] = entity.ToSnapshot();
@@ -82,7 +90,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         return snapshots;
     }
 
-    public IReadOnlyDictionary<Guid, EntitySnapshot> CreateEntityPuppetSnapshots()
+    public IReadOnlyDictionary<Guid, EntitySnapshot> GetSynchronizationEntitySnapshots()
     {
         IReadOnlyDictionary<Guid, EntitySnapshot> snapshots = _entities.Values
             .Select(it => it.ToSnapshot().ToPuppet())

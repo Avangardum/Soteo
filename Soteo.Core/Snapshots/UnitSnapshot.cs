@@ -16,6 +16,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required EquipmentInventorySnapshot EquipmentInventory { get; init; }
     public required IReadOnlyList<Ability> InnateHotbarAbilities { get; init; }
     public required IReadOnlyDictionary<SpecialAbilitySlot, Ability> InnateSpecialAbilities { get; init; }
+    public Faction Faction => Faction.FromId(Id);
 
     public override EntitySnapshot ToPuppet()
     {

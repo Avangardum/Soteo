@@ -155,7 +155,11 @@ public abstract class Unit : UnitBase<IUnitNode>
     private void Think()
     {
         if (_ai == null) return;
-        var context = new UnitAiContext(this);
+        IndexedShardSnapshot? snapshot = _services.ShardSnapshotArchive[_services.CurrentTickRepository.Tick - 1];
+        if (snapshot == null) return;
+        UnitSnapshot? self = snapshot.GetUnit(Id);
+        if (self == null) return;
+        var context = new UnitAiContext(this, self, snapshot, _services.ShardSnapshotArchive);
         _ai.Think(context);
     }
 

@@ -7,6 +7,7 @@ public enum ProcessPriority
     Communicator,
     Default = 0,
     OverheadUi,
+    SnapshotArchive,
     SynchronizationServer,
     CurrentTickRepository
 }

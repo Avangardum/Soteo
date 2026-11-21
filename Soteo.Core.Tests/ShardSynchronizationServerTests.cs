@@ -3,7 +3,6 @@ using NSubstitute;
 using Soteo.Core.Entities;
 using Soteo.Core.Networking;
 using Soteo.Core.Packets;
-using Soteo.Core.Serialization;
 using Soteo.Core.Synchronization;
 using Soteo.TestUtil;
 
@@ -77,7 +76,7 @@ public sealed class ShardSynchronizationServerTests
         // This guard detects if a new snapshot is created twice per tick number and throws.
         HashSet<long> ticksWhereEntityPuppetSnapshotsWereCreated = [];
         _entitySnapshotManager
-            .When(it => it.CreateEntityPuppetSnapshots())
+            .When(it => it.GetSynchronizationEntitySnapshots())
             .Do(_ =>
             {
                 if (!ticksWhereEntityPuppetSnapshotsWereCreated.Add(_tickRepo.Tick))
@@ -134,6 +133,6 @@ public sealed class ShardSynchronizationServerTests
         var theOnePacket = new [] { player1Packet, player2Packet }.Distinct().Single();
         theOnePacket.Snapshot.Tick.Should().Be(99);
         // Once again, ensure that only one snapshot per tick number 99 is created
-        _entitySnapshotManager.Received(1).CreateEntityPuppetSnapshots();
+        _entitySnapshotManager.Received(1).GetSynchronizationEntitySnapshots();
     }
 }

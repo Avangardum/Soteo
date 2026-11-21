@@ -66,21 +66,21 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
 
     private void UnpausedTick()
     {
-        var shardSnapshot = new ShardSnapshot
+        var snapshot = new ShardSnapshot
         {
             Tick = _tickRepo.Tick,
-            Entities = _entitySnapshotManager.CreateEntityPuppetSnapshots()
+            Entities = _entitySnapshotManager.GetSynchronizationEntitySnapshots()
         };
 
         if (_snapshotRequesters.Count > 0)
         {
-            var shardSnapshotPacket = new ShardSnapshotPacket { Snapshot = shardSnapshot };
+            var shardSnapshotPacket = new ShardSnapshotPacket { Snapshot = snapshot };
             _packetSender.Send(shardSnapshotPacket, _snapshotRequesters.ToList());
             _snapshotRequesters.Clear();
         }
 
         ShardDelta? shardDelta = _prevShardSnapshot == null ? null :
-            ShardDelta.Between(_prevShardSnapshot, shardSnapshot);
+            ShardDelta.Between(_prevShardSnapshot, snapshot);
 
         if (shardDelta != null)
         {
@@ -92,7 +92,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
             _packetSender.Broadcast(shardDeltaPacket, deferToNextTick: true);
         }
 
-        _prevShardSnapshot = shardSnapshot;
+        _prevShardSnapshot = snapshot;
     }
 
     private void PausedTick()
@@ -102,7 +102,7 @@ public sealed class ShardSynchronizationServer : IShardSynchronizationServer, ID
             _prevShardSnapshot ??= new ShardSnapshot
             {
                 Tick = _tickRepo.Tick - 1,
-                Entities = _entitySnapshotManager.CreateEntityPuppetSnapshots()
+                Entities = _entitySnapshotManager.GetSynchronizationEntitySnapshots()
             };
 
             var shardSnapshotPacket = new ShardSnapshotPacket { Snapshot = _prevShardSnapshot };

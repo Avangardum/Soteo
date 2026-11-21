@@ -16,7 +16,7 @@ public sealed class ShardPersistenceSnapshotManager
         return new ShardSnapshot
         {
             Tick = tickRepo.Tick,
-            Entities = entitySnapshotManager.CreateEntitySnapshots(),
+            Entities = entitySnapshotManager.GetPersistenceEntitySnapshots(),
         };
     }
 

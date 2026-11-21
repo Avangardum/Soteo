@@ -13,6 +13,7 @@ using Soteo.Core.Packets;
 using Soteo.Core.Persistence;
 using Soteo.Core.Serialization;
 using Soteo.Core.Serialization.Packets;
+using Soteo.Core.Snapshots;
 using Soteo.Core.Synchronization;
 using Soteo.Main.Gameplay.Communicators;
 using Soteo.Main.Gameplay.EntityNodes;
@@ -175,6 +176,7 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         services.AddScoped<ICurrentTickRepository, CurrentTickRepository>();
         services.AddScoped<IShardPersistenceSnapshotManager, ShardPersistenceSnapshotManager>();
         services.AddScoped<Services>();
+        services.AddScoped<ShardSnapshotArchive>();
     }
 
     private void RegisterClientServices(IServiceCollection services)

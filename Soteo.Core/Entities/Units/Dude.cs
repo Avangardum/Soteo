@@ -1,4 +1,5 @@
 using Soteo.Core.Commands;
+using Soteo.Core.Snapshots;
 
 namespace Soteo.Core.Entities.Units;
 
@@ -26,7 +27,14 @@ public sealed class Dude : Unit
     {
         public override void Think(UnitAiContext context)
         {
-            context.SetCommand(new MoveCommand(Vector2.Zero));
+            UnitSnapshot? closestEnemy =
+                context.Snapshot.Units.NotInFaction(context.Self.Faction).ClosestTo(context.Self.Position);
+            if (closestEnemy == null) return;
+            context.SetCommand(new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Attack,
+                TargetUnitId = closestEnemy.Id
+            });
         }
     }
 }
