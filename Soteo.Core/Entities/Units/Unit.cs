@@ -384,21 +384,21 @@ public abstract class Unit : UnitBase<IUnitNode>
         if (remainingDeltaTime < timeToComplete)
         {
             Vector2 movement = normalizedDesiredMovement * _stats[Stat.MoveSpeed] * remainingDeltaTime;
-            MoveAndCollide(movement, node);
+            Move(movement, node);
             remainingDeltaTime = 0;
         }
         else
         {
-            MoveAndCollide(desiredMovement, node);
+            Move(desiredMovement, node);
             remainingDeltaTime -= timeToComplete;
             if (_commands.PeekOrDefault() is MoveCommand) _commands.Dequeue();
         }
         IsMoving = true;
     }
 
-    private void MoveAndCollide(Vector2 movement, IUnitNode node)
+    private void Move(Vector2 movement, IUnitNode node)
     {
-        node.MoveAndCollide(movement);
+        node.Move(movement);
         Position = node.PositionMeters;
     }
 

@@ -20,5 +20,9 @@ public sealed partial class UnitNode : CharacterBody2D, IUnitNode
         set => Position = value.ToGd() * Const.PixelsInMeter;
     }
 
-    public void MoveAndCollide(Vector2 movement) => base.MoveAndCollide(movement.ToGd() * Const.PixelsInMeter);
+    public void Move(Vector2 movement)
+    {
+        Velocity = movement.ToGd() * Const.PixelsInMeter / Const.TickInterval;
+        MoveAndSlide();
+    }
 }
