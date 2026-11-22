@@ -176,13 +176,12 @@ script = ExtResource("1")
 _halfPixelXVisualOffset = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1968297260]
-position = Vector2(0.5, -7)
+position = Vector2(0.5, -6)
 sprite_frames = SubResource("7")
 animation = &"Death"
 
 [node name="AzimuthIndicator" type="Line2D" parent="." unique_id=1220325910]
 z_index = -1
-position = Vector2(0, -1)
 width = 2.0
 script = ExtResource("4")
 
@@ -194,5 +193,5 @@ monitoring = false
 monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ClickArea" unique_id=2125216864]
-position = Vector2(0, -8.5)
+position = Vector2(0, -8)
 shape = SubResource("68")
