@@ -11,3 +11,6 @@ script = ExtResource("1")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=103851431]
 rotation = 1.5708
 shape = SubResource("CircleShape2D_spxmk")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=1005977399]
+path_desired_distance = 10.0

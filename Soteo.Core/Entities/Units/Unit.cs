@@ -46,6 +46,8 @@ public abstract class Unit : UnitBase<IUnitNode>
         EquipmentInventory.Changed += () => { UpdateHotbarAbilityList(); UpdateSpecialAbilityList(); };
     }
 
+    public virtual bool UseNavigation => true;
+
     // For testing
     private protected IReadOnlyList<Command> GetCommands() => _commands.ToList();
 
@@ -368,6 +370,14 @@ public abstract class Unit : UnitBase<IUnitNode>
     }
 
     private void MoveToPosition(Vector2 position, ref double remainingDeltaTime, IUnitNode node)
+    {
+        if (UseNavigation)
+            MoveToPositionStraight(node.NextPathPosition(position), ref remainingDeltaTime, node);
+        else
+            MoveToPositionStraight(position, ref remainingDeltaTime, node);
+    }
+
+    private void MoveToPositionStraight(Vector2 position, ref double remainingDeltaTime, IUnitNode node)
     {
         LookAtPosition(position, ref remainingDeltaTime);
         if (remainingDeltaTime == 0 || _stats[Stat.MoveSpeed] == 0) return;
