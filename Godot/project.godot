@@ -20,6 +20,10 @@ config/icon="res://Textures/icon.png"
 
 AsyncExceptionCollectorNode="*res://Scripts/AsyncExceptionCollectorNode.cs"
 
+[debug]
+
+shapes/collision/shape_color=Color(1, 1, 0, 0.41960785)
+
 [dotnet]
 
 project/assembly_name="Soteo"

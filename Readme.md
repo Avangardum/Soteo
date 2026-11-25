@@ -114,6 +114,11 @@ Windows releases of Godot include 2 executables, one with the _console suffix an
 the console one. Also Godot doesn't work well with terminal IO redirection, so don't use tools that do that,
 such as Git Bash, instead use a native terminal app (cmd or PowerShell on Windows).
 
+### Debugging collisions / navigation
+
+Since collisions and navigation only happen on shard servers, debug visuals for them won't show on clients.
+In order to see them, replace `--headless` in a shard server arguments with `--debug-collisions --debug-navigation`.
+
 ## Contributing
 
 If you'd like to contribute, join the Discord server and let me know.

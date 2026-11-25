@@ -229,6 +229,11 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
             _debugScreenNode = DebugScreenNode.Instantiate().Also(it => ui.AddChild(it));
             _campaignScreenNode = CampaignScreenNode.Instantiate().Also(it => ui.AddChild(it));
         }
+        else
+        {
+            // For debugging collisions / navigation
+            AddChild(new SoteoCamera(new CameraOptions { NoScroll = true }));
+        }
     }
 
     private void CreateSingletonServices()

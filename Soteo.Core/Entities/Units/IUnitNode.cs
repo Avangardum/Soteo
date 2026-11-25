@@ -4,4 +4,5 @@ public interface IUnitNode : IEntityNode
 {
     void Move(Vector2 movement);
     Vector2 NextPathPosition(Vector2 target);
+    bool IsNavigationFinished { get; }
 }

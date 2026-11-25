@@ -51,4 +51,6 @@ public sealed partial class UnitNode : CharacterBody2D, IUnitNode
 
         return _navigationAgent.Value.GetNextPathPosition().ToSys() / Const.PixelsInMeter;
     }
+
+    public bool IsNavigationFinished => _navigationAgent.Value.IsNavigationFinished();
 }

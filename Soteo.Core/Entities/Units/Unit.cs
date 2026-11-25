@@ -340,6 +340,13 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void LookAtPosition(Vector2 position, ref double remainingDeltaTime)
     {
+        if (position == Position)
+        {
+            if (_commands.PeekOrDefault() is LookCommand)
+                _commands.Dequeue();
+            return;
+        }
+
         LookInDirection(position - Position, ref remainingDeltaTime);
     }
 
@@ -379,16 +386,17 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void MoveToPositionStraight(Vector2 position, ref double remainingDeltaTime, IUnitNode node)
     {
-        LookAtPosition(position, ref remainingDeltaTime);
-        if (remainingDeltaTime == 0 || _stats[Stat.MoveSpeed] == 0) return;
-
         Vector2 desiredMovement = position - Position;
         double desiredMovementLength = desiredMovement.Length();
         if (desiredMovementLength == 0)
         {
-            if (_commands.PeekOrDefault() is MoveCommand) _commands.Dequeue();
+            OnPositionReached();
             return;
         }
+
+        LookAtPosition(position, ref remainingDeltaTime);
+        if (remainingDeltaTime == 0 || _stats[Stat.MoveSpeed] == 0) return;
+
         Vector2 normalizedDesiredMovement = desiredMovement / desiredMovementLength;
         double timeToComplete = desiredMovementLength / _stats[Stat.MoveSpeed];
         if (remainingDeltaTime < timeToComplete)
@@ -401,9 +409,16 @@ public abstract class Unit : UnitBase<IUnitNode>
         {
             Move(desiredMovement, node);
             remainingDeltaTime -= timeToComplete;
-            if (_commands.PeekOrDefault() is MoveCommand) _commands.Dequeue();
+            OnPositionReached();
         }
         IsMoving = true;
+
+        void OnPositionReached()
+        {
+            bool isMoveCompleted = !UseNavigation || node.IsNavigationFinished;
+            if (isMoveCompleted && _commands.PeekOrDefault() is MoveCommand)
+                _commands.Dequeue();
+        }
     }
 
     private void Move(Vector2 movement, IUnitNode node)

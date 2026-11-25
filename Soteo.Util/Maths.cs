@@ -4,8 +4,12 @@ public static class Maths
 {
     public const double Pi = Math.PI;
 
-    public static double DirectionToAzimuth(Vector2 direction) =>
-        Rad2Deg(PosMod(Math.Atan2(direction.Y, direction.X) + Pi / 2, 2 * Pi));
+    public static double DirectionToAzimuth(Vector2 direction)
+    {
+        if (direction == Vector2.Zero)
+            throw new ArgumentException("Direction is zero");
+        return Rad2Deg(PosMod(Math.Atan2(direction.Y, direction.X) + Pi / 2, 2 * Pi));
+    }
 
     public static Vector2 AzimuthToDirection(double azimuth)
     {
