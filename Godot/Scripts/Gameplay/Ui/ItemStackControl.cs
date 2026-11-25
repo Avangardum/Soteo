@@ -9,11 +9,8 @@ public sealed partial class ItemStackControl : Control
     private GdVector2 _offset;
     private GdVector2? _mouseDownPosition;
 
-    private readonly LateInit<Node> _originalParent = new();
-    private readonly LateInit<Node> _dragAndDropLayer = new();
-    private readonly LateInit<TextureRect> _textureRect = new();
-    private readonly LateInit<Control> _countBackground = new();
-    private readonly LateInit<Label> _countLabel = new();
+    private Node _originalParent = null!;
+    private Node _dragAndDropLayer = null!;
 
     public bool IsInteractive { get; set; }
 
@@ -21,17 +18,17 @@ public sealed partial class ItemStackControl : Control
     public event Action DragStarted = delegate { };
     public event Action DragStopped = delegate { };
 
-    public TextureRect TextureRect => _textureRect.Value;
-    public Control CountBackground => _countBackground.Value;
-    public Label CountLabel => _countLabel.Value;
+    public TextureRect TextureRect { get; private set; } = null!;
+    public Control CountBackground { get; private set; } = null!;
+    public Label CountLabel { get; private set; } = null!;
 
     public override void _Ready()
     {
-        _originalParent.Value = GetParent().Required;
-        _dragAndDropLayer.Value = GetNode("/root/GameplayMain/Ui/DragAndDropLayer").Required;
-        _textureRect.Value = GetNode<TextureRect>("TextureRect").Required;
-        _countBackground.Value = GetNode<Control>("TextureRect/CountBackground").Required;
-        _countLabel.Value = GetNode<Label>("TextureRect/CountBackground/CountLabel").Required;
+        _originalParent = GetParent().Required;
+        _dragAndDropLayer = GetNode("/root/GameplayMain/Ui/DragAndDropLayer").Required;
+        TextureRect = GetNode<TextureRect>("TextureRect").Required;
+        CountBackground = GetNode<Control>("TextureRect/CountBackground").Required;
+        CountLabel = GetNode<Label>("TextureRect/CountBackground/CountLabel").Required;
 
         MouseEntered += () => _isMouseHovering = true;
         MouseExited += () => _isMouseHovering = false;
@@ -80,7 +77,7 @@ public sealed partial class ItemStackControl : Control
         _offset = -GetLocalMousePosition();
         GdVector2 position = GlobalPosition;
         GetParent().RemoveChild(this);
-        _dragAndDropLayer.Value.AddChild(this);
+        _dragAndDropLayer.AddChild(this);
         GlobalPosition = position;
         DragStarted();
     }
@@ -91,7 +88,7 @@ public sealed partial class ItemStackControl : Control
         _isMouseHovering = false;
         Position = GdVector2.Zero;
         GetParent().RemoveChild(this);
-        _originalParent.Value.AddChild(this);
+        _originalParent.AddChild(this);
         DragStopped();
     }
 }

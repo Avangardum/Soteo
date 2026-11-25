@@ -6,11 +6,11 @@ namespace Soteo.Main.Gameplay.EntityNodes;
 
 public sealed partial class UnitNode : CharacterBody2D, IUnitNode
 {
-    private readonly LateInit<NavigationAgent2D> _navigationAgent = new();
+    private NavigationAgent2D _navigationAgent = null!;
 
     public override void _Ready()
     {
-        _navigationAgent.Value = GetNode<NavigationAgent2D>("NavigationAgent2D");
+        _navigationAgent = GetNode<NavigationAgent2D>("NavigationAgent2D");
     }
 
     public Unit? Unit { get; set; }
@@ -35,22 +35,22 @@ public sealed partial class UnitNode : CharacterBody2D, IUnitNode
 
     public Vector2 NextPathPosition(Vector2 target)
     {
-        double targetDesiredDistance = _navigationAgent.Value.TargetDesiredDistance / Const.PixelsInMeter;
+        double targetDesiredDistance = _navigationAgent.TargetDesiredDistance / Const.PixelsInMeter;
         if (Vector2.Distance(PositionMeters, target) <= targetDesiredDistance) return target;
 
-        Vector2 prevTarget = _navigationAgent.Value.TargetPosition.ToSys() / Const.PixelsInMeter;
+        Vector2 prevTarget = _navigationAgent.TargetPosition.ToSys() / Const.PixelsInMeter;
 
         if
         (
-            _navigationAgent.Value.IsNavigationFinished() ||
+            _navigationAgent.IsNavigationFinished() ||
             Vector2.Distance(prevTarget, target) > targetDesiredDistance
         )
         {
-            _navigationAgent.Value.TargetPosition = target.ToGd() * Const.PixelsInMeter;
+            _navigationAgent.TargetPosition = target.ToGd() * Const.PixelsInMeter;
         }
 
-        return _navigationAgent.Value.GetNextPathPosition().ToSys() / Const.PixelsInMeter;
+        return _navigationAgent.GetNextPathPosition().ToSys() / Const.PixelsInMeter;
     }
 
-    public bool IsNavigationFinished => _navigationAgent.Value.IsNavigationFinished();
+    public bool IsNavigationFinished => _navigationAgent.IsNavigationFinished();
 }

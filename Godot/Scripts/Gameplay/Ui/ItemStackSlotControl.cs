@@ -2,12 +2,10 @@ namespace Soteo.Main.Gameplay.Ui;
 
 public sealed partial class ItemStackSlotControl : Control
 {
-    private readonly LateInit<ItemStackControl> _itemStack = new();
+    public ItemStackControl ItemStack { get; private set; } = null!;
 
     public override void _Ready()
     {
-        _itemStack.Value = GetNode<ItemStackControl>("ItemStack");
+        ItemStack = GetNode<ItemStackControl>("ItemStack");
     }
-
-    public ItemStackControl ItemStack => _itemStack.Value;
 }

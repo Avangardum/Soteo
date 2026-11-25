@@ -9,11 +9,8 @@ public sealed partial class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode,
     private double? _removalCountdown;
     private TaskCompletionSource _waitUntilCanRemoveSource = new();
 
-    private readonly LateInit<AnimatedSprite2D> _sprite = new();
-    private readonly LateInit<AzimuthIndicator> _azimuthIndicator = new();
-
-    private AnimatedSprite2D Sprite2D => _sprite;
-    private AzimuthIndicator AzimuthIndicator => _azimuthIndicator;
+    private AnimatedSprite2D _sprite = null!;
+    private AzimuthIndicator _azimuthIndicator = null!;
 
     // If a sprite has pixel position with .5 as the fractional part in any dimension
     // (used to center sprites with odd sizes), the following fields help compensate
@@ -43,7 +40,7 @@ public sealed partial class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode,
     {
         _removalCountdown = null;
         _waitUntilCanRemoveSource = new TaskCompletionSource();
-        AzimuthIndicator.Visible = true;
+        _azimuthIndicator.Visible = true;
     }
 
     private void OnDetached()
@@ -65,10 +62,10 @@ public sealed partial class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode,
 
     public override void _Ready()
     {
-        _sprite.Value = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
-        _azimuthIndicator.Value = GetNode<AzimuthIndicator>("AzimuthIndicator");
+        _sprite = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
+        _azimuthIndicator = GetNode<AzimuthIndicator>("AzimuthIndicator");
 
-        Sprite2D.Play();
+        _sprite.Play();
     }
 
     public override void _Process(double delta)
@@ -85,36 +82,36 @@ public sealed partial class UnitPuppetNode : Node2D, IDeferredRemovalEntityNode,
 
     public bool IsAzimuthIndicatorVisible
     {
-        get => AzimuthIndicator.Visible;
-        set => AzimuthIndicator.Visible = value;
+        get => _azimuthIndicator.Visible;
+        set => _azimuthIndicator.Visible = value;
     }
 
     public bool FlipSpriteH
     {
-        get => Sprite2D.FlipH;
-        set => Sprite2D.FlipH = value;
+        get => _sprite.FlipH;
+        set => _sprite.FlipH = value;
     }
 
     public string Animation
     {
-        get => Sprite2D.Animation;
-        set => Sprite2D.Animation = value;
+        get => _sprite.Animation;
+        set => _sprite.Animation = value;
     }
 
     public double AnimationSpeedScale
     {
-        get => Sprite2D.SpeedScale;
-        set => Sprite2D.SpeedScale = (float)value;
+        get => _sprite.SpeedScale;
+        set => _sprite.SpeedScale = (float)value;
     }
 
     public int AnimationFrame
     {
-        get => Sprite2D.Frame;
-        set => Sprite2D.Frame = value;
+        get => _sprite.Frame;
+        set => _sprite.Frame = value;
     }
 
-    public int AnimationFrameCount => Sprite2D.SpriteFrames.GetFrameCount(Animation);
+    public int AnimationFrameCount => _sprite.SpriteFrames.GetFrameCount(Animation);
 
     public void CalculateAzimuthIndicatorPoints(double azimuth, double zoom) =>
-        AzimuthIndicator.CalculatePoints(azimuth, zoom);
+        _azimuthIndicator.CalculatePoints(azimuth, zoom);
 }

@@ -2,22 +2,19 @@ namespace Soteo.Main.Gameplay.Ui;
 
 public sealed partial class Tooltip : Control, ITooltip
 {
-    private readonly LateInit<Label> _headerLabel = new();
-    private readonly LateInit<HSeparator> _separator = new();
-    private readonly LateInit<RichTextLabel> _bodyLabel = new();
-    private readonly LateInit<float> _bodyDefaultMinWidth = new();
+    private float _bodyDefaultMinWidth;
 
-    public Label HeaderLabel => _headerLabel;
-    public HSeparator Separator => _separator;
-    public RichTextLabel BodyLabel => _bodyLabel;
+    public Label HeaderLabel { get; private set; } = null!;
+    public HSeparator Separator { get; private set; } = null!;
+    public RichTextLabel BodyLabel { get; private set; } = null!;
 
     public override void _Ready()
     {
-        _headerLabel.Value = GetNode<Label>("PanelContainer/MarginContainer/VBoxContainer/Header");
-        _separator.Value = GetNode<HSeparator>("PanelContainer/MarginContainer/VBoxContainer/HSeparator");
-        _bodyLabel.Value = GetNode<RichTextLabel>("PanelContainer/MarginContainer/VBoxContainer/Body");
+        HeaderLabel = GetNode<Label>("PanelContainer/MarginContainer/VBoxContainer/Header");
+        Separator = GetNode<HSeparator>("PanelContainer/MarginContainer/VBoxContainer/HSeparator");
+        BodyLabel = GetNode<RichTextLabel>("PanelContainer/MarginContainer/VBoxContainer/Body");
 
-        _bodyDefaultMinWidth.Value = BodyLabel.CustomMinimumSize.X;
+        _bodyDefaultMinWidth = BodyLabel.CustomMinimumSize.X;
     }
 
     public void Show(Vector2 position, string header, string body)
