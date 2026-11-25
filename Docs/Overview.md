@@ -34,6 +34,26 @@ approach include avoidance of manual lifetime management (no need to call Free, 
 unreferenced) and ability to use object pooling separately (such as pooling nodes for performance and avoiding pooling
 plain C# objects with complex lifetime).
 
+# Error handling
+
+Godot's behavior on an error or an unhandled C# exception is to print an error message and keep going with potentially
+invalid state. This complicates error detection, especially when working with multiple processes. Soteo uses
+`CrashOnErrorLogger` to crash the game on any Godot error or unhandled C# exception, so that in development it's easier
+to spot errors, and in production a campaign can restart from a recent snapshot instead of continuing to run in a
+broken state.
+
+# CultureInfo
+
+`CultureInfo` is a common source of errors in C#. Its default value depends on the user's language and it can cause
+sneaky OS-language-dependent bugs like the infamous Turkish I problem. Soteo sets the current culture to the invariant
+one in `Main`, so that any culture-dependent features work the same regardless of the OS langugage.
+
+# Integer overflow / underflow
+
+In C#, by default, if an integer value overflows or underflows, it silently loops around to a min/max value.
+Soteo changes this default using `Directory.Build.props`, so that an exception is thrown in such case.
+If the silent looping behavior is intended use the `unchecked` keyword to suppress the exception.
+
 # Concurrency
 
 Most of the codebase is thread-unaware, meaning that it works under the assumption that no other thread is performing
