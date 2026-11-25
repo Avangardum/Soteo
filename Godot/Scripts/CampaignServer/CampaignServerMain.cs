@@ -19,16 +19,15 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
 {
     private readonly Dictionary<Guid, TaskCompletionSource> _shardServerLocalInitDoneTcs = new();
 
-    private IFromCampaignServerCommunicator _communicator = null!;
-    private IServiceProvider _serviceProvider = null!;
-    private CampaignSnapshotManager _snapshotManager = null!;
-    private ICampaignSnapshotSerializer _snapshotSerializer = null!;
-    private IUserRepository _userRepo = null!;
-    private ISynchronizedCampaignStateRepository _synchronizedCampaignStateRepo = null!;
-    private TimeProvider _timeProvider = null!;
-    private ILogger<CampaignServerMain> _logger = null!;
-    private IInitializationRepository _initRepo = null!;
-    private IProcessPublisher _processPublisher = null!;
+    private IFromCampaignServerCommunicator? _communicator;
+    private IServiceProvider? _serviceProvider;
+    private CampaignSnapshotManager? _snapshotManager;
+    private ICampaignSnapshotSerializer? _snapshotSerializer;
+    private IUserRepository? _userRepo;
+    private ISynchronizedCampaignStateRepository? _synchronizedCampaignStateRepo;
+    private ILogger<CampaignServerMain>? _logger;
+    private IInitializationRepository? _initRepo;
+    private IProcessPublisher? _processPublisher;
 
     public override void _Ready()
     {
@@ -45,8 +44,8 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
 
         IReadOnlyList<Guid> shardIds = _serviceProvider.GetRequiredService<CampaignOptions>().ShardIds;
 
-        _logger.LogInformation("Waiting for shard servers to connect");
-        await _userRepo.WaitForUsersToConnectAsync(shardIds, timeout: 30);
+        _logger.Required.LogInformation("Waiting for shard servers to connect");
+        await _userRepo.Required.WaitForUsersToConnectAsync(shardIds, timeout: 30);
 
         // Create a task for each shard server waiting for it to finish local initializing, which is everything
         // except for waiting for other servers' initialization. Once all the shard servers sent that, we can
@@ -57,17 +56,17 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
         await TryLoadSnapshotAsync();
 
         await WaitForShardServersLocalInit();
-        _communicator.BroadcastToShardServers(new CampaignInitializedPacket());
-        _initRepo.IsInitialized = true;
+        _communicator.Required.BroadcastToShardServers(new CampaignInitializedPacket());
+        _initRepo.Required.IsInitialized = true;
 
         const int initialPauseDuration = 10;
         _logger.LogInformation("Initialized, unpausing in {duration} seconds", initialPauseDuration);
-        await _timeProvider.Delay(TimeSpan.FromSeconds(initialPauseDuration));
-        _synchronizedCampaignStateRepo.Unpause();
+        await Task.Delay(TimeSpan.FromSeconds(initialPauseDuration));
+        _synchronizedCampaignStateRepo.Required.Unpause();
 
         const int sessionDuration = 120;
         _logger.LogInformation("Unpaused, the session ends in {duration} seconds", sessionDuration);
-        await _timeProvider.Delay(TimeSpan.FromSeconds(sessionDuration));
+        await Task.Delay(TimeSpan.FromSeconds(sessionDuration));
         _synchronizedCampaignStateRepo.Pause();
 
         await TrySaveSnapshotAsync();
@@ -76,13 +75,12 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
 
     private void CreateSingletonServices()
     {
-        _communicator = _serviceProvider.GetRequiredService<IFromCampaignServerCommunicator>();
+        _communicator = _serviceProvider.Required.GetRequiredService<IFromCampaignServerCommunicator>();
         _snapshotManager = _serviceProvider.GetRequiredService<CampaignSnapshotManager>();
         _snapshotSerializer = _serviceProvider.GetRequiredService<ICampaignSnapshotSerializer>();
         _userRepo = _serviceProvider.GetRequiredService<IUserRepository>();
         _synchronizedCampaignStateRepo =
             _serviceProvider.GetRequiredService<ISynchronizedCampaignStateRepository>();
-        _timeProvider = _serviceProvider.GetRequiredService<TimeProvider>();
         _logger = _serviceProvider.GetRequiredService<ILogger<CampaignServerMain>>();
         _initRepo = _serviceProvider.GetRequiredService<IInitializationRepository>();
     }
@@ -91,21 +89,21 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
     {
         if (File.Exists(SnapshotPath))
         {
-            _logger.LogInformation("Loading a snapshot");
+            _logger.Required.LogInformation("Loading a snapshot");
             byte[] bytes = File.ReadAllBytes(SnapshotPath);
-            CampaignSnapshot snapshot = _snapshotSerializer.Deserialize(bytes);
-            await _snapshotManager.ReplicateSnapshotAsync(snapshot);
+            CampaignSnapshot snapshot = _snapshotSerializer.Required.Deserialize(bytes);
+            await _snapshotManager.Required.ReplicateSnapshotAsync(snapshot);
         }
         else
         {
-            _logger.LogInformation("Starting a new campaign");
-            _communicator.BroadcastToShardServers(new NoInitialShardSnapshotPacket());
+            _logger.Required.LogInformation("Starting a new campaign");
+            _communicator.Required.BroadcastToShardServers(new NoInitialShardSnapshotPacket());
         }
     }
 
     private async Task WaitForShardServersLocalInit()
     {
-        _logger.LogInformation("Waiting for shard servers to finish local initializing");
+        _logger.Required.LogInformation("Waiting for shard servers to finish local initializing");
         Task timeout = Task.Delay(TimeSpan.FromSeconds(30));
         await Task.WhenAny(timeout, Task.WhenAll(_shardServerLocalInitDoneTcs.Values.Select(it => it.Task)));
         IReadOnlyList<Guid> uninitializedShardServerIds = _shardServerLocalInitDoneTcs
@@ -121,8 +119,8 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
 
     private async Task TrySaveSnapshotAsync()
     {
-        CampaignSnapshot snapshot = await _snapshotManager.CreateSnapshotAsync();
-        byte[] bytes = _snapshotSerializer.Serialize(snapshot);
+        CampaignSnapshot snapshot = await _snapshotManager.Required.CreateSnapshotAsync();
+        byte[] bytes = _snapshotSerializer.Required.Serialize(snapshot);
         File.WriteAllBytes(SnapshotPath, bytes);
     }
 
@@ -132,7 +130,7 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
         {
             return Path.Combine
             (
-                _serviceProvider.GetRequiredService<CampaignPersistenceOptions>().SnapshotFolder,
+                _serviceProvider.Required.GetRequiredService<CampaignPersistenceOptions>().SnapshotFolder,
                 "Snapshot"
             );
         }
@@ -140,7 +138,7 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
 
     public override void _Process(double delta)
     {
-        _communicator.Poll();
+        _communicator.Required.Poll();
     }
 
     private void RegisterServices(IServiceCollection services)
@@ -167,7 +165,7 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
         services.AddSingleton<IShardServerAllowlist>(sp =>
             ShardServerAllowlist.Enabled(sp.GetRequiredService<CampaignOptions>().ShardIds));
         services.AddSingleton<ISynchronizedCampaignStateRepository, SynchronizedCampaignStateRepository>();
-        services.AddSingleton<IProcessPublisher>(_ => _processPublisher);
+        services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
         services.AddSingleton<IFromCampaignServerCommunicator, WebSocketFromCampaignServerToGameplayCommunicator>();
 
         foreach (Type type in PacketSerializer.AllTypes(new TypeLocator(SoteoCoreAssembly.Value)))
