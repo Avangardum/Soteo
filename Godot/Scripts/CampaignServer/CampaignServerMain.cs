@@ -37,7 +37,6 @@ public sealed partial class CampaignServerMain : Node, ICampaignServerInitPacket
 
     private async Task InitAsync()
     {
-        GlobalInit.Init();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         CreateSingletonNodes();

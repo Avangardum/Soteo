@@ -60,7 +60,6 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
 
     private async Task InitAsync()
     {
-        GlobalInit.Init();
         var serviceCollection = new ServiceCollection();
         RegisterServices(serviceCollection);
         _rootServiceProvider = serviceCollection.BuildServiceProvider();
