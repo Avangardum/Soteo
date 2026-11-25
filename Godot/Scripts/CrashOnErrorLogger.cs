@@ -2,7 +2,7 @@ using Godot.Collections;
 
 namespace Soteo.Main;
 
-public sealed partial class CrashOnExceptionLogger(SceneTree sceneTree) : Logger
+public sealed partial class CrashOnErrorLogger(SceneTree sceneTree) : Logger
 {
     public override void _LogError
     (
@@ -16,7 +16,6 @@ public sealed partial class CrashOnExceptionLogger(SceneTree sceneTree) : Logger
         Array<ScriptBacktrace> scriptBacktraces
     )
     {
-        if (function == "void Godot.NativeInterop.ExceptionUtils.LogException(System.Exception)")
-            sceneTree.Quit(1);
+        sceneTree.Quit(1);
     }
 }

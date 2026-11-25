@@ -24,6 +24,7 @@ public sealed class Hud : IHud
     private readonly IReadOnlyList<AbilityButton> _abilityButtons;
     private readonly IReadOnlyList<StatusIndicator> _statusIndicators;
     private readonly GridContainer _inventoryGrid;
+    private readonly Control _inventoryPanel;
     private readonly IReadOnlyList<ItemStackSlotControl> _inventorySlotControls;
     private readonly Control _equipmentPanel;
     private readonly IReadOnlyDictionary<EquipmentSlot, ItemStackSlotControl> _equipmentSlotControls;
@@ -96,7 +97,8 @@ public sealed class Hud : IHud
         _statusIndicators = node.GetNode("VBoxContainer/Statuses").GetChildren()
             .OfType<StatusIndicator>()
             .ToList().AsReadOnly();
-        _inventoryGrid = node.GetNode<GridContainer>("Inventory/MarginContainer/Slots");
+        _inventoryPanel = node.GetNode<Control>("Inventory");
+        _inventoryGrid = _inventoryPanel.GetNode<GridContainer>("MarginContainer/Slots");
         _inventorySlotControls = _inventoryGrid.GetChildren()
             .Cast<ItemStackSlotControl>()
             .ToList().AsReadOnly();
@@ -468,6 +470,12 @@ public sealed class Hud : IHud
 
     private void ProcessInventory(UnitPuppet unit)
     {
+        if (unit.Inventory.Count == 0)
+        {
+            _inventoryPanel.Visible = false;
+            return;
+        }
+
         _inventoryGrid.Columns = Maths.CeilToInt(unit.Inventory.Count / 2.0);
         bool canControlSelectedUnit = CanControlSelectedUnit(out _);
 
@@ -493,7 +501,7 @@ public sealed class Hud : IHud
 
     private void ProcessEquipment(UnitPuppet unit)
     {
-        if (!unit.EquipmentInventory.Any())
+        if (unit.EquipmentInventory.Count == 0)
         {
             _equipmentPanel.Visible = false;
             return;

@@ -1,27 +1,30 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene format=3 uid="uid://pbopflkxenbk"]
 
-[ext_resource path="res://Textures/White.png" type="Texture2D" id=1]
-[ext_resource path="res://Scenes/Ui/AbilityButton.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Scripts/Gameplay/Ui/HudNode.cs" type="Script" id=3]
-[ext_resource path="res://Scenes/Ui/StatusIndicator.tscn" type="PackedScene" id=4]
-[ext_resource path="res://Scenes/Ui/InventorySlot.tscn" type="PackedScene" id=5]
+[ext_resource type="Texture2D" uid="uid://bxfqieqwkc1i0" path="res://Textures/White.png" id="1"]
+[ext_resource type="PackedScene" path="res://Scenes/Ui/AbilityButton.tscn" id="2"]
+[ext_resource type="Script" uid="uid://b471k5p2v2ejo" path="res://Scripts/Gameplay/Ui/HudNode.cs" id="3"]
+[ext_resource type="PackedScene" path="res://Scenes/Ui/StatusIndicator.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://Scenes/Ui/InventorySlot.tscn" id="5"]
 
-[sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0.145098, 0.145098, 0.164706, 1 )
+[sub_resource type="StyleBoxFlat" id="1"]
+bg_color = Color(0.145098, 0.145098, 0.164706, 1)
 border_width_left = 5
 border_width_top = 5
 border_width_right = 5
 border_width_bottom = 5
-border_color = Color( 0.145098, 0.145098, 0.164706, 1 )
+border_color = Color(0.145098, 0.145098, 0.164706, 1)
 
-[node name="Hud" type="Control"]
+[node name="Hud" type="Control" unique_id=2075117212]
 process_mode = 3
+layout_mode = 3
+anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-script = ExtResource( 3 )
+script = ExtResource("3")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2114590246]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
@@ -30,154 +33,125 @@ grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
 
-[node name="Statuses" type="HBoxContainer" parent="VBoxContainer"]
-offset_right = 594.0
-offset_bottom = 38.0
+[node name="Statuses" type="HBoxContainer" parent="VBoxContainer" unique_id=984099273]
+layout_mode = 2
 mouse_filter = 2
 
-[node name="Filler" type="Control" parent="VBoxContainer/Statuses"]
-offset_right = 5.0
-offset_bottom = 38.0
-custom_minimum_size = Vector2( 5, 0 )
+[node name="Filler" type="Control" parent="VBoxContainer/Statuses" unique_id=222705023]
+custom_minimum_size = Vector2(5, 0)
+layout_mode = 2
 
-[node name="0" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 9.0
-offset_right = 47.0
+[node name="0" parent="VBoxContainer/Statuses" unique_id=1784865355 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="1" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 51.0
-offset_right = 89.0
+[node name="1" parent="VBoxContainer/Statuses" unique_id=161650405 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="2" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 93.0
-offset_right = 131.0
+[node name="2" parent="VBoxContainer/Statuses" unique_id=1553546306 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="3" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 135.0
-offset_right = 173.0
+[node name="3" parent="VBoxContainer/Statuses" unique_id=623142300 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="4" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 177.0
-offset_right = 215.0
+[node name="4" parent="VBoxContainer/Statuses" unique_id=1466287430 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="5" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 219.0
-offset_right = 257.0
+[node name="5" parent="VBoxContainer/Statuses" unique_id=1622030709 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="6" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 261.0
-offset_right = 299.0
+[node name="6" parent="VBoxContainer/Statuses" unique_id=1568147091 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="7" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 303.0
-offset_right = 341.0
+[node name="7" parent="VBoxContainer/Statuses" unique_id=170304361 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="8" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 345.0
-offset_right = 383.0
+[node name="8" parent="VBoxContainer/Statuses" unique_id=1696447025 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="9" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 387.0
-offset_right = 425.0
+[node name="9" parent="VBoxContainer/Statuses" unique_id=2078770975 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="10" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 429.0
-offset_right = 467.0
+[node name="10" parent="VBoxContainer/Statuses" unique_id=206124647 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="11" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 471.0
-offset_right = 509.0
+[node name="11" parent="VBoxContainer/Statuses" unique_id=993322206 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="12" parent="VBoxContainer/Statuses" instance=ExtResource( 4 )]
-offset_left = 513.0
-offset_right = 551.0
+[node name="12" parent="VBoxContainer/Statuses" unique_id=347075427 instance=ExtResource("4")]
+layout_mode = 2
 
-[node name="UnitPanel" type="PanelContainer" parent="VBoxContainer"]
-offset_top = 42.0
-offset_right = 594.0
-offset_bottom = 190.0
-grow_horizontal = 2
-grow_vertical = 0
-custom_minimum_size = Vector2( 400, 0 )
-theme_override_styles/panel = SubResource( 1 )
+[node name="UnitPanel" type="PanelContainer" parent="VBoxContainer" unique_id=302722137]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("1")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/UnitPanel"]
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 589.0
-offset_bottom = 143.0
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/UnitPanel" unique_id=1646375422]
+layout_mode = 2
 
-[node name="Abilities" type="HBoxContainer" parent="VBoxContainer/UnitPanel/VBoxContainer"]
-offset_right = 584.0
-offset_bottom = 80.0
+[node name="Abilities" type="HBoxContainer" parent="VBoxContainer/UnitPanel/VBoxContainer" unique_id=61244221]
+layout_mode = 2
 
-[node name="0" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
+[node name="0" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" unique_id=412775713 instance=ExtResource("2")]
+layout_mode = 2
 
-[node name="1" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
-offset_left = 84.0
-offset_right = 164.0
+[node name="1" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" unique_id=568030812 instance=ExtResource("2")]
+layout_mode = 2
 
-[node name="2" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
-offset_left = 168.0
-offset_right = 248.0
+[node name="2" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" unique_id=1794429920 instance=ExtResource("2")]
+layout_mode = 2
 
-[node name="3" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
-offset_left = 252.0
-offset_right = 332.0
+[node name="3" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" unique_id=1788286738 instance=ExtResource("2")]
+layout_mode = 2
 
-[node name="4" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
-offset_left = 336.0
-offset_right = 416.0
+[node name="4" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" unique_id=944979187 instance=ExtResource("2")]
+layout_mode = 2
 
-[node name="5" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
-offset_left = 420.0
-offset_right = 500.0
+[node name="5" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" unique_id=580687594 instance=ExtResource("2")]
+layout_mode = 2
 
-[node name="6" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" instance=ExtResource( 2 )]
-offset_left = 504.0
-offset_right = 584.0
+[node name="6" parent="VBoxContainer/UnitPanel/VBoxContainer/Abilities" unique_id=1702761084 instance=ExtResource("2")]
+layout_mode = 2
 
-[node name="Health" type="TextureProgressBar" parent="VBoxContainer/UnitPanel/VBoxContainer"]
-offset_top = 84.0
-offset_right = 584.0
-offset_bottom = 109.0
-custom_minimum_size = Vector2( 250, 25 )
+[node name="Health" type="TextureProgressBar" parent="VBoxContainer/UnitPanel/VBoxContainer" unique_id=1906931309]
+custom_minimum_size = Vector2(250, 25)
+layout_mode = 2
 mouse_filter = 2
 value = 70.0
-texture_under = ExtResource( 1 )
-texture_progress = ExtResource( 1 )
-tint_under = Color( 0, 0, 0, 1 )
-tint_progress = Color( 0.705882, 0, 0, 1 )
 nine_patch_stretch = true
+texture_under = ExtResource("1")
+texture_progress = ExtResource("1")
+tint_under = Color(0, 0, 0, 1)
+tint_progress = Color(0.705882, 0, 0, 1)
 
-[node name="Label" type="Label" parent="VBoxContainer/UnitPanel/VBoxContainer/Health"]
+[node name="Label" type="Label" parent="VBoxContainer/UnitPanel/VBoxContainer/Health" unique_id=1624573631]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 text = "1000 / 1000"
-align = 1
-valign = 1
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Mana" type="TextureProgressBar" parent="VBoxContainer/UnitPanel/VBoxContainer"]
-offset_top = 113.0
-offset_right = 584.0
-offset_bottom = 138.0
-custom_minimum_size = Vector2( 250, 25 )
+[node name="Mana" type="TextureProgressBar" parent="VBoxContainer/UnitPanel/VBoxContainer" unique_id=86426714]
+custom_minimum_size = Vector2(250, 25)
+layout_mode = 2
 mouse_filter = 2
 value = 70.0
-texture_under = ExtResource( 1 )
-texture_progress = ExtResource( 1 )
-tint_under = Color( 0, 0, 0, 1 )
-tint_progress = Color( 0.254902, 0.254902, 1, 1 )
 nine_patch_stretch = true
+texture_under = ExtResource("1")
+texture_progress = ExtResource("1")
+tint_under = Color(0, 0, 0, 1)
+tint_progress = Color(0.254902, 0.254902, 1, 1)
 
-[node name="Label" type="Label" parent="VBoxContainer/UnitPanel/VBoxContainer/Mana"]
+[node name="Label" type="Label" parent="VBoxContainer/UnitPanel/VBoxContainer/Mana" unique_id=1138509996]
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 text = "1000 / 1000"
-align = 1
-valign = 1
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="Inventory" type="PanelContainer" parent="."]
+[node name="Inventory" type="PanelContainer" parent="." unique_id=215411751]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
@@ -185,58 +159,43 @@ anchor_bottom = 1.0
 offset_left = 292.0
 grow_vertical = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="Inventory"]
-offset_right = 342.0
-offset_bottom = 174.0
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_top = 5
+[node name="MarginContainer" type="MarginContainer" parent="Inventory" unique_id=1199876133]
+layout_mode = 2
 theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="Slots" type="GridContainer" parent="Inventory/MarginContainer"]
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 337.0
-offset_bottom = 169.0
+[node name="Slots" type="GridContainer" parent="Inventory/MarginContainer" unique_id=1039409826]
+layout_mode = 2
 columns = 4
 
-[node name="0" parent="Inventory/MarginContainer/Slots" instance=ExtResource( 5 )]
+[node name="0" parent="Inventory/MarginContainer/Slots" unique_id=254951222 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="1" parent="Inventory/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 84.0
-offset_right = 164.0
+[node name="1" parent="Inventory/MarginContainer/Slots" unique_id=1900479831 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="2" parent="Inventory/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 168.0
-offset_right = 248.0
+[node name="2" parent="Inventory/MarginContainer/Slots" unique_id=463358005 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="3" parent="Inventory/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 252.0
-offset_right = 332.0
+[node name="3" parent="Inventory/MarginContainer/Slots" unique_id=529325494 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="4" parent="Inventory/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_top = 84.0
-offset_bottom = 164.0
+[node name="4" parent="Inventory/MarginContainer/Slots" unique_id=619519493 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="5" parent="Inventory/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 84.0
-offset_top = 84.0
-offset_right = 164.0
-offset_bottom = 164.0
+[node name="5" parent="Inventory/MarginContainer/Slots" unique_id=1673212868 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="6" parent="Inventory/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 168.0
-offset_top = 84.0
-offset_right = 248.0
-offset_bottom = 164.0
+[node name="6" parent="Inventory/MarginContainer/Slots" unique_id=240039918 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="7" parent="Inventory/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 252.0
-offset_top = 84.0
-offset_right = 332.0
-offset_bottom = 164.0
+[node name="7" parent="Inventory/MarginContainer/Slots" unique_id=179813326 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="Equipment" type="PanelContainer" parent="."]
+[node name="Equipment" type="PanelContainer" parent="." unique_id=2022338699]
+layout_mode = 0
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
@@ -245,43 +204,31 @@ offset_right = -292.0
 grow_horizontal = 0
 grow_vertical = 0
 
-[node name="MarginContainer" type="MarginContainer" parent="Equipment"]
-offset_right = 258.0
-offset_bottom = 174.0
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_top = 5
+[node name="MarginContainer" type="MarginContainer" parent="Equipment" unique_id=1361691287]
+layout_mode = 2
 theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="Slots" type="GridContainer" parent="Equipment/MarginContainer"]
-offset_left = 5.0
-offset_top = 5.0
-offset_right = 253.0
-offset_bottom = 169.0
+[node name="Slots" type="GridContainer" parent="Equipment/MarginContainer" unique_id=1193746428]
+layout_mode = 2
 columns = 3
 
-[node name="Potion" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
+[node name="Potion" parent="Equipment/MarginContainer/Slots" unique_id=716757318 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="MainHand" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 84.0
-offset_right = 164.0
+[node name="MainHand" parent="Equipment/MarginContainer/Slots" unique_id=280241192 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="Offhand" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 168.0
-offset_right = 248.0
+[node name="Offhand" parent="Equipment/MarginContainer/Slots" unique_id=1080192047 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="Head" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_top = 84.0
-offset_bottom = 164.0
+[node name="Head" parent="Equipment/MarginContainer/Slots" unique_id=1612546994 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="Body" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 84.0
-offset_top = 84.0
-offset_right = 164.0
-offset_bottom = 164.0
+[node name="Body" parent="Equipment/MarginContainer/Slots" unique_id=1165409874 instance=ExtResource("5")]
+layout_mode = 2
 
-[node name="Feet" parent="Equipment/MarginContainer/Slots" instance=ExtResource( 5 )]
-offset_left = 168.0
-offset_top = 84.0
-offset_right = 248.0
-offset_bottom = 164.0
+[node name="Feet" parent="Equipment/MarginContainer/Slots" unique_id=236521677 instance=ExtResource("5")]
+layout_mode = 2
