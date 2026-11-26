@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-using Soteo.Core;
-using Soteo.Core.Serialization;
 
 BenchmarkRunner.Run<Benchmarks>();
 
