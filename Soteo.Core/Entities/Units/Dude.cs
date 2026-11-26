@@ -21,6 +21,7 @@ public sealed class Dude : Unit
     )
     {
         SetInnateSpecialAbility<RangedAttackAbility>(AbilitySlot.Attack);
+        AddInnateHotbarAbility<VampireAbility>();
     }
 
     private sealed class Ai : UnitAi
