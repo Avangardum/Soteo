@@ -800,8 +800,7 @@ public sealed class UnitTests
 
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitY });
 
-        Ticker.Tick(_sut.Tick).WithDefaultInterval()
-            .ForAtLeast(Ability.Instance<SpyAbilityWithUseTime>().StaticUseTime);
+        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
         usedContext.Required().TargetPosition.Should().Be(Vector2.UnitY);
     }
 
@@ -820,12 +819,31 @@ public sealed class UnitTests
 
         _sut.AbilityUseProgress.Required().Slot.Should().Be(AbilitySlot.Hotbar(0));
         _sut.AbilityUseProgress.ElapsedTime.Should().BePositive();
-        Ticker.Tick(_sut.Tick).WithDefaultInterval()
-            .ForAtLeast(Ability.Instance<SpyAbilityWithUseTime>().StaticUseTime);
+        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
         usedContext.Required().TargetPosition.Should().Be(Vector2.UnitX);
     }
 
-    // todo SettingRepeatedUseAbilityCommandWhileSameAbilityIsBeingUsedForDifferentTargetFinishesUsageForCurrentTargetThenUsesItOnNewTarget
+    [Fact]
+    public void SettingUseAbilityCommandWithRepeatWhileSameAbilityIsBeingUsedForDifferentTargetFinishesUsageForCurrentTargetThenUsesItOnNewTarget()
+    {
+        AbilityContext? usedContext = null;
+        Ability.Instance<SpyAbilityWithUseTime>().Used += context => usedContext = context;
+        _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitX });
+        _sut.Tick(Const.TickInterval);
+        _sut.AbilityUseProgress.Required().Slot.Should().Be(AbilitySlot.Hotbar(0));
+        _sut.AbilityUseProgress.ElapsedTime.Should().BePositive();
+
+        _sut.SetCommand
+        (
+            new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitY, Repeat = true }
+        );
+
+        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
+        usedContext.Required().TargetPosition.Should().Be(Vector2.UnitX);
+        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
+        usedContext.Required().TargetPosition.Should().Be(Vector2.UnitY);
+    }
 
     private class SpyAbility : Ability
     {
