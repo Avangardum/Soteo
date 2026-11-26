@@ -12,7 +12,7 @@ public sealed class HealAbility : Ability
 
     protected override void TakeEffectCore(AbilityContext context)
     {
-        Unit target = context.Alt ? context.User : context.TargetUnit.Required;
+        Unit target = context.Alt ? context.User : context.TargetUnit.Required();
         target.RestoreHealth(Heal, context.User, this);
     }
 }

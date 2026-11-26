@@ -151,7 +151,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         if (IsRemoved) return;
         ApplyRegen(delta);
         if (IsRemoved) return;
-        ExecuteCommands(Node.Required, delta);
+        ExecuteCommands(Node.Required(), delta);
     }
 
     private void Think()
@@ -564,10 +564,10 @@ public abstract class Unit : UnitBase<IUnitNode>
                 case AbilityValidationResult.Ok:
                     return abilityValidationResult;
                 case AbilityValidationResult.OutOfRange:
-                    MoveToPosition(targetPosition.Required, ref remainingDeltaTime, node);
+                    MoveToPosition(targetPosition.Required(), ref remainingDeltaTime, node);
                     break;
                 case AbilityValidationResult.OutOfAngularRange:
-                    LookAtPosition(targetPosition.Required, ref remainingDeltaTime);
+                    LookAtPosition(targetPosition.Required(), ref remainingDeltaTime);
                     break;
                 default:
                     if (command.Repeat)
@@ -847,7 +847,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         IEnumerable<Ability> itemHotbarAbilities = EquipmentInventory
             .Where(it => it.Value != null)
             .OrderBy(it => it.Key)
-            .SelectMany(it => it.Value.Required.Item.HotbarAbilities);
+            .SelectMany(it => it.Value.Required().Item.HotbarAbilities);
         List<Ability> hotbarAbilities = _innateHotbarAbilities.Concat(itemHotbarAbilities).Distinct().ToList();
 
         Dictionary<AbilitySlot, AbilitySlotState> newStates = [];

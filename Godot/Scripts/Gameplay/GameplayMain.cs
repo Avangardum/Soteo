@@ -73,14 +73,14 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
 
     private async Task ServerInitAsync()
     {
-        LoadShard(_rootServiceProvider.Required.GetRequiredService<ICurrentUserIdRepository>().Id.Required);
+        LoadShard(_rootServiceProvider.Required().GetRequiredService<ICurrentUserIdRepository>().Id.Required());
         Guid shardId = _rootServiceProvider.GetRequiredService<ShardOptions>().ShardId;
         _rootServiceProvider = _shardServiceScopes[shardId].ServiceProvider;
         _rootServiceProvider.GetRequiredService<IShardPersistenceSnapshotManager>().SnapshotReplicated +=
             () => _serverSnapshotReplicatedOrNoSnapshotConfirmedTcs.TrySetResult();
         _rootServiceProvider.GetRequiredService<ISynchronizedCampaignStatePuppetRepository>().Changed +=
             () => _synchronizedCampaignStateInitializedTcs.TrySetResult();
-        _logger.Required.LogInformation("Initializing");
+        _logger.Required().LogInformation("Initializing");
         using var timeout = new DisposableTimeout
         (
             _rootServiceProvider.GetRequiredService<TimeProvider>(),
@@ -91,10 +91,10 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         await _synchronizedCampaignStateInitializedTcs.Task;
         _rootServiceProvider.GetRequiredService<IFromGameplayPacketSender>()
             .Send(new ShardServerLocalInitDonePacket(), Const.CampaignServerId);
-        _logger.Required.LogInformation("Local initializing done, waiting for others");
+        _logger.Required().LogInformation("Local initializing done, waiting for others");
         await _campaignInitializedTcs.Task;
-        _initRepo.Required.IsInitialized = true;
-        _logger.Required.LogInformation("Initialized");
+        _initRepo.Required().IsInitialized = true;
+        _logger.Required().LogInformation("Initialized");
     }
 
     private void RegisterServices(IServiceCollection services)
@@ -121,7 +121,7 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         services.AddSingleton<IPacketHandler, GameplayRoutingPacketHandler>();
         services.AddSingleton<IPacketSerializer, RoutingPacketSerializer>();
         services.AddSingleton<IEntityNodePool, EntityNodePool>();
-        services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required);
+        services.AddSingleton<IProcessPublisher>(_ => _processPublisher.Required());
         services.AddSingleton<IFrameStopwatch, FrameStopwatch>();
         services.AddSingleton<SerializationHelper, SerializationHelper>();
         var typeLocator = new TypeLocator(SoteoCoreAssembly.Value);
@@ -142,20 +142,20 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         services.AddAlias<IPauseRepository, SynchronizedCampaignStatePuppetRepository>();
         services.AddSingleton<SceneTreePauser>();
         services.AddSingleton<ICrossInventoryHelper, CrossInventoryHelper>();
-        services.AddSingleton<ICampaignServerConnector>(_ => _webSocketCampaignServerCommunicator.Required);
-        services.AddSingleton<IFromGameplayToCampaignServerPacketSender>(_ => _webSocketCampaignServerCommunicator.Required);
+        services.AddSingleton<ICampaignServerConnector>(_ => _webSocketCampaignServerCommunicator.Required());
+        services.AddSingleton<IFromGameplayToCampaignServerPacketSender>(_ => _webSocketCampaignServerCommunicator.Required());
         services.AddSingleton<IFromGameplayPacketSender>
         (
             _ => new RoutingPacketSender
             (
-                _webSocketCampaignServerCommunicator.Required,
-                _webRtcGameplayCommunicator.Required
+                _webSocketCampaignServerCommunicator.Required(),
+                _webRtcGameplayCommunicator.Required()
             )
         );
-        services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required);
-        services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required);
-        services.AddSingleton<IConnectionNotifier>(_ => _webRtcGameplayCommunicator.Required);
-        services.AddSingleton<IShardServerConnector>(_ => _webRtcGameplayCommunicator.Required);
+        services.AddSingleton<IWebrtcPacketReceiver>(_ => _webRtcGameplayCommunicator.Required());
+        services.AddSingleton<INetworkDebugger>(_ => _webRtcGameplayCommunicator.Required());
+        services.AddSingleton<IConnectionNotifier>(_ => _webRtcGameplayCommunicator.Required());
+        services.AddSingleton<IShardServerConnector>(_ => _webRtcGameplayCommunicator.Required());
         services.AddSingleton<IPacketChunkCollector, PacketChunkCollector>();
         services.AddSingleton<IPacketChunker, PacketChunker>();
 
@@ -183,14 +183,14 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         services.AddTransient(typeof(ServerDependency<>), typeof(ServerDependency<>.Null));
         services.AddTransient(typeof(ClientDependency<>), typeof(ClientDependency<>.NotNull));
 
-        services.AddSingleton<LogInScreenNode>(_ => _logIScreenNode.Required);
+        services.AddSingleton<LogInScreenNode>(_ => _logIScreenNode.Required());
         services.AddSingleton<LogInScreen>();
-        services.AddSingleton<ICamera>(_ => _camera.Required);
-        services.AddSingleton<HudNode>(_ => _hudNode.Required);
+        services.AddSingleton<ICamera>(_ => _camera.Required());
+        services.AddSingleton<HudNode>(_ => _hudNode.Required());
         services.AddSingleton<IHud, Hud>();
-        services.AddSingleton<DebugScreenNode>(_ => _debugScreenNode.Required);
+        services.AddSingleton<DebugScreenNode>(_ => _debugScreenNode.Required());
         services.AddSingleton<DebugScreen>();
-        services.AddSingleton<CampaignScreenNode>(_ => _campaignScreenNode.Required);
+        services.AddSingleton<CampaignScreenNode>(_ => _campaignScreenNode.Required());
         services.AddSingleton<CampaignScreen>();
         services.AddSingleton<IEntityLocator, EntityLocator>();
         services.AddSingleton<IPalette>(ResourceLoader.Load<Palette>("res://Palette.tres"));
@@ -212,7 +212,7 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         _processPublisher = new ProcessPublisher().Also(it => AddChild(it));
 
         _webSocketCampaignServerCommunicator = ActivatorUtilities
-            .CreateInstance<WebSocketFromGameplayToCampaignServerCommunicator>(_rootServiceProvider.Required)
+            .CreateInstance<WebSocketFromGameplayToCampaignServerCommunicator>(_rootServiceProvider.Required())
             .Also(it => AddChild(it));
         _webRtcGameplayCommunicator = ActivatorUtilities
             .CreateInstance<WebRtcFromGameplayToGameplayCommunicator>(_rootServiceProvider)
@@ -221,7 +221,7 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         if (Config.Side == Side.Client)
         {
             _camera = ActivatorUtilities.CreateInstance<SoteoCamera>(_rootServiceProvider).Also(it => AddChild(it));
-            var ui = GetNode<CanvasLayer>("Ui").Required;
+            var ui = GetNode<CanvasLayer>("Ui").Required();
             _hudNode = HudNode.Instantiate().Also(it => ui.AddChild(it));
             AddChild(ActivatorUtilities.CreateInstance<InputHandler>(_rootServiceProvider));
             _logIScreenNode = LogInScreenNode.Instantiate().Also(it => ui.AddChild(it));
@@ -237,17 +237,17 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
 
     private void CreateSingletonServices()
     {
-        _logger = _rootServiceProvider.Required.GetRequiredService<ILogger<GameplayMain>>();
-        _initRepo = _rootServiceProvider.Required.GetRequiredService<IInitializationRepository>();
-        _rootServiceProvider.Required.GetRequiredService<SceneTreePauser>();
+        _logger = _rootServiceProvider.Required().GetRequiredService<ILogger<GameplayMain>>();
+        _initRepo = _rootServiceProvider.Required().GetRequiredService<IInitializationRepository>();
+        _rootServiceProvider.Required().GetRequiredService<SceneTreePauser>();
 
         if (Config.Side == Side.Client)
         {
-            _rootServiceProvider.Required.GetRequiredService<LogInScreen>();
-            _rootServiceProvider.Required.GetRequiredService<DebugScreen>();
-            _rootServiceProvider.Required.GetRequiredService<IHud>();
-            _rootServiceProvider.Required.GetRequiredService<CampaignScreen>();
-            _rootServiceProvider.Required.GetRequiredService<ClientInitializer>();
+            _rootServiceProvider.Required().GetRequiredService<LogInScreen>();
+            _rootServiceProvider.Required().GetRequiredService<DebugScreen>();
+            _rootServiceProvider.Required().GetRequiredService<IHud>();
+            _rootServiceProvider.Required().GetRequiredService<CampaignScreen>();
+            _rootServiceProvider.Required().GetRequiredService<ClientInitializer>();
         }
     }
 
@@ -268,16 +268,16 @@ public sealed partial class GameplayMain : Node2D, IShardLoader, IGameplayInitPa
         string mapPath = $"res://Scenes/Maps/Test{id.ToString()[^1]}.tscn";
         Vector2 position = new Vector2(0, 0);
 
-        var shard = _shardScene.Required.Instantiate<ShardNode>();
+        var shard = _shardScene.Required().Instantiate<ShardNode>();
         shard.Id = id;
         shard.Name = id.ToString();
         shard.Position = position.ToGd();
-        _shardRoot.Required.AddChild(shard);
+        _shardRoot.Required().AddChild(shard);
 
         var map = ResourceLoader.Load<PackedScene>(mapPath).Instantiate<Node2D>();
         shard.GetNode<Node2D>("Map").AddChild(map);
 
-        var scope = _rootServiceProvider.Required.CreateScope();
+        var scope = _rootServiceProvider.Required().CreateScope();
         _newScopeShard = shard;
         scope.ServiceProvider.GetRequiredService<ShardNode>();
         _newScopeShard = null;

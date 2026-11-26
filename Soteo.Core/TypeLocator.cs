@@ -32,7 +32,7 @@ public class TypeLocator : ITypeLocator
     public IReadOnlyList<T> InstanceSubclassesOf<T>(Func<Type, bool>? where = null)
     {
         return ConcreteSubclassesOf<T>(where)
-            .Select(it => (T)Activator.CreateInstance(it).Required)
+            .Select(it => (T)Activator.CreateInstance(it).Required())
             .ToList().AsReadOnly();
     }
 }

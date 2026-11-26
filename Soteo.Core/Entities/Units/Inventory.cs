@@ -83,7 +83,7 @@ public class Inventory : IReadOnlyList<ItemStack?>
 
         if (canMerge)
         {
-            long movedCount = Math.Min(stack.Count, existingStack.Required.FreeSpace);
+            long movedCount = Math.Min(stack.Count, existingStack.Required().FreeSpace);
             _stacks[slot] = existingStack.WithCount(existingStack.Count + movedCount);
             long remainder = stack.Count - movedCount;
             Changed();

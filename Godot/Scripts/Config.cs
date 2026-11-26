@@ -19,11 +19,11 @@ internal static class Config
     // - command line arguments in the Key=Value format (for distinction against Godot arguments, which use the
     // --key value format) (use the : separator to declare hierarchical values)
 
-    private static readonly string Environment = BuildConfiguration(null)["Environment"].Required;
+    private static readonly string Environment = BuildConfiguration(null)["Environment"].Required();
     private static readonly IConfiguration Configuration = BuildConfiguration(Environment);
 
     // Static fields are only for accessing the configuration in main classes before a service provider is built
-    public static readonly Side Side = Side.Parse(Configuration["Side"].Required);
+    public static readonly Side Side = Side.Parse(Configuration["Side"].Required());
 
     private static IConfiguration BuildConfiguration(string? environment)
     {

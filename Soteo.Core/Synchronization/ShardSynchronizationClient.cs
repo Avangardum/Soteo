@@ -65,15 +65,15 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
     {
         if (State != StateEnum.Synchronized && !TrySynchronize()) return;
 
-        if (_syncData.DeltaRingEarliestValidTick > Maths.CeilToLong(_syncData.Tick.Required))
+        if (_syncData.DeltaRingEarliestValidTick > Maths.CeilToLong(_syncData.Tick.Required()))
         {
             State = StateEnum.Desynchronized;
             return;
         }
 
         _syncData.ApproxServerTick += delta * Const.TicksPerSecond;
-        double prevTick = _syncData.Tick.Required;
-        double prevSecond = _syncData.Second.Required;
+        double prevTick = _syncData.Tick.Required();
+        double prevSecond = _syncData.Second.Required();
         _syncData.Tick += delta * Const.TicksPerSecond;
         if ((long)_syncData.Second > (long)prevSecond)
             _syncData.BufferTicksHistoryRing.RingSet((long)_syncData.Second, double.PositiveInfinity);
@@ -96,14 +96,14 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         if (State != StateEnum.Synchronized) throw new InvalidOperationException();
 
         long firstFullDeltaTick = Maths.NextIntegerToLong(prevTick);
-        long lastFullDeltaTick = Maths.FloorToLong(_syncData.Tick.Required);
+        long lastFullDeltaTick = Maths.FloorToLong(_syncData.Tick.Required());
 
         for (long t = firstFullDeltaTick; t <= lastFullDeltaTick; t++)
-            _entitySnapshotManager.ApplyDelta(_syncData.DeltaRing.RingGet(t).Required, lerpWeight: 1);
+            _entitySnapshotManager.ApplyDelta(_syncData.DeltaRing.RingGet(t).Required(), lerpWeight: 1);
 
         if (_syncData.Tick % 1 > 0)
         {
-            ShardDelta partialDelta = _syncData.DeltaRing.RingGet(lastFullDeltaTick + 1).Required;
+            ShardDelta partialDelta = _syncData.DeltaRing.RingGet(lastFullDeltaTick + 1).Required();
             if ((long)prevTick < (long)_syncData.Tick)
             {
                 double interpolationWeight = _syncData.Tick.Value % 1;
@@ -135,7 +135,7 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         bool canSynchronize = _syncData.ReceivedDeltaCount >= 2;
         if (!canSynchronize) return false;
 
-        _syncData.Tick = _syncData.LastSnapshotPacket.Required.Snapshot.Tick;
+        _syncData.Tick = _syncData.LastSnapshotPacket.Required().Snapshot.Tick;
         State = StateEnum.Synchronized;
         return true;
     }
@@ -144,7 +144,7 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
     {
         if (State != StateEnum.Synchronized) throw new InvalidOperationException();
 
-        double bufferTicks = _syncData.LastDeltaTick.Required - _syncData.Tick.Required;
+        double bufferTicks = _syncData.LastDeltaTick.Required() - _syncData.Tick.Required();
         if (bufferTicks < _syncData.BufferTicksHistoryRing.RingGet((long)_syncData.Second!))
             _syncData.BufferTicksHistoryRing.RingSet((long)_syncData.Second, bufferTicks);
     }
@@ -159,7 +159,7 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         double fastForwardTicks = minBufferTicks - BufferTicksMinSafeValue;
         _syncData.Tick += fastForwardTicks;
         _syncData.BufferTicksHistoryRing
-            .RingSet((long)_syncData.Second!, _syncData.LastDeltaTick.Required - _syncData.Tick.Required);
+            .RingSet((long)_syncData.Second!, _syncData.LastDeltaTick.Required() - _syncData.Tick.Required());
         FastForwardCount++;
     }
 
@@ -177,8 +177,8 @@ public sealed class ShardSynchronizationClient : IShardSynchronizationClient, ID
         if (State == StateEnum.Desynchronized) return;
 
         long expectedTick = _syncData.ReceivedDeltaCount > 0 ?
-            _syncData.LastDeltaTick.Required + 1 :
-            _syncData.LastSnapshotPacket.Required.Snapshot.Tick + 1;
+            _syncData.LastDeltaTick.Required() + 1 :
+            _syncData.LastSnapshotPacket.Required().Snapshot.Tick + 1;
         if (packet.Delta.Tick < expectedTick) return;
         if (packet.Delta.Tick > expectedTick)
             throw new Exception($"Expected delta for tick {expectedTick}, received for {packet.Delta.Tick}");

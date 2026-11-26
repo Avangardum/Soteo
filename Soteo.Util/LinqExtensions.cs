@@ -9,7 +9,7 @@ public static class LinqExtensions
 
     extension<T> (IEnumerable<T?> self) where T : struct
     {
-        public IEnumerable<T> WhereNotNull() => self.Where(it => it != null).Select(it => it.Required);
+        public IEnumerable<T> WhereNotNull() => self.Where(it => it != null).Select(it => it.Required());
     }
 
     extension<T> (IEnumerable<T> self)

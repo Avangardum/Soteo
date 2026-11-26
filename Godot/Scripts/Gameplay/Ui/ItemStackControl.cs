@@ -24,11 +24,11 @@ public sealed partial class ItemStackControl : Control
 
     public override void _Ready()
     {
-        _originalParent = GetParent().Required;
-        _dragAndDropLayer = GetNode("/root/GameplayMain/Ui/DragAndDropLayer").Required;
-        TextureRect = GetNode<TextureRect>("TextureRect").Required;
-        CountBackground = GetNode<Control>("TextureRect/CountBackground").Required;
-        CountLabel = GetNode<Label>("TextureRect/CountBackground/CountLabel").Required;
+        _originalParent = GetParent().Required();
+        _dragAndDropLayer = GetNode("/root/GameplayMain/Ui/DragAndDropLayer").Required();
+        TextureRect = GetNode<TextureRect>("TextureRect").Required();
+        CountBackground = GetNode<Control>("TextureRect/CountBackground").Required();
+        CountLabel = GetNode<Label>("TextureRect/CountBackground/CountLabel").Required();
 
         MouseEntered += () => _isMouseHovering = true;
         MouseExited += () => _isMouseHovering = false;

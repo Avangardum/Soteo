@@ -1,18 +1,20 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 
 namespace Soteo.Util;
 
 public static class ObjectExtensions
 {
-    // NotNull here means that if Required returns, self is guaranteed to be not null
     extension<T> ([NotNull] T? self) where T : class
     {
-        public T Required => self ?? throw new NullReferenceException();
+        public T Required([CallerArgumentExpression(nameof(self))] string expr = "") =>
+            self ?? throw new Exception($"{expr} is null");
     }
 
     extension<T> ([NotNull] T? self) where T : struct
     {
-        public T Required => self ?? throw new NullReferenceException();
+        public T Required([CallerArgumentExpression(nameof(self))] string expr = "") =>
+            self ?? throw new Exception($"{expr} is null");
     }
 
     extension<T> (T self)

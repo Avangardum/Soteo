@@ -22,7 +22,7 @@ public sealed class CampaignSnapshotManagerTests
         _timeProvider = new FakeTimeProvider();
         _userRepo = new UserRepository(ShardServerAllowlist.Disabled(), _timeProvider);
         _trackerRepo = new PlayerCharacterTrackerRepository();
-        _packetSender = new FakePacketSender(() => _sut.Required);
+        _packetSender = new FakePacketSender(() => _sut.Required());
         _consistencyValidator = new FakeConsistencyValidator();
         _sut =
             new CampaignSnapshotManager(_packetSender, _userRepo, _trackerRepo, _timeProvider, _consistencyValidator);

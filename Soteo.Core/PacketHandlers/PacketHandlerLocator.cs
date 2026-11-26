@@ -22,7 +22,7 @@ public static class PacketHandlerLocator<TAttribute> where TAttribute : Attribut
             .ConcreteSubclassesOf<IPacketHandler>(where: it => it.HasAttribute<TAttribute>())
             .ToDictionary<Type, Type>
             (
-                it => it.SingleTypeArgOfGenericDefinitionOrNull(typeof(PacketHandler<>)).Required
+                it => it.SingleTypeArgOfGenericDefinitionOrNull(typeof(PacketHandler<>)).Required()
             ).AsReadOnly();
     }
 }

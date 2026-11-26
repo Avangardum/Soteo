@@ -92,7 +92,7 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
         {
             case WebSocketPeer.State.Open when _status is Status.Connecting:
                 _status = Status.Handshake;
-                SendPacket(new CampaignServerHandshakePacket { Token = _token.Required, Version = Const.Version });
+                SendPacket(new CampaignServerHandshakePacket { Token = _token.Required(), Version = Const.Version });
                 _token = null;
                 break;
             case WebSocketPeer.State.Open when _status is Status.Handshake or Status.Connected:
@@ -144,9 +144,9 @@ public sealed partial class WebSocketFromGameplayToCampaignServerCommunicator :
 
         _status = Status.Connecting;
         string[] headers = ["Content-Type: application/x-www-form-urlencoded"];
-        Guid id = _currentUserIdRepository.Id.Required;
+        Guid id = _currentUserIdRepository.Id.Required();
         string body = $"id={Uri.EscapeDataString(id.ToString())}&role=shard" +
-            $"&serverSecret={Uri.EscapeDataString(_serverOptions.Value.Required.ServerSecret)}";
+            $"&serverSecret={Uri.EscapeDataString(_serverOptions.Value.Required().ServerSecret)}";
         string url = $"{_toAuthServerConnectionOptions.AuthServerUrl}/token/server";
         _httpRequest.Request
         (

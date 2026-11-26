@@ -26,7 +26,7 @@ public sealed class CampaignSnapshotCrossServerConsistencyValidator : ICampaignS
             snapshot.CampaignServer.PlayerCharacterTrackers.Values.Where(it => it.ShardId != null);
         foreach (PlayerCharacterTrackerSnapshot character in deployedPlayerCharacters)
         {
-            ShardSnapshot shard = snapshot.Shards[character.ShardId.Required];
+            ShardSnapshot shard = snapshot.Shards[character.ShardId.Required()];
             if (!shard.Entities.ContainsKey(character.Id)) return false;
         }
 

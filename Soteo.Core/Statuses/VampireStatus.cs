@@ -15,7 +15,7 @@ public sealed class VampireStatus : AbilityPassiveStatus
         {
             const double healthDrainPerSecond = 5;
             double healthDrain = Maths.Min(unstableHealth, healthDrainPerSecond * delta);
-            context.Unit.SpendHealth(healthDrain, context.SourceAbilityContext.Required.Ability);
+            context.Unit.SpendHealth(healthDrain, context.SourceAbilityContext.Required().Ability);
         }
     }
 

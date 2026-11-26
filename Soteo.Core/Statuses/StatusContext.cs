@@ -22,7 +22,7 @@ public sealed record StatusContext : ISourceUnitAndAbility
     AbilityContext? ISourceUnitAndAbility.AbilityContext => SourceAbilityContext;
 
     [MemberNotNull(nameof(SourceAbilityContext))]
-    public T SourceAbilityAs<T>() where T : Ability => (T)SourceAbilityContext.Required.Ability;
+    public T SourceAbilityAs<T>() where T : Ability => (T)SourceAbilityContext.Required().Ability;
 
     public StatusContextSnapshot ToSnapshot()
     {
@@ -48,8 +48,8 @@ public sealed record StatusContext : ISourceUnitAndAbility
             Status = snapshot.Status,
             SourceAbilityContext =
                 snapshot.AbilityContext?.PassTo(it => AbilityContext.FromSnapshot(it, services)),
-            Unit = services.EntityManager.GetEntity<Unit>(snapshot.UnitId).Required,
-            SourceUnit = snapshot.SourceId?.PassTo(it => services.EntityManager.GetEntity<Unit>(it).Required),
+            Unit = services.EntityManager.GetEntity<Unit>(snapshot.UnitId).Required(),
+            SourceUnit = snapshot.SourceId?.PassTo(it => services.EntityManager.GetEntity<Unit>(it).Required()),
             ElapsedTime = snapshot.ElapsedTime,
             DisplayElapsedTime = snapshot.DisplayElapsedTime,
             RemainingTime = snapshot.RemainingTime,

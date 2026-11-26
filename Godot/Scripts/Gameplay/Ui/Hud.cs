@@ -401,7 +401,7 @@ public sealed class Hud : IHud
     public bool TrySelectCurrentUnit()
     {
         if (_currentCharIdRepo.Id == null) return false;
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required, out UnitPuppet? unit, out _))
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required(), out UnitPuppet? unit, out _))
             return false;
 
         SelectedUnit = unit;
@@ -526,7 +526,7 @@ public sealed class Hud : IHud
             {
                 control.ItemStack.Visible = true;
                 control.ItemStack.Modulate = BlockedSlotItemStackColor;
-                control.ItemStack.TextureRect.Texture = unit.EquipmentInventory[blockingSlot].Required.Item.Icon;
+                control.ItemStack.TextureRect.Texture = unit.EquipmentInventory[blockingSlot].Required().Item.Icon;
                 control.ItemStack.CountBackground.Visible = false;
                 control.ItemStack.IsInteractive = false;
                 continue;

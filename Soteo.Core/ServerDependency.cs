@@ -12,7 +12,7 @@ public static class ServerDependency
 public abstract class ServerDependency<T> where T : class
 {
     public abstract T? Value { get; }
-    public T Required => Value.Required;
+    public T Required => Value.Required();
 
     public sealed class Null : ServerDependency<T>
     {

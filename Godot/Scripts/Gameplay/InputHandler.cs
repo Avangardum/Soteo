@@ -66,7 +66,7 @@ public sealed partial class InputHandler : Node2D
     {
         if (_currentCharIdRepo.Id == null) return;
         _hud.TrySelectCurrentUnit();
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required, out UnitPuppet? user, out Guid? shardId))
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required(), out UnitPuppet? user, out Guid? shardId))
             return;
 
         UnitPuppet? targetUnit = GetUnitsUnderMouse().FirstOrDefault
@@ -85,7 +85,7 @@ public sealed partial class InputHandler : Node2D
             };
             _packetSender.Send
             (
-                new UseAbilityPacket { UnitId = _currentCharIdRepo.Id.Required, Command = command },
+                new UseAbilityPacket { UnitId = _currentCharIdRepo.Id.Required(), Command = command },
                 shardId.Value
             );
         }
@@ -95,7 +95,7 @@ public sealed partial class InputHandler : Node2D
             (
                 new MovePacket
                 {
-                    UnitId = _currentCharIdRepo.Id.Required,
+                    UnitId = _currentCharIdRepo.Id.Required(),
                     Command = new MoveCommand(GetGlobalMousePosition().ToSys() / Const.PixelsInMeter)
                 },
                 shardId.Value
@@ -107,11 +107,11 @@ public sealed partial class InputHandler : Node2D
     {
         if (_currentCharIdRepo.Id == null) return;
         _hud.TrySelectCurrentUnit();
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required, out UnitPuppet? user, out Guid? shardId))
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required(), out UnitPuppet? user, out Guid? shardId))
             return;
         _packetSender.Send
         (
-            new StopPacket { UnitId = _currentCharIdRepo.Id.Required, Command = new StopCommand() },
+            new StopPacket { UnitId = _currentCharIdRepo.Id.Required(), Command = new StopCommand() },
             shardId.Value
         );
     }
@@ -120,7 +120,7 @@ public sealed partial class InputHandler : Node2D
     {
         if (_currentCharIdRepo.Id == null) return;
         _hud.TrySelectCurrentUnit();
-        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required, out UnitPuppet? user, out Guid? shardId))
+        if (!_entityLocator.TryFindEntity(_currentCharIdRepo.Id.Required(), out UnitPuppet? user, out Guid? shardId))
             return;
         if (!user.AbilitySlotStates.TryGetValue(slot, out AbilitySlotState? state)) return;
 
@@ -138,7 +138,7 @@ public sealed partial class InputHandler : Node2D
         (
             new UseAbilityPacket
             {
-                UnitId = _currentCharIdRepo.Id.Required,
+                UnitId = _currentCharIdRepo.Id.Required(),
                 Command = new UseAbilityCommand
                 {
                     Slot = slot,

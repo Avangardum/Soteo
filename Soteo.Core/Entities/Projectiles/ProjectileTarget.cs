@@ -19,7 +19,7 @@ public union ProjectileTarget(Unit, Vector2)
     public static ProjectileTarget FromSnapshot(ProjectileTargetSnapshot snapshot, IEntityManager entityManager)
     {
         return snapshot.IsUnit ?
-            entityManager.GetEntity<Unit>(snapshot.UnitId.Value).Required :
-            snapshot.Position.Required;
+            entityManager.GetEntity<Unit>(snapshot.UnitId.Value).Required() :
+            snapshot.Position.Required();
     }
 }

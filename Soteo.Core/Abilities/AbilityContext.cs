@@ -43,13 +43,13 @@ public sealed record AbilityContext : ISourceUnitAndAbility
         return new AbilityContext
         {
             Ability = snapshot.Ability,
-            User = services.EntityManager.GetEntity<Unit>(snapshot.UserId).Required,
+            User = services.EntityManager.GetEntity<Unit>(snapshot.UserId).Required(),
             Alt = snapshot.Alt,
             UserStats = snapshot.UserStats,
             Services = services,
             TargetPosition = snapshot.TargetPosition,
             TargetUnit = snapshot.TargetUnitId == null ? null :
-                services.EntityManager.GetEntity<Unit>(snapshot.TargetUnitId.Value).Required,
+                services.EntityManager.GetEntity<Unit>(snapshot.TargetUnitId.Value).Required(),
             TargetDirection = snapshot.TargetDirection,
             TargetShardId = snapshot.TargetShardId
         };
