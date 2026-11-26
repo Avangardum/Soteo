@@ -106,7 +106,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         foreach (EntitySnapshot entitySnapshot in snapshots.Values)
         {
             ids.Add(entitySnapshot.Id);
-            if (this.GetEntity(entitySnapshot.Id) == null)
+            if (!_entities.ContainsKey(entitySnapshot.Id))
                 SpawnEntityFromSnapshot(entitySnapshot);
         }
         foreach (Guid id in _entities.Keys.Except(ids).ToArray())
@@ -117,8 +117,18 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         {
             // Entity snapshots are replicated only after all entities are spawned so that references between entities
             // can be replicated correctly.
-            _entities[entitySnapshot.Id].ReplicateSnapshot(entitySnapshot);
+            _entities[entitySnapshot.Id].ReplicateSnapshot(entitySnapshot, ReplicateEntityReference);
         }
+    }
+
+    private Entity ReplicateEntityReference(Guid id)
+    {
+        Entity? entity;
+        if (_entities.TryGetValue(id, out entity))
+            return entity;
+        if (_removedEntities.TryGetValue(id, out WeakReference<Entity>? weakRef) && weakRef.TryGetTarget(out entity))
+            return entity;
+        throw new InvalidOperationException($"Entity with id {id} was not found.");
     }
 
     public void ApplyDelta(ShardDelta delta, double lerpWeight)

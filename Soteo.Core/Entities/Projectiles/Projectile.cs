@@ -68,13 +68,13 @@ public sealed class Projectile : Entity
         };
     }
 
-    public override void ReplicateSnapshot(EntitySnapshot snapshot)
+    public override void ReplicateSnapshot(EntitySnapshot snapshot, Func<Guid, Entity> replicateEntityReference)
     {
-        base.ReplicateSnapshot(snapshot);
+        base.ReplicateSnapshot(snapshot, replicateEntityReference);
         var s = (ProjectileSnapshot)snapshot;
-        _abilityContext = AbilityContext.FromSnapshot(s.AbilityContext, _services);
+        _abilityContext = AbilityContext.FromSnapshot(s.AbilityContext, _services, replicateEntityReference);
         _speed = s.Speed;
-        _target = ProjectileTarget.FromSnapshot(s.Target, _services.EntityManager);
+        _target = ProjectileTarget.FromSnapshot(s.Target, replicateEntityReference);
         _isSnapshotReplicationPendingToFinishInit = false;
     }
 

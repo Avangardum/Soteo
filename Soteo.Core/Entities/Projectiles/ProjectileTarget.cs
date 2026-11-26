@@ -16,10 +16,14 @@ public union ProjectileTarget(Unit, Vector2)
         };
     }
 
-    public static ProjectileTarget FromSnapshot(ProjectileTargetSnapshot snapshot, IEntityManager entityManager)
+    public static ProjectileTarget FromSnapshot
+    (
+        ProjectileTargetSnapshot snapshot,
+        Func<Guid, Entity> replicateEntityReference
+    )
     {
         return snapshot.IsUnit ?
-            entityManager.GetEntity<Unit>(snapshot.UnitId.Value).Required() :
+            (Unit)replicateEntityReference(snapshot.UnitId.Required()) :
             snapshot.Position.Required();
     }
 }

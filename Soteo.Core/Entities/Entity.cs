@@ -21,7 +21,7 @@ public abstract class Entity
 
     public abstract EntitySnapshot ToSnapshot();
 
-    public virtual void ReplicateSnapshot(EntitySnapshot snapshot)
+    public virtual void ReplicateSnapshot(EntitySnapshot snapshot, Func<Guid, Entity> replicateEntityReference)
     {
         Position = snapshot.Position;
         Azimuth = snapshot.Azimuth;

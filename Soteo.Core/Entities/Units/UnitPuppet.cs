@@ -87,9 +87,9 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
 
     public override EntitySnapshot ToSnapshot() => throw new NotSupportedException();
 
-    public override void ReplicateSnapshot(EntitySnapshot snapshot)
+    public override void ReplicateSnapshot(EntitySnapshot snapshot, Func<Guid, Entity> replicateEntityReference)
     {
-        base.ReplicateSnapshot(snapshot);
+        base.ReplicateSnapshot(snapshot, replicateEntityReference);
         var s = (UnitPuppetSnapshot)snapshot;
         IsDead = s.IsDead;
         IsMoving = s.IsMoving;
@@ -101,11 +101,8 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
 
         _alwaysSynchronizedInventory.ReplicateSnapshot(s.InventorySnapshot);
         _alwaysSynchronizedEquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
-        if (_inventoryDesyncTimeRemaining == 0)
-        {
-            Inventory.ReplicateSnapshot(s.InventorySnapshot);
-            EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
-        }
+        Inventory.ReplicateSnapshot(s.InventorySnapshot);
+        EquipmentInventory.ReplicateSnapshot(s.EquipmentInventory);
 
         UpdateAnimation();
     }

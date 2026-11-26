@@ -38,18 +38,22 @@ public sealed record AbilityContext : ISourceUnitAndAbility
         };
     }
 
-    public static AbilityContext FromSnapshot(AbilityContextSnapshot snapshot, Services services)
+    public static AbilityContext FromSnapshot
+    (
+        AbilityContextSnapshot snapshot,
+        Services services,
+        Func<Guid, Entity> replicateEntityReference
+    )
     {
         return new AbilityContext
         {
             Ability = snapshot.Ability,
-            User = services.EntityManager.GetEntity<Unit>(snapshot.UserId).Required(),
+            User = (Unit)replicateEntityReference(snapshot.UserId),
             Alt = snapshot.Alt,
             UserStats = snapshot.UserStats,
             Services = services,
             TargetPosition = snapshot.TargetPosition,
-            TargetUnit = snapshot.TargetUnitId == null ? null :
-                services.EntityManager.GetEntity<Unit>(snapshot.TargetUnitId.Value).Required(),
+            TargetUnit = (Unit?)snapshot.TargetUnitId?.PassTo(replicateEntityReference),
             TargetDirection = snapshot.TargetDirection,
             TargetShardId = snapshot.TargetShardId
         };

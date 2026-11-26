@@ -113,20 +113,24 @@ public abstract class Unit : UnitBase<IUnitNode>
         };
     }
 
-    public override void ReplicateSnapshot(EntitySnapshot snapshot)
+    public override void ReplicateSnapshot(EntitySnapshot snapshot, Func<Guid, Entity> replicateEntityReference)
     {
-        base.ReplicateSnapshot(snapshot);
+        base.ReplicateSnapshot(snapshot, replicateEntityReference);
         var s = (UnitSnapshot)snapshot;
         if (s.Type != GetType())
-            throw new ArgumentException($"{GetType()} can't replicate a {s.Type} snapshot");
+            throw new ArgumentException($"{GetType()} can't replicate a {s.Type} snapshot.");
         IsDead = s.IsDead;
         IsMoving = s.IsMoving;
         _stats = s.Stats.ToDictionary();
         _abilitySlotStates = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
         _statusContexts = s.StatusesContexts
-             .OrderBy(it => it.Value.Ordinal)
-             .ToOrderedDictionary(it => it.Key, it => StatusContext.FromSnapshot(it.Value, _services));
+            .OrderBy(it => it.Value.Ordinal)
+            .ToOrderedDictionary
+            (
+                it => it.Key,
+                it => StatusContext.FromSnapshot(it.Value, _services, replicateEntityReference)
+            );
         _nextStatusOrdinal = _statusContexts.Count > 0 ? _statusContexts.Values.Max(it => it.Ordinal) + 1 : 0;
         _controllingPlayerId = s.ControllingPlayerId;
         Inventory.ReplicateSnapshot(s.InventorySnapshot);

@@ -40,16 +40,21 @@ public sealed record StatusContext : ISourceUnitAndAbility
         };
     }
 
-    public static StatusContext FromSnapshot(StatusContextSnapshot snapshot, Services services)
+    public static StatusContext FromSnapshot
+    (
+        StatusContextSnapshot snapshot,
+        Services services,
+        Func<Guid, Entity> replicateEntityReference
+    )
     {
         return new StatusContext
         {
             Id = snapshot.Id,
             Status = snapshot.Status,
-            SourceAbilityContext =
-                snapshot.AbilityContext?.PassTo(it => AbilityContext.FromSnapshot(it, services)),
-            Unit = services.EntityManager.GetEntity<Unit>(snapshot.UnitId).Required(),
-            SourceUnit = snapshot.SourceId?.PassTo(it => services.EntityManager.GetEntity<Unit>(it).Required()),
+            SourceAbilityContext = snapshot.AbilityContext
+                ?.PassTo(it => AbilityContext.FromSnapshot(it, services, replicateEntityReference)),
+            Unit = (Unit)replicateEntityReference(snapshot.UnitId),
+            SourceUnit = (Unit?)snapshot.SourceId?.PassTo(replicateEntityReference),
             ElapsedTime = snapshot.ElapsedTime,
             DisplayElapsedTime = snapshot.DisplayElapsedTime,
             RemainingTime = snapshot.RemainingTime,

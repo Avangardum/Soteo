@@ -10,4 +10,7 @@ public interface IEntityManager
     PlayerCharacter SpawnPlayerCharacter(Guid id, Guid controllingPlayerId);
     Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target);
     Dude SpawnDude(Vector2 position);
+
+    Entity? GetEntity(Guid id) => Entities.GetValueOrDefault(id);
+    T? GetEntity<T>(Guid id) where T : Entity => (T?)GetEntity(id);
 }
