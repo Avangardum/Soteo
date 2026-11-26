@@ -13,6 +13,9 @@ public sealed class DebugScreen
     private readonly double[] _fpsRing = new double[RingLength];
     private readonly double[] _entityCountRing = new double[RingLength];
     private readonly double[] _serverLoadRing = new double[RingLength];
+    private readonly double[] _clientGen0CollectionsRing = new double[RingLength];
+    private readonly double[] _clientGen1CollectionsRing = new double[RingLength];
+    private readonly double[] _clientGen2CollectionsRing = new double[RingLength];
     private readonly double[] _unrolledRing = new double[RingLength];
     private int _ringNextIndex;
     private int _pendingProcessCount;
@@ -26,6 +29,9 @@ public sealed class DebugScreen
     private readonly Graph _fpsGraph;
     private readonly Graph _serverLoadGraph;
     private readonly Graph _entityCountGraph;
+    private readonly Graph _clientGen0CollectionsGraph;
+    private readonly Graph _clientGen1CollectionsGraph;
+    private readonly Graph _clientGen2CollectionsGraph;
 
     public DebugScreen
     (
@@ -47,6 +53,9 @@ public sealed class DebugScreen
         _fpsGraph = node.GetNode<Graph>("FpsGraph");
         _serverLoadGraph = node.GetNode<Graph>("ServerLoadGraph");
         _entityCountGraph = node.GetNode<Graph>("EntityCountGraph");
+        _clientGen0CollectionsGraph = node.GetNode<Graph>("ClientGen0CollectionsGraph");
+        _clientGen1CollectionsGraph = node.GetNode<Graph>("ClientGen1CollectionsGraph");
+        _clientGen2CollectionsGraph = node.GetNode<Graph>("ClientGen2CollectionsGraph");
     }
 
     public void PhysicsProcess(double delta)
@@ -68,6 +77,7 @@ public sealed class DebugScreen
             ProcessFpsGraph(delta);
             ProcessEntityCountGraph(entityManager);
             ProcessServerLoadGraph(synchronizationClient);
+            ProcessGcCollectionsGraphs();
 
             UpdateText(delta, synchronizationClient, entityManager);
         }
@@ -92,6 +102,21 @@ public sealed class DebugScreen
         _serverLoadRing[_ringNextIndex] = syncClient?.ServerLoad ?? 0;
         _serverLoadRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
         _serverLoadGraph.SetData(_unrolledRing, "N2", min: 0, max: 1);
+    }
+
+    private void ProcessGcCollectionsGraphs()
+    {
+        _clientGen0CollectionsRing[_ringNextIndex] = GC.CollectionCount(0);
+        _clientGen0CollectionsRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
+        _clientGen0CollectionsGraph.SetData(_unrolledRing, "N0");
+
+        _clientGen1CollectionsRing[_ringNextIndex] = GC.CollectionCount(1);
+        _clientGen1CollectionsRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
+        _clientGen1CollectionsGraph.SetData(_unrolledRing, "N0");
+
+        _clientGen2CollectionsRing[_ringNextIndex] = GC.CollectionCount(2);
+        _clientGen2CollectionsRing.UnrollRingTo(_unrolledRing, _ringNextIndex + 1);
+        _clientGen2CollectionsGraph.SetData(_unrolledRing, "N0");
     }
 
     private void UpdateText(double delta, IShardSynchronizationClient? synchronizationClient, IEntityManager? entityManager)
