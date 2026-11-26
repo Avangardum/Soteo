@@ -4,6 +4,8 @@ using Soteo.Core.Snapshots;
 
 namespace Soteo.Core.Entities.Units;
 
+// TODO this class and its tests are getting hard to navigate, consider reorganizing
+
 public abstract class Unit : UnitBase<IUnitNode>
 {
     private readonly Services _services;
@@ -615,12 +617,18 @@ public abstract class Unit : UnitBase<IUnitNode>
     internal void SetCommand(Command command)
     {
         if (_isExecutingCommands)
-            throw new InvalidOperationException("SetCommand should not be called while executing commands");
+            throw new InvalidOperationException("SetCommand should not be called while executing commands.");
 
         Command? prevCommand = _commands.PeekOrDefault();
         _commands.Clear();
 
-        if (command is UseAbilityCommand a && prevCommand is UseAbilityCommand b && a.Slot == b.Slot)
+        if
+        (
+            AbilityUseProgress != null &&
+            command is UseAbilityCommand a &&
+            prevCommand is UseAbilityCommand b &&
+            a.Slot == b.Slot
+        )
         {
             _commands.Enqueue(prevCommand);
             return;

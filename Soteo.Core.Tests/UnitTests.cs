@@ -790,13 +790,53 @@ public sealed class UnitTests
         _sut.GetStat(Stat.AttackSpeed).Should().Be(Stat.AttackSpeed.Max);
     }
 
+    [Fact]
+    public void SettingUseAbilityCommandWhileSameAbilityIsQueuedForDifferentTargetChangesTarget()
+    {
+        AbilityContext? usedContext = null;
+        Ability.Instance<SpyAbilityWithUseTime>().Used2 += context => usedContext = context;
+        _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitX });
+
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitY });
+
+        Ticker.Tick(_sut.Tick).WithDefaultInterval()
+            .ForAtLeast(Ability.Instance<SpyAbilityWithUseTime>().StaticUseTime);
+        usedContext.Required().TargetPosition.Should().Be(Vector2.UnitY);
+    }
+
+    [Fact]
+    public void SettingUseAbilityCommandWhileSameAbilityIsBeingUsedForDifferentTargetDoesNotChangeTargetOrInterruptUsage()
+    {
+        AbilityContext? usedContext = null;
+        Ability.Instance<SpyAbilityWithUseTime>().Used2 += context => usedContext = context;
+        _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitX });
+        _sut.Tick(Const.TickInterval);
+        _sut.AbilityUseProgress.Required().Slot.Should().Be(AbilitySlot.Hotbar(0));
+        _sut.AbilityUseProgress.ElapsedTime.Should().BePositive();
+
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitY });
+
+        _sut.AbilityUseProgress.Required().Slot.Should().Be(AbilitySlot.Hotbar(0));
+        _sut.AbilityUseProgress.ElapsedTime.Should().BePositive();
+        Ticker.Tick(_sut.Tick).WithDefaultInterval()
+            .ForAtLeast(Ability.Instance<SpyAbilityWithUseTime>().StaticUseTime);
+        usedContext.Required().TargetPosition.Should().Be(Vector2.UnitX);
+    }
+
+    // todo SettingRepeatedUseAbilityCommandWhileSameAbilityIsBeingUsedForDifferentTargetFinishesUsageForCurrentTargetThenUsesItOnNewTarget
+
     private class SpyAbility : Ability
     {
         public event Action Used = delegate { };
+        public event Action<AbilityContext> Used2 = delegate { }; // todo merge
         public event Action ValidatedInitially = delegate { };
         public event Action ValidatedContinuously = delegate { };
 
         public override Targeting Targeting => Targeting.Anything;
+        public override double StaticRange => double.PositiveInfinity;
+        public override double StaticAngularRange => 180;
 
         protected override AbilityValidationResult ValidateCore(AbilityContext context, AbilityValidationMode mode)
         {
@@ -817,6 +857,7 @@ public sealed class UnitTests
         protected override void TakeEffectCore(AbilityContext context)
         {
             Used();
+            Used2(context);
         }
     }
 
