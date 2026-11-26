@@ -197,7 +197,7 @@ When receiving a value from an API that doesn't use nullable reference types (su
 null explicitly or add `.Reqired`.
 
 When receving an error code from an API that returns them (such as Godot's `Error`), either check it explicitly
-or add `.ShouldBeOk()`.
+or use an extension method that throws an exception on an error (`.ShouldBeOk()` for Godot's `Error`).
 
 Do not use `Debug.Assert` or `Trace.Assert`. Instead throw exceptions manually or use AwesomeAssertions.
 
