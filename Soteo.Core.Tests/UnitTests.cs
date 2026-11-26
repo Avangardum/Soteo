@@ -653,7 +653,7 @@ public sealed class UnitTests
     ];
 
     [Fact]
-    public void AddingFirstInnateHotbarAbilityThatIsSameAsExistingItemHotbarAbilityMovesThatAbilityStateToFirstSlot()
+    public void AddingInnateHotbarAbilityThatIsSameAsExistingItemHotbarAbilityMovesThatAbilityStateToFirstSlot()
     {
         _sut.EquipmentInventory.Put<SwordWith1SAnd10SCdHotbarAbilities>(EquipmentSlot.MainHand, 1);
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(1) } );
@@ -671,7 +671,7 @@ public sealed class UnitTests
     }
 
     [Fact]
-    public void RemovingFirstInnateHotbarAbilityThatIsSameAsExistingItemHotbarAbilityMovesThatAbilityStateAfterInnates()
+    public void RemovingInnateHotbarAbilityThatIsSameAsExistingItemHotbarAbilityMovesThatAbilityStateAfterInnates()
     {
         _sut.AddInnateHotbarAbility<AbilityWith10SCooldown>();
         _sut.AddInnateHotbarAbility<SpyAbility>();
