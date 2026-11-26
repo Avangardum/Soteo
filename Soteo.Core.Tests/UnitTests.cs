@@ -50,7 +50,7 @@ public sealed class UnitTests
     {
         _sut.AddInnateHotbarAbility<SpyAbility>();
         int useCount = 0;
-        Ability.Instance<SpyAbility>().Used += () => useCount++;
+        Ability.Instance<SpyAbility>().Used += _ => useCount++;
 
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetUnitId = Guid.NewGuid() });
         _sut.Tick(Const.TickInterval);
@@ -63,7 +63,7 @@ public sealed class UnitTests
     {
         _sut.AddInnateHotbarAbility<SpyAbility>();
         int useCount = 0;
-        Ability.Instance<SpyAbility>().Used += () => useCount++;
+        Ability.Instance<SpyAbility>().Used += _ => useCount++;
         var projectileId = Guid.NewGuid();
         var projectileAbilityContext = new AbilityContext
         {
@@ -794,7 +794,7 @@ public sealed class UnitTests
     public void SettingUseAbilityCommandWhileSameAbilityIsQueuedForDifferentTargetChangesTarget()
     {
         AbilityContext? usedContext = null;
-        Ability.Instance<SpyAbilityWithUseTime>().Used2 += context => usedContext = context;
+        Ability.Instance<SpyAbilityWithUseTime>().Used += context => usedContext = context;
         _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitX });
 
@@ -809,7 +809,7 @@ public sealed class UnitTests
     public void SettingUseAbilityCommandWhileSameAbilityIsBeingUsedForDifferentTargetDoesNotChangeTargetOrInterruptUsage()
     {
         AbilityContext? usedContext = null;
-        Ability.Instance<SpyAbilityWithUseTime>().Used2 += context => usedContext = context;
+        Ability.Instance<SpyAbilityWithUseTime>().Used += context => usedContext = context;
         _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
         _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitX });
         _sut.Tick(Const.TickInterval);
@@ -829,8 +829,7 @@ public sealed class UnitTests
 
     private class SpyAbility : Ability
     {
-        public event Action Used = delegate { };
-        public event Action<AbilityContext> Used2 = delegate { }; // todo merge
+        public event Action<AbilityContext> Used = delegate { };
         public event Action ValidatedInitially = delegate { };
         public event Action ValidatedContinuously = delegate { };
 
@@ -856,8 +855,7 @@ public sealed class UnitTests
 
         protected override void TakeEffectCore(AbilityContext context)
         {
-            Used();
-            Used2(context);
+            Used(context);
         }
     }
 
