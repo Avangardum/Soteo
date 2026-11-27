@@ -1,8 +1,11 @@
+using Soteo.Core.Snapshots;
+
 namespace Soteo.Core.Entities.Units;
 
 public sealed record AbilityUseProgress
 {
     public required AbilitySlot Slot { get; init; }
+    public required AbilityContext Context { get; init; }
     public double ElapsedTime { get; init; }
     public required double RemainingTime { get; init; }
 
@@ -18,12 +21,30 @@ public sealed record AbilityUseProgress
         };
     }
 
-    public static AbilityUseProgress Interpolate(AbilityUseProgress from, AbilityUseProgress to, double weight)
+    public AbilityUseProgressSnapshot ToSnapshot()
     {
-        return to with
+        return new()
         {
-            ElapsedTime = Maths.LerpIncrease(from.ElapsedTime, to.ElapsedTime, weight),
-            RemainingTime = Maths.LerpDecrease(from.RemainingTime, to.RemainingTime, weight)
+            Slot = Slot,
+            Context = Context.ToSnapshot(),
+            ElapsedTime = ElapsedTime,
+            RemainingTime = RemainingTime
+        };
+    }
+
+    public static AbilityUseProgress FromSnapshot
+    (
+        AbilityUseProgressSnapshot snapshot,
+        Services services,
+        Func<Guid, Entity> replicateEntityReference
+    )
+    {
+        return new()
+        {
+            Slot = snapshot.Slot,
+            Context = AbilityContext.FromSnapshot(snapshot.Context, services, replicateEntityReference),
+            ElapsedTime = snapshot.ElapsedTime,
+            RemainingTime = snapshot.RemainingTime
         };
     }
 }

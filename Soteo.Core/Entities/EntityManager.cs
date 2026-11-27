@@ -111,7 +111,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
                 // Since all entity references are updated during replication, there is no need to respawn removed
                 // entities, as references to removed entities will be updated to point at newly created instances.
                 _removedEntities.Remove(entitySnapshot.Id);
-                Add(SpawnEntityFromSnapshot(entitySnapshot));
+                SpawnEntityFromSnapshot(entitySnapshot);
             }
         }
 

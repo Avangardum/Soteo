@@ -24,6 +24,7 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     public Inventory Inventory { get; }
     public EquipmentInventory EquipmentInventory { get; }
+    public AbilityUseProgress? AbilityUseProgress { get; private set; }
 
     protected Unit
     (
@@ -105,7 +106,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             IsMoving = IsMoving,
             Stats = GetStats(),
             AbilitySlotStates = _abilitySlotStates.ToDictionary().AsReadOnly(),
-            AbilityUseProgress = AbilityUseProgress,
+            AbilityUseProgress = AbilityUseProgress?.ToSnapshot(),
             StatusesContexts = _statusContexts.ToDictionary(it => it.Key, it => it.Value.ToSnapshot()).AsReadOnly(),
             ControllingPlayerId = _controllingPlayerId,
             InventorySnapshot = Inventory.ToSnapshot(),
@@ -125,7 +126,8 @@ public abstract class Unit : UnitBase<IUnitNode>
         IsMoving = s.IsMoving;
         _stats = s.Stats.ToDictionary();
         _abilitySlotStates = s.AbilitySlotStates.ToDictionary();
-        AbilityUseProgress = s.AbilityUseProgress;
+        AbilityUseProgress = s.AbilityUseProgress
+            ?.PassTo(it => AbilityUseProgress.FromSnapshot(it, _services, replicateEntityReference));
         _statusContexts = s.StatusesContexts
             .OrderBy(it => it.Value.Ordinal)
             .ToOrderedDictionary
@@ -466,6 +468,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             AbilityUseProgress = new AbilityUseProgress
             {
                 Slot = command.Slot,
+                Context = context,
                 RemainingTime = context.Ability.UseTime(context)
             };
         }

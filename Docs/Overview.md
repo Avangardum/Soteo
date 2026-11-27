@@ -122,6 +122,18 @@ tick with a fixed interval.
 Items represent different kinds of items. `ItemStack` represents a concrete stack of some item in some quantity.
 `Item` is the base class for items, each specific item is defined in a stateless singleton derived class.
 
+# Snapshots
+
+Snapshots are data structures storing a state of something at a certain moment of time.
+Snapshots are transitively immutable, which means that non only snapshots themselves are immutable,
+but they also can only reference other immutable objects.
+Snapshots are used for a variety of purposes.
+Synchronization snapshots (and their deltas) are used to send relevant shard state to clients.
+Persistence snapshots are used to write the entire campaign state to a file, which can then be loaded to continue the
+campaign from that state.
+Archive snapshots can be used by abilities and statuses to implement effects based on some state in the past,
+also, unit AI uses latest archive snapshots to make decisions.
+
 # Networking
 
 Services suffixed `Communicator` manage communications between servers and clients by sending and receiving packets.

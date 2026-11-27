@@ -11,7 +11,7 @@ public sealed record AbilityContext : ISourceUnitAndAbility
     /// <summary>
     /// Snapshot of user stats at the moment the ability took effect. Use this instead of User.Stats.
     /// </summary>
-    public required IReadOnlyDictionary<Stat, double> UserStats { get; init; }
+    public required IReadOnlyDictionary<Stat, double> UserStats { get; init; } // todo rename?
 
     public required Services Services { get; init; }
     public AbilityTarget Target { get; init; } = AbilityTarget.Nothing;

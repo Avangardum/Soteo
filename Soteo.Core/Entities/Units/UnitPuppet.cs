@@ -20,6 +20,8 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
     public Inventory Inventory { get; } = new(0);
     public EquipmentInventory EquipmentInventory { get; } = new();
 
+    public AbilityUseProgressSnapshot? AbilityUseProgress { get; private set; }
+
     public IReadOnlyList<Guid> ControllingPlayerIds => _controllingPlayerIds;
 
     public UnitPuppet
@@ -129,7 +131,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
                 AbilityUseProgress,
                 d.AbilityUseProgress.NewValue,
                 interpolationWeight,
-                AbilityUseProgress.Interpolate
+                AbilityUseProgressSnapshot.Interpolate
             );
         }
         d.StatusContexts.MutateDictionary(StatusesInternal, interpolationWeight, PuppetStatusContext.Interpolate);
@@ -180,7 +182,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         }
     }
 
-    private void UpdateAbilityAnimation(IUnitPuppetNode node, AbilityUseProgress abilityUseProgress)
+    private void UpdateAbilityAnimation(IUnitPuppetNode node, AbilityUseProgressSnapshot abilityUseProgress)
     {
         Ability ability = AbilitySlotStates[abilityUseProgress.Slot].Ability;
         node.Animation = ability.Animation;

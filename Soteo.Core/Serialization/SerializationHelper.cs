@@ -363,18 +363,20 @@ public class SerializationHelper(ITypeLocator typeLocator)
         };
     }
 
-    public void SerializeAbilityUseProgress(AbilityUseProgress value, Stream stream)
+    public void SerializeAbilityUseProgressSnapshot(AbilityUseProgressSnapshot value, Stream stream)
     {
         SerializeAbilitySlot(value.Slot, stream);
+        SerializeAbilityContextSnapshot(value.Context, stream);
         SerializeDouble(value.ElapsedTime, stream);
         SerializeDouble(value.RemainingTime, stream);
     }
 
-    public AbilityUseProgress DeserializeAbilityUseProgress(Stream stream)
+    public AbilityUseProgressSnapshot DeserializeAbilityUseProgressSnapshot(Stream stream)
     {
-        return new AbilityUseProgress
+        return new()
         {
             Slot = DeserializeAbilitySlot(stream),
+            Context = DeserializeAbilityContextSnapshot(stream),
             ElapsedTime = DeserializeDouble(stream),
             RemainingTime = DeserializeDouble(stream)
         };
@@ -446,7 +448,7 @@ public class SerializationHelper(ITypeLocator typeLocator)
         SerializeBool(unit.IsMoving, stream);
         SerializeDictionary(unit.Stats, SerializeEnum, SerializeDouble, stream);
         SerializeDictionary(unit.AbilitySlotStates, SerializeAbilitySlot, SerializeAbilitySlotState, stream);
-        SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgress, stream);
+        SerializeNullableClass(unit.AbilityUseProgress, SerializeAbilityUseProgressSnapshot, stream);
         SerializeIndexedDictionary(unit.StatusesContexts, SerializeStatusContextSnapshot, stream);
         SerializeNullableStruct(unit.ControllingPlayerId, SerializeGuid, stream);
         SerializeInventorySnapshot(unit.InventorySnapshot, stream);
@@ -469,7 +471,7 @@ public class SerializationHelper(ITypeLocator typeLocator)
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilitySlotStates =
                 DeserializeDictionary(DeserializeAbilitySlot, DeserializeAbilitySlotState, stream),
-            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
+            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgressSnapshot, stream),
             StatusesContexts = DeserializeIndexedDictionary(DeserializeStatusContextSnapshot, it => it.Id, stream),
             ControllingPlayerId = DeserializeNullableStruct(DeserializeGuid, stream),
             InventorySnapshot = DeserializeInventorySnapshot(stream),
@@ -488,7 +490,7 @@ public class SerializationHelper(ITypeLocator typeLocator)
         SerializeBool(unitPuppet.IsMoving, stream);
         SerializeDictionary(unitPuppet.Stats, SerializeEnum, SerializeDouble, stream);
         SerializeDictionary(unitPuppet.AbilitySlotStates, SerializeAbilitySlot, SerializeAbilitySlotState, stream);
-        SerializeNullableClass(unitPuppet.AbilityUseProgress, SerializeAbilityUseProgress, stream);
+        SerializeNullableClass(unitPuppet.AbilityUseProgress, SerializeAbilityUseProgressSnapshot, stream);
         SerializeIndexedDictionary(unitPuppet.StatusesContexts, SerializePuppetStatusContext, stream);
         SerializeList(unitPuppet.ControllingPlayerIds, SerializeGuid, stream);
         SerializeInventorySnapshot(unitPuppet.InventorySnapshot, stream);
@@ -508,7 +510,7 @@ public class SerializationHelper(ITypeLocator typeLocator)
             Stats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
             AbilitySlotStates =
                 DeserializeDictionary(DeserializeAbilitySlot, DeserializeAbilitySlotState, stream),
-            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgress, stream),
+            AbilityUseProgress = DeserializeNullableClass(DeserializeAbilityUseProgressSnapshot, stream),
             StatusesContexts = DeserializeIndexedDictionary(DeserializePuppetStatusContext, it => it.Id, stream),
             ControllingPlayerIds = DeserializeList(DeserializeGuid, stream),
             InventorySnapshot = DeserializeInventorySnapshot(stream),

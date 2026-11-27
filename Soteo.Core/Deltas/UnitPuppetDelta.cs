@@ -1,3 +1,5 @@
+using Soteo.Core.Snapshots;
+
 namespace Soteo.Core.Deltas;
 
 public sealed record UnitPuppetDelta : EntityDelta
@@ -6,7 +8,7 @@ public sealed record UnitPuppetDelta : EntityDelta
     public required Delta<bool> IsMoving { get; init; }
     public required DictionaryDelta<Stat, double> Stats { get; init; }
     public required DictionaryDelta<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
-    public required Delta<AbilityUseProgress?> AbilityUseProgress { get; init; }
+    public required Delta<AbilityUseProgressSnapshot?> AbilityUseProgress { get; init; }
     public required DictionaryDelta<Guid, PuppetStatusContext> StatusContexts { get; init; }
     public required ListDelta<Guid> ControllingPlayerIds { get; init; }
     public required InventoryDelta Inventory { get; init; }

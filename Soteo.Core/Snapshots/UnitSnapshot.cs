@@ -9,7 +9,7 @@ public sealed record UnitSnapshot : EntitySnapshot<UnitSnapshot>
     public required bool IsMoving { get; init; }
     public required IReadOnlyDictionary<Stat, double> Stats { get; init; }
     public required IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates { get; init; }
-    public required AbilityUseProgress? AbilityUseProgress { get; init; }
+    public required AbilityUseProgressSnapshot? AbilityUseProgress { get; init; }
     public required IReadOnlyDictionary<Guid, StatusContextSnapshot> StatusesContexts { get; init; }
     public required Guid? ControllingPlayerId { get; init; }
     public required InventorySnapshot InventorySnapshot { get; init; }
