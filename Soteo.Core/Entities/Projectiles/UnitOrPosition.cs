@@ -2,11 +2,11 @@ using Soteo.Core.Snapshots;
 
 namespace Soteo.Core.Entities.Projectiles;
 
-public union ProjectileTarget(Unit, Vector2)
+public union UnitOrPosition(Unit, Vector2)
 {
     public Vector2 Position => this switch { Unit u => u.Position, Vector2 v => v };
 
-    public ProjectileTargetSnapshot ToSnapshot()
+    public UnitOrPositionSnapshot ToSnapshot()
     {
         return this switch
         {
@@ -15,14 +15,16 @@ public union ProjectileTarget(Unit, Vector2)
         };
     }
 
-    public static ProjectileTarget FromSnapshot
+    public static UnitOrPosition FromSnapshot
     (
-        ProjectileTargetSnapshot snapshot,
+        UnitOrPositionSnapshot snapshot,
         Func<Guid, Entity> replicateEntityReference
     )
     {
-        return snapshot.IsUnit ?
-            (Unit)replicateEntityReference(snapshot.UnitId.Required()) :
-            snapshot.Position.Required();
+        return snapshot switch
+        {
+            Guid unitId => (Unit)replicateEntityReference(unitId),
+            Vector2 position => position
+        };
     }
 }
