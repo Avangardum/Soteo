@@ -8,7 +8,7 @@ public interface IEntityManager
     event Action<Entity> EntityRemoved;
 
     PlayerCharacter SpawnPlayerCharacter(Guid id, Guid controllingPlayerId);
-    Projectile SpawnProjectile(AbilityContext abilityContext, double speed, UnitOrPosition target);
+    Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target);
     Dude SpawnDude(Vector2 position);
 }
 

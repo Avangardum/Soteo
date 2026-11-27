@@ -522,7 +522,7 @@ public class SerializationHelper(ITypeLocator typeLocator)
         SerializeBaseEntitySnapshot(projectile, stream);
         SerializeDouble(projectile.Speed, stream);
         SerializeAbilityContextSnapshot(projectile.AbilityContext, stream);
-        SerializeUnitOrPositionSnapshot(projectile.Target, stream);
+        SerializeProjectileTargetSnapshot(projectile.Target, stream);
     }
 
     public ProjectileSnapshot DeserializeProjectileSnapshot(Stream stream)
@@ -535,11 +535,11 @@ public class SerializationHelper(ITypeLocator typeLocator)
             Azimuth = DeserializeDouble(stream),
             Speed = DeserializeDouble(stream),
             AbilityContext = DeserializeAbilityContextSnapshot(stream),
-            Target = DeserializeProjectileTarget(stream)
+            Target = DeserializeProjectileTargetSnapshot(stream)
         };
     }
 
-    public void SerializeUnitOrPositionSnapshot(UnitOrPositionSnapshot value, Stream stream)
+    public void SerializeProjectileTargetSnapshot(ProjectileTargetSnapshot value, Stream stream)
     {
         SerializeBool(value is Guid, stream);
         switch (value)
@@ -553,7 +553,7 @@ public class SerializationHelper(ITypeLocator typeLocator)
         }
     }
 
-    public UnitOrPositionSnapshot DeserializeProjectileTarget(Stream stream)
+    public ProjectileTargetSnapshot DeserializeProjectileTargetSnapshot(Stream stream)
     {
         bool isUnit = DeserializeBool(stream);
         if (isUnit)

@@ -242,7 +242,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         }
     }
 
-    public Projectile SpawnProjectile(AbilityContext abilityContext, double speed, UnitOrPosition target)
+    public Projectile SpawnProjectile(AbilityContext abilityContext, double speed, ProjectileTarget target)
     {
         var id = Guid.NewGuid();
         return Add(new Projectile(id, abilityContext, speed, target, _services.Required)

@@ -8,7 +8,7 @@ public sealed class Projectile : Entity
 
     private AbilityContext _abilityContext;
     private double _speed;
-    private UnitOrPosition _target;
+    private ProjectileTarget _target;
     private bool _didHit;
 
     /// <summary>
@@ -22,7 +22,7 @@ public sealed class Projectile : Entity
         Guid id,
         AbilityContext abilityContext,
         double speed,
-        UnitOrPosition target,
+        ProjectileTarget target,
         Services services
     ) : base(id)
     {
@@ -74,7 +74,7 @@ public sealed class Projectile : Entity
         var s = (ProjectileSnapshot)snapshot;
         _abilityContext = AbilityContext.FromSnapshot(s.AbilityContext, _services, replicateEntityReference);
         _speed = s.Speed;
-        _target = UnitOrPosition.FromSnapshot(s.Target, replicateEntityReference);
+        _target = ProjectileTarget.FromSnapshot(s.Target, replicateEntityReference);
         _isSnapshotReplicationPendingToFinishInit = false;
     }
 

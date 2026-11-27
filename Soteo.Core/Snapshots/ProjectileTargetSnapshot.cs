@@ -2,4 +2,4 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Soteo.Core.Snapshots;
 
-public union UnitOrPositionSnapshot(Guid, Vector2);
+public union ProjectileTargetSnapshot(Guid, Vector2);
