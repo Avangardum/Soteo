@@ -45,10 +45,7 @@ public sealed class AbilityTests
             Alt = alt,
             UserStats = ReadOnlyDictionary<Stat, double>.Empty,
             Services = new Services(Substitute.For<IServiceProvider>()),
-            TargetPosition = targetPosition,
-            TargetUnit = null,
-            TargetDirection = null,
-            TargetShardId = null
+            Target = new AbilityTarget { Position = targetPosition }
         };
         Ability.Instance<TestAbility>().Validate(context, AbilityValidationMode.Initial).Should().Be(expectedResult);
     }

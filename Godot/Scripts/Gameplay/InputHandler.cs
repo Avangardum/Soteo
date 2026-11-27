@@ -7,6 +7,7 @@ using Soteo.Core.Entities;
 using Soteo.Core.Entities.Units;
 using Soteo.Core.Networking;
 using Soteo.Core.Packets.Commands;
+using Soteo.Core.Snapshots;
 using Soteo.Main.Gameplay.EntityNodes;
 using Soteo.Main.Gameplay.Ui;
 
@@ -81,7 +82,7 @@ public sealed partial class InputHandler : Node2D
             {
                 Slot = AbilitySlot.Attack,
                 Repeat = true,
-                TargetUnitId = targetUnit.Id
+                Target = new AbilityTargetSnapshot { UnitId = targetUnit.Id }
             };
             _packetSender.Send
             (
@@ -144,8 +145,11 @@ public sealed partial class InputHandler : Node2D
                     Slot = slot,
                     Repeat = false,
                     Alt = alt,
-                    TargetPosition = targetPosition,
-                    TargetUnitId = targetUnit?.Id
+                    Target = new AbilityTargetSnapshot
+                    {
+                        Position = targetPosition,
+                        UnitId = targetUnit?.Id
+                    }
                 }
             },
             shardId.Value
@@ -160,7 +164,15 @@ public sealed partial class InputHandler : Node2D
         bool alt
     )
     {
-        return ValidateAbility(user, new UseAbilityCommand { Slot = slot, TargetUnitId = targetUnit.Id, Alt = alt });
+        return ValidateAbility
+        (
+            user,
+            new UseAbilityCommand
+            {
+                Slot = slot,
+                Target = new AbilityTargetSnapshot { UnitId = targetUnit.Id }, Alt = alt
+            }
+        );
     }
 
     private AbilityValidationResult ValidateAbility
@@ -174,9 +186,9 @@ public sealed partial class InputHandler : Node2D
         AbilitySlotState state = user.AbilitySlotStates[command.Slot];
         Targeting targeting = command.Alt ? state.Ability.AltTargeting : state.Ability.Targeting;
 
-        if (command.TargetUnitId != null)
+        if (command.Target.UnitId != null)
         {
-            if (!_entityLocator.TryFindEntity(command.TargetUnitId.Value, out UnitPuppet? targetUnit, out _))
+            if (!_entityLocator.TryFindEntity(command.Target.UnitId.Value, out UnitPuppet? targetUnit, out _))
                 return AbilityValidationResult.InvalidTarget;
             if (targetUnit.IsAlliedTo(user) && !targeting.HasFlag(Targeting.Ally))
                 return AbilityValidationResult.InvalidTarget;

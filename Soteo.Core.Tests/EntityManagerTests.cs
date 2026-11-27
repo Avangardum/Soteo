@@ -45,7 +45,7 @@ public sealed class EntityManagerTests
             User = _projectileSourceChar,
             UserStats = _projectileSourceChar.GetStats().ToDictionary().AsReadOnly(),
             Services = new Services(_serviceProvider),
-            TargetUnit = _projectileTargetChar
+            Target = new AbilityTarget { Unit = _projectileTargetChar }
         };
 
         _projectile = _sut.SpawnProjectile(abilityContext, speed: 1, _projectileTargetChar);

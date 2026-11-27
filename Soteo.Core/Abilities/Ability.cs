@@ -85,8 +85,8 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
         if
         (
             coreValidationResult is AbilityValidationResult.OutOfRange or AbilityValidationResult.OutOfAngularRange &&
-            context.TargetUnit == null &&
-            context.TargetPosition == null
+            context.Target.Unit == null &&
+            context.Target.Position == null
         )
         {
             throw new InvalidOperationException
@@ -103,22 +103,22 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     private AbilityValidationResult ValidateTarget(AbilityContext context)
     {
         Targeting targeting = context.Alt ? AltTargeting : Targeting;
-        if (!targeting.HasFlag(Targeting.Nothing) && context.TargetPosition == null && context.TargetUnit == null)
+        if (!targeting.HasFlag(Targeting.Nothing) && context.Target.Position == null && context.Target.Unit == null)
             return AbilityValidationResult.InvalidTarget;
-        if (context.TargetPosition != null && context.TargetUnit != null)
+        if (context.Target.Position != null && context.Target.Unit != null)
             return AbilityValidationResult.InvalidTarget;
-        if (!targeting.HasFlag(Targeting.Position) && context.TargetPosition != null)
+        if (!targeting.HasFlag(Targeting.Position) && context.Target.Position != null)
             return AbilityValidationResult.InvalidTarget;
-        if (context.TargetUnit != null)
+        if (context.Target.Unit != null)
         {
             AbilityValidationResult targetUnitValidationResult =
-                ValidateTargetUnit(context.User, context.TargetUnit, targeting);
+                ValidateTargetUnit(context.User, context.Target.Unit, targeting);
             if (targetUnitValidationResult != AbilityValidationResult.Ok)
                 return targetUnitValidationResult;
         }
-        if (targeting.HasFlag(Targeting.WithDirection) != context.TargetDirection.HasValue)
+        if (targeting.HasFlag(Targeting.WithDirection) != context.Target.Direction.HasValue)
             return AbilityValidationResult.InvalidTarget;
-        if (targeting.HasFlag(Targeting.WithShard) != context.TargetShardId.HasValue)
+        if (targeting.HasFlag(Targeting.WithShard) != context.Target.ShardId.HasValue)
             return AbilityValidationResult.InvalidTarget;
         return AbilityValidationResult.Ok;
     }
@@ -152,7 +152,7 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     {
         if
         (
-            (context.TargetPosition ?? context.TargetUnit?.Position) is Vector2 targetPosition &&
+            (context.Target.Position ?? context.Target.Unit?.Position) is Vector2 targetPosition &&
             targetPosition != context.User.Position
         )
         {

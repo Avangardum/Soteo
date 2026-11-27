@@ -14,10 +14,7 @@ public sealed record AbilityContext : ISourceUnitAndAbility
     public required IReadOnlyDictionary<Stat, double> UserStats { get; init; }
 
     public required Services Services { get; init; }
-    public Vector2? TargetPosition { get; init; }
-    public Unit? TargetUnit { get; init; }
-    public Vector2? TargetDirection { get; init; }
-    public Guid? TargetShardId { get; init; }
+    public AbilityTarget Target { get; init; } = AbilityTarget.Nothing;
 
     Unit ISourceUnitAndAbility.Unit => User;
     AbilityContext ISourceUnitAndAbility.AbilityContext => this;
@@ -30,10 +27,7 @@ public sealed record AbilityContext : ISourceUnitAndAbility
             UserId = User.Id,
             Alt = Alt,
             UserStats = UserStats,
-            TargetPosition = TargetPosition,
-            TargetUnitId = TargetUnit?.Id,
-            TargetDirection = TargetDirection,
-            TargetShardId = TargetShardId
+            Target = Target.ToSnapshot()
         };
     }
 
@@ -51,10 +45,7 @@ public sealed record AbilityContext : ISourceUnitAndAbility
             Alt = snapshot.Alt,
             UserStats = snapshot.UserStats,
             Services = services,
-            TargetPosition = snapshot.TargetPosition,
-            TargetUnit = (Unit?)snapshot.TargetUnitId?.PassTo(replicateEntityReference),
-            TargetDirection = snapshot.TargetDirection,
-            TargetShardId = snapshot.TargetShardId
+            Target = AbilityTarget.FromSnapshot(snapshot.Target, replicateEntityReference)
         };
     }
 }

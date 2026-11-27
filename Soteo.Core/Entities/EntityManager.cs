@@ -108,6 +108,9 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
             ids.Add(entitySnapshot.Id);
             if (!_entities.ContainsKey(entitySnapshot.Id))
                 SpawnEntityFromSnapshot(entitySnapshot);
+                // TODO This method can remove the spawned entity immediately if it's removed in the snapshot.
+                // As EntityManager only tracks removed as WeakRefs, they may be garbage collected before actual
+                // references to them are replicated
         }
         foreach (Guid id in _entities.Keys.Except(ids).ToArray())
         {

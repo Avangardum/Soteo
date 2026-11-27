@@ -7,6 +7,7 @@ using Soteo.Core.Entities;
 using Soteo.Core.Entities.Projectiles;
 using Soteo.Core.Entities.Units;
 using Soteo.Core.Items;
+using Soteo.Core.Snapshots;
 using Soteo.Core.Statuses;
 using Soteo.TestUtil;
 
@@ -41,7 +42,14 @@ public sealed class UnitTests
     [Fact]
     public void UseAbilityCommandForEmptySlotDoesntThrow()
     {
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetUnitId = Guid.NewGuid() });
+        _sut.SetCommand
+        (
+            new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Hotbar(0),
+                Target = new AbilityTargetSnapshot { UnitId = Guid.NewGuid() }
+            }
+        );
         _sut.Tick(Const.TickInterval);
     }
 
@@ -52,7 +60,14 @@ public sealed class UnitTests
         int useCount = 0;
         Ability.Instance<SpyAbility>().Used += _ => useCount++;
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetUnitId = Guid.NewGuid() });
+        _sut.SetCommand
+        (
+            new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Hotbar(0),
+                Target = new AbilityTargetSnapshot { UnitId = Guid.NewGuid() }
+            }
+        );
         _sut.Tick(Const.TickInterval);
 
         useCount.Should().Be(0);
@@ -82,7 +97,14 @@ public sealed class UnitTests
         );
         _entityManager.Entities.Returns(new Dictionary<Guid, Entity> { [projectileId] = projectile });
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetUnitId = projectileId });
+        _sut.SetCommand
+        (
+            new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Hotbar(0),
+                Target = new AbilityTargetSnapshot { UnitId = projectileId }
+            }
+        );
         _sut.Tick(Const.TickInterval);
 
         useCount.Should().Be(0);
@@ -796,12 +818,26 @@ public sealed class UnitTests
         AbilityContext? usedContext = null;
         Ability.Instance<SpyAbilityWithUseTime>().Used += context => usedContext = context;
         _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitX });
+        _sut.SetCommand
+        (
+            new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Hotbar(0),
+                Target = new AbilityTargetSnapshot { Position = Vector2.UnitX }
+            }
+        );
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitY });
+        _sut.SetCommand
+        (
+            new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Hotbar(0),
+                Target = new AbilityTargetSnapshot { Position = Vector2.UnitY }
+            }
+        );
 
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
-        usedContext.Required().TargetPosition.Should().Be(Vector2.UnitY);
+        usedContext.Required().Target.Position.Should().Be(Vector2.UnitY);
     }
 
     [Fact]
@@ -810,17 +846,31 @@ public sealed class UnitTests
         AbilityContext? usedContext = null;
         Ability.Instance<SpyAbilityWithUseTime>().Used += context => usedContext = context;
         _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitX });
+        _sut.SetCommand
+        (
+            new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Hotbar(0),
+                Target = new AbilityTargetSnapshot { Position = Vector2.UnitX }
+            }
+        );
         _sut.Tick(Const.TickInterval);
         _sut.AbilityUseProgress.Required().Slot.Should().Be(AbilitySlot.Hotbar(0));
         _sut.AbilityUseProgress.ElapsedTime.Should().BePositive();
 
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitY });
+        _sut.SetCommand
+        (
+            new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Hotbar(0),
+                Target = new AbilityTargetSnapshot { Position = Vector2.UnitY }
+            }
+        );
 
         _sut.AbilityUseProgress.Required().Slot.Should().Be(AbilitySlot.Hotbar(0));
         _sut.AbilityUseProgress.ElapsedTime.Should().BePositive();
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
-        usedContext.Required().TargetPosition.Should().Be(Vector2.UnitX);
+        usedContext.Required().Target.Position.Should().Be(Vector2.UnitX);
     }
 
     [Fact]
@@ -829,20 +879,31 @@ public sealed class UnitTests
         AbilityContext? usedContext = null;
         Ability.Instance<SpyAbilityWithUseTime>().Used += context => usedContext = context;
         _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
-        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitX });
+        _sut.SetCommand
+        (
+            new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Hotbar(0),
+                Target = new AbilityTargetSnapshot { Position = Vector2.UnitX } }
+        );
         _sut.Tick(Const.TickInterval);
         _sut.AbilityUseProgress.Required().Slot.Should().Be(AbilitySlot.Hotbar(0));
         _sut.AbilityUseProgress.ElapsedTime.Should().BePositive();
 
         _sut.SetCommand
         (
-            new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0), TargetPosition = Vector2.UnitY, Repeat = true }
+            new UseAbilityCommand
+            {
+                Slot = AbilitySlot.Hotbar(0),
+                Target = new AbilityTargetSnapshot { Position = Vector2.UnitY },
+                Repeat = true
+            }
         );
 
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
-        usedContext.Required().TargetPosition.Should().Be(Vector2.UnitX);
+        usedContext.Required().Target.Position.Should().Be(Vector2.UnitX);
         Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
-        usedContext.Required().TargetPosition.Should().Be(Vector2.UnitY);
+        usedContext.Required().Target.Position.Should().Be(Vector2.UnitY);
     }
 
     private class SpyAbility : Ability

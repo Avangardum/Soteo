@@ -6,11 +6,11 @@ public sealed class RangedAttackAbility : AttackAbility
     {
         double projectileSpeed = context.UserStats[Stat.AttackProjectileSpeed];
         context.Services.EntityManager
-            .SpawnProjectile(context, projectileSpeed, context.TargetUnit.Required());
+            .SpawnProjectile(context, projectileSpeed, context.Target.Unit.Required());
     }
 
     public override void OnProjectileHit(AbilityContext context)
     {
-        context.User.DealAttackDamageTo(context.TargetUnit.Required(), this);
+        context.User.DealAttackDamageTo(context.Target.Unit.Required(), this);
     }
 }

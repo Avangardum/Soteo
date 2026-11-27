@@ -585,10 +585,7 @@ public class SerializationHelper(ITypeLocator typeLocator)
         SerializeGuid(context.UserId, stream);
         SerializeBool(context.Alt, stream);
         SerializeDictionary(context.UserStats, SerializeEnum, SerializeDouble, stream);
-        SerializeNullableStruct(context.TargetPosition, SerializeVector2, stream);
-        SerializeNullableStruct(context.TargetUnitId, SerializeGuid, stream);
-        SerializeNullableStruct(context.TargetDirection, SerializeVector2, stream);
-        SerializeNullableStruct(context.TargetShardId, SerializeGuid, stream);
+        SerializeAbilityTargetSnapshot(context.Target, stream);
     }
 
     public AbilityContextSnapshot DeserializeAbilityContextSnapshot(Stream stream)
@@ -599,10 +596,26 @@ public class SerializationHelper(ITypeLocator typeLocator)
             UserId = DeserializeGuid(stream),
             Alt = DeserializeBool(stream),
             UserStats = DeserializeDictionary(DeserializeEnum<Stat>, DeserializeDouble, stream),
-            TargetPosition = DeserializeNullableStruct(DeserializeVector2, stream),
-            TargetUnitId = DeserializeNullableStruct(DeserializeGuid, stream),
-            TargetDirection = DeserializeNullableStruct(DeserializeVector2, stream),
-            TargetShardId = DeserializeNullableStruct(DeserializeGuid, stream)
+            Target = DeserializeAbilityTargetSnapshot(stream)
+        };
+    }
+
+    public void SerializeAbilityTargetSnapshot(AbilityTargetSnapshot value, Stream stream)
+    {
+        SerializeNullableStruct(value.Position, SerializeVector2, stream);
+        SerializeNullableStruct(value.UnitId, SerializeGuid, stream);
+        SerializeNullableStruct(value.Direction, SerializeVector2, stream);
+        SerializeNullableStruct(value.ShardId, SerializeGuid, stream);
+    }
+
+    public AbilityTargetSnapshot DeserializeAbilityTargetSnapshot(Stream stream)
+    {
+        return new AbilityTargetSnapshot
+        {
+            Position = DeserializeNullableStruct(DeserializeVector2, stream),
+            UnitId = DeserializeNullableStruct(DeserializeGuid, stream),
+            Direction = DeserializeNullableStruct(DeserializeVector2, stream),
+            ShardId = DeserializeNullableStruct(DeserializeGuid, stream)
         };
     }
 

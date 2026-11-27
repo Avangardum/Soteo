@@ -8,15 +8,10 @@ public sealed class UseAbilityPacketSerializer(SerializationHelper s) : PacketSe
     protected override void SerializeCore(UseAbilityPacket packet, Stream stream)
     {
         s.SerializeGuid(packet.UnitId, stream);
-
         s.SerializeAbilitySlot(packet.Command.Slot, stream);
         s.SerializeBool(packet.Command.Repeat, stream);
         s.SerializeBool(packet.Command.Alt, stream);
-
-        s.SerializeNullableStruct(packet.Command.TargetPosition, s.SerializeVector2, stream);
-        s.SerializeNullableStruct(packet.Command.TargetUnitId, s.SerializeGuid, stream);
-        s.SerializeNullableStruct(packet.Command.TargetDirection, s.SerializeVector2, stream);
-        s.SerializeNullableStruct(packet.Command.TargetShardId, s.SerializeGuid, stream);
+        s.SerializeAbilityTargetSnapshot(packet.Command.Target, stream);
     }
 
     protected override UseAbilityPacket DeserializeCore(Stream stream)
@@ -29,10 +24,7 @@ public sealed class UseAbilityPacketSerializer(SerializationHelper s) : PacketSe
                 Slot = s.DeserializeAbilitySlot(stream),
                 Repeat = s.DeserializeBool(stream),
                 Alt = s.DeserializeBool(stream),
-                TargetPosition = s.DeserializeNullableStruct(s.DeserializeVector2, stream),
-                TargetUnitId = s.DeserializeNullableStruct(s.DeserializeGuid, stream),
-                TargetDirection = s.DeserializeNullableStruct(s.DeserializeVector2, stream),
-                TargetShardId = s.DeserializeNullableStruct(s.DeserializeGuid, stream)
+                Target = s.DeserializeAbilityTargetSnapshot(stream)
             }
         };
     }

@@ -10,7 +10,7 @@ public sealed class SpawnDudesAbility : Ability
     {
         for (double azimuth = 0; azimuth < 360; azimuth += 36)
         {
-            Vector2 position = context.TargetPosition.Required() + Maths.AzimuthToDirection(azimuth) * 3;
+            Vector2 position = context.Target.Position.Required() + Maths.AzimuthToDirection(azimuth) * 3;
             context.Services.EntityManager.SpawnDude(position);
         }
     }

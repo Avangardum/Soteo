@@ -486,9 +486,9 @@ public abstract class Unit : UnitBase<IUnitNode>
     {
         if (!_abilitySlotStates.TryGetValue(command.Slot, out AbilitySlotState? state)) return null;
         Unit? targetUnit = null;
-        if (command.TargetUnitId != null)
+        if (command.Target.UnitId != null)
         {
-            targetUnit = _services.EntityManager.GetEntity(command.TargetUnitId.Value) as Unit;
+            targetUnit = _services.EntityManager.GetEntity(command.Target.UnitId.Value) as Unit;
             if (targetUnit == null) return null;
         }
         return new AbilityContext
@@ -498,10 +498,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Alt = command.Alt,
             UserStats = GetStats(),
             Services = _services,
-            TargetPosition = command.TargetPosition,
-            TargetUnit = targetUnit,
-            TargetDirection = command.TargetDirection,
-            TargetShardId = command.TargetShardId
+            Target = AbilityTarget.FromSnapshot(command.Target, _ => targetUnit.Required())
         };
     }
 
@@ -514,10 +511,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Alt = false,
             UserStats = GetStats(),
             Services = _services,
-            TargetPosition = null,
-            TargetUnit = null,
-            TargetDirection = null,
-            TargetShardId = null
+            Target = AbilityTarget.Nothing
         };
     }
 
@@ -537,7 +531,7 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void WaitForAbilityCooldown(AbilityContext context, ref double remainingDeltaTime)
     {
-        Vector2? targetPosition = context.TargetPosition ?? context.TargetUnit?.Position;
+        Vector2? targetPosition = context.Target.Position ?? context.Target.Unit?.Position;
         if (targetPosition != null)
             LookAtPosition(targetPosition.Value, ref remainingDeltaTime);
         remainingDeltaTime = 0;
@@ -555,7 +549,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         IUnitNode node
     )
     {
-        Vector2? targetPosition = context.TargetUnit?.Position ?? context.TargetPosition;
+        Vector2? targetPosition = context.Target.Unit?.Position ?? context.Target.Position;
         AbilityValidationResult abilityValidationResult;
         int iterations = 0;
         const int maxIterations = 5;
