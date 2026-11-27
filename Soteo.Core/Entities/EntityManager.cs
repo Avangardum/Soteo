@@ -102,25 +102,36 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
 
     public void ReplicateEntitySnapshots(IReadOnlyDictionary<Guid, EntitySnapshot> snapshots)
     {
-        List<Guid> ids = [];
+        var ids = new List<Guid>(snapshots.Count);
         foreach (EntitySnapshot entitySnapshot in snapshots.Values)
         {
             ids.Add(entitySnapshot.Id);
             if (!_entities.ContainsKey(entitySnapshot.Id))
-                SpawnEntityFromSnapshot(entitySnapshot);
-                // TODO This method can remove the spawned entity immediately if it's removed in the snapshot.
-                // As EntityManager only tracks removed as WeakRefs, they may be garbage collected before actual
-                // references to them are replicated
+            {
+                // Since all entity references are updated during replication, there is no need to respawn removed
+                // entities, as references to removed entities will be updated to point at newly created instances.
+                _removedEntities.Remove(entitySnapshot.Id);
+                Add(SpawnEntityFromSnapshot(entitySnapshot));
+            }
         }
+
         foreach (Guid id in _entities.Keys.Except(ids).ToArray())
-        {
             _entities[id].Remove();
-        }
+
+        // Entity snapshots are replicated only after all entities are spawned, so that references between entities
+        // can be replicated correctly.
+
+        // During replication an entity may temporarily end up in a state, where there are no strong references to it,
+        // as old references were already removed, but new ones were not yet replicated.
+        // To prevent such entities from being garbage collected,
+        // they are stored in a temporary list until all entities are updated.
+        var entities = new List<Entity>(snapshots.Count);
+
         foreach (EntitySnapshot entitySnapshot in snapshots.Values)
         {
-            // Entity snapshots are replicated only after all entities are spawned so that references between entities
-            // can be replicated correctly.
-            _entities[entitySnapshot.Id].ReplicateSnapshot(entitySnapshot, ReplicateEntityReference);
+            Entity entity = _entities[entitySnapshot.Id];
+            entities.Add(entity);
+            entity.ReplicateSnapshot(entitySnapshot, ReplicateEntityReference);
         }
     }
 
@@ -157,7 +168,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     {
         return snapshot switch
         {
-            UnitSnapshot s when s.Type == typeof(PlayerCharacter)  => Add
+            UnitSnapshot s when s.Type == typeof(PlayerCharacter) => Add
             (
                 new PlayerCharacter
                 (
