@@ -437,7 +437,11 @@ public abstract class Unit : UnitBase<IUnitNode>
 
     private void UseAbility(UseAbilityCommand command, ref double remainingDeltaTime, IUnitNode node)
     {
-        AbilityContext? context = GetAbilityContext(command);
+        // If an ability use is already in progress, its context is used to continue its usage, regardless of the
+        // command.
+        // See SetCommand for details on when a current ability use is interrupted by setting AbilityUseProgress to null
+        // or continued by preserving its existing value.
+        AbilityContext? context = AbilityUseProgress?.Context ?? GetAbilityContext(command);
         if (context == null)
         {
             _commands.Dequeue();
@@ -445,13 +449,12 @@ public abstract class Unit : UnitBase<IUnitNode>
             return;
         }
 
-        if (_abilitySlotStates[command.Slot].Cooldown > 0)
+        if (AbilityUseProgress == null && _abilitySlotStates[command.Slot].Cooldown > 0)
         {
             if (command.Repeat)
                 WaitForAbilityCooldown(context, ref remainingDeltaTime);
             else
                 _commands.Dequeue();
-            AbilityUseProgress = null;
             return;
         }
 
@@ -463,15 +466,12 @@ public abstract class Unit : UnitBase<IUnitNode>
             return;
         }
 
-        if (AbilityUseProgress?.Slot != command.Slot)
+        AbilityUseProgress ??= new AbilityUseProgress
         {
-            AbilityUseProgress = new AbilityUseProgress
-            {
-                Slot = command.Slot,
-                Context = context,
-                RemainingTime = context.Ability.UseTime(context)
-            };
-        }
+            Slot = command.Slot,
+            Context = context,
+            RemainingTime = context.Ability.UseTime(context)
+        };
 
         if (remainingDeltaTime < AbilityUseProgress.RemainingTime)
         {
@@ -481,7 +481,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         else
         {
             remainingDeltaTime -= AbilityUseProgress.RemainingTime;
-            TriggerAbilityEffect(context, command);
+            TriggerAbilityEffect(AbilityUseProgress, command);
         }
     }
 
@@ -518,17 +518,18 @@ public abstract class Unit : UnitBase<IUnitNode>
         };
     }
 
-    private void TriggerAbilityEffect(AbilityContext context, UseAbilityCommand command)
+    private void TriggerAbilityEffect(AbilityUseProgress progress, UseAbilityCommand command)
     {
+        AbilityContext context = progress.Context;
         context.Ability.TakeEffect(context);
         double cooldown = context.Ability.Cooldown(context);
-        _abilitySlotStates[command.Slot] = _abilitySlotStates[command.Slot] with
+        _abilitySlotStates[progress.Slot] = _abilitySlotStates[progress.Slot] with
         {
             Cooldown = cooldown,
             MaxCooldown = cooldown
         };
         AbilityUseProgress = null;
-        if (!command.Repeat)
+        if (progress.Slot == command.Slot && !command.Repeat)
             _commands.Dequeue();
     }
 
@@ -562,6 +563,8 @@ public abstract class Unit : UnitBase<IUnitNode>
             AbilityValidationMode mode =
                 AbilityUseProgress == null ? AbilityValidationMode.Initial : AbilityValidationMode.Continuous;
             abilityValidationResult = ability.Validate(context, mode);
+            if (mode == AbilityValidationMode.Continuous)
+                return abilityValidationResult;
             switch (abilityValidationResult)
             {
                 case AbilityValidationResult.Ok:
@@ -622,12 +625,17 @@ public abstract class Unit : UnitBase<IUnitNode>
         if
         (
             AbilityUseProgress != null &&
-            command is UseAbilityCommand a &&
-            prevCommand is UseAbilityCommand b &&
-            a.Slot == b.Slot
+            command is UseAbilityCommand useAbilityCommand &&
+            prevCommand is UseAbilityCommand prevUseAbilityCommand &&
+            useAbilityCommand.Slot == prevUseAbilityCommand.Slot
         )
         {
-            _commands.Enqueue(prevCommand);
+            // If a new command uses the same ability as the one already being used, it is not interrupted, so that
+            // spamming same ability commands in the same general area doesn't interrupt progress.
+            // In the case of a non-repeated command, the new command is just ignored.
+            // In the case of a repeated command, the new command is enqueued, but existing progress is preserved,
+            // so that the previous use is finished and then the new command is executed repeatedly.
+            _commands.Enqueue(useAbilityCommand.Repeat ? command : prevCommand);
             return;
         }
 

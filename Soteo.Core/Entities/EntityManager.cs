@@ -8,7 +8,7 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     private readonly ServerDependency<Services> _services;
     private readonly ClientDependency<ICamera> _camera;
     private readonly IEntityNodeManager _entityNodeManager;
-    private readonly ICrossInventoryHelper _crossInventoryHelper;
+    private readonly ICrossInventoryHelper _crossInventoryHelper; // todo remove
 
     private readonly IDisposable _processSubscription;
     private readonly SortedDictionary<Guid, Entity> _entities = [];
