@@ -32,7 +32,6 @@ Comments should be written using `//`, not `/* */`.
 
 If `//` is not in the beginning of a line, it should also be preceded by a space.
 
-
 ### Namespaces
 
 Use file-scoped namespaces.
@@ -41,7 +40,10 @@ Namespaces should correspond to the folder structure (use automatic namespace ad
 
 ### Types
 
-Types with the same name that differ only by number of generic parameters should be in one file.
+Types with the same name that differ only by number of generic parameters should be in the same file.
+
+Extension classes located in the same namespace and assembly as types they extend should be in the same file as the
+extended type.
 
 Other non-nested types should be each in their own file.
 
