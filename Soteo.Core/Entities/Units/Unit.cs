@@ -504,7 +504,7 @@ public abstract class Unit : Entity<IUnitNode>
             Ability = state.Ability,
             User = this,
             Alt = command.Alt,
-            UserStatsAtTakeEffect = GetStats(),
+            UserStatsAtTakeEffect = ReadOnlyDictionary<Stat, double>.Empty,
             Services = _services,
             Target = AbilityTarget.FromSnapshot(command.Target, _ => targetUnit.Required())
         };
@@ -525,7 +525,7 @@ public abstract class Unit : Entity<IUnitNode>
 
     private void TriggerAbilityEffect(AbilityUseProgress progress, UseAbilityCommand command)
     {
-        AbilityContext context = progress.Context;
+        AbilityContext context = progress.Context with { UserStatsAtTakeEffect = GetStats() };
         context.Ability.TakeEffect(context);
         double cooldown = context.Ability.Cooldown(context);
         _abilitySlotStates[progress.Slot] = _abilitySlotStates[progress.Slot] with

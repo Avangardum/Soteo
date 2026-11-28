@@ -58,7 +58,9 @@ public abstract class Ability : SingletonHierarchyBase<Ability>
     /// </summary>
     public void TakeEffect(AbilityContext context)
     {
-        AbilityValidationResult validationResult = Validate(context, AbilityValidationMode.Continuous);
+        AbilityContext validationContext =
+            context with { UserStatsAtTakeEffect = ReadOnlyDictionary<Stat, double>.Empty };
+        AbilityValidationResult validationResult = Validate(validationContext, AbilityValidationMode.Continuous);
         if (validationResult != AbilityValidationResult.Ok)
             throw new InvalidOperationException($"Ability validation failed: {validationResult}");
         context.User.SpendHealth(HealthCost(context), this);

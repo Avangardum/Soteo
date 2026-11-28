@@ -182,8 +182,8 @@ public sealed class UnitTests
         _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
         int initialValidationCount = 0;
         int continuousValidationCount = 0;
-        Ability.Instance<SpyAbilityWithUseTime>().ValidatedInitially += () => initialValidationCount++;
-        Ability.Instance<SpyAbilityWithUseTime>().ValidatedContinuously += () => continuousValidationCount++;
+        Ability.Instance<SpyAbilityWithUseTime>().ValidatedInitially += _ => initialValidationCount++;
+        Ability.Instance<SpyAbilityWithUseTime>().ValidatedContinuously += _ => continuousValidationCount++;
 
         _sut.SetCommand(new UseAbilityCommand { Slot = slot });
         _sut.Tick(Const.TickInterval);
@@ -906,11 +906,44 @@ public sealed class UnitTests
         usedContext.Required().Target.Position.Should().Be(Vector2.UnitY);
     }
 
+    [Fact]
+    public void BothInitialAndContinuousValidationReceiveContextWithoutStatsAtTakeEffect()
+    {
+        AbilityContext? initialValidationContext = null;
+        AbilityContext? continuousValidationContext = null;
+        Ability.Instance<SpyAbilityWithUseTime>().ValidatedInitially += c => initialValidationContext = c;
+        Ability.Instance<SpyAbilityWithUseTime>().ValidatedContinuously += c => continuousValidationContext = c;
+        _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
+
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0) });
+        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(1);
+
+        initialValidationContext.Required().UserStatsAtTakeEffect.Should().BeEmpty();
+        continuousValidationContext.Required().UserStatsAtTakeEffect.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AddingStatusThatSetsMaxManaTo0WhileUsingAbilityResultsInTakeEffectReceivingStatsAtTakeEffectWith0MaxMana()
+    {
+        AbilityContext? context = null;
+        Ability.Instance<SpyAbilityWithUseTime>().Used += c => context = c;
+        _sut.AddInnateHotbarAbility<SpyAbilityWithUseTime>();
+
+        _sut.SetCommand(new UseAbilityCommand { Slot = AbilitySlot.Hotbar(0) });
+        _sut.Tick(Const.TickInterval);
+        _sut.AddStatus<StatusThatSetsMaxManaTo0>(1, null);
+        Ticker.Tick(_sut.Tick).WithDefaultInterval().ForAtLeast(2);
+
+        _sut.GetStatusContexts().Should().BeEmpty();
+        // Despite the status expiring, the context should still capture the modified stat.
+        context.Required().UserStatsAtTakeEffect[Stat.MaxMana].Should().Be(0);
+    }
+
     private class SpyAbility : Ability
     {
         public event Action<AbilityContext> Used = delegate { };
-        public event Action ValidatedInitially = delegate { };
-        public event Action ValidatedContinuously = delegate { };
+        public event Action<AbilityContext> ValidatedInitially = delegate { };
+        public event Action<AbilityContext> ValidatedContinuously = delegate { };
 
         public override Targeting Targeting => Targeting.Anything;
         public override double StaticRange => double.PositiveInfinity;
@@ -921,10 +954,10 @@ public sealed class UnitTests
             switch (mode)
             {
                 case AbilityValidationMode.Initial:
-                    ValidatedInitially();
+                    ValidatedInitially(context);
                     break;
                 case AbilityValidationMode.Continuous:
-                    ValidatedContinuously();
+                    ValidatedContinuously(context);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
