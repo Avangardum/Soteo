@@ -32,5 +32,5 @@ public enum Stat : byte
     /// <summary>
     /// Attack projectile speed in meters per second
     /// </summary>
-    AttackProjectileSpeed,
+    AttackProjectileSpeed
 }

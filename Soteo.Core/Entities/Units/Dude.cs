@@ -34,6 +34,7 @@ public sealed class Dude : Unit
             context.SetCommand(new UseAbilityCommand
             {
                 Slot = AbilitySlot.Attack,
+                Repeat = true,
                 Target = new AbilityTargetSnapshot { UnitId = closestEnemy.Id }
             });
         }

@@ -8,6 +8,7 @@ public sealed record AbilityContext : ISourceUnitAndAbility
     public required Unit User { get; init; }
     public bool Alt { get; init; }
 
+    // todo reconsider when this thing is used
     public required IReadOnlyDictionary<Stat, double> UserStatsAtTakeEffect { get; init; }
 
     public required Services Services { get; init; }

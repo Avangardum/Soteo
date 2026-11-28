@@ -177,6 +177,8 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
             ),
             UnitSnapshot s when s.Type == typeof(Dude) =>
                 Add(new Dude(s.Id, AddNode<IUnitNode>(s.Id), _services.Required)),
+            UnitSnapshot s when s.Type == typeof(Turret) =>
+                Add(new Turret(s.Id, AddNode<IUnitNode>(s.Id), _services.Required)),
             ProjectileSnapshot s => Add(Projectile.FromSnapshot(s, _services.Required)),
             UnitPuppetSnapshot s => Add
             (
@@ -267,10 +269,13 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     public Dude SpawnDude(Vector2 position)
     {
         var id = Guid.NewGuid();
-        return Add
-        (
-            new Dude(id, AddNode<IUnitNode>(id), _services.Required) { Position = position }
-        );
+        return Add(new Dude(id, AddNode<IUnitNode>(id), _services.Required) { Position = position });
+    }
+
+    public Turret SpawnTurret(Vector2 position)
+    {
+        var id = Guid.NewGuid();
+        return Add(new Turret(id, AddNode<IUnitNode>(id), _services.Required) { Position = position });
     }
 
     private T Add<T>(T entity) where T : Entity

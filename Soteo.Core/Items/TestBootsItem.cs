@@ -8,6 +8,7 @@ public sealed class TestBootsItem : Item
     [
         Ability.Instance<ProjectileBurstAbility>(),
         Ability.Instance<SpawnDudesAbility>(),
+        Ability.Instance<BuildTurretAbility>(),
         Ability.Instance<VampireAbility>()
     ];
 }

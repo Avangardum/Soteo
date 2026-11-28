@@ -1,5 +1,6 @@
 namespace Soteo.Core.Entities.Units;
 
+// TODO Move all same assembly extensions to the same file as extended type and update the style convention
 public static class StatExtensions
 {
     private static readonly IReadOnlyList<Stat> AllCore;

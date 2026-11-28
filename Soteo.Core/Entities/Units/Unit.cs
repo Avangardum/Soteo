@@ -70,6 +70,7 @@ public abstract class Unit : Entity<IUnitNode>
     public IReadOnlyDictionary<Guid, StatusContext> GetStatusContexts() =>
         _statusContexts.ToDictionary().AsReadOnly();
 
+    // TODO Consider replacing with an indexer.
     public double GetStat(Stat stat) =>
         _stats[stat];
 
