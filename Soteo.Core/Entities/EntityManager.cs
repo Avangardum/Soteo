@@ -8,7 +8,6 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
     private readonly ServerDependency<Services> _services;
     private readonly ClientDependency<ICamera> _camera;
     private readonly IEntityNodeManager _entityNodeManager;
-    private readonly ICrossInventoryHelper _crossInventoryHelper; // todo remove
 
     private readonly IDisposable _processSubscription;
     private readonly SortedDictionary<Guid, Entity> _entities = [];
@@ -34,7 +33,6 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         ServerDependency<Services> services,
         ClientDependency<ICamera> camera,
         IEntityNodeManager entityNodeManager,
-        ICrossInventoryHelper crossInventoryHelper,
         IProcessPublisher processPublisher,
         SideOptions sideOptions
     )
@@ -42,7 +40,6 @@ public sealed class EntityManager : IEntityManager, IEntitySnapshotManager, IDis
         _services = services;
         _camera = camera;
         _entityNodeManager = entityNodeManager;
-        _crossInventoryHelper = crossInventoryHelper;
 
         _processSubscription = sideOptions.Side is Side.Client ?
             processPublisher.SubscribeToProcess(Tick, ProcessPriority.Default, callWhenPaused: false) :
