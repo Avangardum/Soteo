@@ -3,13 +3,14 @@ using Soteo.Core.Snapshots;
 
 namespace Soteo.Core.Entities.Units;
 
-public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
+public sealed class UnitPuppet : Entity<IUnitPuppetNode>
 {
     private readonly ICamera _camera;
     private double _inventoryDesyncTimeRemaining;
     private List<Guid> _controllingPlayerIds = [];
     private readonly Inventory _alwaysSynchronizedInventory = new(0);
     private readonly EquipmentInventory _alwaysSynchronizedEquipmentInventory = new();
+    private bool _isMoving;
 
     private Dictionary<Stat, double> StatsInternal { get; set; } = [];
     public IReadOnlyDictionary<Stat, double> Stats => StatsInternal;
@@ -17,6 +18,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
     private Dictionary<AbilitySlot, AbilitySlotState> AbilitySlotStatesInternal { get; set; } = [];
     public IReadOnlyDictionary<AbilitySlot, AbilitySlotState> AbilitySlotStates => AbilitySlotStatesInternal;
 
+    public Faction Faction { get; }
     public Inventory Inventory { get; } = new(0);
     public EquipmentInventory EquipmentInventory { get; } = new();
 
@@ -32,6 +34,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
     ) : base(id, node)
     {
         _camera = camera;
+        Faction = Faction.FromId(id);
         camera.ZoomChanged += OnZoomChanged;
     }
 
@@ -41,13 +44,13 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         base.Remove();
     }
 
-    public override bool IsDead
+    public bool IsDead
     {
-        get => base.IsDead;
-        protected set
+        get;
+        private set
         {
-            base.IsDead = value;
-            if (IsDead && Node != null)
+            field = value;
+            if (value && Node != null)
                 Node.IsAzimuthIndicatorVisible = false;
         }
     }
@@ -94,7 +97,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         base.ReplicateSnapshot(snapshot, replicateEntityReference);
         var s = (UnitPuppetSnapshot)snapshot;
         IsDead = s.IsDead;
-        IsMoving = s.IsMoving;
+        _isMoving = s.IsMoving;
         StatsInternal = s.Stats.ToDictionary();
         AbilitySlotStatesInternal = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress;
@@ -116,7 +119,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         if (d.IsDead.HasChanged)
             IsDead = d.IsDead.NewValue;
         if (d.IsMoving.HasChanged)
-            IsMoving = d.IsMoving.NewValue;
+            _isMoving = d.IsMoving.NewValue;
         d.Stats.MutateDictionary(StatsInternal);
         d.AbilitySlotStates.MutateDictionary
         (
@@ -169,7 +172,7 @@ public sealed class UnitPuppet : UnitBase<IUnitPuppetNode>
         {
             UpdateAbilityAnimation(Node, AbilityUseProgress);
         }
-        else if (IsMoving)
+        else if (_isMoving)
         {
             Node.Animation = "Move";
             const double referenceMoveSpeed = 3.5;

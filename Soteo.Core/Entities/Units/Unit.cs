@@ -6,7 +6,7 @@ namespace Soteo.Core.Entities.Units;
 
 // TODO this class and its tests are getting hard to navigate, consider reorganizing
 
-public abstract class Unit : UnitBase<IUnitNode>
+public abstract class Unit : Entity<IUnitNode>
 {
     private readonly Services _services;
     private readonly UnitAi? _ai;
@@ -21,7 +21,10 @@ public abstract class Unit : UnitBase<IUnitNode>
     private Dictionary<SpecialAbilitySlot, Ability> _innateSpecialAbilities = [];
     private bool _allowAbilityPassiveStatusManipulation;
     private bool _isExecutingCommands;
+    private bool _isMoving;
 
+    public bool IsDead { get; private set; }
+    public Faction Faction { get; }
     public Inventory Inventory { get; }
     public EquipmentInventory EquipmentInventory { get; }
     public AbilityUseProgress? AbilityUseProgress { get; private set; }
@@ -45,6 +48,8 @@ public abstract class Unit : UnitBase<IUnitNode>
 
         foreach (Stat stat in Stat.All)
             _stats[stat] = stat.Default;
+
+        Faction = Faction.FromId(id);
 
         EquipmentInventory.Changed += () => { UpdateHotbarAbilityList(); UpdateSpecialAbilityList(); };
     }
@@ -103,7 +108,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             Azimuth = Azimuth,
             Type = GetType(),
             IsDead = IsDead,
-            IsMoving = IsMoving,
+            IsMoving = _isMoving,
             Stats = GetStats(),
             AbilitySlotStates = _abilitySlotStates.ToDictionary().AsReadOnly(),
             AbilityUseProgress = AbilityUseProgress?.ToSnapshot(),
@@ -123,7 +128,7 @@ public abstract class Unit : UnitBase<IUnitNode>
         if (s.Type != GetType())
             throw new ArgumentException($"{GetType()} can't replicate a {s.Type} snapshot.");
         IsDead = s.IsDead;
-        IsMoving = s.IsMoving;
+        _isMoving = s.IsMoving;
         _stats = s.Stats.ToDictionary();
         _abilitySlotStates = s.AbilitySlotStates.ToDictionary();
         AbilityUseProgress = s.AbilityUseProgress
@@ -149,7 +154,7 @@ public abstract class Unit : UnitBase<IUnitNode>
     public override void Tick(double delta)
     {
         if (IsRemoved) return;
-        IsMoving = false;
+        _isMoving = false;
         Think();
         ProcessStatuses(delta);
         if (IsRemoved) return;
@@ -419,7 +424,7 @@ public abstract class Unit : UnitBase<IUnitNode>
             remainingDeltaTime -= timeToComplete;
             OnPositionReached();
         }
-        IsMoving = true;
+        _isMoving = true;
 
         void OnPositionReached()
         {
