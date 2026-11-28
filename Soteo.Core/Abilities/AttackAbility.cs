@@ -8,14 +8,14 @@ public abstract class AttackAbility : Ability
     public sealed override double StaticCooldown => 0;
 
     protected sealed override double DynamicUseTime(AbilityContext context) =>
-        AttackInterval(context) * context.UserStats[Stat.AttackUseTimeFraction];
+        AttackInterval(context) * context.UserStatsAtTakeEffect[Stat.AttackUseTimeFraction];
 
     protected sealed override double DynamicCooldown(AbilityContext context) =>
-        AttackInterval(context) * (1 - context.UserStats[Stat.AttackUseTimeFraction]);
+        AttackInterval(context) * (1 - context.UserStatsAtTakeEffect[Stat.AttackUseTimeFraction]);
 
     private double AttackInterval(AbilityContext context) =>
-        1 / context.UserStats[Stat.AttackSpeed];
+        1 / context.UserStatsAtTakeEffect[Stat.AttackSpeed];
 
     protected sealed override double DynamicRange(AbilityContext context) =>
-        context.UserStats[Stat.AttackRange];
+        context.UserStatsAtTakeEffect[Stat.AttackRange];
 }

@@ -42,7 +42,7 @@ public sealed class EntityManagerTests
         {
             Ability = Ability.Instance<TestAbility>(),
             User = _projectileSourceChar,
-            UserStats = _projectileSourceChar.GetStats().ToDictionary().AsReadOnly(),
+            UserStatsAtTakeEffect = _projectileSourceChar.GetStats().ToDictionary().AsReadOnly(),
             Services = new Services(_serviceProvider),
             Target = new AbilityTarget { Unit = _projectileTargetChar }
         };

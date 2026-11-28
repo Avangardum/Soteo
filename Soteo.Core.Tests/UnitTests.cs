@@ -84,7 +84,7 @@ public sealed class UnitTests
         {
             Ability = Ability.Instance<SpyAbility>(),
             User = _sut,
-            UserStats = _sut.GetStats().ToDictionary().AsReadOnly(),
+            UserStatsAtTakeEffect = _sut.GetStats().ToDictionary().AsReadOnly(),
             Services = new Services(_serviceProvider)
         };
         var projectile = new Projectile

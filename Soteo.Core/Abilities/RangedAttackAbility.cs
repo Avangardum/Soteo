@@ -4,7 +4,7 @@ public sealed class RangedAttackAbility : AttackAbility
 {
     protected override void TakeEffectCore(AbilityContext context)
     {
-        double projectileSpeed = context.UserStats[Stat.AttackProjectileSpeed];
+        double projectileSpeed = context.UserStatsAtTakeEffect[Stat.AttackProjectileSpeed];
         context.Services.EntityManager
             .SpawnProjectile(context, projectileSpeed, context.Target.Unit.Required());
     }

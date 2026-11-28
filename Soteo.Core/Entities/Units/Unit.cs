@@ -504,7 +504,7 @@ public abstract class Unit : Entity<IUnitNode>
             Ability = state.Ability,
             User = this,
             Alt = command.Alt,
-            UserStats = GetStats(),
+            UserStatsAtTakeEffect = GetStats(),
             Services = _services,
             Target = AbilityTarget.FromSnapshot(command.Target, _ => targetUnit.Required())
         };
@@ -517,7 +517,7 @@ public abstract class Unit : Entity<IUnitNode>
             Ability = ability,
             User = this,
             Alt = false,
-            UserStats = GetStats(),
+            UserStatsAtTakeEffect = GetStats(),
             Services = _services,
             Target = AbilityTarget.Nothing
         };

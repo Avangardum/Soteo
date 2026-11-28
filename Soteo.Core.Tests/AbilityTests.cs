@@ -43,7 +43,7 @@ public sealed class AbilityTests
             Ability = Ability.Instance<TestAbility>(),
             User = new TestUnit(),
             Alt = alt,
-            UserStats = ReadOnlyDictionary<Stat, double>.Empty,
+            UserStatsAtTakeEffect = ReadOnlyDictionary<Stat, double>.Empty,
             Services = new Services(Substitute.For<IServiceProvider>()),
             Target = new AbilityTarget { Position = targetPosition }
         };
